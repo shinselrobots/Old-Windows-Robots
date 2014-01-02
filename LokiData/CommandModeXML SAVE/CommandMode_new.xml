@@ -1,0 +1,435 @@
+<GRAMMAR LANGID="409">
+    <DEFINE>
+      <ID NAME="PID_CmdMenu" VAL="1"/>
+
+
+      <ID NAME="PID_CmdMicrophoneOn" VAL="10"/>
+      <ID NAME="PID_CmdMicrophoneOff" VAL="11"/>
+      <ID NAME="PID_CmdAIMode" VAL="12"/>
+      <ID NAME="PID_CmdDictTestMode" VAL="13"/>
+      <ID NAME="PID_CmdEnableMovement" VAL="14"/>
+      <ID NAME="PID_CmdDisableMovement" VAL="15"/>
+      <ID NAME="PID_CmdMoveStop" VAL="16"/>
+      <ID NAME="PID_CmdMoveForward" VAL="17"/>
+      <ID NAME="PID_CmdMoveBack" VAL="18"/>
+      <ID NAME="PID_CmdTurnLeft" VAL="19"/>
+      <ID NAME="PID_CmdTurnRight" VAL="20"/>
+      <ID NAME="PID_CmdLookUp" VAL="21"/>
+      <ID NAME="PID_CmdLookDown" VAL="22"/>
+      <ID NAME="PID_CmdLookLeft" VAL="23"/>
+      <ID NAME="PID_CmdLookRight" VAL="24"/>
+      <ID NAME="PID_CmdLookForward" VAL="25"/>
+
+
+      <ID NAME="PID_CmdAvoidObjectsOn" VAL="26"/>
+      <ID NAME="PID_CmdAvoidObjectsOff" VAL="27"/>
+      <ID NAME="PID_CmdTalkAboutObstaclesOn" VAL="28"/>
+      <ID NAME="PID_CmdTalkAboutObstaclesOff" VAL="29"/>
+      <ID NAME="PID_CmdTalkingEnabled" VAL="30"/>
+      <ID NAME="PID_CmdTalkingDisabled" VAL="31"/>
+      <ID NAME="PID_CmdCameraTrackFaceOn" VAL="32"/>
+      <ID NAME="PID_CmdCameraTrackFaceOff" VAL="33"/>
+      <ID NAME="PID_CmdArmHome" VAL="34"/>
+      <ID NAME="PID_CmdArmExtendOpen" VAL="35"/>
+      <ID NAME="PID_CmdArmExtendFull" VAL="36"/>
+      <ID NAME="PID_CmdArmTakeObject" VAL="37"/>
+      <ID NAME="PID_CmdArmPutDown" VAL="38"/>
+      <ID NAME="PID_CmdArmPickUp" VAL="39"/>
+      <ID NAME="PID_CmdArmDropIt" VAL="40"/>
+      <ID NAME="PID_CmdArmTossFront" VAL="41"/>
+      <ID NAME="PID_CmdArmTossBack" VAL="42"/>
+      <ID NAME="PID_CmdArmHandsUp" VAL="43"/>
+      <ID NAME="PID_CmdArmWave" VAL="44"/>
+      <ID NAME="PID_CmdArmScratchBack" VAL="45"/>
+      <ID NAME="PID_CmdArmScratchHead" VAL="46"/>
+
+      <ID NAME="PID_CmdArmCloseClaw" VAL="47"/>
+      <ID NAME="PID_CmdArmOpenClaw" VAL="48"/>
+
+      <ID NAME="PID_CmdExploreStart" VAL="49"/>
+      <ID NAME="PID_CmdExploreStop" VAL="50"/>
+
+      <ID NAME="PID_CmdGotoOffice" VAL="51"/>
+      <ID NAME="PID_CmdGotoBedroom" VAL="52"/>
+      <ID NAME="PID_CmdGotoHeatherRoom" VAL="53"/>
+      <ID NAME="PID_CmdGotoAmberRoom" VAL="54"/>
+      <ID NAME="PID_CmdGotoMyBathroom" VAL="55"/>
+
+      <ID NAME="PID_CmdBlueLightsOn" VAL="56"/>
+      <ID NAME="PID_CmdBlueLightsOff" VAL="57"/>
+      <ID NAME="PID_CmdKarate" VAL="58"/>
+      <ID NAME="PID_CmdWakeUp" VAL="59"/>
+      <ID NAME="PID_CmdGoToSleep" VAL="60"/>
+
+      <ID NAME="PID_CmdPlaySimonSaysOn" VAL="61"/>
+      <ID NAME="PID_CmdPlaySimonSaysOff" VAL="62"/>
+      <ID NAME="PID_CmdSimonSays" VAL="63"/>
+
+      <ID NAME="PID_CmdIdentifyObject" VAL="64"/>
+
+      <ID NAME="PID_CmdPlayStart" VAL="65"/>
+      <ID NAME="PID_CmdPlayStop" VAL="66"/>
+      
+      <ID NAME="PID_CmdArmExtendClosed" VAL="67"/>
+
+      <ID NAME="PID_RightArm" VAL="100"/>
+      <ID NAME="PID_LeftArm" VAL="101"/>
+
+    </DEFINE>
+
+  
+    <RULE NAME="PID_CmdMicrophoneOn" ID="PID_CmdMicrophoneOn" TOPLEVEL="ACTIVE">
+      <L>
+        <P VAL="PID_CmdMicrophoneOn">?turn microphone on</P>
+        <P VAL="PID_CmdMicrophoneOn">+listen</P>
+        <P VAL="PID_CmdMicrophoneOn">start listening</P>
+
+        <P VAL="PID_CmdMicrophoneOff">?turn microphone off</P>
+        <P VAL="PID_CmdMicrophoneOff">stop listening</P>
+        <P VAL="PID_CmdMicrophoneOff">don't listen</P>
+      </L>
+    </RULE>
+
+    <RULE NAME="PID_CmdAIMode" ID="PID_CmdAIMode" TOPLEVEL="ACTIVE">
+      <L>
+        <P VAL="PID_CmdAIMode">?Low ?Key lets chat</P>
+        <P VAL="PID_CmdAIMode">?Low ?Key lets talk</P>
+        <P VAL="PID_CmdAIMode">?I want to talk ?to ?with ?you</P>
+        <P VAL="PID_CmdAIMode">a i mode on</P>
+      </L>
+    </RULE>
+
+    <RULE NAME="PID_CmdEnableMovement" ID="PID_CmdEnableMovement" TOPLEVEL="ACTIVE">
+      <L>
+        <P VAL="PID_CmdEnableMovement">enable movement</P>
+        <P VAL="PID_CmdEnableMovement">enable ?wheel motors</P>
+        <P VAL="PID_CmdEnableMovement">movement enabled</P>
+        <P VAL="PID_CmdEnableMovement">motors enabled</P>
+
+        <P VAL="PID_CmdDisableMovement">disable movement</P>
+        <P VAL="PID_CmdDisableMovement">disable ?wheel motors</P>
+        <P VAL="PID_CmdDisableMovement">disable wheels</P>
+        <P VAL="PID_CmdDisableMovement">movement disabled</P>
+        <P VAL="PID_CmdDisableMovement">motors disabled</P>
+        <P VAL="PID_CmdDisableMovement">dont move</P>
+      </L>
+    </RULE>
+
+    <RULE NAME="PID_CmdMoveStop" ID="PID_CmdMoveStop" TOPLEVEL="ACTIVE">
+      <L>
+        <P VAL="PID_CmdMoveStop">stop ?moving</P>
+        <P VAL="PID_CmdMoveStop">halt</P>
+        <P VAL="PID_CmdMoveStop">freeze</P>
+      </L>
+    </RULE>
+
+    <RULE NAME="PID_CmdMoveForward" ID="PID_CmdMoveForward" TOPLEVEL="ACTIVE">
+      <L>
+        <P VAL="PID_CmdMoveForward">go forward</P>
+        <P VAL="PID_CmdMoveForward">move forward</P>
+      </L>
+    </RULE>
+
+    <RULE NAME="PID_CmdMoveBack" ID="PID_CmdMoveBack" TOPLEVEL="ACTIVE">
+      <L>
+        <P VAL="PID_CmdMoveBack">go back</P>
+        <P VAL="PID_CmdMoveBack">move back</P>
+        <P VAL="PID_CmdMoveBack">back up</P>
+      </L>
+    </RULE>
+
+    <RULE NAME="PID_CmdTurnRight" ID="PID_CmdTurnRight" TOPLEVEL="ACTIVE">
+      <L>
+        <P VAL="PID_CmdTurnRight">turn right</P>
+        <P VAL="PID_CmdTurnRight">go right</P>
+      </L>
+    </RULE>
+
+    <RULE NAME="PID_CmdTurnLeft" ID="PID_CmdTurnLeft" TOPLEVEL="ACTIVE">
+      <L>
+        <P VAL="PID_CmdTurnLeft">turn left</P>
+        <P VAL="PID_CmdTurnLeft">go left</P>
+      </L>
+    </RULE>
+
+    <RULE NAME="PID_CmdLookUp" ID="PID_CmdLookUp" TOPLEVEL="ACTIVE">
+      <L>
+        <P VAL="PID_CmdLookUp">look up</P>
+        <P VAL="PID_CmdLookDown">look down</P>
+        <P VAL="PID_CmdLookLeft">look left</P>
+        <P VAL="PID_CmdLookRight">look right</P>
+      </L>
+    </RULE>
+
+    <RULE NAME="PID_CmdLookForward" ID="PID_CmdLookForward" TOPLEVEL="ACTIVE">
+      <L>
+        <P VAL="PID_CmdLookForward">look forward</P>
+        <P VAL="PID_CmdLookForward">look front</P>
+        <P VAL="PID_CmdLookForward">look center</P>
+        <P VAL="PID_CmdLookForward">look ?straight ahead</P>
+      </L>
+    </RULE>
+
+    <RULE NAME="PID_CmdAvoidObjectsOn" ID="PID_CmdAvoidObjectsOn" TOPLEVEL="ACTIVE">
+      <L>
+        <P VAL="PID_CmdAvoidObjectsOn">avoid objects ?on</P>
+        <P VAL="PID_CmdAvoidObjectsOn">avoid obstacles ?on</P>
+
+        <P VAL="PID_CmdAvoidObjectsOff">avoid objects +off</P>
+        <P VAL="PID_CmdAvoidObjectsOff">avoid obstacles +off</P>
+      </L>
+    </RULE>
+
+    <RULE NAME="PID_CmdTalkAboutObstaclesOn" ID="PID_CmdTalkAboutObstaclesOn" TOPLEVEL="ACTIVE">
+      <L>
+        <P VAL="PID_CmdTalkAboutObstaclesOn">talk about obstacles</P>
+        <P VAL="PID_CmdTalkAboutObstaclesOff">dont talk about obstacles</P>
+      </L>
+    </RULE>
+
+    <RULE NAME="PID_CmdTalkingEnabled" ID="PID_CmdTalkingEnabled" TOPLEVEL="ACTIVE">
+      <L>
+        <P VAL="PID_CmdTalkingEnabled">voice enabled</P>
+        <P VAL="PID_CmdTalkingEnabled">talking enabled</P>
+        <P VAL="PID_CmdTalkingEnabled">speech enabled</P>
+        <P VAL="PID_CmdTalkingEnabled">?ok you can talk ?now</P>
+
+        <P VAL="PID_CmdTalkingDisabled">voice disabled</P>
+        <P VAL="PID_CmdTalkingDisabled">talking disabled</P>
+        <P VAL="PID_CmdTalkingDisabled">stop talking</P>
+        <P VAL="PID_CmdTalkingDisabled">shut up</P>
+        <P VAL="PID_CmdTalkingDisabled">shutup</P>
+        <P VAL="PID_CmdTalkingDisabled">dont talk</P>
+        <P VAL="PID_CmdTalkingDisabled">quiet</P>
+      </L>
+    </RULE>
+
+    <RULE NAME="PID_CmdCameraTrackFaceOn" ID="PID_CmdCameraTrackFaceOn" TOPLEVEL="ACTIVE">
+      <L>
+        <P VAL="PID_CmdCameraTrackFaceOn">track ?my face</P>
+        <P VAL="PID_CmdCameraTrackFaceOn">track faces</P>
+        <P VAL="PID_CmdCameraTrackFaceOn">track face ?mode on</P>
+        <P VAL="PID_CmdCameraTrackFaceOn">track faces ?mode on</P>
+        <P VAL="PID_CmdCameraTrackFaceOn">track face ?mode enabled</P>
+        <P VAL="PID_CmdCameraTrackFaceOn">track faces ?mode enabled</P>
+        <P VAL="PID_CmdCameraTrackFaceOn">face tracking ?mode on</P>
+        <P VAL="PID_CmdCameraTrackFaceOn">face tracking ?mode enabled</P>
+        <P VAL="PID_CmdCameraTrackFaceOn">turn on face tracking ?mode</P>
+        <P VAL="PID_CmdCameraTrackFaceOn">enable face tracking ?mode</P>
+
+        <P VAL="PID_CmdCameraTrackFaceOff">track face ?mode off</P>
+        <P VAL="PID_CmdCameraTrackFaceOff">face tracking ?mode off</P>
+        <P VAL="PID_CmdCameraTrackFaceOff">disable face tracking ?mode</P>
+        <P VAL="PID_CmdCameraTrackFaceOff">turn off face tracking ?mode</P>
+        <P VAL="PID_CmdCameraTrackFaceOff">stop face tracking ?mode</P>
+      </L>
+    </RULE>
+
+    <RULE NAME="PID_CmdArmHome" ID="PID_CmdArmHome" TOPLEVEL="ACTIVE">
+      <L>
+        <P VAL="PID_CmdArmHome">arm home</P>
+        <P VAL="PID_CmdArmHome">?put ?your arm down</P>
+      </L>
+    </RULE>
+
+    <RULE NAME="PID_CmdArmExtendOpen" ID="PID_CmdArmExtendOpen" TOPLEVEL="ACTIVE">
+      <L>
+        <P VAL="PID_RightArm">?put ?your arm out</P>
+        <P VAL="PID_CmdArmExtendOpen">extend ?your arm</P>
+        <P VAL="PID_CmdArmExtendOpen">i have something for you</P>
+        <P VAL="PID_CmdArmExtendOpen">take this *</P>
+      </L>
+    </RULE>
+
+    <RULE NAME="PID_CmdArmExtendClosed" ID="PID_CmdArmExtendClosed" TOPLEVEL="ACTIVE">
+      <L>
+        <P VAL="PID_CmdArmExtendClosed">I'll take ... </P>
+        <P VAL="PID_CmdArmExtendClosed">give it to me</P>
+        <P VAL="PID_CmdArmExtendClosed">I will take ... </P>
+        <P VAL="PID_CmdArmExtendClosed">give the * to me</P>
+      </L>
+    </RULE>
+
+    <RULE NAME="PID_CmdArmExtendFull" ID="PID_CmdArmExtendFull" TOPLEVEL="ACTIVE">
+      <L>
+        <P VAL="PID_CmdArmExtendFull">extend ?your arm fully</P>
+        <P VAL="PID_CmdArmExtendFull">reach out</P>
+        <P VAL="PID_CmdArmExtendFull">reach forward</P>
+        <P VAL="PID_CmdArmExtendFull">reach more</P>
+      </L>
+    </RULE>
+
+    <RULE NAME="PID_CmdArmTakeObject" ID="PID_CmdArmTakeObject" TOPLEVEL="ACTIVE">
+      <L>
+        <P VAL="PID_CmdArmTakeObject">here you go</P>
+        <P VAL="PID_CmdArmTakeObject">here</P>
+      </L>
+    </RULE>
+
+    <RULE NAME="PID_CmdArmPutDown" ID="PID_CmdArmPutDown" TOPLEVEL="ACTIVE">
+      <L>
+        <P VAL="PID_CmdArmPutDown">put it down</P>
+        <P VAL="PID_CmdArmPutDown">put ?the ?ball down</P>
+      </L>
+    </RULE>
+
+    <RULE NAME="PID_CmdArmPickUp" ID="PID_CmdArmPickUp" TOPLEVEL="ACTIVE">
+      <L>
+        <P VAL="PID_CmdArmPickUp">pick up ?your ?the ?ball</P>
+        <P VAL="PID_CmdArmPickUp">pick up ?your ?the ?object</P>
+        <P VAL="PID_CmdArmPickUp">pick it up</P>
+      </L>
+    </RULE>
+
+    <RULE NAME="PID_CmdArmDropIt" ID="PID_CmdArmDropIt" TOPLEVEL="ACTIVE">
+      <L>
+        <P VAL="PID_CmdArmDropIt">drop it</P>
+        <P VAL="PID_CmdArmDropIt">drop ?your ?ball</P>
+        <P VAL="PID_CmdArmDropIt">drop ?the ?ball ?object</P>
+      </L>
+    </RULE>
+
+    <RULE NAME="PID_CmdArmOpenClaw" ID="PID_CmdArmOpenClaw" TOPLEVEL="ACTIVE">
+      <L>
+        <P VAL="PID_CmdArmOpenClaw">open claw</P>
+        <P VAL="PID_CmdArmOpenClaw">open hand</P>
+        </L>
+    </RULE>
+
+    <RULE NAME="PID_CmdArmCloseClaw" ID="PID_CmdArmTossFront" TOPLEVEL="ACTIVE">
+      <L>
+        <P VAL="PID_CmdArmCloseClaw">close claw</P>
+        <P VAL="PID_CmdArmCloseClaw">close hand</P>
+      </L>
+    </RULE>
+
+    <RULE NAME="PID_CmdArmTossBack" ID="PID_CmdArmTossBack" TOPLEVEL="ACTIVE">
+      <L>
+        <P VAL="PID_CmdArmTossBack">?just toss it</P>
+        <P VAL="PID_CmdArmTossBack">throw it +away</P>
+      </L>
+    </RULE>
+
+    <RULE NAME="PID_CmdArmTossFront" ID="PID_CmdArmTossFront" TOPLEVEL="ACTIVE">
+      <L>
+        <P VAL="PID_CmdArmTossFront">throw it</P>
+        <P VAL="PID_CmdArmTossFront">throw ?me the ball</P>
+        <P VAL="PID_CmdArmTossFront">throw ?me the object</P>
+      </L>
+    </RULE>
+
+    <RULE NAME="PID_CmdArmHandsUp" ID="PID_CmdArmHandsUp" TOPLEVEL="ACTIVE">
+      <L>
+        <P VAL="PID_CmdArmHandsUp">?put ?your hands up</P>
+        <P VAL="PID_CmdArmHandsUp">?put ?your hand up</P>
+        <P VAL="PID_CmdArmHandsUp">raise your ?right arm</P>
+      </L>
+    </RULE>
+
+    <RULE NAME="PID_CmdArmWave" ID="PID_CmdArmWave" TOPLEVEL="ACTIVE">
+      <L>
+        <P VAL="PID_CmdArmWave">+wave ?good ?bye</P>
+        <P VAL="PID_CmdArmWave">+wave ?hello</P>
+      </L>
+    </RULE>
+
+    <RULE NAME="PID_CmdArmScratchBack" ID="PID_CmdArmScratchBack" TOPLEVEL="ACTIVE">
+      <L>
+        <P VAL="PID_CmdArmScratchBack">scratch your +back</P>
+      </L>
+    </RULE>
+
+    <RULE NAME="PID_CmdArmScratchHead" ID="PID_CmdArmScratchHead" TOPLEVEL="ACTIVE">
+      <L>
+        <P VAL="PID_CmdArmScratchHead">scratch your +head</P>
+      </L>
+    </RULE>
+
+    <RULE NAME="PID_CmdExploreStart" ID="PID_CmdExploreStart" TOPLEVEL="ACTIVE">
+      <L>
+        <P VAL="PID_CmdExploreStart">?you ?can explore</P>
+        <P VAL="PID_CmdExploreStart">look around</P>
+        <P VAL="PID_CmdExploreStart">?you ?can wander ?around</P>
+      </L>
+    </RULE>
+
+    <RULE NAME="PID_CmdGotoOffice" ID="PID_CmdGotoOffice" TOPLEVEL="ACTIVE">
+      <L>
+        <P VAL="PID_CmdGotoOffice">go to ?my office</P>
+        <P VAL="PID_CmdGotoOffice">go to ?the office</P>
+        <P VAL="PID_CmdGotoOffice">go to your room</P>
+        <P VAL="PID_CmdGotoOffice">go to ?your home</P>
+
+        <P VAL="PID_CmdGotoBedroom">go to ?my bedroom</P>
+        <P VAL="PID_CmdGotoBedroom">go to my room</P>
+        <P VAL="PID_CmdGotoBedroom">go to ?the ?our bedroom</P>
+        <P VAL="PID_CmdGotoBedroom">go to ?the master bedroom</P>
+
+        <P VAL="PID_CmdGotoHeatherRoom">go to heathers room</P>
+        <P VAL="PID_CmdGotoHeatherRoom">go to heathers ?bed room</P>
+        <P VAL="PID_CmdGotoHeatherRoom">go to heathers bedroom</P>
+
+        <P VAL="PID_CmdGotoAmberRoom">go to ambers room</P>
+        <P VAL="PID_CmdGotoAmberRoom">go to ambers ?bed room</P>
+        <P VAL="PID_CmdGotoAmberRoom">go to ambers bedroom</P>
+
+        <P VAL="PID_CmdGotoMyBathroom">go to my bath room</P>
+        <P VAL="PID_CmdGotoMyBathroom">go to ?the master bath room</P>
+      </L>
+    </RULE>
+
+    <RULE NAME="PID_CmdBlueLightsOn" ID="PID_CmdBlueLightsOn" TOPLEVEL="ACTIVE">
+      <L>
+        <P VAL="PID_CmdBlueLightsOn">?turn ?your lights on</P>
+        <P VAL="PID_CmdBlueLightsOff">?turn ?your lights off</P>
+      </L>
+    </RULE>
+
+    <RULE NAME="PID_CmdKarate" ID="PID_CmdKarate" TOPLEVEL="ACTIVE">
+      <L>
+        <P VAL="PID_CmdKarate">...karate</P>
+        <P VAL="PID_CmdKarate">...fight</P>
+      </L>
+    </RULE>
+
+    <RULE NAME="PID_CmdGoToSleep" ID="PID_CmdGoToSleep" TOPLEVEL="ACTIVE">
+      <L>
+        <P VAL="PID_CmdWakeUp">wake up</P>
+        <P VAL="PID_CmdGoToSleep">go to sleep</P>
+      </L>
+    </RULE>
+
+    <RULE NAME="PID_CmdPlaySimonSaysOn" ID="PID_CmdPlaySimonSaysOn" TOPLEVEL="ACTIVE">
+      <L>
+        <P VAL="PID_CmdPlaySimonSaysOn">lets play simon says</P>
+        <P VAL="PID_CmdPlaySimonSaysOn">?I want to play simon says</P>
+
+        <P VAL="PID_CmdPlaySimonSaysOff">stop ?playing simon says</P>
+        <P VAL="PID_CmdPlaySimonSaysOff">quit ?playing simon says</P>
+        <P VAL="PID_CmdPlaySimonSaysOff">no more simon says</P>
+      </L>
+    </RULE>
+
+    <RULE NAME="PID_CmdSimonSays" ID="PID_CmdSimonSays" TOPLEVEL="ACTIVE">
+      <L>
+        <P VAL="PID_CmdSimonSays">simon says</P>
+      </L>
+    </RULE>
+
+    <RULE NAME="PID_CmdIdentifyObject" ID="PID_CmdIdentifyObject" TOPLEVEL="ACTIVE">
+      <L>
+        <P VAL="PID_CmdIdentifyObject">identify ?object</P>
+        <P VAL="PID_CmdIdentifyObject">examine ?object</P>
+      </L>
+    </RULE>
+
+    <RULE NAME="PID_CmdPlayStop" ID="PID_CmdPlayStop" TOPLEVEL="ACTIVE">
+      <L>
+        <P VAL="PID_CmdPlayStop">stop playing</P>
+        <P VAL="PID_CmdPlayStop">quit playing</P>
+      </L>
+    </RULE>
+
+
+
+</GRAMMAR>

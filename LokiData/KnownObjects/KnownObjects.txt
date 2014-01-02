@@ -1,0 +1,104 @@
+// ID, Image File, Object Name Text, Comment, Prompt/NoPrompt (Y/N Prompt enabled)
+// Only first letter of keyword read, so keep unique!
+// Format:
+// :F File Name for image
+// :O Name of object
+// :G Generic type of object
+// :C Comment
+// :P Prompt to ask when object found
+// :N Response to "No"
+// :Y Response to "Yes"
+// :X = Execute (end of entry)
+
+//
+:F AgeOfMythology.jpg
+:O Age Of Mythology CD
+:G Game CD
+:C I love that game.  Loki is the god of mischief.
+:P NOP
+:X
+
+
+//
+:F WallSocket.jpg
+:O A Wall Socket
+:G Wall Socket
+:C That reminds me to charge my batteries  
+:P NOP
+:X
+
+//
+:F DriversLicenseFront.jpg
+:O Your Drivers License
+:G Drivers License
+:C You look old in that picture  
+:P NOP
+:X
+
+//
+:F IntelBadge1.jpg
+:O Your Intel Badge
+:G Intel Badge
+:C Some day, I would like to work at Intel
+:P NOP
+:X
+
+//
+:F Money-1-Front.jpg
+:O One Dollar
+:G Money
+:C Hello, George
+:P NOP
+:X
+
+//
+:F Money-1-Back.jpg
+:O One Dollar
+:G Money
+:C With 3 of those you can get coffee at star bucks  
+:P NOP
+:X
+
+//
+:F Money-10-Front.jpg
+:O 10 Dollar Bill
+:G Money
+:C Hello, mister hamilton
+:P NOP
+:X
+
+//
+:F Money-10-Back.jpg
+:O 10 Dollar Bill
+:G Money
+:C Don't spend it all in one place  
+:P NOP
+:X
+
+//
+:F Money-20-Front.jpg
+:O 20 Dollar Bill
+:G Money
+:C Oh good. I need some money to buy a new servo
+:P NOP
+:X
+
+//
+:F Money-20-Back.jpg
+:O 20 Dollar Bill
+:G Money
+:C I'll keep this.  Thanks for playing.  
+:P NOP
+:X
+
+
+
+//
+:F Visa-Starbucks1.jpg
+:O Starbucks Visa Card
+:G Visa
+:C I see you like Star bucks 
+:P NOP
+:X
+
+
