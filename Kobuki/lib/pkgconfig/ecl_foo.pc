@@ -1,0 +1,6 @@
+Name: ecl_foo
+Description: Description of ecl_foo
+Version: 0.50.5
+Cflags: -I
+Libs: -LC:/opt/overlay/groovy/x86/lib 
+Requires: 

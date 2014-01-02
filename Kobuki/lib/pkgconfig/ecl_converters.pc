@@ -1,0 +1,6 @@
+Name: ecl_converters
+Description: Description of ecl_converters
+Version: 0.50.5
+Cflags: -IC:/opt/overlay/groovy/x86/include
+Libs: -LC:/opt/overlay/groovy/x86/lib 
+Requires: ecl_config ecl_mpl ecl_errors ecl_exceptions ecl_type_traits ecl_concepts

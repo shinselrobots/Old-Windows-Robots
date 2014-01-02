@@ -1,0 +1,6 @@
+Name: ecl_eigen
+Description: Description of ecl_eigen
+Version: 0.50.5
+Cflags: -IC:/opt/rosdeps/groovy/x86/share/cmake/eigen/../../../include/eigen3
+Libs: -LC:/opt/overlay/groovy/x86/lib 
+Requires: 

@@ -1,0 +1,6 @@
+Name: ecl_license
+Description: Description of ecl_license
+Version: 0.50.2
+Cflags: -I
+Libs: -LC:/opt/overlay/groovy/x86/lib 
+Requires: 

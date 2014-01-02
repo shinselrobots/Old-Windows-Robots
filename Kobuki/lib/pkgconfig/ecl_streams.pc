@@ -1,0 +1,6 @@
+Name: ecl_streams
+Description: Description of ecl_streams
+Version: 0.50.5
+Cflags: -IC:/opt/overlay/groovy/x86/include
+Libs: -LC:/opt/overlay/groovy/x86/lib -lecl_streams
+Requires: ecl_errors ecl_concepts ecl_devices ecl_time ecl_converters ecl_type_traits

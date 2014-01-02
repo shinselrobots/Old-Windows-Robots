@@ -1,0 +1,6 @@
+Name: ecl_linear_algebra
+Description: Description of ecl_linear_algebra
+Version: 0.50.5
+Cflags: -IC:/opt/overlay/groovy/x86/include
+Libs: -LC:/opt/overlay/groovy/x86/lib 
+Requires: ecl_exceptions ecl_formatters ecl_eigen

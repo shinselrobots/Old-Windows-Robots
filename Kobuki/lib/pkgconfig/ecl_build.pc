@@ -1,0 +1,6 @@
+Name: ecl_build
+Description: Description of ecl_build
+Version: 0.50.2
+Cflags: -I
+Libs: -LC:/opt/overlay/groovy/x86/lib 
+Requires: 

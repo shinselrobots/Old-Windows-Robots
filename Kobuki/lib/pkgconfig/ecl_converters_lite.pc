@@ -1,0 +1,6 @@
+Name: ecl_converters_lite
+Description: Description of ecl_converters_lite
+Version: 0.50.5
+Cflags: -IC:/opt/overlay/groovy/x86/include
+Libs: -LC:/opt/overlay/groovy/x86/lib 
+Requires: 

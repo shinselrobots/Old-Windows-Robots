@@ -1,0 +1,6 @@
+Name: ecl_sigslots_lite
+Description: Description of ecl_sigslots_lite
+Version: 0.50.5
+Cflags: -IC:/opt/overlay/groovy/x86/include
+Libs: -LC:/opt/overlay/groovy/x86/lib -lecl_sigslots_lite
+Requires: 

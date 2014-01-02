@@ -1,0 +1,6 @@
+Name: ecl_containers
+Description: Description of ecl_containers
+Version: 0.50.5
+Cflags: -IC:/opt/overlay/groovy/x86/include
+Libs: -LC:/opt/overlay/groovy/x86/lib 
+Requires: ecl_config ecl_errors ecl_exceptions ecl_formatters ecl_converters ecl_mpl ecl_type_traits ecl_utilities

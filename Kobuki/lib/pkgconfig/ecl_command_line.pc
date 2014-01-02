@@ -1,0 +1,6 @@
+Name: ecl_command_line
+Description: Description of ecl_command_line
+Version: 0.50.5
+Cflags: -IC:/opt/overlay/groovy/x86/include
+Libs: -LC:/opt/overlay/groovy/x86/lib 
+Requires: 

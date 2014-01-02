@@ -1,0 +1,6 @@
+Name: ecl_core_apps
+Description: Description of ecl_core_apps
+Version: 0.50.5
+Cflags: -I
+Libs: -LC:/opt/overlay/groovy/x86/lib 
+Requires: 

@@ -1,0 +1,6 @@
+Name: ecl_ipc
+Description: Description of ecl_ipc
+Version: 0.50.5
+Cflags: -IC:/opt/overlay/groovy/x86/include
+Libs: -LC:/opt/overlay/groovy/x86/lib 
+Requires: ecl_config ecl_errors ecl_time_lite ecl_exceptions ecl_time

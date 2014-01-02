@@ -1,0 +1,6 @@
+Name: ecl_mobile_robot
+Description: Description of ecl_mobile_robot
+Version: 0.50.3
+Cflags: -IC:/opt/overlay/groovy/x86/include
+Libs: -LC:/opt/overlay/groovy/x86/lib -lecl_mobile_robot
+Requires: ecl_errors ecl_geometry ecl_math ecl_formatters ecl_linear_algebra

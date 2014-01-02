@@ -1,0 +1,6 @@
+Name: ecl_concepts
+Description: Description of ecl_concepts
+Version: 0.50.5
+Cflags: -IC:/opt/overlay/groovy/x86/include
+Libs: -LC:/opt/overlay/groovy/x86/lib 
+Requires: ecl_config ecl_type_traits

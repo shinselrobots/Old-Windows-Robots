@@ -1,0 +1,6 @@
+Name: ecl_manipulators
+Description: Description of ecl_manipulators
+Version: 0.50.2
+Cflags: -IC:/opt/overlay/groovy/x86/include
+Libs: -LC:/opt/overlay/groovy/x86/lib -lecl_manipulators
+Requires: ecl_exceptions ecl_geometry ecl_formatters

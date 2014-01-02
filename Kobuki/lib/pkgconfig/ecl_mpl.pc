@@ -1,0 +1,6 @@
+Name: ecl_mpl
+Description: Description of ecl_mpl
+Version: 0.50.5
+Cflags: -IC:/opt/overlay/groovy/x86/include
+Libs: -LC:/opt/overlay/groovy/x86/lib 
+Requires: 

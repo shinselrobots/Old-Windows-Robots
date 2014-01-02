@@ -1,0 +1,6 @@
+Name: ecl_geometry
+Description: Description of ecl_geometry
+Version: 0.50.5
+Cflags: -IC:/opt/overlay/groovy/x86/include
+Libs: -LC:/opt/overlay/groovy/x86/lib -lecl_geometry
+Requires: ecl_config ecl_type_traits ecl_containers ecl_formatters ecl_linear_algebra ecl_exceptions ecl_math ecl_mpl

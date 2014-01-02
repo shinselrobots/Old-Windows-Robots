@@ -1,0 +1,6 @@
+Name: ecl_threads
+Description: Description of ecl_threads
+Version: 0.50.5
+Cflags: -IC:/opt/overlay/groovy/x86/include
+Libs: -LC:/opt/overlay/groovy/x86/lib -lecl_threads
+Requires: ecl_config ecl_errors ecl_concepts ecl_exceptions ecl_time ecl_utilities

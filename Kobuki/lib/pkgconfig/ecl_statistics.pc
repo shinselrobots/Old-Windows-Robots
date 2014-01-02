@@ -1,0 +1,6 @@
+Name: ecl_statistics
+Description: Description of ecl_statistics
+Version: 0.50.5
+Cflags: -IC:/opt/overlay/groovy/x86/include
+Libs: -LC:/opt/overlay/groovy/x86/lib -lecl_statistics
+Requires: ecl_config ecl_linear_algebra

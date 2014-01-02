@@ -1,0 +1,6 @@
+Name: ecl_errors
+Description: Description of ecl_errors
+Version: 0.50.5
+Cflags: -IC:/opt/overlay/groovy/x86/include
+Libs: -LC:/opt/overlay/groovy/x86/lib -lecl_errors
+Requires: 

@@ -1,0 +1,6 @@
+Name: ecl_type_traits
+Description: Description of ecl_type_traits
+Version: 0.50.5
+Cflags: -IC:/opt/overlay/groovy/x86/include
+Libs: -LC:/opt/overlay/groovy/x86/lib -lecl_type_traits
+Requires: ecl_config ecl_mpl
