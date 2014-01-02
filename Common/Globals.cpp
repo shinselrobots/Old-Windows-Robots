@@ -33,7 +33,7 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 // Auto launch Kinect C# Application
-#define AUTO_LAUNCH_KINECT_APP		0	// set value to 1 to auto launch
+#define AUTO_LAUNCH_KINECT_APP		1	// set value to 1 to auto launch
 #if (AUTO_LAUNCH_KINECT_APP == 1)
 	FIND_WINDOW_HANDLE_STRUCT_T KinectFWHS; // global to this file
 #endif
