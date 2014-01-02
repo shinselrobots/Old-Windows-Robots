@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="utf-8"?>
+<grammar xml:lang="en-US" root="question"
+tag-format="semantics-ms/1.0" version="1.0"
+xmlns="http://www.w3.org/2001/06/grammar">
+
+
+  <!-- *****************************************  -->
+  <!--              QUESTIONS                     -->
+  <!-- *****************************************  -->
+  <rule id="question" scope="public">
+  <tag> $.Param1="NA"; </tag>
+  <tag> $.Param2="NA"; </tag>
+  <tag> $.Param3="NA"; </tag>
+  <tag> $.Param4="NA"; </tag>
+  <tag> $.Param5="NA"; </tag>
+  <tag> $.nResponses="1"; </tag>
+    
+  <one-of>
+
+
+    <!-- *****************************************  -->
+    <!-- Specific Canned Phrases -->
+    <!-- *****************************************  -->
+    <item> thank you <tag>  $.Param1="THANK YOU"; $.nResponses="3"; </tag>  </item>
+
+    <!-- *****************************************  -->
+    <!-- Five Ws: who, what, when, where, why, how  -->
+    <!-- *****************************************  -->
+
+    
+    <!-- WHO IS  -->
+    <item> who is <tag>  $.Param1="WHO IS YOUR "; </tag>
+      <item repeat="0-1"> <token>favorite</token> </item>
+      <one-of>
+        <item> 
+          <ruleref uri="#Person"/>    <tag> $.Param3=$$.Param;  $.nResponses=$$.nResponses </tag> <!-- dad, mom, friend, dog, cat...   -->
+        </item>
+        <item> 
+          <ruleref uri="#occupation"/> <tag> $.Param3=$$.Param;  </tag> 
+        </item>
+      </one-of>
+    </item>
+
+    <!-- WHAT IS  -->
+    <item> what is <tag>  $.Param1="WHAT IS"; </tag>
+      <ruleref uri="#PossessiveNoun"/>
+      <one-of>
+        <item> name         <tag>  $.Param2="NAME"; </tag></item>
+        <item> age          <tag>  $.Param2="AGE"; </tag></item>
+        <item> address      <tag>  $.Param2="ADDRESS"; </tag></item>
+        <item> height       <tag>  $.Param2="HEIGHT"; </tag></item>
+        <item> phone number <tag>  $.Param2="NAME"; </tag></item>
+      </one-of>
+    </item>
+
+    
+    <!-- WHAT IS FAVORITE -->
+    <item> what is <tag>  $.Param1="WHAT IS"; </tag>
+      <ruleref uri="#PossessiveNoun"/> <tag> $.Param2=$$.Param; $.Param3="favorite"; </tag>  <!-- my, your, his...  -->
+      favorite
+      <ruleref uri="#Object"/>         <tag> $.Param4=$$.Param; </tag>  <!-- book, movie, store...  -->
+    </item>
+    
+    <!-- What is the Color -->
+  <item>
+    <one-of>
+      <item> what is the color of <tag> $.Param1= "WHAT IS COLOR OF" </tag></item>
+      <item> what color is <tag> $.Param1= "WHAT IS COLOR OF" </tag></item>
+    </one-of>
+    <one-of>
+      <item> my shirt  <tag> $.Param2= "SHIRT"; </tag> </item>
+      <item> the sky   <tag> $.Param2= "SKY";   </tag> </item>
+      </one-of>
+   </item>
+    
+    <!-- What do -->
+    <item> What do <tag> $.Paraml="WHAT DO"; </tag>
+    <one-of>
+      <item> you like  <tag> $.Param2= "YOU LIKE"; </tag></item>
+      <item> you like to do  <tag> $.Param2= "YOU LIKE TO DO"; </tag></item>
+      <item> you like to do at home  <tag> $.Param2= "YOU LIKE DO AT HOME"; </tag></item>
+      <item> you like to do on your spare time  <tag> $.Param2= "YOU LIKE DO ON SPARE TIME"; </tag></item>
+      </one-of>
+      </item>
+    
+    <!-- What did -->
+    <item> What did you <tag> $.Paraml= "WHAT DID"; </tag>
+      <one-of>
+        <item> do yesterday <tag> $.Param2="DO YESTERDAY"; </tag></item>
+        <item> do today     <tag> $.Param2="DO TODAY"; </tag></item>
+        <item> eat          <tag> $.Param2= "EAT"; </tag>
+          <one-of>
+            <item> for breakfest<tag>$.Param2="BREAKFEST"; </tag></item>
+            <item> for lunch    <tag>$.Param2="LUNCH";     </tag></item>
+            <item> for dinner   <tag>$.Param2="DINNER";    </tag></item>
+            <item> last         <tag> $.Param2= "LAST";    </tag></item>
+            <item> today        <tag> $.Param2= "TODAY";   </tag></item>
+          </one-of>
+        </item>
+      </one-of>  
+    </item>
+    
+      
+  <!-- How -->
+
+    <!-- When -->
+    
+    <!-- Where-->
+    
+    <!--ARE YOU -->
+    
+    <!-- CAN YOU -->
+    
+    <!-- CAN I-->
+
+   <!-- DO YOU KNOW -->
+    
+    <!--DO YOU (LIKE/DISLIKE)-->
+  
+    
+  </one-of>
+  </rule>
+  <!-- *****************************************  -->
+  <!--             END OF QUESTIONS               -->
+  <!-- *****************************************  -->
+
+ <!--      <item repeat="0-1"> <token>good</token> </item> -->
+ 
+
+  <!-- LOCAL ENUMERATIONS  -->
+
+  <rule id="SubVerb" scope="public">
+    <one-of>
+      <item> is    <tag>  $.Param="IS";  	    $.nResponses="1"; </tag></item>
+      <item> was   <tag>  $.Param="WAS";  	  $.nResponses="1"; </tag></item>
+      <item> were  <tag>  $.Param="WERE";  	  $.nResponses="1"; </tag></item>
+      <item> will  <tag>  $.Param="WILL";  	  $.nResponses="1"; </tag></item>
+      <item> can   <tag>  $.Param="CAN";  	  $.nResponses="1"; </tag></item>
+      <item> are   <tag>  $.Param="ARE";  	  $.nResponses="1"; </tag></item>
+      <item> could <tag>  $.Param="COULD";  	$.nResponses="1"; </tag></item>
+      <item> can   <tag>  $.Param="CAN";  	  $.nResponses="1"; </tag></item>
+    </one-of>
+  </rule>
+
+   <rule id="Identity" scope="public">
+    <one-of>
+      <item> you <tag>   $.Param="YOU";  	    $.nResponses="1"; </tag></item>
+      <item> me  <tag>   $.Param="ME";  	    $.nResponses="1"; </tag></item>
+      <item> her <tag>   $.Param="HER";   	  $.nResponses="1"; </tag></item>
+      <item> him <tag>   $.Param="HIM";   	  $.nResponses="1"; </tag></item>
+      <item> his <tag>   $.Param="HIM";  	    $.nResponses="1"; </tag></item>
+      <item> she <tag>   $.Param="SHE";  	    $.nResponses="1"; </tag></item>
+      <item> he  <tag>   $.Param="HE";  	    $.nResponses="1"; </tag></item>
+      <item> we  <tag>   $.Param="WE";  	    $.nResponses="1"; </tag></item>
+      <item> us  <tag>   $.Param="US";  	    $.nResponses="1"; </tag></item>
+    </one-of>
+  </rule>
+
+   <rule id="PossessiveNoun" scope="public">
+    <one-of>
+      <item> your <tag>  $.Param="YOU";  	    $.nResponses="1"; </tag></item>
+      <item> my   <tag>  $.Param="ME";  	    $.nResponses="1"; </tag></item>
+      <item> our  <tag>  $.Param="WE";  	    $.nResponses="1"; </tag></item>
+    </one-of>
+  </rule>
+  
+   <rule id="PosNeg" scope="public">
+    <one-of>
+      <item> most       <tag>  $.Param="IS";  $.nResponses="1"; </tag></item>
+      <item> least <tag>  $.Param="WAS";  	  $.nResponses="1"; </tag></item>
+    </one-of>
+  </rule>
+  
+     <rule id="LIKENO" scope="public">
+    <one-of>
+      <item> like       <tag>  $.Param="LIKE";  $.nResponses="1"; </tag></item>
+      <item> dislike    <tag>  $.Param="DISLIKE";  	  $.nResponses="1"; </tag></item>
+    </one-of>
+  </rule>
+  
+   <rule id="Modifier" scope="public">
+    <one-of>
+      <item> favorite  <tag>  $.Param="FAVORITE";  	$.nResponses="1"; </tag></item>
+      <item> happiest  <tag>  $.Param="HAPPY";  	  $.nResponses="1"; </tag></item>
+      <item> saddest   <tag>  $.Param="SAD";  	    $.nResponses="1"; </tag></item>
+      <item> brightest <tag>  $.Param="BRIGHT";  	  $.nResponses="1"; </tag></item>
+      <item> darkest   <tag>  $.Param="DARK";  	    $.nResponses="1"; </tag></item>
+      <item> pretty    <tag>  $.Param="PRETTY";  	  $.nResponses="1"; </tag></item>
+      <item> ugly      <tag>  $.Param="UGLY";     	$.nResponses="1"; </tag></item>
+      <item> best      <tag>  $.Param="BEST";  	    $.nResponses="1"; </tag></item>
+      <item> worst     <tag>  $.Param="WORST";  	  $.nResponses="1"; </tag></item>
+    </one-of>
+  </rule>
+
+  
+   <rule id="Object" scope="public">
+    <one-of>
+      <item> dog          <tag>  $.Param="DOG";       	$.nResponses="1"; </tag></item>
+      <item> home         <tag>  $.Param="HOME";      	$.nResponses="1"; </tag></item>
+      <item> movie        <tag>  $.Param="MOVIE";    	  $.nResponses="1"; </tag></item>
+      <item> book         <tag>  $.Param="BOOK";     	  $.nResponses="1"; </tag></item>
+      <item> color        <tag>  $.Param="COLOR";    	  $.nResponses="1"; </tag></item>
+      <item> friend       <tag>  $.Param="FRIEND";  	  $.nResponses="1"; </tag></item>
+      <item> place        <tag>  $.Param="PLACE";   	  $.nResponses="1"; </tag></item>
+      <item> T V Show     <tag> $.Param="SHOW";    	    $.nResponses="1"; </tag></item>
+      <item> food         <tag>  $.Param="FOOD";    	  $.nResponses="1"; </tag></item>
+      <item> vacation spot <tag>  $.Param="VACATION SPOT";  	$.nResponses="1"; </tag></item>
+      <item> class        <tag>  $.Param="CLASS";   	  $.nResponses="1"; </tag></item>
+      <item> subject      <tag>  $.Param="CLASS";  	    $.nResponses="1"; </tag></item>
+      <item> animal       <tag>  $.Param="ANIMAL";  	  $.nResponses="1"; </tag></item>
+      <item> song         <tag>  $Param="SONG";     	  $.nResponses="1"; </tag></item>
+      <item> joke         <tag>  $Param="JOKE";     	  $.nResponses="1"; </tag></item>
+    </one-of>
+  </rule>
+    
+   <rule id="Person" scope="public">    <!-- People or animals you know  -->
+    <one-of>
+      <item> dad     <tag>  $.Param="DAD";      $.nResponses="1"; </tag></item>
+      <item> mom     <tag>  $.Param="MOM";      $.nResponses="1"; </tag></item>
+      <item> dog     <tag>  $.Param="DOG";      $.nResponses="2"; </tag></item>
+      <item> friend  <tag>  $.Param="FRIEND";   $.nResponses="1"; </tag></item>
+      <item> son     <tag>  $.Param="SON";      $.nResponses="1"; </tag></item>
+      <item> daughter<tag>  $.Param="DAUGHTER"; $.nResponses="1"; </tag></item>
+      <item> wife    <tag>  $.Param="WIFE";     $.nResponses="1"; </tag></item>
+      <item> husband <tag>  $.Param="HUSBAND";  $.nResponses="1"; </tag></item>
+      <item> spouse  <tag>  $.Param="SPOUSE";   $.nResponses="1"; </tag></item>
+      <item> brother <tag>  $.Param="BROTHER";  $.nResponses="1"; </tag></item>
+      <item> sister  <tag>  $.Param="SISTER";   $.nResponses="1"; </tag></item>
+      <item> callie  <tag>  $.Param="DOG";      $.nResponses="1"; </tag></item>
+      <item> candy   <tag>  $.Param="DOG";      $.nResponses="1"; </tag></item>
+    </one-of>
+  </rule>
+
+  <rule id="GirlName" scope="public">
+    <one-of>
+      <item> Emily   <tag> $.Param="girl name"; 	$.nResponses="1"; </tag></item>
+      <item> Madison <tag> $.Param="girl name"; 	$.nResponses="1"; </tag></item>
+      <item> Hannah  <tag> $.Param="girl name"; 	$.nResponses="1"; </tag></item>
+      <item> Sarah   <tag> $.Param="girl name"; 	$.nResponses="1"; </tag></item>
+      <item> Amber   <tag> $.Param="girl name"; 	$.nResponses="1"; </tag></item>
+      <item> Heather <tag> $.Param="girl name"; 	$.nResponses="1"; </tag></item>
+      <item> Racheal <tag> $.Param="girl name"; 	$.nResponses="1"; </tag></item>
+
+    </one-of>
+  </rule>
+  <rule id="occupation" scope="public">
+    <one-of>
+      <item> host <tag>     $.Param="HOST";	      $.nResponses="1"; </tag></item>
+      <item> actor <tag>    $.Param="ACTOR";	    $.nResponses="1"; </tag></item>
+      <item> singer <tag>   $.Param="SINGER";	    $.nResponses="1"; </tag></item>
+      <item> actress <tag>  $.Param="ACTRESS";	  $.nResponses="1"; </tag></item>
+      <item> writer <tag>   $.Param="WRITER";	    $.nResponses="1"; </tag></item>
+      <item> friend <tag>   $.Param="FRIEND";	    $.nResponses="1"; </tag></item>
+      <item> man <tag>      $.Param="MAN";	      $.nResponses="1"; </tag></item>
+      <item> chef <tag>     $.Param="CHEF";	      $.nResponses="1"; </tag></item>
+    </one-of>
+  </rule>
+
+  <rule id="verbStuff" scope="public">
+    <one-of>
+      <item> are <tag>    $.Param="ARE";	  $.nResponses="1"; </tag></item>
+      <item> do <tag>     $.Param="DO";	    $.nResponses="1"; </tag></item>
+      <item> long <tag>   $.Param="LONG";	$.nResponses="1"; </tag></item>
+      <item> old <tag>    $.Param="OLD";	  $.nResponses="1"; </tag></item>
+      <item> did <tag>    $.Param="DID";	  $.nResponses="1"; </tag></item>
+    </one-of>
+  </rule>
+  
+ <rule id="MaleWords" scope="public">
+    <one-of>
+      <item> guy <tag>      $.Param="MALE";  	  $.nResponses="1"; </tag></item>
+      <item> male <tag>     $.Param="MALE";  	$.nResponses="1"; </tag></item>
+      <item> boy  <tag>     $.Param="MALE";  	$.nResponses="1"; </tag></item>
+      <item> dude  <tag>    $.Param="MALE";  	$.nResponses="1"; </tag></item>
+    </one-of>
+  </rule>
+  
+  <rule id="FemaleWords" scope="public">
+    <one-of>
+      <item> girl <tag>     $.Param="FEMALE";  	$.nResponses="1"; </tag></item>
+      <item> female <tag>   $.Param="FEMALE";  	$.nResponses="1"; </tag></item>
+      <item> women  <tag>   $.Param="FEMALE";  	$.nResponses="1"; </tag></item>
+      <item> chick  <tag>   $.Param="FEMALE";  	$.nResponses="1"; </tag></item>
+    </one-of>
+  </rule>
+  
+   <rule id="CommonFears" scope="public">
+    <one-of>
+      <item> spiders <tag>    $.Param="FEAR";  	$.nResponses="1"; </tag></item>
+      <item> snakes   <tag>   $.Param="FEAR";  	$.nResponses="1"; </tag></item>
+      <item> the dark  <tag>  $.Param="FEAR";  	$.nResponses="1"; </tag></item>
+      <item> heights  <tag>   $.Param="FEAR";  	$.nResponses="1"; </tag></item>
+    </one-of>
+  </rule>
+  
+  <rule id="Adjetives" scope="public">
+    <one-of>
+      <item> intelligent <tag>  $.Param="SMART";  	  $.nResponses="1"; </tag></item>
+      <item> smart   <tag>      $.Param="SMART";  	  $.nResponses="1"; </tag></item>
+      <item> stupid  <tag>      $.Param="DUMB";       $.nResponses="1"; </tag></item>
+      <item> dumb  <tag>        $.Param="DUMB";  	    $.nResponses="1"; </tag></item>
+       <item> dangerous <tag>   $.Param="DANGEROUS";  $.nResponses="1"; </tag></item>
+      <item> nice   <tag>       $.Param="NICE";  	    $.nResponses="1"; </tag></item>
+      <item> mean  <tag>        $.Param="MEAN";     	$.nResponses="1"; </tag></item>
+      <item> human  <tag>       $.Param="HUMAN";  	  $.nResponses="1"; </tag></item>
+    </one-of>
+  </rule>
+  
+   <rule id="Actions" scope="public">
+    <one-of>
+      <item> eat <tag>        $.Param="EAT";  	  $.nResponses="1"; </tag></item>
+      <item> dance <tag>      $.Param="DANCE"; 	  $.nResponses="1"; </tag></item>
+      <item> run  <tag>       $.Param="RUN";  	  $.nResponses="1"; </tag></item>
+      <item> jump  <tag>      $.Param="JUMP";  	  $.nResponses="1"; </tag></item>
+    </one-of>
+  </rule>
+  
+   <rule id="Recites" scope="public">
+    <one-of>
+      <item> Pie <tag>                        $.Param="Pi";  	                $.nResponses="1"; </tag></item>
+      <item> the national anthem <tag>        $.Param="ANTHEM";  	            $.nResponses="1"; </tag></item>
+      <item> the pledge of alligance  <tag>   $.Param="PLEDGE OF ALLIGANCE";  $.nResponses="1"; </tag></item>
+    </one-of>
+  </rule>
+  
+     <rule id="MAMMELS" scope="public">
+    <one-of>
+      <item> dogs <tag>      $.Param="DOGS";  	  $.nResponses="1"; </tag></item>
+      <item> cats <tag>      $.Param="CATS";  	  $.nResponses="1"; </tag></item>
+      <item> horses  <tag>   $.Param="HORSES";  	$.nResponses="1"; </tag></item>     
+      <item> bunnies <tag>   $.Param="BUNNIES";  	$.nResponses="1"; </tag></item>
+      <item> mammels  <tag>  $.Param="MAMMMELS";  $.nResponses="1"; </tag></item>
+      <item> birds  <tag>    $.Param="BIRDS";  	  $.nResponses="1"; </tag></item>
+       </one-of>
+     </rule>
+  
+      <rule id="REPTILES" scope="public">
+    <one-of>
+      <item> turtles <tag>  $.Param="TURTLES";  	$.nResponses="1"; </tag></item>
+      <item> frogs <tag>    $.Param="FROGS";  	  $.nResponses="1"; </tag></item>
+      <item> fish  <tag>    $.Param="FISH";  	    $.nResponses="1"; </tag></item>     
+      <item> snakes <tag>   $.Param="SNAKES";  	  $.nResponses="1"; </tag></item>
+      <item> lizards  <tag> $.Param="LIZARDS";  	$.nResponses="1"; </tag></item>
+      <item> reptiles <tag> $.Param="REPTILES";  	$.nResponses="1"; </tag></item>
+       </one-of>
+     </rule>
+  
+  <rule id="FOOD" scope="public">
+    <one-of>
+      <item> hot dogs <tag>   $.Param="FOOD_LIKED";  	$.nResponses="1"; </tag></item>
+      <item> burgers <tag>    $.Param="FOOD_LIKED";  	$.nResponses="1"; </tag></item>
+      <item> cereal  <tag>    $.Param="FOOD_LIKED";  	$.nResponses="1"; </tag></item>     
+      <item> food <tag>       $.Param="FOOD_LIKED";  	$.nResponses="1"; </tag></item>
+      <item> pizza  <tag>     $.Param="FOOD_LIKED";  	$.nResponses="1"; </tag></item>
+      <item> banannas  <tag>  $.Param="FOOD_HATED";  	$.nResponses="1"; </tag></item>
+      <item> cake  <tag>      $.Param="FOOD_LIKED";  	$.nResponses="1"; </tag></item>
+      <item> brownies <tag>   $.Param="FOOD_LIKED";  	$.nResponses="1"; </tag></item>
+      <item> spagetti  <tag>  $.Param="FOOD_LIKED";  	$.nResponses="1"; </tag></item>
+      <item> apples  <tag>    $.Param="FOOD_HATED";  	$.nResponses="1"; </tag></item>
+      <item> carrots  <tag>   $.Param="FOOD_HATED";  	$.nResponses="1"; </tag></item>
+       </one-of>
+     </rule>
+  
+  <rule id="CLOTHING" scope="public">
+    <one-of>
+      <item> this shirt <tag>       $.Param="CLOTHING";  	$.nResponses="1"; </tag></item>
+      <item> these shorts <tag>     $.Param="CLOTHING";  	$.nResponses="1"; </tag></item>
+      <item> this dress  <tag>      $.Param="CLOTHING";  	$.nResponses="1"; </tag></item>     
+      <item> this skirt <tag>       $.Param="CLOTHING";  	$.nResponses="1"; </tag></item>
+      <item> this necklace  <tag>   $.Param="CLOTHING";  	$.nResponses="1"; </tag></item>
+      <item> these earings  <tag>   $.Param="CLOTHING";  	$.nResponses="1"; </tag></item>
+      <item> these pants <tag>      $.Param="CLOTHING";  	$.nResponses="1"; </tag></item>
+      <item> this braclet  <tag>    $.Param="CLOTHING";  	$.nResponses="1"; </tag></item>
+      <item> these shoes <tag>      $.Param="CLOTHING";  	$.nResponses="1"; </tag></item>
+      <item> this headband  <tag>   $.Param="CLOTHING";  	$.nResponses="1"; </tag></item>
+       </one-of>
+     </rule>
+
+ <rule id="TECHNOLOGY" scope="public">
+    <one-of>
+      <item> phones <tag>         $.Param="TECHNOLOGY";  	$.nResponses="1"; </tag></item>
+      <item> computers   <tag>    $.Param="TECHNOLOGY";  	$.nResponses="1"; </tag></item>
+      <item> cars  <tag>          $.Param="TECHNOLOGY";  	$.nResponses="1"; </tag></item>
+      <item> robots  <tag>        $.Param="TECHNOLOGY";  	$.nResponses="1"; </tag></item>
+      <item> the radio  <tag>     $.Param="TECHNOLOGY";  	$.nResponses="1"; </tag></item>
+      <item> radios  <tag>        $.Param="TECHNOLOGY";  	$.nResponses="1"; </tag></item>
+      <item> T Vs  <tag>          $.Param="TECHNOLOGY";  	$.nResponses="1"; </tag></item>
+    </one-of>
+  </rule>
+
+</grammar>
+

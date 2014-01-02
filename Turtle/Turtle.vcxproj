@@ -1,0 +1,251 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{07A738B8-BA68-4A37-A7AA-E4683B501A82}</ProjectGuid>
+    <RootNamespace>Turtle</RootNamespace>
+    <Keyword>MFCProj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <UseOfMfc>Static</UseOfMfc>
+    <UseOfAtl>false</UseOfAtl>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+    <UseOfMfc>Static</UseOfMfc>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;__TURTLE_CONFIG__;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\Turtle;..\Common;..\WiiYourself;..\RobotKinectViewer</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>LIBCMT;atlthunk;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+    </Link>
+    <Midl>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <ValidateAllParameters>true</ValidateAllParameters>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;__TURTLE_CONFIG__;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\Turtle;..\Common;..\WiiYourself;..\RobotKinectViewer</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>atlthunk</IgnoreSpecificDefaultLibraries>
+    </Link>
+    <Midl>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <ValidateAllParameters>true</ValidateAllParameters>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <None Include="mdi.ico" />
+    <None Include="res\bitmap2.bmp" />
+    <None Include="res\cursor1.cur" />
+    <None Include="res\idr_robo.ico" />
+    <None Include="res\idr_setu.ico" />
+    <None Include="res\Turtle.ico" />
+    <None Include="res\Turtle.rc2" />
+    <None Include="res\MapDoc.ico" />
+    <None Include="res\StarTrek1.bmp" />
+    <None Include="res\test256.bmp" />
+    <None Include="res\Toolbar.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Common\ArmControl.h" />
+    <ClInclude Include="..\Common\ChildFrm.h" />
+    <ClInclude Include="..\Common\ClientOrServer.h" />
+    <ClInclude Include="..\Common\Config.h" />
+    <ClInclude Include="..\Common\DrawDevice.h" />
+    <ClInclude Include="..\Common\DynamixelControl.h" />
+    <ClInclude Include="..\Common\Globals.h" />
+    <ClInclude Include="..\Common\GridMap.h" />
+    <ClInclude Include="..\Common\HardwareCmds.h" />
+    <ClInclude Include="..\Common\HardwareConfig.h" />
+    <ClInclude Include="..\Common\HeadControl.h" />
+    <ClInclude Include="..\Common\HtmlCtrl.h" />
+    <ClInclude Include="..\Common\HWInterface.h" />
+    <ClInclude Include="..\Common\HWInterfaceLokiArduino.h" />
+    <ClInclude Include="..\Common\HWInterfaceLokiPic.h" />
+    <ClInclude Include="..\Common\HWInterfaceOther.h" />
+    <ClInclude Include="..\Common\HWInterfaceParams.h" />
+    <ClInclude Include="..\Common\HWInterfaceSeeker.h" />
+    <ClInclude Include="..\Common\HWInterfaceTurtle.h" />
+    <ClInclude Include="..\Common\KerrControl.h" />
+    <ClInclude Include="..\Common\Kinect.h" />
+    <ClInclude Include="..\Common\KinectInterface.h" />
+    <ClInclude Include="..\Common\KobukiCommon.h" />
+    <ClInclude Include="..\Common\LaserDisplayWnd.h" />
+    <ClInclude Include="..\Common\LaserScanner.h" />
+    <ClInclude Include="..\Common\MainFrm.h" />
+    <ClInclude Include="..\Common\MapDoc.h" />
+    <ClInclude Include="..\Common\MapView.h" />
+    <ClInclude Include="..\Common\micropather.h" />
+    <ClInclude Include="..\Common\Module.h" />
+    <ClInclude Include="..\Common\MotorControl.h" />
+    <ClInclude Include="..\Common\NMEAParser.h" />
+    <ClInclude Include="..\Common\osbmp.h" />
+    <ClInclude Include="..\Common\PathDoc.h" />
+    <ClInclude Include="..\Common\PathStruct.h" />
+    <ClInclude Include="..\Common\PathView.h" />
+    <ClInclude Include="..\Common\PenWidthsDlg.h" />
+    <ClInclude Include="..\Common\RadarDisplayWnd.h" />
+    <ClInclude Include="..\Common\Robot.h" />
+    <ClInclude Include="..\Common\RobotAI.h" />
+    <ClInclude Include="..\Common\RobotClientSock.h" />
+    <ClInclude Include="..\Common\RobotCmdDoc.h" />
+    <ClInclude Include="..\Common\RobotCmdView.h" />
+    <ClInclude Include="..\Common\RobotServerSock.h" />
+    <ClInclude Include="..\Common\RobotSharedParams.h" />
+    <ClInclude Include="..\Common\RobotType.h" />
+    <ClInclude Include="..\Common\RotateMapDlg.h" />
+    <ClInclude Include="..\Common\SetupDoc.h" />
+    <ClInclude Include="..\Common\SetupView.h" />
+    <ClInclude Include="..\Common\Speak.h" />
+    <ClInclude Include="..\Common\SpeechReco.h" />
+    <ClInclude Include="..\Common\thread.h" />
+    <ClInclude Include="..\Common\WiiControl.h" />
+    <ClInclude Include="..\Common\WiiMoteCommon.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="RobotType.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Common\ArmBehavior.cpp" />
+    <ClCompile Include="..\Common\ArmBehaviorLeft.cpp" />
+    <ClCompile Include="..\Common\ArmBehaviorRight.cpp" />
+    <ClCompile Include="..\Common\ArmControl.cpp" />
+    <ClCompile Include="..\Common\BehaviorModule.cpp" />
+    <ClCompile Include="..\Common\ChildFrm.cpp" />
+    <ClCompile Include="..\Common\ClientSock.cpp" />
+    <ClCompile Include="..\Common\DrawDevice.cpp" />
+    <ClCompile Include="..\Common\DriveBehaviorModule.cpp" />
+    <ClCompile Include="..\Common\DriveControlModule.cpp" />
+    <ClCompile Include="..\Common\DynamixelControl.cpp" />
+    <ClCompile Include="..\Common\Globals.cpp" />
+    <ClCompile Include="..\Common\GridNavModule.cpp" />
+    <ClCompile Include="..\Common\HeadBehavior.cpp" />
+    <ClCompile Include="..\Common\HeadControl.cpp" />
+    <ClCompile Include="..\Common\HWInterface.cpp" />
+    <ClCompile Include="..\Common\KerrControl.cpp" />
+    <ClCompile Include="..\Common\KinectInterface.cpp" />
+    <ClCompile Include="..\Common\KinectModule.cpp" />
+    <ClCompile Include="..\Common\LaserDisplayWnd.cpp" />
+    <ClCompile Include="..\Common\LaserScanner.cpp" />
+    <ClCompile Include="..\Common\MainFrm.cpp" />
+    <ClCompile Include="..\Common\MapDoc.cpp" />
+    <ClCompile Include="..\Common\MapView.cpp" />
+    <ClCompile Include="..\Common\micropather.cpp" />
+    <ClCompile Include="..\Common\Module.cpp" />
+    <ClCompile Include="..\Common\MotorControliRobot.cpp" />
+    <ClCompile Include="..\Common\MotorControlKobuki.cpp" />
+    <ClCompile Include="..\Common\MotorControlPilot.cpp" />
+    <ClCompile Include="..\Common\MotorControlTrex.cpp" />
+    <ClCompile Include="..\Common\NavModule.cpp" />
+    <ClCompile Include="..\Common\NMEAParser.cpp" />
+    <ClCompile Include="..\Common\osbmp.cpp" />
+    <ClCompile Include="..\Common\PathDoc.cpp" />
+    <ClCompile Include="..\Common\PathStruct.cpp" />
+    <ClCompile Include="..\Common\PathView.cpp" />
+    <ClCompile Include="..\Common\PenWidthsDlg.cpp" />
+    <ClCompile Include="..\Common\RadarDisplayWnd.cpp" />
+    <ClCompile Include="..\Common\Robot.cpp" />
+    <ClCompile Include="..\Common\RobotCmdDoc.cpp" />
+    <ClCompile Include="..\Common\RobotCmdView.cpp" />
+    <ClCompile Include="..\Common\RotateMapDlg.cpp" />
+    <ClCompile Include="..\Common\SensorModule.cpp" />
+    <ClCompile Include="..\Common\ServerSock.cpp" />
+    <ClCompile Include="..\Common\SetupDoc.cpp" />
+    <ClCompile Include="..\Common\SetupView.cpp" />
+    <ClCompile Include="..\Common\Simulator.cpp" />
+    <ClCompile Include="..\Common\Speak.cpp" />
+    <ClCompile Include="..\Common\SpeechReco.cpp" />
+    <ClCompile Include="..\Common\Thread.cpp" />
+    <ClCompile Include="..\Common\WiiControl.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Turtle.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties RESOURCE_FILE="Turtle.rc" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

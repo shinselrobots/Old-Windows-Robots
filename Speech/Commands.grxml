@@ -1,0 +1,484 @@
+<?xml version="1.0" encoding="utf-8"?>
+<grammar xml:lang="en-US" root="command"
+tag-format="semantics-ms/1.0" version="1.0"
+xmlns="http://www.w3.org/2001/06/grammar">
+
+  <rule id="command" scope="public">
+    <tag> $.Param1="NA"; </tag>
+    <tag> $.Param2="NA"; </tag>
+    <tag> $.Param3="NA"; </tag>
+    <tag> $.Param4="NA"; </tag>
+    <tag> $.Param5="NA"; </tag>
+    <tag> $.nResponses="1"; </tag>
+    <one-of>
+      
+      <!-- ************** Single Param Commands ************** -->
+      <item>  stop 
+        <tag> $.Param1="STOP"; </tag>
+      </item>
+
+      <item>  yes 
+        <tag> $.Param1="YES"; </tag>
+        <item repeat="0-1"> <token>please</token> </item>
+      </item>
+
+      <item>  ok 
+        <tag> $.Param1="YES"; </tag>
+      </item>
+      
+      <item>  no 
+        <tag> $.Param1="NO"; </tag>
+        <item repeat="0-1"> <token>thanks</token> </item>
+        <item repeat="0-1"> <token>thank you</token> </item>
+      </item>
+
+      <item>  wave 
+        <tag> $.Param1="WAVE"; </tag>
+      </item>
+
+      <item>  say hello 
+        <tag> $.Param1="SAY_HI"; </tag>
+      </item>
+
+      <item>  say goodbye 
+        <tag> $.Param1="SAY_BYE"; </tag>
+      </item>
+
+      <item>
+        take a picture
+        <tag> $.Param1="TAKE_PHOTO"; </tag>
+      </item>
+
+      <item> send        
+        <one-of>
+          <item>the picture</item> 
+          <item> it </item>
+        </one-of>
+        to
+        <one-of>
+          <item>me</item>
+          <item>my phone</item>
+          <item>my email</item>
+        </one-of>
+        <tag> $.Param1="SEND_EMAIL"; </tag>
+     </item>
+
+      <item>  introduce yourself 
+        <tag> $.Param1="DO_INTRO"; </tag>
+      </item>
+
+      <item>  look forward <!-- TODO - lots of variations of this -->
+        <tag> $.Param1="LOOK_FWD"; </tag>
+      </item>
+      
+      <item>  follow me
+        <tag> $.Param1="FOLLOW"; </tag>
+      </item>
+
+      <item>  what time is it 
+        <tag> $.Param1="DO_WHAT_TIME"; </tag>
+      </item>
+
+      <item> face me
+        <tag> $.Param1="FACE_ME"; </tag>
+      </item>
+
+      <item> clean up the floor
+        <tag> $.Param1="CLEAN_UP"; </tag>
+      </item>
+
+      <item>
+        <token>identify</token>
+        <one-of>
+          <item> it</item>
+          <item> object </item>
+          <item> item </item>
+        </one-of>
+        <ruleref special="GARBAGE"/>
+        <tag> $.Param1="IDENTIFY_OBJ"; </tag>
+      </item>
+
+      <item>   
+        <one-of>
+          <item> danger danger </item>
+          <item> freak out </item>
+          <item> here comes darth vader </item>
+        </one-of>
+        <tag> $.Param1="DO_DANGER"; </tag>
+      </item>
+
+      <item>
+        <item repeat="0-1"> <token> you are a </token> </item>
+        <one-of>
+          <item> bad robot </item>
+          <item> naughty robot </item>
+        </one-of>
+        <tag> $.Param1="BAD_ROBOT"; </tag>
+      </item>
+
+      <item>
+        shake hands 
+        <tag> $.Param1="SHAKE"; </tag>
+      </item>
+
+      <item>
+        id like you to meet someone
+        <tag> $.Param1="MEET_NAME"; </tag>
+        <tag> $.Param2=""; </tag>
+      </item>
+
+      <item>
+        <one-of>
+           <item> id like you to meet </item>
+           <item> id like to introduce </item>
+        </one-of>
+        <tag> $.Param1="MEET_NAME"; </tag>
+        <ruleref uri="C:/Dev/_Robot/Speech/Names.grxml#ListOfNames"/>
+        <tag> $.Param2=$$.Param; </tag>
+        <!-- Amber, Heather, Lin, Bob, Fred...  -->
+      </item>
+      
+      <!-- ************** Two Param Commands ************** -->
+      <item>  wake up 
+        <tag> $.Param1="WAKE"; </tag>
+        <tag> $.Param2="TRUE"; </tag>
+      </item>
+
+      <item>  go to sleep 
+        <tag> $.Param1="WAKE"; </tag>
+        <tag> $.Param2="FALSE"; </tag>
+      </item>
+
+     <item>  listen
+        <tag> $.Param1="MIC"; </tag>
+        <tag> $.Param2="TRUE"; </tag>
+      </item>
+      
+      <item>  dont listen 
+        <tag> $.Param1="MIC"; </tag>
+        <tag> $.Param2="FALSE"; </tag>
+      </item>
+
+      <!-- example: turn your lights on/off -->
+      <item> turn your lights
+        <one-of>
+          <item> on  <tag> $.Param2="TRUE"; </tag> </item>
+          <item> off  <tag> $.Param2="FALSE"; </tag> </item>
+        </one-of>
+        <tag> $.Param1="LIGHTS"; </tag>
+      </item>
+      
+      <item>
+        <!-- move short distance fwd/back -->
+        <item> move </item>
+        <tag> $.Param1="MOVE"; </tag>
+        <ruleref uri="#FwdRev"/>
+        <tag> $.Param2=$$.Param; </tag>
+      </item>
+      <item>  back up 
+        <tag> $.Param1="MOVE"; </tag>
+        <tag> $.Param2="REVERSE"; </tag>
+      </item>
+
+      <item>
+        <!-- move continuously fwd -->
+        <one-of>
+          <item> go forward </item>
+          <item> explore </item>
+        </one-of>
+        <tag> $.Param1="EXPLORE"; </tag>
+      </item>
+
+      <!-- turns -->
+      <item>  spin
+        <tag> $.Param1="SPIN"; </tag>
+        <ruleref uri="#RightLeft"/>
+        <tag> $.Param2=$$.Param; </tag>
+      </item>
+
+      <item>  turn
+        <tag> $.Param1="TURN"; </tag>
+        <ruleref uri="#RightLeft"/>
+        <tag> $.Param2=$$.Param; </tag>        
+      </item>
+
+      <item>
+        <one-of>
+          <item> small turn </item>
+          <item> bear  </item>
+        </one-of>
+        <tag> $.Param1="SMALL_TURN"; </tag>
+        <ruleref uri="#RightLeft"/>
+        <tag> $.Param2=$$.Param; </tag>
+      </item>
+
+      <!-- enable / disable -->
+      <item>  enable
+        <tag> $.Param2="ENABLE"; </tag> <!-- note, Param2 on purpose -->
+        <ruleref uri="#ThingsToEnable"/>
+        <tag> $.Param1=$$.Param; </tag>
+      </item>
+
+      <item>  disable
+        <tag> $.Param2="DISABLE"; </tag> <!-- note, Param2 on purpose -->
+        <ruleref uri="#ThingsToEnable"/>
+        <tag> $.Param1=$$.Param; </tag>
+      </item>
+
+      <!-- arm commands -->
+
+      <!-- example: "{put your} left/right arm down/up/home" -->
+      <item>         
+        <item repeat="0-1"> <token>put</token> </item>
+        <item repeat="0-1"> <token>your</token> </item>
+        <one-of>
+          <item> left  <tag> $.Param2="LEFT"; </tag> </item>
+          <item> right <tag> $.Param2="RIGHT"; </tag> </item>
+        </one-of>
+        arm        
+        <one-of>
+          <item> home <tag> $.Param1="ARM_HOME"; </tag> </item>
+          <item> down <tag> $.Param1="ARM_HOME"; </tag> </item>
+          <item> up <tag> $.Param1="ARM_UP"; </tag> </item>
+        </one-of>
+      </item>
+
+      <!-- example: "open/close {your} left/right hand/claw" -->
+      <item>         
+        <one-of>
+          <item> open <tag> $.Param3="OPEN"; </tag> </item>
+          <item> close <tag> $.Param3="CLOSE"; </tag> </item>
+        </one-of>
+        
+        <item repeat="0-1"> <token>your</token> </item>
+        
+        <one-of>
+          <item> left  <tag> $.Param2="LEFT"; </tag> </item>
+          <item> right <tag> $.Param2="RIGHT"; </tag> </item>
+        </one-of>
+
+        <one-of>
+          <item> claw <tag> $.Param1="CLAW"; </tag> </item>
+          <item> hand <tag> $.Param1="CLAW"; </tag> </item>
+        </one-of>
+      </item>
+
+      <item>
+        drop it <!-- for example, to drop the ball -->
+        <tag> $.Param1="CLAW"; </tag>
+        <tag> $.Param2="LEFT"; </tag> <!-- LEFT HAND ONLY -->
+        <tag> $.Param3="OPEN"; </tag>
+      </item>
+
+
+      <!-- example: "extend {your} left/right arm {fully}" -->
+      <item>  extend       
+        <item repeat="0-1"> <token>your</token> </item>
+        <one-of>
+          <item> left  <tag> $.Param2="LEFT"; </tag> </item>
+          <item> right <tag> $.Param2="RIGHT"; </tag> </item>
+        </one-of>
+        arm <tag> $.Param1="EXTEND_ARM"; </tag>
+        <item repeat="0-1"> <token>full</token> <tag> $.Param3="FULL"; </tag> </item>
+        <item repeat="0-1"> <token>fully</token> <tag> $.Param3="FULL"; </tag> </item>
+      </item>
+
+      <item> i have something for you
+        <tag> $.Param1="TAKE_OBJ"; </tag>
+        <tag> $.Param2="LEFT"; </tag>
+      </item>
+
+      <item> give it to me
+        <tag> $.Param1="GIVE_OBJ"; </tag>
+        <tag> $.Param2="LEFT"; </tag>
+      </item>
+
+      <!-- example: "pick up your ball " -->
+      <!-- example: "pick your ball up " -->
+      <item>         
+        <one-of>
+          <item> pick your ball up </item>
+          <item> pick up your ball </item>
+          <item> pick it up </item>
+        </one-of>
+        <tag> $.Param1="PICK_UP_OBJ"; </tag>
+        <tag> $.Param2="LEFT"; </tag>
+      </item>
+            
+      <!-- example: "pick up item left/right " -->
+      <item>  pick up object        
+        <one-of>
+          <item> left  <tag> $.Param2="LEFT"; </tag> </item>
+          <item> right <tag> $.Param2="RIGHT"; </tag> </item>
+        </one-of>
+        <tag> $.Param1="PICK_UP_OBJ"; </tag>
+      </item>
+
+      <!-- example: "put it down " -->
+      <item>
+        <one-of>
+          <item> put it down </item>
+          <item> put your ball down </item>
+        </one-of>
+        <tag> $.Param1="PUT_OBJ_DOWN"; </tag>
+      </item>
+
+      <!-- example: "throw it away = put in trash" -->
+      <item> throw it away
+        <tag> $.Param1="PUT_IN_BASKET"; </tag>
+      </item>
+      
+      <item> put it in
+        <one-of>
+          <item> the </item>
+          <item> your </item>
+        </one-of>
+        <one-of>
+          <item> trash </item>
+          <item> basket </item>
+        </one-of>
+        <tag> $.Param1="PUT_IN_BASKET"; </tag>
+      </item>
+
+      <!-- example: "toss it front/back " -->
+      <item> 
+        <one-of>
+          <item> toss it </item>
+          <item> throw it </item>
+          <item> throw it to me </item>
+        </one-of>
+        <tag> $.Param1="THROW_OBJECT"; </tag>
+      </item>
+
+
+     <!-- example: "Put your hands up " -->
+      <item> put your hands
+        <tag> $.Param1="ARM_UP"; </tag>
+        <tag> $.Param2="BOTH"; </tag>
+        <one-of>
+          <item> up   <tag> $.Param3="TRUE"; </tag> </item>
+          <item> down <tag> $.Param3="FALSE"; </tag> </item>
+        </one-of>
+      </item>
+      
+
+     <!-- example: "Raise your right/left arm " -->
+      <item> raise your
+        <one-of>
+          <item> left  <tag> $.Param2="LEFT"; </tag> </item>
+          <item> right <tag> $.Param2="RIGHT"; </tag> </item>
+        </one-of>
+
+        <one-of>
+          <item> arm  </item>
+          <item> hand </item>
+        </one-of>
+        <tag> $.Param1="ARM_UP"; </tag>
+        <tag> $.Param3="TRUE"; </tag> <!-- always up -->
+      </item>
+      
+      
+      <item> scratch your head
+        <tag> $.Param1="SCRATCH_HEAD"; </tag>
+      </item>
+
+      <item> scratch your back
+        <tag> $.Param1="SCRATCH_BACK"; </tag>
+      </item>
+
+      <item> what is the meaning of life
+        <tag> $.Param1="MEANING_OF_LIFE"; </tag>
+      </item>
+
+      <item>
+        demonstrate karate
+        <tag> $.Param1="KARATE"; </tag>
+      </item>
+
+       <item>
+        tell
+        <item repeat="0-1"> <token>me</token> </item>
+        <item repeat="0-1"> <token>us</token> </item>
+        <one-of>
+          <item> a joke <tag> $.Param1="JOKE"; $.Param2="SINGLE"; </tag> </item>
+          <item> some jokes <tag> $.Param1="JOKE"; $.Param2="MULTIPLE"; </tag> </item>
+        </one-of>
+      </item>
+      
+      <item>
+        <one-of>
+          <item> demonstrate  </item>
+          <item> practice </item>
+        </one-of>
+        <item repeat="0-1"> <token>your</token> </item>
+         light saber
+        <tag> $.Param1="LIGHT_SABER"; </tag>
+      </item>
+
+      <item>
+        face
+        <tag> $.Param1="FACE_COMPASS"; </tag>
+        <ruleref uri="#CompassDir"/>
+        <tag> $.Param2=$$.Param; </tag>
+      </item>
+
+      <item>
+        which way is
+        <tag> $.Param1="POINT_COMPASS"; </tag>
+        <ruleref uri="#CompassDir"/>
+        <tag> $.Param2=$$.Param; </tag>
+      </item>
+      
+      <item>
+        go to
+        <tag> $.Param1="GOTO_LOCATION"; </tag>
+        <one-of>
+          <item> the office     <tag> $.Param2="OFFICE"; </tag> </item>
+          <item> my office      <tag> $.Param2="OFFICE"; </tag> </item>
+          <item> heathers room  <tag> $.Param2="HEATHERS_ROOM"; </tag> </item>
+          <item> ambers room    <tag> $.Param2="AMBERS_ROOM"; </tag> </item>
+          <item> my bed room    <tag> $.Param2="MASTER_BEDROOM"; </tag> </item>
+          <item> my bath room   <tag> $.Param2="MASTER_BATH"; </tag> </item>
+        </one-of>
+      </item>
+      
+    </one-of>  <!-- End of Commands -->
+  </rule>
+
+
+  <!-- LOCAL ENUMERATIONS  -->
+  <rule id="ThingsToEnable" scope="public">
+    <one-of>
+      <item> microphone <tag>  $.Param="MIC"; </tag></item>
+      <item> wheel motors  <tag>  $.Param="MOTORS"; </tag></item>
+      <item> 
+        <item repeat="0-1"> <token>obstacle</token> </item>
+        avoidance  <tag> $.Param="AVOIDANCE"; </tag>
+      </item>
+      <item> x  <tag>  $.Param="x"; </tag></item>
+    </one-of>
+  </rule>
+  
+
+
+  <!-- EXTERNAL ENUMERATIONS  -->
+  
+  <rule id="RightLeft" >
+    <ruleref uri="C:/Dev/_Robot/Speech/Enums.grxml#RightLeft" />
+    <tag> $.Param=$$.Param; </tag>
+  </rule>
+
+  <rule id="FwdRev" >
+    <ruleref uri="C:/Dev/_Robot/Speech/Enums.grxml#FwdRev" />
+    <tag> $.Param=$$.Param; </tag>
+  </rule>
+
+  <rule id="CompassDir" >
+    <ruleref uri="C:/Dev/_Robot/Speech/Enums.grxml#CompassDir" />
+    <tag> $.Param=$$.Param; </tag>
+  </rule>
+
+
+
+</grammar>
+

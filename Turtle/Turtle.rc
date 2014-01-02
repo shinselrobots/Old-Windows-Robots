@@ -1,0 +1,1797 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+// Generated Help ID header file
+#define APSTUDIO_HIDDEN_SYMBOLS
+#include "resource.hm"
+#undef APSTUDIO_HIDDEN_SYMBOLS
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "#ifdef _WIN32\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#endif //_WIN32\r\n"
+    "#include ""res\\Turtle.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#include ""afxprint.rc""       // printing/print preview resources\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_PATHVIEW_TMPL       ICON                    "mdi.ico"
+IDR_MAINFRAME           ICON                    "res\\Turtle.ico"
+IDR_MAPTYPE             ICON                    "res\\MapDoc.ico"
+IDR_ROBOTCMDVIEW_TMPL   ICON                    "res\\idr_robo.ico"
+IDR_SETUP_TMPL          ICON                    "res\\idr_setu.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDR_MAINFRAME           BITMAP                  "res\\Toolbar.bmp"
+IDB_BITMAP1             BITMAP                  "res\\test256.bmp"
+IDB_BITMAP2             BITMAP                  "res\\bitmap2.bmp"
+IDB_BITMAP3             BITMAP                  "res\\StarTrek1.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Toolbar
+//
+
+IDR_MAINFRAME TOOLBAR 16, 15
+BEGIN
+    BUTTON      ID_FILE_NEW
+    BUTTON      ID_FILE_OPEN
+    BUTTON      ID_FILE_SAVE
+    SEPARATOR
+    BUTTON      ID_EDIT_CUT
+    BUTTON      ID_EDIT_COPY
+    BUTTON      ID_EDIT_PASTE
+    SEPARATOR
+    BUTTON      ID_FILE_PRINT
+    SEPARATOR
+    BUTTON      ID_APP_ABOUT
+    BUTTON      ID_PEN_THICK_OR_THIN
+    BUTTON      ID_SEL_CMD_VIEW_BTN
+    BUTTON      ID_SEL_SETUP_VIEW_BTN
+    BUTTON      ID_SEL_PATH_VIEW_BTN
+    BUTTON      ID_SEL_MAP_VIEW_BTN
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MAINFRAME MENU
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&New\tCtrl+N",                ID_FILE_NEW
+        MENUITEM "&Open...\tCtrl+O",            ID_FILE_OPEN
+        MENUITEM SEPARATOR
+        MENUITEM "P&rint Setup...",             ID_FILE_PRINT_SETUP
+        MENUITEM SEPARATOR
+        MENUITEM "Recent File",                 ID_FILE_MRU_FILE1, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       ID_APP_EXIT
+    END
+    POPUP "&View"
+    BEGIN
+        MENUITEM "&Toolbar",                    ID_VIEW_TOOLBAR
+        MENUITEM "&Status Bar",                 ID_VIEW_STATUS_BAR
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&About Robot...",             ID_APP_ABOUT
+    END
+END
+
+IDR_MAPTYPE MENU
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&New\tCtrl+N",                ID_FILE_NEW
+        MENUITEM "&Open...\tCtrl+O",            ID_FILE_OPEN
+        MENUITEM "&Close",                      ID_FILE_CLOSE
+        MENUITEM "&Save\tCtrl+S",               ID_FILE_SAVE
+        MENUITEM "Save &As...",                 ID_FILE_SAVE_AS
+        MENUITEM SEPARATOR
+        MENUITEM "&Print...\tCtrl+P",           ID_FILE_PRINT
+        MENUITEM "Print Pre&view",              ID_FILE_PRINT_PREVIEW
+        MENUITEM "P&rint Setup...",             ID_FILE_PRINT_SETUP
+        MENUITEM SEPARATOR
+        MENUITEM "Recent File",                 ID_FILE_MRU_FILE1, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       ID_APP_EXIT
+    END
+    POPUP "&Edit"
+    BEGIN
+        MENUITEM "&Undo\tCtrl+Z",               ID_EDIT_UNDO
+        MENUITEM SEPARATOR
+        MENUITEM "Cu&t\tCtrl+X",                ID_EDIT_CUT
+        MENUITEM "&Copy\tCtrl+C",               ID_EDIT_COPY
+        MENUITEM "&Paste\tCtrl+V",              ID_EDIT_PASTE
+        MENUITEM "Clear &All\tCtrl-A",          ID_EDIT_CLEAR_ALL, MENUBARBREAK
+    END
+    POPUP "&View"
+    BEGIN
+        MENUITEM "&Toolbar",                    ID_VIEW_TOOLBAR
+        MENUITEM "&Status Bar",                 ID_VIEW_STATUS_BAR
+    END
+    POPUP "&Window"
+    BEGIN
+        MENUITEM "&New Window",                 ID_WINDOW_NEW
+        MENUITEM "&Cascade",                    ID_WINDOW_CASCADE
+        MENUITEM "&Tile",                       ID_WINDOW_TILE_HORZ
+        MENUITEM "&Arrange Icons",              ID_WINDOW_ARRANGE
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&About Robot...",             ID_APP_ABOUT
+    END
+    POPUP "&Pen"
+    BEGIN
+        MENUITEM "Thick &Line",                 ID_PEN_THICK_OR_THIN
+        MENUITEM "Pen &Widths...",              ID_PEN_PENWIDTHS
+    END
+    POPUP "&Draw Mode"
+    BEGIN
+        MENUITEM "Navigation Mode",             ID_NAVIGATION_MODE
+        MENUITEM SEPARATOR
+        MENUITEM "&Wall",                       ID_TYPE_WALLOBJECT
+        MENUITEM "&Door",                       ID_TYPE_DOOR_OBJECT
+        MENUITEM "&Cliff",                      ID_TYPE_CLIFF
+        MENUITEM "&Low Obstacle",               ID_TYPE_LOW_OBSTACLE
+        MENUITEM "&Obstacle",                   ID_TYPE_OBSTACLE
+        MENUITEM "&User Draw",                  ID_TYPE_USERDRAW
+        MENUITEM SEPARATOR
+        MENUITEM "Waypoint",                    IDC_WAYPOINT_LOCATION
+        MENUITEM "&Set Current Location",       ID_SET_CURRENT_LOCATION
+    END
+    POPUP "&Add Page"
+    BEGIN
+        MENUITEM "&North",                      ID_ADD_PAGE_ABOVE
+        MENUITEM "&East",                       ID_ADD_PAGE_RIGHT
+        MENUITEM "&South",                      ID_ADD_PAGE_BELOW
+        MENUITEM "&West",                       ID_ADD_PAGE_LEFT
+    END
+    POPUP "&Show"
+    BEGIN
+        MENUITEM "GPS Tracking",                ID_GPS_ENABLE, CHECKED
+        MENUITEM "Robot &Trail",                ID_SHOW_ROBOT_TRAILS, CHECKED
+        MENUITEM "Show &Gridmap Squares",       ID_SHOW_GRIDMAP_SQUARES, CHECKED
+        MENUITEM "Show &Sensor Readings",       ID_SHOW_SENSOR_READINGS, CHECKED
+    END
+    POPUP ""
+    BEGIN
+        MENUITEM "RightMouse",                  ID_RIGHT_MOUSE_MENU
+        MENUITEM "Show current location",       ID_SHOW_LOCATION
+    END
+    POPUP "&Zoom"
+    BEGIN
+        MENUITEM "&025%",                       ID_ZOOM_MAP_025, CHECKED
+        MENUITEM "&50%",                        ID_ZOOM_MAP_050, CHECKED
+        MENUITEM "&100%",                       ID_ZOOM_MAP_100, CHECKED
+        MENUITEM "150%",                        ID_ZOOM_MAP_150, CHECKED
+        MENUITEM "&200%",                       ID_ZOOM_MAP_200, CHECKED
+        MENUITEM "&400%",                       ID_ZOOM_MAP_400, CHECKED
+    END
+    POPUP "Text Import/Export"
+    BEGIN
+        MENUITEM "Export",                      ID_EXPORT_TO_FILE
+        MENUITEM "Import",                      ID_IMPORT_FROM_FILE
+    END
+    MENUITEM "&Rotate",                     ID_ROTATE_MAP
+    POPUP "Clear"
+    BEGIN
+        MENUITEM "Mouse Trail",                 ID_CLEAR_MOUSE_TRAIL
+        MENUITEM "Sensor Readings",             ID_CLEAR_SENSOR_READINGS
+    END
+END
+
+IDR_PATHVIEW_TMPL MENU
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&New\tCtrl+N",                ID_FILE_NEW
+        MENUITEM "&Open...\tCtrl+O",            ID_FILE_OPEN
+        MENUITEM "&Close",                      ID_FILE_CLOSE
+        MENUITEM "&Save\tCtrl+S",               ID_FILE_SAVE
+        MENUITEM "Save &As...",                 ID_FILE_SAVE_AS
+        MENUITEM SEPARATOR
+        MENUITEM "&Print...\tCtrl+P",           ID_FILE_PRINT
+        MENUITEM "Print Pre&view",              ID_FILE_PRINT_PREVIEW
+        MENUITEM "P&rint Setup...",             ID_FILE_PRINT_SETUP
+        MENUITEM SEPARATOR
+        MENUITEM "Recent File",                 ID_FILE_MRU_FILE1, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       ID_APP_EXIT
+    END
+    POPUP "&Edit"
+    BEGIN
+        MENUITEM "&Undo\tCtrl+Z",               ID_EDIT_UNDO
+        MENUITEM SEPARATOR
+        MENUITEM "Cu&t\tCtrl+X",                ID_EDIT_CUT
+        MENUITEM "&Copy\tCtrl+C",               ID_EDIT_COPY
+        MENUITEM "&Paste\tCtrl+V",              ID_EDIT_PASTE
+    END
+    POPUP "&View"
+    BEGIN
+        MENUITEM "&Toolbar",                    ID_VIEW_TOOLBAR
+        MENUITEM "&Status Bar",                 ID_VIEW_STATUS_BAR
+    END
+    POPUP "&Window"
+    BEGIN
+        MENUITEM "&New Window",                 ID_WINDOW_NEW
+        MENUITEM "&Cascade",                    ID_WINDOW_CASCADE
+        MENUITEM "&Tile",                       ID_WINDOW_TILE_HORZ
+        MENUITEM "&Arrange Icons",              ID_WINDOW_ARRANGE
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&About Turtle...",            ID_APP_ABOUT
+    END
+END
+
+IDR_ROBOTCMDVIEW_TMPL MENU
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&New\tCtrl+N",                ID_FILE_NEW
+        MENUITEM "&Open...\tCtrl+O",            ID_FILE_OPEN
+        MENUITEM "&Close",                      ID_FILE_CLOSE
+        MENUITEM "&Save\tCtrl+S",               ID_FILE_SAVE
+        MENUITEM "Save &As...",                 ID_FILE_SAVE_AS
+        MENUITEM SEPARATOR
+        MENUITEM "&Print...\tCtrl+P",           ID_FILE_PRINT
+        MENUITEM "Print Pre&view",              ID_FILE_PRINT_PREVIEW
+        MENUITEM "P&rint Setup...",             ID_FILE_PRINT_SETUP
+        MENUITEM SEPARATOR
+        MENUITEM "Recent File",                 ID_FILE_MRU_FILE1, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       ID_APP_EXIT
+    END
+    POPUP "Edit"
+    BEGIN
+        MENUITEM "&Undo\tCtrl+Z",               ID_EDIT_UNDO
+        MENUITEM SEPARATOR
+        MENUITEM "Cu&t\tCtrl+X",                ID_EDIT_CUT
+        MENUITEM "&Copy\tCtrl+C",               ID_EDIT_COPY
+        MENUITEM "&Paste\tCtrl+V",              ID_EDIT_PASTE
+    END
+    POPUP "View"
+    BEGIN
+        MENUITEM "&Toolbar",                    ID_VIEW_TOOLBAR
+        MENUITEM "&Status Bar",                 ID_VIEW_STATUS_BAR
+    END
+    POPUP "Window"
+    BEGIN
+        MENUITEM "&New Window",                 ID_WINDOW_NEW
+        MENUITEM "&Cascade",                    ID_WINDOW_CASCADE
+        MENUITEM "&Tile",                       ID_WINDOW_TILE_HORZ
+        MENUITEM "&Arrange Icons",              ID_WINDOW_ARRANGE
+    END
+    POPUP "Help"
+    BEGIN
+        MENUITEM "&About Turtle...",            ID_APP_ABOUT
+    END
+    MENUITEM SEPARATOR
+    MENUITEM "Arm Ctrl",                    ID_ARM_CONTROL_DLG
+    MENUITEM "&q",                          ID_Q
+    MENUITEM "&w",                          ID_W
+    MENUITEM "&e",                          ID_E
+    MENUITEM "&s",                          ID_S
+    MENUITEM "&x",                          ID_X
+    MENUITEM "&c",                          ID_C
+    MENUITEM "&a",                          ID_A
+    MENUITEM "&d",                          ID_D
+    MENUITEM "&=",                          ID_KEY_PLUS
+    MENUITEM "&-",                          ID_KEY_MINUS
+    MENUITEM "&0",                          ID_KEY_ZERO
+END
+
+IDR_RIGHT_POPUP_MENU MENU
+BEGIN
+    MENUITEM "Show Location",               ID_SHOWLOCATION
+    MENUITEM "Add Waypoint",                ID_ADD_WAYPONT
+END
+
+IDR_SETUP_TMPL MENU
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&New\tCtrl+N",                ID_FILE_NEW
+        MENUITEM "&Open...\tCtrl+O",            ID_FILE_OPEN
+        MENUITEM "&Close",                      ID_FILE_CLOSE
+        MENUITEM "&Save\tCtrl+S",               ID_FILE_SAVE
+        MENUITEM "Save &As...",                 ID_FILE_SAVE_AS
+        MENUITEM SEPARATOR
+        MENUITEM "&Print...\tCtrl+P",           ID_FILE_PRINT
+        MENUITEM "Print Pre&view",              ID_FILE_PRINT_PREVIEW
+        MENUITEM "P&rint Setup...",             ID_FILE_PRINT_SETUP
+        MENUITEM SEPARATOR
+        MENUITEM "Recent File",                 ID_FILE_MRU_FILE1, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       ID_APP_EXIT
+    END
+    POPUP "&Edit"
+    BEGIN
+        MENUITEM "&Undo\tCtrl+Z",               ID_EDIT_UNDO
+        MENUITEM SEPARATOR
+        MENUITEM "Cu&t\tCtrl+X",                ID_EDIT_CUT
+        MENUITEM "&Copy\tCtrl+C",               ID_EDIT_COPY
+        MENUITEM "&Paste\tCtrl+V",              ID_EDIT_PASTE
+    END
+    POPUP "&View"
+    BEGIN
+        MENUITEM "&Toolbar",                    ID_VIEW_TOOLBAR
+        MENUITEM "&Status Bar",                 ID_VIEW_STATUS_BAR
+    END
+    POPUP "&Window"
+    BEGIN
+        MENUITEM "&New Window",                 ID_WINDOW_NEW
+        MENUITEM "&Cascade",                    ID_WINDOW_CASCADE
+        MENUITEM "&Tile",                       ID_WINDOW_TILE_HORZ
+        MENUITEM "&Arrange Icons",              ID_WINDOW_ARRANGE
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&About MDI1...",              ID_APP_ABOUT
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_MAINFRAME ACCELERATORS
+BEGIN
+    "N",            ID_FILE_NEW,            VIRTKEY, CONTROL
+    "O",            ID_FILE_OPEN,           VIRTKEY, CONTROL
+    "S",            ID_FILE_SAVE,           VIRTKEY, CONTROL
+    "P",            ID_FILE_PRINT,          VIRTKEY, CONTROL
+    "Z",            ID_EDIT_UNDO,           VIRTKEY, CONTROL
+    "X",            ID_EDIT_CUT,            VIRTKEY, CONTROL
+    "C",            ID_EDIT_COPY,           VIRTKEY, CONTROL
+    "V",            ID_EDIT_PASTE,          VIRTKEY, CONTROL
+    VK_BACK,        ID_EDIT_UNDO,           VIRTKEY, ALT
+    VK_DELETE,      ID_EDIT_CUT,            VIRTKEY, SHIFT
+    VK_INSERT,      ID_EDIT_COPY,           VIRTKEY, CONTROL
+    VK_INSERT,      ID_EDIT_PASTE,          VIRTKEY, SHIFT
+    VK_F6,          ID_NEXT_PANE,           VIRTKEY 
+    VK_F6,          ID_PREV_PANE,           VIRTKEY, SHIFT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOG 0, 0, 211, 65
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About Turtle"
+FONT 8, "MS Sans Serif"
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,11,17,20,20
+    LTEXT           "Turtle Robot Control Program Version 1.0",IDC_STATIC,40,10,108,8,SS_NOPREFIX
+    CTEXT           "Copyright (C) 2005-2009,  Dave Shinsel  www.dshinsel.com",IDC_STATIC,40,30,119,22
+    DEFPUSHBUTTON   "OK",IDOK,154,7,50,14,WS_GROUP
+END
+
+IDD_PEN_WIDTHS DIALOG 0, 0, 186, 90
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Pen Widths"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,129,6,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,129,23,50,14
+    EDITTEXT        IDC_THIN_PEN_WIDTH,73,14,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_THICK_PEN_WIDTH,73,39,40,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Reset to Defaults",IDC_DEFAULT_PEN_WIDTHS,57,65,71,14
+    LTEXT           "Thin Pen Width:",IDC_STATIC,11,14,52,14,SS_CENTERIMAGE
+    LTEXT           "Thick Pen Width:",IDC_STATIC,11,39,56,14,SS_CENTERIMAGE
+END
+
+IDD_PATH_FORM DIALOGEX 0, 0, 619, 375
+STYLE DS_SETFONT | WS_CHILD | WS_BORDER
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_SEGMENT_NAME,42,19,159,14,ES_AUTOHSCROLL
+    COMBOBOX        IDC_SEGMENT_BEHAVIOR,42,37,63,122,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_SEGMENT_SPEED,136,37,65,121,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_SEGMENT_FROM_WAYPOINT_ID,137,60,17,14,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_SEGMENT_TO_WAYPOINT_ID,175,60,17,14,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_SEGMENT_DIRECTION,51,60,31,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_SEGMENT_DISTANCE_FEET,130,79,24,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_SEGMENT_DISTANCE_INCHES,169,79,24,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Calculate",IDC_CALCUALTE_NEW_WAYPOINT,81,98,50,14
+    CONTROL         "Left",IDC_SEGMENT_FOLLOW_LEFT,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,10,130,28,10
+    CONTROL         "Right",IDC_SEGMENT_FOLLOW_RIGHT,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,10,143,33,10
+    EDITTEXT        IDC_SEGMENT_FOLLOW_DISTANCE,84,134,24,14,ES_AUTOHSCROLL | WS_GROUP
+    EDITTEXT        IDC_SEGMENT_AVOID_DISTANCE,168,134,23,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "&Add",IDC_SEGMENT_ADD,154,173,50,14
+    PUSHBUTTON      "Insert Before",IDC_SEGMENT_INSERT,154,191,50,14
+    PUSHBUTTON      "Update",IDC_SEGMENT_UPDATE,154,209,50,14
+    PUSHBUTTON      "Move Up",IDC_SEGMENT_MOVE_UP,154,227,50,14
+    PUSHBUTTON      "Move Down",IDC_SEGMENT_MOVE_DOWN,154,245,50,14
+    PUSHBUTTON      "Remove",IDC_SEGMENT_REMOVE,154,263,50,14
+    PUSHBUTTON      "Remove All",IDC_SEGMENT_REMOVE_ALL,154,281,50,14
+    EDITTEXT        IDC_WAYPOINT_NAME,245,19,133,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_WAYPOINT_ID,245,38,17,14,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_WAYPOINT_X_FEET,292,38,31,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_WAYPOINT_X_INCHES,346,38,31,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_WAYPOINT_Y_FEET,292,58,31,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_WAYPOINT_Y_INCHES,346,58,31,14,ES_AUTOHSCROLL
+    COMBOBOX        IDC_WAYPOINT_LANDMARK_TYPE1,227,96,59,81,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_WAYPOINT_LANDMARK_TYPE2,227,115,59,81,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_WAYPOINT_LANDMARK_TYPE3,227,135,59,81,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_WAYPOINT_LANDMARK_RANGE1,294,96,26,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_WAYPOINT_LANDMARK_RANGE2,294,115,26,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_WAYPOINT_LANDMARK_RANGE3,294,135,26,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_WAYPOINT_LANDMARK_DIRECTION1,328,96,26,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_WAYPOINT_LANDMARK_DIRECTION2,328,115,26,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_WAYPOINT_LANDMARK_DIRECTION3,328,135,26,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_WAYPOINT_LANDMARK_HEIGHT1,362,96,26,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_WAYPOINT_LANDMARK_HEIGHT2,362,115,26,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_WAYPOINT_LANDMARK_HEIGHT3,362,135,26,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "A&dd",IDC_WAYPOINT_ADD,339,173,50,14
+    PUSHBUTTON      "Set Anchor Point",IDC_SET_GPS_ANCHOR_POINT,220,323,31,27,BS_MULTILINE
+    PUSHBUTTON      "Insert Before",IDC_WAYPOINT_INSERT,339,191,50,14
+    PUSHBUTTON      "Update",IDC_WAYPOINT_UPDATE,339,209,50,14
+    PUSHBUTTON      "Move Up",IDC_WAYPOINT_MOVE_UP,339,227,50,14
+    PUSHBUTTON      "Move Down",IDC_WAYPOINT_MOVE_DOWN,339,245,50,14
+    PUSHBUTTON      "Remove",IDC_WAYPOINT_REMOVE,339,263,50,14
+    PUSHBUTTON      "Remove All",IDC_WAYPOINT_REMOVE_ALL,339,281,50,14
+    LISTBOX         IDC_SEGMENT_LISTBOX,4,170,146,130,LBS_USETABSTOPS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL,WS_EX_STATICEDGE
+    LISTBOX         IDC_WAYPOINT_LISTBOX,212,170,123,130,LBS_USETABSTOPS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL,WS_EX_STATICEDGE
+    RTEXT           "X:",IDC_STATIC,276,38,8,14,SS_CENTERIMAGE
+    LTEXT           "ft",IDC_STATIC,326,38,11,14,SS_CENTERIMAGE
+    LTEXT           "Distance:",IDC_STATIC,94,79,32,14,SS_CENTERIMAGE
+    LTEXT           "Behavior:",IDC_STATIC,10,37,31,12,SS_CENTERIMAGE
+    GROUPBOX        "Path Segments",IDC_STATIC,4,10,205,290,BS_CENTER
+    GROUPBOX        "Way Points",IDC_STATIC,212,10,182,290,BS_CENTER
+    LTEXT           "Name:",IDC_STATIC,10,19,22,14,SS_CENTERIMAGE
+    RTEXT           "To:",IDC_STATIC,155,60,16,14,SS_CENTERIMAGE
+    LTEXT           "Name:",IDC_STATIC,219,19,22,14,SS_CENTERIMAGE
+    LTEXT           "ID:",IDC_STATIC,219,38,15,14,SS_CENTERIMAGE
+    LTEXT           "   Landmark Type         Range     Direction    Height",IDC_STATIC,223,85,165,8
+    RTEXT           "1:",IDC_STATIC,215,96,8,14,SS_CENTERIMAGE
+    RTEXT           "2:",IDC_STATIC,214,115,8,14,SS_CENTERIMAGE
+    RTEXT           "3:",IDC_STATIC,214,135,8,14,SS_CENTERIMAGE
+    GROUPBOX        "",IDC_STATIC,212,78,182,78
+    RTEXT           "Y:",IDC_STATIC,276,58,8,14,SS_CENTERIMAGE
+    GROUPBOX        "Way Points",IDC_STATIC,4,53,205,70
+    LTEXT           "Direction:",IDC_STATIC,12,60,33,14,SS_CENTERIMAGE
+    RTEXT           "in",IDC_STATIC,380,38,8,14,SS_CENTERIMAGE
+    LTEXT           "ft",IDC_STATIC,327,58,11,14,SS_CENTERIMAGE
+    RTEXT           "Speed:",IDC_STATIC,107,37,25,12,SS_CENTERIMAGE
+    GROUPBOX        "Wall Follow Parameters",IDC_STATIC,4,118,123,38
+    RTEXT           "Distance:",IDC_STATIC,49,134,32,14,SS_CENTERIMAGE
+    LTEXT           "in",IDC_STATIC,111,134,9,14,SS_CENTERIMAGE
+    LTEXT           "ID:    From:",IDC_STATIC,95,60,38,14,SS_CENTERIMAGE
+    LTEXT           "New WayPoint:",IDC_STATIC,10,98,50,14,SS_CENTERIMAGE
+    LTEXT           "ft",IDC_STATIC,158,79,8,14,SS_CENTERIMAGE
+    LTEXT           "in",IDC_STATIC,197,79,8,14,SS_CENTERIMAGE
+    RTEXT           "in",IDC_STATIC,379,58,9,14,SS_CENTERIMAGE
+    LTEXT           "Name    From-To   Dir  Feet-In       Behavior  ",IDC_STATIC,8,159,154,8
+    LTEXT           "ID      X        Y         Name",IDC_STATIC,218,159,120,8
+    LTEXT           "in",IDC_STATIC,194,134,8,14,SS_CENTERIMAGE
+    GROUPBOX        "GPS to Map Coordinate",IDC_STATIC,4,304,144,61
+    RTEXT           "GPS:",IDC_STATIC,22,320,18,8
+    CTEXT           "None",IDC_STAT_GPS2,44,317,20,11,WS_BORDER
+    LTEXT           "Long:",IDC_STATIC,67,331,19,8
+    LTEXT           "None",IDC_STAT_GPS_LONG2,89,330,50,11,WS_BORDER
+    LTEXT           "Lat:",IDC_STATIC,67,319,13,8
+    LTEXT           "None",IDC_STAT_GPS_LAT2,89,317,50,11,WS_BORDER
+    RTEXT           "*",IDC_STATIC_GPS_BLINK2,10,321,9,8,NOT WS_GROUP
+    RTEXT           "Sats:",IDC_STATIC,22,332,17,8
+    CTEXT           "0",IDC_STAT_GPS_SATS_IN_VIEW2,44,330,20,11,WS_BORDER
+    EDITTEXT        IDC_ANCHOR_POINT_X,171,320,31,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_ANCHOR_POINT_Y,171,340,31,14,ES_AUTOHSCROLL
+    RTEXT           "X:",IDC_STATIC,155,320,8,14,SS_CENTERIMAGE
+    LTEXT           "ft",IDC_STATIC,205,320,11,14,SS_CENTERIMAGE
+    RTEXT           "Y:",IDC_STATIC,155,340,8,14,SS_CENTERIMAGE
+    LTEXT           "ft",IDC_STATIC,206,340,11,14,SS_CENTERIMAGE
+    PUSHBUTTON      "Set Waypoint",IDC_CALCUALTE_NEW_GPS_WAYPOINT,43,347,96,14
+    GROUPBOX        "",IDC_STATIC,146,304,113,61
+    LTEXT           "Latitude:",IDC_STATIC,269,318,28,8
+    LTEXT           "Longitude:",IDC_STATIC,269,330,34,8
+    GROUPBOX        "Map Origin",IDC_STATIC,258,304,136,61
+    LTEXT           "Not Set",IDC_PATH_ORIGIN_LAT,313,318,67,8
+    LTEXT           "Not Set",IDC_PATH_ORIGIN_LONG,313,330,67,8
+    PUSHBUTTON      "Recalc All",IDC_RECALCUALTE_ALL_WAYPOINTS,144,98,50,14
+    GROUPBOX        "Avoid Objects",IDC_STATIC,126,118,83,38
+    RTEXT           "Distance:",IDC_STATIC,132,134,32,14,SS_CENTERIMAGE
+    PUSHBUTTON      "Recalc Segments",IDC_RECALC_SEGMENTS,219,58,51,18,BS_MULTILINE
+    EDITTEXT        IDC_SEGMENT_COMPASS_CORRECTION,51,79,31,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Compass",IDC_STATIC,12,75,36,11,SS_CENTERIMAGE
+    LTEXT           "Correction",IDC_STATIC,12,84,36,11,SS_CENTERIMAGE
+END
+
+IDD_ROBOTCMD_FORM DIALOGEX 0, 0, 626, 396
+STYLE DS_SETFONT | WS_CHILD
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    PUSHBUTTON      "Stop",IDC_STOP_BUTTON,39,52,30,14
+    PUSHBUTTON      "Center",IDC_CENTER_BUTTON,40,34,30,14
+    COMBOBOX        IDC_MOVE_DISTANCE,565,261,32,131,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Fwd",IDC_MOVE_DISTANCE_FORWARD,558,276,22,12
+    PUSHBUTTON      "Rev",IDC_MOVE_DISTANCE_REVERSE,582,276,22,12
+    COMBOBOX        IDC_TURN_AMOUNT,564,293,32,131,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Left",IDC_TURN_DISTANCE_LEFT,557,307,22,12
+    PUSHBUTTON      "Right",IDC_TURN_DISTANCE_RIGHT,581,307,22,12
+    CONTROL         "Slider1",IDC_TURN_SLIDER,"msctls_trackbar32",TBS_AUTOTICKS | TBS_BOTH | WS_BORDER | WS_TABSTOP,6,5,161,25
+    CONTROL         "Slider2",IDC_SPEED_SLIDER,"msctls_trackbar32",TBS_AUTOTICKS | TBS_VERT | TBS_BOTH | WS_BORDER | WS_TABSTOP,6,37,28,122
+    PUSHBUTTON      "On",IDC_12V_ON,558,333,22,12
+    PUSHBUTTON      "Off",IDC_12V_OFF,582,333,22,12
+    CONTROL         "Nav Object",IDC_ENABLE_OBJECT_NAV_UPDATE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,181,47,10
+    CONTROL         "Joystick",IDC_USE_JOYSTICK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,192,38,10
+    CTEXT           "00",IDC_MOTOR_SPEED_STATIC,38,92,20,12,SS_CENTERIMAGE | SS_SUNKEN | WS_BORDER
+    CTEXT           "00",IDC_MOTOR_TURN_STATIC,76,32,20,12,SS_CENTERIMAGE | SS_SUNKEN | WS_BORDER
+    RTEXT           "TCP",IDC_STATIC,331,286,16,8
+    CTEXT           "none",IDC_CONNECT_SPEED,353,284,26,10,SS_SUNKEN
+    GROUPBOX        "",IDC_STATIC,0,256,388,28
+    LTEXT           " Battery       Volts         Base         Plug       Current      Debug        Bumpers         Error         Tach     Odometer    FPS",IDC_STATIC,12,261,371,8
+    CTEXT           "--Waiting--",IDC_PIC_STATUS,413,13,55,12,SS_SUNKEN | WS_BORDER
+    LTEXT           "none",IDC_STAT_CURRENT_DRAW,146,270,22,12,SS_SUNKEN | WS_BORDER
+    LTEXT           "none",IDC_STAT_DEBUG,179,270,22,12,SS_SUNKEN | WS_BORDER
+    LTEXT           "Joystick buttons",IDC_STR_JOY_BUTTONS,214,284,108,10,SS_SUNKEN
+    CTEXT           "--",IDC_STATIC,33,93,8,8,SS_CENTERIMAGE | NOT WS_GROUP
+    GROUPBOX        "Sensor Fusion",IDC_RADAR_WIN,395,294,135,71,BS_CENTER
+    LTEXT           "none",IDC_STAT_BATTERY,14,270,22,12,SS_SUNKEN | WS_BORDER
+    LTEXT           "none",IDC_BUMPER_DISPLAY,212,270,35,12,SS_SUNKEN | WS_BORDER
+    LTEXT           "none",IDC_STAT_LAST_ERROR,258,270,22,12,SS_SUNKEN | WS_BORDER
+    GROUPBOX        "Camera View",IDC_CAMERA_WIN,171,2,135,76,BS_CENTER
+    CTEXT           "000",IDC_STAT_COMPASS,84,54,20,11,SS_SUNKEN | WS_BORDER
+    CTEXT           "---",IDC_COMPASS_DIR,109,54,15,11,SS_SUNKEN | WS_BORDER
+    LTEXT           "Errors:",IDC_STATIC,127,55,21,8
+    CTEXT           "0",IDC_STAT_COMPASS_ERROR,151,55,14,9,SS_SUNKEN
+    LTEXT           "none",IDC_STAT_TACH,291,270,22,12,SS_SUNKEN | WS_BORDER
+    LTEXT           "none",IDC_STAT_ODOMETER,324,270,22,12,SS_SUNKEN | WS_BORDER
+    LTEXT           "Battery OK",IDC_BATTERY_WARNING_TEXT,111,284,96,10,SS_SUNKEN
+    PUSHBUTTON      "Outdoor Path",IDC_OPEN_DEFAULT_PATH,553,174,47,13
+    CTEXT           "",IDC_CLIENT_OR_SERVER,130,33,37,11,SS_CENTERIMAGE | SS_SUNKEN
+    RTEXT           "",IDC_STATIC,38,135,8,8
+    PUSHBUTTON      "Execute",IDC_EXECUTE_PATH,553,188,47,13
+    PUSHBUTTON      "Up",IDC_CAM_UP,195,10,20,18
+    PUSHBUTTON      "Stop",IDC_CAM_STOP,195,28,20,18
+    PUSHBUTTON      "Dn",IDC_CAM_DOWN,195,45,20,18
+    PUSHBUTTON      "Right",IDC_CAM_RIGHT,215,28,20,18
+    PUSHBUTTON      "Left",IDC_CAM_LEFT,175,28,20,18
+    PUSHBUTTON      "",IDC_CAM_UP_RIGHT,215,10,20,18
+    PUSHBUTTON      "",IDC_CAM_UP_LEFT,175,10,20,18
+    PUSHBUTTON      "",IDC_CAM_DOWN_RIGHT,215,45,20,18
+    PUSHBUTTON      "",IDC_CAM_DOWN_LEFT,175,45,20,18
+    PUSHBUTTON      "Center",IDC_CAM_CENTER,175,63,60,14
+    PUSHBUTTON      "Cancel",IDC_CANCEL_PATH,553,231,47,13
+    PUSHBUTTON      "Pause",IDC_PAUSE_PATH,553,202,47,13
+    PUSHBUTTON      "Resume",IDC_RESUME_PATH,553,217,47,13
+    LISTBOX         IDC_STATUS_LISTBOX,2,311,385,72,NOT LBS_NOTIFY | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Collision",IDC_ENABLE_COLLISION_MODULE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,203,36,10
+    CONTROL         "Avoidance",IDC_ENABLE_AVOIDANCE_MODULE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,215,47,10
+    GROUPBOX        "Compass",IDC_STATIC,82,44,85,24
+    LTEXT           "Servo Pwr",IDC_STATIC,566,323,34,8
+    CTEXT           "NO_MODULE",IDC_DRIVE_MODULE_OWNER,6,284,104,10,SS_SUNKEN
+    GROUPBOX        "",IDC_STATIC,547,253,63,96
+    PUSHBUTTON      "Up",IDC_KINECT_UP,510,27,15,12
+    PUSHBUTTON      "Stop",IDC_ZOOM_STOP,507,57,20,12
+    PUSHBUTTON      "Out",IDC_ZOOM_OUT,528,57,20,12
+    COMBOBOX        IDC_BEHAVIOR_MODE,310,19,69,101,CBS_DROPDOWN | WS_TABSTOP
+    COMBOBOX        IDC_ACTION_MODE,310,41,69,115,CBS_DROPDOWN | WS_TABSTOP
+    CTEXT           "Standby Mode",IDC_STATIC,311,10,67,8
+    CTEXT           "Action Mode",IDC_STATIC,316,32,57,8
+    CONTROL         "LED Eyes",IDC_ENABLE_LED_EYES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,245,49,47,10
+    CONTROL         "Random Blink",IDC_LED_EYES_BLINK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,245,58,60,10
+    EDITTEXT        IDC_TEXT_TO_SPEAK,392,369,220,14,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_WANTRETURN | WS_VSCROLL
+    PUSHBUTTON      "Upstairs Map",IDC_OPEN_UPSTAIRS_MAP,485,190,55,13
+    PUSHBUTTON      "Downstairs Map",IDC_OPEN_DOWNSTAIRS_MAP,485,206,55,13
+    PUSHBUTTON      "Blank Map",IDC_OPEN_BLANK_MAP,485,174,55,13
+    COMBOBOX        IDC_PLAY_MUSIC,310,63,69,144,CBS_DROPDOWN | WS_TABSTOP
+    CTEXT           "Music",IDC_STATIC,317,54,55,8
+    CONTROL         "Aux Lights",IDC_ENABLE_AUX_LIGHTS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,245,40,49,10
+    PUSHBUTTON      "Panic",IDC_STOP_PANIC_STOP,37,123,30,26
+    CONTROL         "Send to AI",IDC_SEND_TO_AI,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,565,359,48,10
+    CTEXT           "Camera Zoom",IDC_STATIC,486,49,60,8
+    COMBOBOX        IDC_HEAD_TILT,245,17,56,101,CBS_DROPDOWN | WS_TABSTOP
+    CTEXT           "Head SideTilt",IDC_STATIC,246,9,56,8
+    GROUPBOX        "Behaviors",IDC_STATIC,306,2,78,76,BS_CENTER
+    CTEXT           "L BMPR",IDC_STAT_BMPR_LEFT,354,127,35,12,SS_SUNKEN | WS_BORDER
+    PUSHBUTTON      "Take Snapshot",IDC_TAKE_SNAPSHOT,485,226,55,13
+    PUSHBUTTON      "Record Video",IDC_RECORD_VIDEO,485,241,55,13
+    PUSHBUTTON      "Stop Recording",IDC_RECORD_VIDEO_STOP,485,257,55,13
+    LTEXT           "none",IDC_STAT_FPS,357,270,22,12,SS_SUNKEN | WS_BORDER
+    LTEXT           "Hand",IDC_STATIC,58,105,24,8
+    GROUPBOX        "Laser",IDC_LASER_DISPLAY_WIN,107,96,213,144,BS_CENTER
+    COMBOBOX        IDC_LASER_ZOOM,272,241,48,62,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "",IDC_STATIC,483,166,61,56
+    GROUPBOX        "",IDC_STATIC,551,166,52,86
+    GROUPBOX        "",IDC_STATIC,481,217,62,56
+    PUSHBUTTON      "In",IDC_ZOOM_IN,486,57,20,12
+    PUSHBUTTON      "Dn",IDC_KINECT_DOWN,528,27,16,12
+    CTEXT           "00",IDC_STAT_KINECT_POSITION,488,27,20,12,SS_SUNKEN | WS_BORDER
+    LTEXT           "Pic",IDC_STATIC,392,14,17,8,0,WS_EX_RIGHT
+    GROUPBOX        "System Status",IDC_STATIC,383,2,99,76
+    CTEXT           "--Waiting--",IDC_DYNA_STATUS,413,27,55,12,SS_SUNKEN | WS_BORDER
+    CTEXT           "--Waiting--",IDC_MOTOR_STATUS,413,41,55,12,SS_SUNKEN | WS_BORDER
+    LTEXT           "Dyna",IDC_STATIC,392,29,17,8,0,WS_EX_RIGHT
+    LTEXT           "Motor",IDC_STATIC,392,43,17,8,0,WS_EX_RIGHT
+    LTEXT           "Kinect",IDC_STATIC,390,59,19,8,0,WS_EX_RIGHT
+    CTEXT           "--Waiting--",IDC_KINECT_STATUS,413,56,55,12,SS_SUNKEN | WS_BORDER
+    CONTROL         "Local User",IDC_LOCAL_USER_CB,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,73,71,50,10
+    CONTROL         "Kinect Power",IDC_KINECT_PWR_ENABLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,486,15,65,10
+    CTEXT           "R BMPR",IDC_STAT_BMPR_RIGHT,399,127,31,12,SS_SUNKEN | WS_BORDER
+    GROUPBOX        "Kinect / Camera",IDC_STATIC,481,2,99,76
+    CTEXT           "Caster Drop",IDC_CASTER_DROP,356,86,61,11,SS_CENTERIMAGE | SS_SUNKEN | WS_BORDER | NOT WS_GROUP,WS_EX_STATICEDGE
+    CTEXT           "Left Wheel Drop",IDC_LEFT_WHEEL_DROP,356,98,61,11,SS_CENTERIMAGE | SS_SUNKEN | WS_BORDER | NOT WS_GROUP,WS_EX_STATICEDGE
+    CTEXT           "Right Wheel Drop",IDC_RIGHT_WHEEL_DROP,355,111,61,11,SS_CENTERIMAGE | SS_SUNKEN | WS_BORDER | NOT WS_GROUP,WS_EX_STATICEDGE
+    LTEXT           "none",IDC_STAT_BATTERY_VOLTS,47,270,22,12,SS_SUNKEN | WS_BORDER
+    LTEXT           "none",IDC_STAT_BASE_DOCKED,80,270,22,12,SS_SUNKEN | WS_BORDER
+    LTEXT           "none",IDC_STAT_PLUG_INSERTED,113,270,22,12,SS_SUNKEN | WS_BORDER
+    PUSHBUTTON      "Capture Face",IDC_CAPTURE_FACE,545,153,55,13
+    EDITTEXT        IDC_FACE_CAPTURE_NAME,457,152,83,14,ES_AUTOHSCROLL
+    GROUPBOX        "Enter Name",IDC_STATIC,451,142,151,27
+END
+
+IDD_SETUP_FORM DIALOGEX 0, 0, 626, 397
+STYLE DS_SETFONT | WS_CHILD
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    LTEXT           "GPS COM Port",IDC_STATIC,19,126,48,8
+    PUSHBUTTON      "Save on Exit",IDC_SAVE_TO_DISK,307,7,50,14
+    EDITTEXT        IDC_GPS_COM_PORT,79,122,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_IP_ADDR1,388,242,83,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Connect",IDC_CONNECT_TO_HOST,388,227,40,12
+    PUSHBUTTON      "Disconnect",IDC_DISCONNECT_FROM_HOST,430,227,41,12
+    EDITTEXT        IDC_IP_ADDR2,202,307,83,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "On",IDC_CAMERA_PWR_ON,201,294,17,12
+    PUSHBUTTON      "Off",IDC_CAMERA_PWR_OFF,221,294,17,12
+    PUSHBUTTON      "Connect",IDC_CONNECT_TO_IP_CAMERA,245,294,40,12,WS_DISABLED
+    GROUPBOX        "Remote Control",IDC_STATIC,382,203,96,54
+    GROUPBOX        "Camera Control",IDC_STATIC,192,7,107,315,BS_CENTER
+    LTEXT           "Path + Speed",IDC_STATIC,491,228,23,18
+    LTEXT           "Avoid Range",IDC_STATIC,491,208,23,18
+    COMBOBOX        IDC_AVOID_OBJ_RANGE,517,208,35,124,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_PATH_SPEED_ADDER,517,229,35,102,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Color Thresh",IDC_STATIC,491,266,23,17
+    COMBOBOX        IDC_CAMERA_TRACKING_COLOR_THRESHOLD,517,269,35,102,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_CAMERA_COLOR_CR,443,324,20,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Set Cr Cb",IDC_CAMERA_MANUAL_COLOR_CAL_BTN,386,324,41,13
+    EDITTEXT        IDC_CAMERA_SCAN_DISTANCE,491,250,20,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "ScanDist",IDC_CAMERA_SCAN_DISTANCE_BTN,517,250,35,13
+    PUSHBUTTON      "LocalClient",IDC_CONNECT_TO_LOCAL_HOST,405,213,47,13
+    PUSHBUTTON      "Radar On",IDC_RADAR_SCAN,304,164,66,12
+    PUSHBUTTON      "Watchdog Reset",IDC_RESET_WATCHDOG,304,211,66,12,BS_CENTER | BS_VCENTER | BS_MULTILINE
+    PUSHBUTTON      "Odometer Reset",IDC_RESET_ODOMETER,304,196,66,12,BS_MULTILINE
+    PUSHBUTTON      "Compass Cal",IDC_COMPASS_CAL_MODE,304,180,48,12
+    PUSHBUTTON      "PT",IDC_COMPASS_CAL_POINT,356,180,15,12
+    PUSHBUTTON      "Stop",IDC_STOP_ZC_SVC,417,269,27,12
+    PUSHBUTTON      "Start",IDC_START_ZC_SVC,389,269,27,12
+    GROUPBOX        "AutoWiFi",IDC_STATIC,386,261,62,23,BS_CENTER
+    CTEXT           "XXX",IDC_X_AXIS,262,371,25,10,SS_CENTERIMAGE | SS_SUNKEN
+    CTEXT           "--",IDC_X_ROT,290,371,25,10,SS_CENTERIMAGE | SS_SUNKEN
+    CTEXT           "--",IDC_SLIDER0,318,371,25,10,SS_CENTERIMAGE | SS_SUNKEN
+    CTEXT           "--",IDC_Y_AXIS,344,371,25,10,SS_CENTERIMAGE | SS_SUNKEN
+    CTEXT           "--",IDC_Y_ROT,372,371,25,10,SS_CENTERIMAGE | SS_SUNKEN
+    CTEXT           "--",IDC_SLIDER1,400,371,25,10,SS_CENTERIMAGE | SS_SUNKEN
+    CTEXT           "--",IDC_Z_AXIS,428,371,25,10,SS_CENTERIMAGE | SS_SUNKEN
+    CTEXT           "--",IDC_Z_ROT,456,371,25,10,SS_CENTERIMAGE | SS_SUNKEN
+    CTEXT           "--",IDC_JOY9,484,371,25,10,SS_CENTERIMAGE | SS_SUNKEN
+    LTEXT           "POV:",IDC_POV,539,365,75,9
+    GROUPBOX        "Joystick",IDC_STATIC,254,354,284,36
+    PUSHBUTTON      "Open Port",IDC_GPS_OPEN_PORT,127,122,50,14
+    LTEXT           "Servo COM Port",IDC_STATIC,19,109,52,8
+    EDITTEXT        IDC_SERVO_COM_PORT,79,106,40,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Open Port",IDC_OPEN_SERVO_PORT,127,106,50,14
+    LTEXT           "Motor COM Port",IDC_STATIC,19,44,52,8
+    EDITTEXT        IDC_MOTOR_COM_PORT,79,42,40,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Open Port",IDC_OPEN_MOTOR_PORT,127,42,50,14
+    LTEXT           "Camera COM Port",IDC_STATIC,19,141,58,8
+    EDITTEXT        IDC_CAMERA_COM_PORT,79,138,40,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Open Port",IDC_OPEN_CAMERA_PORT,127,138,50,14
+    COMBOBOX        IDC_CAM_PAN_SPEED,244,251,53,134,CBS_DROPDOWN | WS_TABSTOP
+    LTEXT           "Pan/Tilt Speed",IDC_STATIC,194,253,52,12
+    EDITTEXT        IDC_CAMERA_POS_ABS_VALUE_X,205,335,25,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Go",IDC_CAMERA_POS_ABS_BTN,275,335,20,14
+    GROUPBOX        "Camera Absolute Pos Test",IDC_STATIC,191,324,108,30
+    LTEXT           "Pic COM Port",IDC_STATIC,19,13,44,8
+    EDITTEXT        IDC_PIC_COM_PORT,79,10,40,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Open Port",IDC_OPEN_PIC_PORT,127,10,50,14
+    CONTROL         "Enable Tracking Face",IDC_CAMERA_ENABLE_TRACKING_FACE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,196,117,93,10
+    CONTROL         "Enable Tracking Colors",IDC_CAMERA_ENABLE_TRACKING_COLORS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,196,139,93,10
+    CONTROL         "Enable Tracking Cones",IDC_CAMERA_ENABLE_TRACKING_CONES,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,196,161,93,10
+    CONTROL         "Enable Tracking Objects",IDC_CAMERA_ENABLE_TRACKING_OBJECTS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,196,172,93,10
+    COMBOBOX        IDC_CAM_ZOOM_LEVEL_ABS,244,268,53,184,CBS_DROPDOWN | WS_TABSTOP
+    LTEXT           "Zoom Level",IDC_STATIC,196,268,38,12
+    CONTROL         "Enable Motion Tracking",IDC_CAMERA_ENABLE_TRACKING_OBJECT_MOTION,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,196,220,93,10
+    CONTROL         "Show Object Motion",IDC_CAMERA_ENABLE_SHOW_MOTION_VIEW,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,196,232,93,10
+    GROUPBOX        "",IDC_STATIC,191,215,108,29
+    COMBOBOX        IDC_CAM_FRAME_SIZE,251,49,33,134,CBS_DROPDOWN | WS_TABSTOP
+    PUSHBUTTON      "Prop R",IDC_VIDEO_PROP_BTN,250,20,36,12
+    PUSHBUTTON      "Prop L",IDC_VIDEO_FORMAT_BTN,250,34,36,12
+    CONTROL         "Slider2",IDC_SLIDER_1,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,408,299,128,12
+    CONTROL         "Slider2",IDC_SLIDER_2,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,408,311,128,12
+    LTEXT           "Cr",IDC_STATIC,386,301,8,8
+    LTEXT           "Cb",IDC_STATIC,386,310,10,8
+    CTEXT           "00",IDC_SLIDER_1_TXT,541,297,20,12,SS_CENTERIMAGE | SS_SUNKEN | WS_BORDER
+    CTEXT           "00",IDC_SLIDER_2_TXT,541,311,20,12,SS_CENTERIMAGE | SS_SUNKEN | WS_BORDER
+    GROUPBOX        "Color Blob Tracking Threshold",IDC_STATIC,382,288,182,73
+    PUSHBUTTON      "Auto Cal",IDC_COLOR_AUTO_CAL_BTN,386,341,41,13
+    EDITTEXT        IDC_CAMERA_COLOR_CB,486,324,20,12,ES_AUTOHSCROLL
+    LTEXT           "Cr",IDC_STATIC,433,345,8,8
+    LTEXT           "Cb",IDC_STATIC,475,345,10,8
+    CTEXT           "Not Calibrated",IDC_COLOR_CAL_STATUS,432,341,99,13,SS_CENTERIMAGE | SS_SUNKEN
+    CONTROL         "Left Cam",IDC_ENABLE_CAMERA_1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,196,20,44,10
+    CONTROL         "Stereo",IDC_ENABLE_CAMERA_2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,196,33,37,10
+    EDITTEXT        IDC_CAMERA_POS_ABS_VALUE_Y,246,335,25,14,ES_AUTOHSCROLL
+    CTEXT           "X",IDC_STATIC,195,336,10,12,SS_CENTERIMAGE
+    CTEXT           "Y",IDC_STATIC,236,336,8,12,SS_CENTERIMAGE
+    LTEXT           " L / R      Zoom   Speed    Up/Dn     N/C       N/C       N/C       Yaw      N/C",IDC_STATIC,264,363,242,8
+    CONTROL         "Sony Display Mode",IDC_CAM_DISPLAY_MODE_ENABLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,510,46,75,10
+    CONTROL         "Sony Auto Face Tracking",IDC_CAM_TRACK_MODE_ENABLE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,510,57,94,10
+    CONTROL         "Thermal PIR Tracking",IDC_CAM_IR_TRACKING_ENABLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,196,128,93,10
+    CONTROL         "Personal Space",IDC_PERSONAL_SPACE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,301,115,66,10
+    LTEXT           "Dyna COM Port",IDC_STATIC,19,29,50,8
+    PUSHBUTTON      "Open Port",IDC_OPEN_DYNA_SERVO_PORT,127,26,50,14
+    EDITTEXT        IDC_DYNA_SERVO_COM_PORT,79,26,40,14,ES_AUTOHSCROLL
+    GROUPBOX        "Dyna Servos",IDC_STATIC,298,227,76,135
+    EDITTEXT        IDC_DYNA_SERVO_TEST_ID,316,241,22,14,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_DYNA_SERVO_TEST_POS,320,261,26,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "ID",IDC_STATIC,304,244,8,8
+    LTEXT           "Pos",IDC_STATIC,304,264,13,8
+    PUSHBUTTON      "GO",IDC_DYNA_SERVO_TEST_GO,349,262,19,12
+    PUSHBUTTON      "Status",IDC_SERVO_GET_STATUS,344,242,28,12
+    EDITTEXT        IDC_DYNA_SERVO_REG_NUM,346,286,26,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Register =",IDC_STATIC,305,289,37,8
+    PUSHBUTTON      "Read Qty:",IDC_DYNA_SERVO_REG_READ,305,302,40,12
+    GROUPBOX        "",IDC_STATIC,298,279,76,83
+    PUSHBUTTON      "Write Byte",IDC_DYNA_SERVO_REG_WRITE_BYTE,306,331,63,12
+    PUSHBUTTON      "Write Word",IDC_DYNA_SERVO_REG_WRITE_WORD,306,346,63,12
+    EDITTEXT        IDC_DYNA_SERVO_REG_WRITE_VALUE,346,315,26,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Write Value",IDC_STATIC,305,319,37,8
+    EDITTEXT        IDC_DYNA_SERVO_NUM_OF_REGISTERS,346,300,26,14,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "Speech Reco to AI",IDC_SPEECH_RECO_SEND_TO_AI,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,301,103,72,10
+    GROUPBOX        "Right Arm Control",IDC_STATIC,7,151,185,81
+    LTEXT           "Limit/Enable       Shoulder Rotate Bend  Wrist  Grip  Limit",IDC_STATIC,19,163,172,9
+    EDITTEXT        IDC_RIGHT_SHOULDER_ROTATE,73,174,19,12,ES_CENTER | ES_AUTOHSCROLL
+    EDITTEXT        IDC_RIGHT_ELBOW_ROTATE,95,174,19,12,ES_CENTER | ES_AUTOHSCROLL
+    EDITTEXT        IDC_RIGHT_ELBOW_BEND,117,174,19,12,ES_CENTER | ES_AUTOHSCROLL
+    EDITTEXT        IDC_RIGHT_WRIST_ROTATE,139,174,19,12,ES_CENTER | ES_AUTOHSCROLL
+    EDITTEXT        IDC_RIGHT_GRIP,161,174,19,12,ES_CENTER | ES_AUTOHSCROLL
+    PUSHBUTTON      "Move",IDC_SET_RIGHT_ARM_POSITION,49,188,20,12
+    PUSHBUTTON      "Get",IDC_READ_RIGHT_ARM_POSITION,18,216,16,12
+    CONTROL         "Enable Face Identification",IDC_CAMERA_ENABLE_FACE_IDENTIFY,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,196,150,97,10
+    CONTROL         "Cliff Sensors",IDC_CLIFF_SENSORS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,301,71,66,10
+    COMBOBOX        IDC_ARM_SPEED_R,74,216,44,134,CBS_DROPDOWN | WS_TABSTOP
+    COMBOBOX        IDC_R_ARM_POS_PRESET,121,216,68,218,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP,0,HIDC_R_ARM_POS_PRESET
+    LTEXT           "Speed",IDC_STATIC,48,219,22,8
+    CONTROL         "Enable",IDC_ENABLE_SERVOS_R,"Button",BS_AUTOCHECKBOX | BS_LEFTTEXT | WS_TABSTOP,7,189,38,8
+    LTEXT           "Kerr COM Port",IDC_STATIC,19,62,46,8
+    PUSHBUTTON      "Open Port",IDC_OPEN_KERR_SERVO_PORT,127,58,50,14
+    EDITTEXT        IDC_KERR_SERVO_COM_PORT,79,58,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_RIGHT_SHOULDER_ROTATE_SET,73,188,19,12,ES_CENTER | ES_AUTOHSCROLL
+    EDITTEXT        IDC_RIGHT_ELBOW_ROTATE_SET,95,188,19,12,ES_CENTER | ES_AUTOHSCROLL
+    EDITTEXT        IDC_RIGHT_ELBOW_BEND_SET,117,188,19,12,ES_CENTER | ES_AUTOHSCROLL
+    EDITTEXT        IDC_RIGHT_WRIST_ROTATE_SET,139,188,19,12,ES_CENTER | ES_AUTOHSCROLL
+    EDITTEXT        IDC_RIGHT_GRIP_SET,161,188,19,12,ES_CENTER | ES_AUTOHSCROLL
+    CONTROL         "Limit",IDC_ARM_LIMIT_R,"Button",BS_AUTOCHECKBOX | BS_LEFTTEXT,15,176,30,8
+    PUSHBUTTON      "Copy",IDC_COPY_RIGHT_ARM_POSITION,50,174,20,12
+    CONTROL         "Dyna USB Enable",IDC_DYNA_USB_ENABLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,301,128,72,10
+    GROUPBOX        "IP Camera",IDC_STATIC,191,284,107,38
+    CONTROL         "Track Robot Hand Position",IDC_CAMERA_ENABLE_TRACKING_HAND,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,196,205,92,10
+    CONTROL         "Stereo - 3D",IDC_CAMERA_ENABLE_STEREO_VISION,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,196,194,92,10
+    GROUPBOX        "",IDC_STATIC,192,13,107,86
+    CONTROL         "Enable Processing",IDC_ENABLE_VIDEO_PROCESSING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,196,100,89,10
+    CONTROL         "Enable Matching Objects",IDC_CAMERA_ENABLE_MATCH_OBJECTS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,196,183,93,10
+    GROUPBOX        "Left Arm Control",IDC_STATIC,7,234,185,82
+    LTEXT           "Limit/Enable       Shoulder Rotate Bend  Wrist  Grip  Limit",IDC_STATIC,19,245,172,9
+    EDITTEXT        IDC_LEFT_SHOULDER_ROTATE,73,255,19,12,ES_CENTER | ES_AUTOHSCROLL
+    EDITTEXT        IDC_LEFT_ELBOW_ROTATE,95,255,19,12,ES_CENTER | ES_AUTOHSCROLL
+    EDITTEXT        IDC_LEFT_ELBOW_BEND,117,255,19,12,ES_CENTER | ES_AUTOHSCROLL
+    EDITTEXT        IDC_LEFT_WRIST_ROTATE,139,255,19,12,ES_CENTER | ES_AUTOHSCROLL
+    EDITTEXT        IDC_LEFT_GRIP,161,255,19,12,ES_CENTER | ES_AUTOHSCROLL
+    PUSHBUTTON      "Move",IDC_SET_LEFT_ARM_POSITION,49,270,20,12
+    PUSHBUTTON      "Get",IDC_READ_LEFT_ARM_POSITION,25,298,16,12
+    COMBOBOX        IDC_ARM_SPEED_L,73,300,44,134,CBS_DROPDOWN | WS_TABSTOP
+    COMBOBOX        IDC_L_ARM_POS_PRESET,121,300,68,218,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP,0,HIDC_L_ARM_POS_PRESET
+    LTEXT           "Speed",IDC_STATIC,47,302,22,8
+    CONTROL         "Enable",IDC_ENABLE_SERVOS_L,"Button",BS_AUTOCHECKBOX | BS_LEFTTEXT | WS_TABSTOP,7,271,38,8
+    EDITTEXT        IDC_LEFT_SHOULDER_ROTATE_SET,73,270,18,14,ES_CENTER | ES_AUTOHSCROLL
+    EDITTEXT        IDC_LEFT_ELBOW_ROTATE_SET,95,270,19,12,ES_CENTER | ES_AUTOHSCROLL
+    EDITTEXT        IDC_LEFT_ELBOW_BEND_SET,117,270,19,12,ES_CENTER | ES_AUTOHSCROLL
+    EDITTEXT        IDC_LEFT_WRIST_ROTATE_SET,139,270,19,12,ES_CENTER | ES_AUTOHSCROLL
+    EDITTEXT        IDC_LEFT_GRIP_SET,161,270,19,12,ES_CENTER | ES_AUTOHSCROLL
+    CONTROL         "Limit",IDC_ARM_LIMIT_L,"Button",BS_AUTOCHECKBOX | BS_LEFTTEXT,15,258,30,8
+    PUSHBUTTON      "Copy",IDC_COPY_LEFT_ARM_POSITION,49,255,20,12
+    PUSHBUTTON      "Launch App",IDC_LAUNCH_APP,383,7,50,14
+    PUSHBUTTON      "Next",IDC_ITUNES_NEXT,470,7,26,14
+    PUSHBUTTON      "Prior",IDC_ITUNES_PRIOR,438,7,28,14
+    PUSHBUTTON      "FullScreen",IDC_ITUNES_FULLSCREEN,501,7,50,14
+    COMBOBOX        IDC_BOTH_ARM_POS_PRESET,120,317,68,218,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP,0,HIDC_BOTH_ARM_POS_PRESET
+    LTEXT           "Both Arms",IDC_STATIC,76,320,34,9
+    LTEXT           "RX64 COM Port",IDC_STATIC,19,78,52,8,0,WS_EX_RIGHT
+    EDITTEXT        IDC_DYNA_RX64_COM_PORT,79,74,40,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Open Port",IDC_OPEN_DYNA_RX64_SERVO_PORT,127,74,50,14
+    LTEXT           "Laser COM Port",IDC_STATIC,19,94,51,8
+    EDITTEXT        IDC_LASER_COM_PORT,79,90,40,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Open Port",IDC_OPEN_LASER_PORT,127,90,50,14
+    CONTROL         "Laser Power",IDC_ENABLE_LASER_POWER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,457,188,53,10
+    PUSHBUTTON      "Laser Scan",IDC_REQUEST_LASER_SCANS,385,163,47,14
+    PUSHBUTTON      "FindObjectAtXYZ",IDC_FIND_OBJ_AT_XYZ,516,184,61,14
+    GROUPBOX        "",IDC_STATIC,510,145,74,57,BS_CENTER
+    PUSHBUTTON      "SLAM",IDC_CHECK_LOCATION,558,7,48,13
+    EDITTEXT        IDC_HEAD_PAN_SET,414,91,18,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_HEAD_PAN_GET,414,75,18,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_HEAD_TILT_SET,435,91,18,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_HEAD_TILT_GET,435,75,18,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_HEAD_SIDETITL_SET,456,91,18,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_HEAD_SIDETILT_GET,456,75,18,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Move",IDC_SET_HEAD_POSITION,389,92,20,12
+    PUSHBUTTON      "Copy",IDC_COPY_HEAD_POSITION,389,77,20,12
+    LTEXT           "Head      Pan    Tilt    Side",IDC_STATIC,389,65,90,9
+    GROUPBOX        "Laser Tests",IDC_STATIC,381,145,203,57
+    GROUPBOX        "Head Servo Control",IDC_STATIC,385,51,98,75
+    EDITTEXT        IDC_LEFT_SHOULDER_ROTATE_LOAD,73,285,18,14,ES_CENTER | ES_AUTOHSCROLL
+    EDITTEXT        IDC_LEFT_ELBOW_ROTATE_LOAD,95,285,19,12,ES_CENTER | ES_AUTOHSCROLL
+    EDITTEXT        IDC_LEFT_ELBOW_BEND_LOAD,117,285,19,12,ES_CENTER | ES_AUTOHSCROLL
+    EDITTEXT        IDC_LEFT_WRIST_ROTATE_LOAD,139,285,19,12,ES_CENTER | ES_AUTOHSCROLL
+    EDITTEXT        IDC_LEFT_GRIP_LOAD,161,285,19,12,ES_CENTER | ES_AUTOHSCROLL
+    LTEXT           "Load",IDC_STATIC,52,287,17,8
+    EDITTEXT        IDC_RIGHT_SHOULDER_ROTATE_LOAD,73,202,19,12,ES_CENTER | ES_AUTOHSCROLL
+    EDITTEXT        IDC_RIGHT_ELBOW_ROTATE_LOAD,95,202,19,12,ES_CENTER | ES_AUTOHSCROLL
+    EDITTEXT        IDC_RIGHT_ELBOW_BEND_LOAD,117,202,19,12,ES_CENTER | ES_AUTOHSCROLL
+    EDITTEXT        IDC_RIGHT_WRIST_ROTATE_LOAD,139,202,19,12,ES_CENTER | ES_AUTOHSCROLL
+    EDITTEXT        IDC_RIGHT_GRIP_LOAD,161,202,19,12,ES_CENTER | ES_AUTOHSCROLL
+    LTEXT           "Load",IDC_STATIC,52,204,17,8
+    EDITTEXT        IDC_HEAD_PAN_LOAD,414,107,18,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_HEAD_TILT_LOAD,436,107,18,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_HEAD_SIDETILT_LOAD,456,107,18,14,ES_AUTOHSCROLL
+    CONTROL         "LaserSearch for Objects",IDC_LASER_SEARCH_FOR_OBJECTS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,389,130,92,10
+    EDITTEXT        IDC_START_ANGLE,436,163,18,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_END_ANGLE,459,163,18,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_STEP_ANGLE,482,163,18,14,ES_AUTOHSCROLL
+    RTEXT           "Start    Stop  StepTD",IDC_STATIC,425,153,78,9
+    EDITTEXT        IDC_KINECT_TILT_SET,408,185,20,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Move",IDC_SET_LASER_POSITION,386,185,20,12
+    CTEXT           "--",IDC_KINECT_TILT_GET,430,185,20,12,SS_CENTERIMAGE | SS_SUNKEN
+    CTEXT           "X       Y       Z",IDC_STATIC,518,154,57,8
+    EDITTEXT        IDC_OBJECT_X,512,163,22,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_OBJECT_Y,535,163,22,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_OBJECT_Z,559,163,22,14,ES_AUTOHSCROLL
+    CONTROL         "Kinect",IDC_ENABLE_KINECT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,197,81,37,10
+    LTEXT           "Capture Size",IDC_STATIC,196,50,41,10
+    COMBOBOX        IDC_CAM_DISPLAY_SIZE,251,64,33,134,CBS_DROPDOWN | WS_TABSTOP
+    COMBOBOX        IDC_KINECT_DISPLAY_SIZE,252,80,33,134,CBS_DROPDOWN | WS_TABSTOP
+    LTEXT           "Display Size",IDC_STATIC,196,65,41,10
+    CONTROL         "Flip Kinect Video",IDC_FLIP_KINECT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,302,29,66,10
+    CONTROL         "Kinect Power",IDC_KINECT_PWR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,302,39,54,9
+    EDITTEXT        IDC_EDIT_SCRIPT_FILENAME,48,340,141,14,ES_AUTOHSCROLL
+    LTEXT           "File Name",IDC_STATIC,12,343,35,8
+    PUSHBUTTON      "New/Edit Script",IDC_EDIT_SCRIPT_FILE,7,360,67,14
+    PUSHBUTTON      "Run Script",IDC_RUN_SCRIPT,77,360,50,14
+    GROUPBOX        "Servo Script",IDC_STATIC,6,328,185,63
+    EDITTEXT        IDC_EDIT_SCRIPT_TEXT_LINE,7,376,153,14,ES_MULTILINE | ES_AUTOHSCROLL | ES_WANTRETURN | WS_VSCROLL
+    PUSHBUTTON      "Add",IDC_ADD_SCRIPT_DELAY,163,376,26,14
+    PUSHBUTTON      "Close Script",IDC_CLOSE_SCRIPT_FILE,130,360,50,14
+END
+
+IDD_ROTATE_MAP DIALOGEX 0, 0, 186, 75
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Rotate Map"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    EDITTEXT        IDC_MAP_ROTATION_AMOUNT,73,14,25,14,ES_CENTER | WS_GROUP
+    DEFPUSHBUTTON   "OK",IDOK,129,7,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,129,24,50,14
+    LTEXT           "Rotation Degrees",IDC_STATIC,7,16,56,8
+    LTEXT           "Scale %",IDC_STATIC,7,40,26,8
+    EDITTEXT        IDC_MAP_SCALE_AMOUNT,73,38,25,14,ES_CENTER | WS_GROUP
+END
+
+IDD_ARM_CONTROL_DLG DIALOG 0, 0, 156, 338
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "Arm Control"
+MENU IDR_MAINFRAME
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,7,316,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,99,318,50,14
+    PUSHBUTTON      "Home",IDC_ARM_MOTION1,7,11,50,14
+    PUSHBUTTON      "Extend Arm",IDC_ARM_MOTION2,7,26,50,14
+    PUSHBUTTON      "Extend Arm All",IDC_ARM_MOTION3,7,41,50,14
+    PUSHBUTTON      "Shake Ready",IDC_ARM_MOTION4,7,56,50,14
+    PUSHBUTTON      "Shake Move",IDC_ARM_MOTION5,7,71,50,14
+    PUSHBUTTON      "Look At Hand",IDC_ARM_MOTION6,7,86,50,14
+    PUSHBUTTON      "Scratch Head",IDC_ARM_MOTION7,7,101,50,14
+    PUSHBUTTON      "Open Hatch",IDC_ARM_MOTION8,7,116,50,14
+    PUSHBUTTON      "Close Hatch",IDC_ARM_MOTION9,7,131,50,14
+    PUSHBUTTON      "Pickup Object",IDC_ARM_MOTION10,7,146,50,14
+    PUSHBUTTON      "Throw Ball",IDC_ARM_MOTION11,7,161,50,14
+    PUSHBUTTON      "Hands Up",IDC_ARM_MOTION12,7,176,50,14
+    PUSHBUTTON      "Scratch Back",IDC_ARM_MOTION13,7,191,50,14
+    PUSHBUTTON      "Wave",IDC_ARM_MOTION14,7,206,50,14
+    PUSHBUTTON      "Open Claw",IDC_ARM_MOTION15,7,220,50,14
+    PUSHBUTTON      "Grab Coke",IDC_ARM_MOTION16,7,235,50,14
+    PUSHBUTTON      "Close Claw Full",IDC_ARM_MOTION17,7,250,50,14
+    PUSHBUTTON      "Lift Object",IDC_ARM_MOTION18,7,264,50,14
+    PUSHBUTTON      "",IDC_ARM_MOTION19,7,278,50,14
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "CompanyName", "Dave Shinsel"
+            VALUE "FileDescription", "Turtle Robot"
+            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "InternalName", "Robot"
+            VALUE "LegalCopyright", "Copyright(C) Dave Shinsel 2005"
+            VALUE "OriginalFilename", "Turtle.EXE"
+            VALUE "ProductName", "Turtle Robot"
+            VALUE "ProductVersion", "1, 0, 0, 1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 204
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 58
+    END
+
+    IDD_PEN_WIDTHS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 179
+        TOPMARGIN, 6
+        BOTTOMMARGIN, 83
+    END
+
+    IDD_PATH_FORM, DIALOG
+    BEGIN
+        LEFTMARGIN, 2
+        RIGHTMARGIN, 617
+        TOPMARGIN, 2
+        BOTTOMMARGIN, 373
+    END
+
+    IDD_ROBOTCMD_FORM, DIALOG
+    BEGIN
+        LEFTMARGIN, 2
+        RIGHTMARGIN, 624
+        TOPMARGIN, 2
+        BOTTOMMARGIN, 383
+    END
+
+    IDD_SETUP_FORM, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 619
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 390
+        HORZGUIDE, 390
+    END
+
+    IDD_ROTATE_MAP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 179
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 68
+    END
+
+    IDD_ARM_CONTROL_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 149
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 331
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog Info
+//
+
+IDD_ROBOTCMD_FORM DLGINIT
+BEGIN
+    IDC_MOVE_DISTANCE, 0x403, 9, 0
+0x2036, 0x6e69, 0x6863, 0x7365, "\000" 
+    IDC_MOVE_DISTANCE, 0x403, 7, 0
+0x2031, 0x6f66, 0x746f, "\000" 
+    IDC_MOVE_DISTANCE, 0x403, 7, 0
+0x2032, 0x6566, 0x7465, "\000" 
+    IDC_MOVE_DISTANCE, 0x403, 7, 0
+0x2033, 0x6566, 0x7465, "\000" 
+    IDC_MOVE_DISTANCE, 0x403, 7, 0
+0x2034, 0x6566, 0x7465, "\000" 
+    IDC_MOVE_DISTANCE, 0x403, 8, 0
+0x3031, 0x6620, 0x6565, 0x0074, 
+    IDC_MOVE_DISTANCE, 0x403, 1, 0
+"\000" 
+    IDC_TURN_AMOUNT, 0x403, 6, 0
+0x2035, 0x6564, 0x0067, 
+    IDC_TURN_AMOUNT, 0x403, 7, 0
+0x3031, 0x6420, 0x6765, "\000" 
+    IDC_TURN_AMOUNT, 0x403, 7, 0
+0x3232, 0x6420, 0x6765, "\000" 
+    IDC_TURN_AMOUNT, 0x403, 7, 0
+0x3534, 0x6420, 0x6765, "\000" 
+    IDC_TURN_AMOUNT, 0x403, 7, 0
+0x3039, 0x6420, 0x6765, "\000" 
+    IDC_TURN_AMOUNT, 0x403, 8, 0
+0x3831, 0x2030, 0x6564, 0x0067, 
+    IDC_BEHAVIOR_MODE, 0x403, 9, 0
+0x7246, 0x6569, 0x646e, 0x796c, "\000" 
+    IDC_BEHAVIOR_MODE, 0x403, 15, 0
+0x614d, 0x756e, 0x6c61, 0x4320, 0x6e6f, 0x7274, 0x6c6f, "\000" 
+    IDC_BEHAVIOR_MODE, 0x403, 12, 0
+0x6157, 0x7469, 0x5620, 0x7265, 0x6162, 0x006c, 
+    IDC_BEHAVIOR_MODE, 0x403, 6, 0
+0x7547, 0x7261, 0x0064, 
+    IDC_ACTION_MODE, 0x403, 6, 0
+0x6552, 0x6461, 0x0079, 
+    IDC_ACTION_MODE, 0x403, 13, 0
+0x6950, 0x6b63, 0x7075, 0x4320, 0x6f6c, 0x6573, "\000" 
+    IDC_ACTION_MODE, 0x403, 11, 0
+0x6950, 0x6b63, 0x7075, 0x4120, 0x796e, "\000" 
+    IDC_ACTION_MODE, 0x403, 7, 0
+0x6f46, 0x6c6c, 0x776f, "\000" 
+    IDC_ACTION_MODE, 0x403, 8, 0
+0x7845, 0x6c70, 0x726f, 0x0065, 
+    IDC_ACTION_MODE, 0x403, 5, 0
+0x6f44, 0x6b63, "\000" 
+    IDC_PLAY_MUSIC, 0x403, 6, 0
+0x6552, 0x6461, 0x0079, 
+    IDC_PLAY_MUSIC, 0x403, 9, 0
+0x2031, 0x202d, 0x7453, 0x706f, "\000" 
+    IDC_PLAY_MUSIC, 0x403, 14, 0
+0x2032, 0x202d, 0x724d, 0x5220, 0x626f, 0x746f, 0x006f, 
+    IDC_PLAY_MUSIC, 0x403, 13, 0
+0x2033, 0x202d, 0x6148, 0x6177, 0x6969, 0x3035, "\000" 
+    IDC_PLAY_MUSIC, 0x403, 2, 0
+0x0033, 
+    IDC_PLAY_MUSIC, 0x403, 2, 0
+0x0034, 
+    IDC_PLAY_MUSIC, 0x403, 2, 0
+0x0035, 
+    IDC_PLAY_MUSIC, 0x403, 2, 0
+0x0036, 
+    IDC_PLAY_MUSIC, 0x403, 2, 0
+0x0037, 
+    IDC_PLAY_MUSIC, 0x403, 2, 0
+0x0038, 
+    IDC_PLAY_MUSIC, 0x403, 2, 0
+0x0039, 
+    IDC_PLAY_MUSIC, 0x403, 3, 0
+0x3031, "\000" 
+    IDC_PLAY_MUSIC, 0x403, 3, 0
+0x3131, "\000" 
+    IDC_PLAY_MUSIC, 0x403, 3, 0
+0x3231, "\000" 
+    IDC_PLAY_MUSIC, 0x403, 3, 0
+0x3331, "\000" 
+    IDC_PLAY_MUSIC, 0x403, 3, 0
+0x3431, "\000" 
+    IDC_PLAY_MUSIC, 0x403, 3, 0
+0x3531, "\000" 
+    IDC_HEAD_TILT, 0x403, 7, 0
+0x6543, 0x746e, 0x7265, "\000" 
+    IDC_HEAD_TILT, 0x403, 5, 0
+0x654c, 0x7466, "\000" 
+    IDC_HEAD_TILT, 0x403, 6, 0
+0x6952, 0x6867, 0x0074, 
+    IDC_HEAD_TILT, 0x403, 1, 0
+"\000" 
+    IDC_LASER_ZOOM, 0x403, 3, 0
+0x7831, "\000" 
+    IDC_LASER_ZOOM, 0x403, 3, 0
+0x7832, "\000" 
+    IDC_LASER_ZOOM, 0x403, 3, 0
+0x7833, "\000" 
+    IDC_LASER_ZOOM, 0x403, 3, 0
+0x7834, "\000" 
+    IDC_LASER_ZOOM, 0x403, 3, 0
+0x7835, "\000" 
+    0
+END
+
+IDD_PATH_FORM DLGINIT
+BEGIN
+    IDC_SEGMENT_BEHAVIOR, 0x403, 12, 0
+0x6f43, 0x706d, 0x7361, 0x2b73, 0x5047, 0x0053, 
+    IDC_SEGMENT_BEHAVIOR, 0x403, 12, 0
+0x6f47, 0x5320, 0x7274, 0x6961, 0x6867, 0x0074, 
+    IDC_SEGMENT_BEHAVIOR, 0x403, 12, 0
+0x6f46, 0x6c6c, 0x776f, 0x5720, 0x6c61, 0x006c, 
+    IDC_SEGMENT_BEHAVIOR, 0x403, 12, 0
+0x6f46, 0x6c6c, 0x776f, 0x4320, 0x7275, 0x0062, 
+    IDC_SEGMENT_BEHAVIOR, 0x403, 15, 0
+0x6f46, 0x6c6c, 0x776f, 0x4420, 0x6f72, 0x6f70, 0x6666, "\000" 
+    IDC_SEGMENT_BEHAVIOR, 0x403, 12, 0
+0x6f46, 0x6c6c, 0x776f, 0x4820, 0x6c61, 0x006c, 
+    IDC_SEGMENT_BEHAVIOR, 0x403, 14, 0
+0x6e45, 0x6574, 0x2072, 0x6f44, 0x726f, 0x6177, 0x0079, 
+    IDC_SEGMENT_SPEED, 0x403, 5, 0
+0x6c53, 0x776f, "\000" 
+    IDC_SEGMENT_SPEED, 0x403, 9, 0
+0x654d, 0x2064, 0x6c53, 0x776f, "\000" 
+    IDC_SEGMENT_SPEED, 0x403, 4, 0
+0x654d, 0x0064, 
+    IDC_SEGMENT_SPEED, 0x403, 9, 0
+0x654d, 0x2064, 0x6146, 0x7473, "\000" 
+    IDC_SEGMENT_SPEED, 0x403, 5, 0
+0x6146, 0x7473, "\000" 
+    IDC_SEGMENT_SPEED, 0x403, 11, 0
+0x7546, 0x6c6c, 0x5320, 0x6570, 0x6465, "\000" 
+    IDC_SEGMENT_SPEED, 0x403, 9, 0
+0x6552, 0x2076, 0x6c53, 0x776f, "\000" 
+    IDC_SEGMENT_SPEED, 0x403, 13, 0
+0x6552, 0x2076, 0x654d, 0x2064, 0x6c53, 0x776f, "\000" 
+    IDC_SEGMENT_SPEED, 0x403, 8, 0
+0x6552, 0x2076, 0x654d, 0x0064, 
+    IDC_WAYPOINT_LANDMARK_TYPE1, 0x403, 5, 0
+0x6f4e, 0x656e, "\000" 
+    IDC_WAYPOINT_LANDMARK_TYPE1, 0x403, 5, 0
+0x6f43, 0x656e, "\000" 
+    IDC_WAYPOINT_LANDMARK_TYPE1, 0x403, 10, 0
+0x654c, 0x7466, 0x4520, 0x6764, 0x0065, 
+    IDC_WAYPOINT_LANDMARK_TYPE1, 0x403, 11, 0
+0x6952, 0x6867, 0x2074, 0x6445, 0x6567, "\000" 
+    IDC_WAYPOINT_LANDMARK_TYPE1, 0x403, 5, 0
+0x6f50, 0x656c, "\000" 
+    IDC_WAYPOINT_LANDMARK_TYPE1, 0x403, 5, 0
+0x7254, 0x6565, "\000" 
+    IDC_WAYPOINT_LANDMARK_TYPE1, 0x403, 5, 0
+0x6157, 0x6c6c, "\000" 
+    IDC_WAYPOINT_LANDMARK_TYPE1, 0x403, 9, 0
+0x7244, 0x706f, 0x4f20, 0x6666, "\000" 
+    IDC_WAYPOINT_LANDMARK_TYPE1, 0x403, 6, 0
+0x6c53, 0x706f, 0x0065, 
+    IDC_WAYPOINT_LANDMARK_TYPE2, 0x403, 5, 0
+0x6f4e, 0x656e, "\000" 
+    IDC_WAYPOINT_LANDMARK_TYPE2, 0x403, 5, 0
+0x6f43, 0x656e, "\000" 
+    IDC_WAYPOINT_LANDMARK_TYPE2, 0x403, 10, 0
+0x654c, 0x7466, 0x4520, 0x6764, 0x0065, 
+    IDC_WAYPOINT_LANDMARK_TYPE2, 0x403, 11, 0
+0x6952, 0x6867, 0x2074, 0x6445, 0x6567, "\000" 
+    IDC_WAYPOINT_LANDMARK_TYPE2, 0x403, 5, 0
+0x6f50, 0x656c, "\000" 
+    IDC_WAYPOINT_LANDMARK_TYPE2, 0x403, 5, 0
+0x7254, 0x6565, "\000" 
+    IDC_WAYPOINT_LANDMARK_TYPE2, 0x403, 5, 0
+0x6157, 0x6c6c, "\000" 
+    IDC_WAYPOINT_LANDMARK_TYPE2, 0x403, 9, 0
+0x7244, 0x706f, 0x4f20, 0x6666, "\000" 
+    IDC_WAYPOINT_LANDMARK_TYPE2, 0x403, 6, 0
+0x6c53, 0x706f, 0x0065, 
+    IDC_WAYPOINT_LANDMARK_TYPE3, 0x403, 5, 0
+0x6f4e, 0x656e, "\000" 
+    IDC_WAYPOINT_LANDMARK_TYPE3, 0x403, 5, 0
+0x6f43, 0x656e, "\000" 
+    IDC_WAYPOINT_LANDMARK_TYPE3, 0x403, 10, 0
+0x654c, 0x7466, 0x4520, 0x6764, 0x0065, 
+    IDC_WAYPOINT_LANDMARK_TYPE3, 0x403, 11, 0
+0x6952, 0x6867, 0x2074, 0x6445, 0x6567, "\000" 
+    IDC_WAYPOINT_LANDMARK_TYPE3, 0x403, 5, 0
+0x6f50, 0x656c, "\000" 
+    IDC_WAYPOINT_LANDMARK_TYPE3, 0x403, 5, 0
+0x7254, 0x6565, "\000" 
+    IDC_WAYPOINT_LANDMARK_TYPE3, 0x403, 5, 0
+0x6157, 0x6c6c, "\000" 
+    IDC_WAYPOINT_LANDMARK_TYPE3, 0x403, 9, 0
+0x7244, 0x706f, 0x4f20, 0x6666, "\000" 
+    IDC_WAYPOINT_LANDMARK_TYPE3, 0x403, 6, 0
+0x6c53, 0x706f, 0x0065, 
+    0
+END
+
+IDD_SETUP_FORM DLGINIT
+BEGIN
+    IDC_AVOID_OBJ_RANGE, 0x403, 5, 0
+0x2030, 0x7466, "\000" 
+    IDC_AVOID_OBJ_RANGE, 0x403, 5, 0
+0x2031, 0x7466, "\000" 
+    IDC_AVOID_OBJ_RANGE, 0x403, 5, 0
+0x2032, 0x7466, "\000" 
+    IDC_AVOID_OBJ_RANGE, 0x403, 5, 0
+0x2033, 0x7466, "\000" 
+    IDC_AVOID_OBJ_RANGE, 0x403, 5, 0
+0x2034, 0x7466, "\000" 
+    IDC_AVOID_OBJ_RANGE, 0x403, 5, 0
+0x2035, 0x7466, "\000" 
+    IDC_AVOID_OBJ_RANGE, 0x403, 5, 0
+0x2036, 0x7466, "\000" 
+    IDC_AVOID_OBJ_RANGE, 0x403, 5, 0
+0x2037, 0x7466, "\000" 
+    IDC_AVOID_OBJ_RANGE, 0x403, 5, 0
+0x2038, 0x7466, "\000" 
+    IDC_PATH_SPEED_ADDER, 0x403, 2, 0
+0x0030, 
+    IDC_PATH_SPEED_ADDER, 0x403, 2, 0
+0x0031, 
+    IDC_PATH_SPEED_ADDER, 0x403, 2, 0
+0x0032, 
+    IDC_PATH_SPEED_ADDER, 0x403, 2, 0
+0x0033, 
+    IDC_PATH_SPEED_ADDER, 0x403, 2, 0
+0x0034, 
+    IDC_PATH_SPEED_ADDER, 0x403, 2, 0
+0x0035, 
+    IDC_CAMERA_TRACKING_COLOR_THRESHOLD, 0x403, 2, 0
+0x0030, 
+    IDC_CAMERA_TRACKING_COLOR_THRESHOLD, 0x403, 2, 0
+0x0031, 
+    IDC_CAMERA_TRACKING_COLOR_THRESHOLD, 0x403, 2, 0
+0x0032, 
+    IDC_CAMERA_TRACKING_COLOR_THRESHOLD, 0x403, 2, 0
+0x0033, 
+    IDC_CAMERA_TRACKING_COLOR_THRESHOLD, 0x403, 2, 0
+0x0034, 
+    IDC_CAMERA_TRACKING_COLOR_THRESHOLD, 0x403, 2, 0
+0x0035, 
+    IDC_CAMERA_TRACKING_COLOR_THRESHOLD, 0x403, 2, 0
+0x0036, 
+    IDC_CAMERA_TRACKING_COLOR_THRESHOLD, 0x403, 2, 0
+0x0037, 
+    IDC_CAMERA_TRACKING_COLOR_THRESHOLD, 0x403, 2, 0
+0x0038, 
+    IDC_CAMERA_TRACKING_COLOR_THRESHOLD, 0x403, 2, 0
+0x0039, 
+    IDC_CAMERA_TRACKING_COLOR_THRESHOLD, 0x403, 3, 0
+0x3031, "\000" 
+    IDC_CAMERA_TRACKING_COLOR_THRESHOLD, 0x403, 3, 0
+0x3131, "\000" 
+    IDC_CAMERA_TRACKING_COLOR_THRESHOLD, 0x403, 3, 0
+0x3231, "\000" 
+    IDC_CAMERA_TRACKING_COLOR_THRESHOLD, 0x403, 3, 0
+0x3331, "\000" 
+    IDC_CAMERA_TRACKING_COLOR_THRESHOLD, 0x403, 3, 0
+0x3431, "\000" 
+    IDC_CAMERA_TRACKING_COLOR_THRESHOLD, 0x403, 3, 0
+0x3531, "\000" 
+    IDC_CAM_PAN_SPEED, 0x403, 11, 0
+0x2031, 0x6556, 0x7972, 0x6c53, 0x776f, "\000" 
+    IDC_CAM_PAN_SPEED, 0x403, 7, 0
+0x2032, 0x6c53, 0x776f, "\000" 
+    IDC_CAM_PAN_SPEED, 0x403, 10, 0
+0x2033, 0x654d, 0x5364, 0x6f6c, 0x0077, 
+    IDC_CAM_PAN_SPEED, 0x403, 6, 0
+0x2034, 0x654d, 0x0064, 
+    IDC_CAM_PAN_SPEED, 0x403, 10, 0
+0x2035, 0x654d, 0x4664, 0x7361, 0x0074, 
+    IDC_CAM_PAN_SPEED, 0x403, 7, 0
+0x2036, 0x6146, 0x7473, "\000" 
+    IDC_CAM_PAN_SPEED, 0x403, 6, 0
+0x2037, 0x614d, 0x0078, 
+    IDC_CAM_ZOOM_LEVEL_ABS, 0x403, 2, 0
+0x0030, 
+    IDC_CAM_ZOOM_LEVEL_ABS, 0x403, 2, 0
+0x0031, 
+    IDC_CAM_ZOOM_LEVEL_ABS, 0x403, 2, 0
+0x0032, 
+    IDC_CAM_ZOOM_LEVEL_ABS, 0x403, 2, 0
+0x0033, 
+    IDC_CAM_ZOOM_LEVEL_ABS, 0x403, 2, 0
+0x0034, 
+    IDC_CAM_ZOOM_LEVEL_ABS, 0x403, 2, 0
+0x0035, 
+    IDC_CAM_ZOOM_LEVEL_ABS, 0x403, 2, 0
+0x0036, 
+    IDC_CAM_ZOOM_LEVEL_ABS, 0x403, 2, 0
+0x0037, 
+    IDC_CAM_ZOOM_LEVEL_ABS, 0x403, 2, 0
+0x0038, 
+    IDC_CAM_ZOOM_LEVEL_ABS, 0x403, 2, 0
+0x0039, 
+    IDC_CAM_ZOOM_LEVEL_ABS, 0x403, 3, 0
+0x3031, "\000" 
+    IDC_CAM_ZOOM_LEVEL_ABS, 0x403, 3, 0
+0x3131, "\000" 
+    IDC_CAM_ZOOM_LEVEL_ABS, 0x403, 3, 0
+0x3231, "\000" 
+    IDC_CAM_ZOOM_LEVEL_ABS, 0x403, 3, 0
+0x3331, "\000" 
+    IDC_CAM_ZOOM_LEVEL_ABS, 0x403, 3, 0
+0x3431, "\000" 
+    IDC_CAM_ZOOM_LEVEL_ABS, 0x403, 3, 0
+0x3531, "\000" 
+    IDC_CAM_ZOOM_LEVEL_ABS, 0x403, 3, 0
+0x3631, "\000" 
+    IDC_CAM_FRAME_SIZE, 0x403, 8, 0
+0x3631, 0x7830, 0x3231, 0x0030, 
+    IDC_CAM_FRAME_SIZE, 0x403, 8, 0
+0x3233, 0x7830, 0x3432, 0x0030, 
+    IDC_CAM_FRAME_SIZE, 0x403, 8, 0
+0x3436, 0x7830, 0x3834, 0x0030, 
+    IDC_ARM_SPEED_R, 0x403, 5, 0
+0x7453, 0x706f, "\000" 
+    IDC_ARM_SPEED_R, 0x403, 5, 0
+0x6c53, 0x776f, "\000" 
+    IDC_ARM_SPEED_R, 0x403, 9, 0
+0x654d, 0x2d64, 0x6c53, 0x776f, "\000" 
+    IDC_ARM_SPEED_R, 0x403, 4, 0
+0x654d, 0x0064, 
+    IDC_ARM_SPEED_R, 0x403, 9, 0
+0x654d, 0x2d64, 0x6146, 0x7473, "\000" 
+    IDC_ARM_SPEED_R, 0x403, 5, 0
+0x6146, 0x7473, "\000" 
+    IDC_ARM_SPEED_R, 0x403, 4, 0
+0x614d, 0x0078, 
+    IDC_R_ARM_POS_PRESET, 0x403, 12, 0
+0x7241, 0x206d, 0x6f4d, 0x6974, 0x6e6f, 0x0073, 
+    IDC_R_ARM_POS_PRESET, 0x403, 8, 0
+0x3a31, 0x4820, 0x6d6f, 0x0065, 
+    IDC_R_ARM_POS_PRESET, 0x403, 10, 0
+0x3a32, 0x4820, 0x6d6f, 0x2065, 0x0032, 
+    IDC_R_ARM_POS_PRESET, 0x403, 14, 0
+0x3a33, 0x4520, 0x7478, 0x6e65, 0x2064, 0x7241, 0x006d, 
+    IDC_R_ARM_POS_PRESET, 0x403, 13, 0
+0x3a34, 0x4f20, 0x6570, 0x206e, 0x6c43, 0x7761, "\000" 
+    IDC_R_ARM_POS_PRESET, 0x403, 14, 0
+0x2e35, 0x4320, 0x6f6c, 0x6573, 0x4320, 0x616c, 0x0077, 
+    IDC_R_ARM_POS_PRESET, 0x403, 18, 0
+0x3a36, 0x4520, 0x7478, 0x6e65, 0x2064, 0x7241, 0x206d, 0x6c41, 0x006c, 
+
+    IDC_R_ARM_POS_PRESET, 0x403, 17, 0
+0x3a37, 0x5320, 0x6168, 0x656b, 0x2820, 0x6552, 0x6461, 0x2979, "\000" 
+    IDC_R_ARM_POS_PRESET, 0x403, 16, 0
+0x3a38, 0x5320, 0x6168, 0x656b, 0x2820, 0x6f4d, 0x6576, 0x0029, 
+    IDC_R_ARM_POS_PRESET, 0x403, 17, 0
+0x3a39, 0x5020, 0x6369, 0x756b, 0x2070, 0x624f, 0x656a, 0x7463, "\000" 
+    IDC_R_ARM_POS_PRESET, 0x403, 20, 0
+0x3031, 0x203a, 0x7550, 0x2074, 0x6f44, 0x6e77, 0x4f20, 0x6a62, 0x6365, 
+0x0074, 
+    IDC_R_ARM_POS_PRESET, 0x403, 23, 0
+0x3131, 0x203a, 0x6854, 0x6f72, 0x2077, 0x624f, 0x656a, 0x7463, 0x4620, 
+0x6f72, 0x746e, "\000" 
+    IDC_R_ARM_POS_PRESET, 0x403, 22, 0
+0x3231, 0x203a, 0x6854, 0x6f72, 0x2077, 0x624f, 0x656a, 0x7463, 0x4220, 
+0x6361, 0x006b, 
+    IDC_R_ARM_POS_PRESET, 0x403, 17, 0
+0x3331, 0x203a, 0x6f4c, 0x6b6f, 0x4120, 0x2074, 0x6148, 0x646e, "\000" 
+    IDC_R_ARM_POS_PRESET, 0x403, 17, 0
+0x3431, 0x203a, 0x6353, 0x6172, 0x6374, 0x2068, 0x6548, 0x6461, "\000" 
+    IDC_R_ARM_POS_PRESET, 0x403, 13, 0
+0x3531, 0x203a, 0x6148, 0x646e, 0x2073, 0x7055, "\000" 
+    IDC_R_ARM_POS_PRESET, 0x403, 17, 0
+0x3631, 0x203a, 0x6353, 0x6172, 0x6374, 0x2068, 0x6142, 0x6b63, "\000" 
+    IDC_R_ARM_POS_PRESET, 0x403, 9, 0
+0x3731, 0x202e, 0x6157, 0x6576, "\000" 
+    IDC_R_ARM_POS_PRESET, 0x403, 14, 0
+0x3831, 0x202e, 0x7247, 0x6261, 0x4320, 0x6b6f, 0x0065, 
+    IDC_R_ARM_POS_PRESET, 0x403, 16, 0
+0x3931, 0x202e, 0x694c, 0x7466, 0x4f20, 0x6a62, 0x6365, 0x0074, 
+    IDC_R_ARM_POS_PRESET, 0x403, 18, 0
+0x3032, 0x202e, 0x6946, 0x646e, 0x6f20, 0x206e, 0x6c46, 0x6f6f, 0x0072, 
+
+    IDC_R_ARM_POS_PRESET, 0x403, 21, 0
+0x3132, 0x202e, 0x7554, 0x6e72, 0x4420, 0x6f6f, 0x2072, 0x6148, 0x646e, 
+0x656c, "\000" 
+    IDC_ARM_SPEED_L, 0x403, 5, 0
+0x7453, 0x706f, "\000" 
+    IDC_ARM_SPEED_L, 0x403, 5, 0
+0x6c53, 0x776f, "\000" 
+    IDC_ARM_SPEED_L, 0x403, 9, 0
+0x654d, 0x2d64, 0x6c53, 0x776f, "\000" 
+    IDC_ARM_SPEED_L, 0x403, 4, 0
+0x654d, 0x0064, 
+    IDC_ARM_SPEED_L, 0x403, 9, 0
+0x654d, 0x2d64, 0x6146, 0x7473, "\000" 
+    IDC_ARM_SPEED_L, 0x403, 5, 0
+0x6146, 0x7473, "\000" 
+    IDC_ARM_SPEED_L, 0x403, 4, 0
+0x614d, 0x0078, 
+    IDC_L_ARM_POS_PRESET, 0x403, 12, 0
+0x7241, 0x206d, 0x6f4d, 0x6974, 0x6e6f, 0x0073, 
+    IDC_L_ARM_POS_PRESET, 0x403, 8, 0
+0x3a31, 0x4820, 0x6d6f, 0x0065, 
+    IDC_L_ARM_POS_PRESET, 0x403, 10, 0
+0x3a32, 0x4820, 0x6d6f, 0x2065, 0x0032, 
+    IDC_L_ARM_POS_PRESET, 0x403, 14, 0
+0x3a33, 0x4520, 0x7478, 0x6e65, 0x2064, 0x7241, 0x006d, 
+    IDC_L_ARM_POS_PRESET, 0x403, 13, 0
+0x3a34, 0x4f20, 0x6570, 0x206e, 0x6c43, 0x7761, "\000" 
+    IDC_L_ARM_POS_PRESET, 0x403, 14, 0
+0x2e35, 0x4320, 0x6f6c, 0x6573, 0x4320, 0x616c, 0x0077, 
+    IDC_L_ARM_POS_PRESET, 0x403, 18, 0
+0x3a36, 0x4520, 0x7478, 0x6e65, 0x2064, 0x7241, 0x206d, 0x6c41, 0x006c, 
+
+    IDC_L_ARM_POS_PRESET, 0x403, 17, 0
+0x3a37, 0x5320, 0x6168, 0x656b, 0x2820, 0x6552, 0x6461, 0x2979, "\000" 
+    IDC_L_ARM_POS_PRESET, 0x403, 16, 0
+0x3a38, 0x5320, 0x6168, 0x656b, 0x2820, 0x6f4d, 0x6576, 0x0029, 
+    IDC_L_ARM_POS_PRESET, 0x403, 17, 0
+0x3a39, 0x5020, 0x6369, 0x756b, 0x2070, 0x624f, 0x656a, 0x7463, "\000" 
+    IDC_L_ARM_POS_PRESET, 0x403, 20, 0
+0x3031, 0x203a, 0x7550, 0x2074, 0x6f44, 0x6e77, 0x4f20, 0x6a62, 0x6365, 
+0x0074, 
+    IDC_L_ARM_POS_PRESET, 0x403, 23, 0
+0x3131, 0x203a, 0x6854, 0x6f72, 0x2077, 0x624f, 0x656a, 0x7463, 0x4620, 
+0x6f72, 0x746e, "\000" 
+    IDC_L_ARM_POS_PRESET, 0x403, 22, 0
+0x3231, 0x203a, 0x6854, 0x6f72, 0x2077, 0x624f, 0x656a, 0x7463, 0x4220, 
+0x6361, 0x006b, 
+    IDC_L_ARM_POS_PRESET, 0x403, 17, 0
+0x3331, 0x203a, 0x6f4c, 0x6b6f, 0x4120, 0x2074, 0x6148, 0x646e, "\000" 
+    IDC_L_ARM_POS_PRESET, 0x403, 17, 0
+0x3431, 0x203a, 0x6353, 0x6172, 0x6374, 0x2068, 0x6548, 0x6461, "\000" 
+    IDC_L_ARM_POS_PRESET, 0x403, 13, 0
+0x3531, 0x203a, 0x6148, 0x646e, 0x2073, 0x7055, "\000" 
+    IDC_L_ARM_POS_PRESET, 0x403, 17, 0
+0x3631, 0x203a, 0x6353, 0x6172, 0x6374, 0x2068, 0x6142, 0x6b63, "\000" 
+    IDC_L_ARM_POS_PRESET, 0x403, 9, 0
+0x3731, 0x202e, 0x6157, 0x6576, "\000" 
+    IDC_L_ARM_POS_PRESET, 0x403, 14, 0
+0x3831, 0x202e, 0x7247, 0x6261, 0x4320, 0x6b6f, 0x0065, 
+    IDC_L_ARM_POS_PRESET, 0x403, 16, 0
+0x3931, 0x202e, 0x694c, 0x7466, 0x4f20, 0x6a62, 0x6365, 0x0074, 
+    IDC_L_ARM_POS_PRESET, 0x403, 18, 0
+0x3032, 0x202e, 0x6946, 0x646e, 0x6f20, 0x206e, 0x6c46, 0x6f6f, 0x0072, 
+
+    IDC_BOTH_ARM_POS_PRESET, 0x403, 10, 0
+0x6f42, 0x6874, 0x4120, 0x6d72, 0x0073, 
+    IDC_BOTH_ARM_POS_PRESET, 0x403, 8, 0
+0x3a31, 0x4820, 0x6d6f, 0x0065, 
+    IDC_BOTH_ARM_POS_PRESET, 0x403, 10, 0
+0x3a32, 0x4820, 0x6d6f, 0x2065, 0x0032, 
+    IDC_BOTH_ARM_POS_PRESET, 0x403, 19, 0
+0x3a33, 0x4520, 0x7478, 0x6e65, 0x2064, 0x7241, 0x206d, 0x7541, 0x6f74, 
+"\000" 
+    IDC_BOTH_ARM_POS_PRESET, 0x403, 13, 0
+0x3a34, 0x4f20, 0x6570, 0x206e, 0x6c43, 0x7761, "\000" 
+    IDC_BOTH_ARM_POS_PRESET, 0x403, 15, 0
+0x2e35, 0x5420, 0x7268, 0x776f, 0x4620, 0x6f72, 0x746e, "\000" 
+    IDC_BOTH_ARM_POS_PRESET, 0x403, 14, 0
+0x2e36, 0x5420, 0x7268, 0x776f, 0x4220, 0x6361, 0x006b, 
+    IDC_BOTH_ARM_POS_PRESET, 0x403, 20, 0
+0x2e37, 0x2020, 0x7550, 0x2074, 0x6f44, 0x6e77, 0x4f20, 0x6a62, 0x6365, 
+0x0074, 
+    IDC_BOTH_ARM_POS_PRESET, 0x403, 10, 0
+0x2e38, 0x7241, 0x736d, 0x5520, 0x0070, 
+    IDC_BOTH_ARM_POS_PRESET, 0x403, 9, 0
+0x2e39, 0x614b, 0x6172, 0x6574, "\000" 
+    IDC_BOTH_ARM_POS_PRESET, 0x403, 14, 0
+0x3031, 0x392e, 0x2030, 0x6544, 0x7267, 0x6565, 0x0073, 
+    IDC_CAM_DISPLAY_SIZE, 0x403, 8, 0
+0x3631, 0x7830, 0x3231, 0x0030, 
+    IDC_CAM_DISPLAY_SIZE, 0x403, 8, 0
+0x3233, 0x7830, 0x3432, 0x0030, 
+    IDC_CAM_DISPLAY_SIZE, 0x403, 8, 0
+0x3436, 0x7830, 0x3834, 0x0030, 
+    IDC_KINECT_DISPLAY_SIZE, 0x403, 8, 0
+0x3631, 0x7830, 0x3231, 0x0030, 
+    IDC_KINECT_DISPLAY_SIZE, 0x403, 8, 0
+0x3233, 0x7830, 0x3432, 0x0030, 
+    IDC_KINECT_DISPLAY_SIZE, 0x403, 8, 0
+0x3436, 0x7830, 0x3834, 0x0030, 
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Cursor
+//
+
+IDC_CURSOR1             CURSOR                  "res\\cursor1.cur"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDR_PATHVIEW_TMPL       "\nPath\nPath\nRobot Path Files (*.pat)\n.pat\nPath.Document\nRobot Path Data"
+    IDP_SOCKETS_INIT_FAILED "Windows sockets initialization failed."
+    IDR_ROBOTCMDVIEW_TMPL   "\nCommand\nRobotCmd\nRobot Command Data Files (*.rcd)\n.rcd\nRobotCmdView.Document\nRobot Command Document"
+    IDR_SETUP_TMPL          "\nSetup\nSetup\nSetup Files (*.rsd)\n.rsd\nSetup.Document\nSetup Document"
+    ID_INDICATOR_POS        """Map Position Indication Goes Here.  Make sure there is plenty of space!"""
+END
+
+STRINGTABLE
+BEGIN
+    IDR_MAINFRAME           "Robot"
+    IDR_MAPTYPE             "\nMap\nMap\nRobot Map Files (*.rmp)\n.rmp\nRobotMap.Document\nRobot Map Data"
+END
+
+STRINGTABLE
+BEGIN
+    AFX_IDS_APP_TITLE       "Robot"
+    AFX_IDS_IDLEMESSAGE     "Ready"
+END
+
+STRINGTABLE
+BEGIN
+    ID_INDICATOR_EXT        "EXT"
+    ID_INDICATOR_CAPS       "CAP"
+    ID_INDICATOR_NUM        "NUM"
+    ID_INDICATOR_SCRL       "SCRL"
+    ID_INDICATOR_OVR        "OVR"
+    ID_INDICATOR_REC        "REC"
+END
+
+STRINGTABLE
+BEGIN
+    ID_FILE_NEW             "Create a new document\nNew"
+    ID_FILE_OPEN            "Open an existing document\nOpen"
+    ID_FILE_CLOSE           "Close the active document\nClose"
+    ID_FILE_SAVE            "Save the active document\nSave"
+    ID_FILE_SAVE_AS         "Save the active document with a new name\nSave As"
+    ID_FILE_PAGE_SETUP      "Change the printing options\nPage Setup"
+    ID_FILE_PRINT_SETUP     "Change the printer and printing options\nPrint Setup"
+    ID_FILE_PRINT           "Print the active document\nPrint"
+    ID_FILE_PRINT_PREVIEW   "Display full pages\nPrint Preview"
+END
+
+STRINGTABLE
+BEGIN
+    ID_APP_ABOUT            "Display program information, version number and copyright\nAbout"
+    ID_APP_EXIT             "Quit the application; prompts to save documents\nExit"
+END
+
+STRINGTABLE
+BEGIN
+    ID_FILE_MRU_FILE1       "Open this document"
+    ID_FILE_MRU_FILE2       "Open this document"
+    ID_FILE_MRU_FILE3       "Open this document"
+    ID_FILE_MRU_FILE4       "Open this document"
+    ID_FILE_MRU_FILE5       "Open this document"
+    ID_FILE_MRU_FILE6       "Open this document"
+    ID_FILE_MRU_FILE7       "Open this document"
+    ID_FILE_MRU_FILE8       "Open this document"
+    ID_FILE_MRU_FILE9       "Open this document"
+    ID_FILE_MRU_FILE10      "Open this document"
+    ID_FILE_MRU_FILE11      "Open this document"
+    ID_FILE_MRU_FILE12      "Open this document"
+    ID_FILE_MRU_FILE13      "Open this document"
+    ID_FILE_MRU_FILE14      "Open this document"
+    ID_FILE_MRU_FILE15      "Open this document"
+    ID_FILE_MRU_FILE16      "Open this document"
+END
+
+STRINGTABLE
+BEGIN
+    ID_NEXT_PANE            "Switch to the next window pane\nNext Pane"
+    ID_PREV_PANE            "Switch back to the previous window pane\nPrevious Pane"
+END
+
+STRINGTABLE
+BEGIN
+    ID_WINDOW_NEW           "Open another window for the active document\nNew Window"
+    ID_WINDOW_ARRANGE       "Arrange icons at the bottom of the window\nArrange Icons"
+    ID_WINDOW_CASCADE       "Arrange windows so they overlap\nCascade Windows"
+    ID_WINDOW_TILE_HORZ     "Arrange windows as non-overlapping tiles\nTile Windows"
+    ID_WINDOW_TILE_VERT     "Arrange windows as non-overlapping tiles\nTile Windows"
+    ID_WINDOW_SPLIT         "Split the active window into panes\nSplit"
+END
+
+STRINGTABLE
+BEGIN
+    ID_EDIT_CLEAR           "Erase the selection\nErase"
+    ID_EDIT_CLEAR_ALL       "Erase everything on the Map"
+    ID_EDIT_COPY            "Copy the selection and put it on the Clipboard\nCopy"
+    ID_EDIT_CUT             "Cut the selection and put it on the Clipboard\nCut"
+    ID_EDIT_FIND            "Find the specified text\nFind"
+    ID_EDIT_PASTE           "Insert Clipboard contents\nPaste"
+    ID_EDIT_REPEAT          "Repeat the last action\nRepeat"
+    ID_EDIT_REPLACE         "Replace specific text with different text\nReplace"
+    ID_EDIT_SELECT_ALL      "Select the entire document\nSelect All"
+    ID_EDIT_UNDO            "Undo the last action\nUndo"
+    ID_EDIT_REDO            "Redo the previously undone action\nRedo"
+END
+
+STRINGTABLE
+BEGIN
+    ID_VIEW_TOOLBAR         "Show or hide the toolbar\nToggle ToolBar"
+    ID_VIEW_STATUS_BAR      "Show or hide the status bar\nToggle StatusBar"
+END
+
+STRINGTABLE
+BEGIN
+    AFX_IDS_SCSIZE          "Change the window size"
+    AFX_IDS_SCMOVE          "Change the window position"
+    AFX_IDS_SCMINIMIZE      "Reduce the window to an icon"
+    AFX_IDS_SCMAXIMIZE      "Enlarge the window to full size"
+    AFX_IDS_SCNEXTWINDOW    "Switch to the next document window"
+    AFX_IDS_SCPREVWINDOW    "Switch to the previous document window"
+    AFX_IDS_SCCLOSE         "Close the active window and prompts to save the documents"
+END
+
+STRINGTABLE
+BEGIN
+    AFX_IDS_SCRESTORE       "Restore the window to normal size"
+    AFX_IDS_SCTASKLIST      "Activate Task List"
+    AFX_IDS_MDICHILD        "Activate this window"
+END
+
+STRINGTABLE
+BEGIN
+    AFX_IDS_PREVIEW_CLOSE   "Close print preview mode\nCancel Preview"
+END
+
+STRINGTABLE
+BEGIN
+    ID_PEN_THICK_OR_THIN    "Toggles the line thickness between thin and thick\nToggle Pen Width"
+    ID_PEN_PENWIDTHS        "Sets the size of the thin and thick pen"
+    ID_SEL_CMD_VIEW_BTN     "Display the Robot Command View"
+    ID_SEL_PATH_VIEW_BTN    "Display the Robot Path View"
+    ID_SEL_MAP_VIEW_BTN     "Display the Robot Map View"
+    ID_GPS_ENABLE           "Enables GPS Tracking on the map"
+    ID_SEL_SETUP_VIEW_BTN   "Display the Robot Setup View"
+    ID_TYPE_WALLOBJECT      "Wall Objects are seen by the Robot"
+    ID_TYPE_OBSTACLE        "Obstacles are seen by Robot"
+END
+
+STRINGTABLE
+BEGIN
+    ID_TYPE_USERDRAW        "User Draw Item - Not seen by Robot"
+    ID_NAVIGATION_MODE      "Click Map to set destination.  Press Esc to cancel path!"
+    IDC_WAYPOINT_LOCATION   "Inserts Waypoints at mouse click locations"
+    ID_ADD_PAGE_ABOVE       "Add page above current map boundry"
+    ID_ADD_PAGE_RIGHT       "Add page to right of current map boundry"
+    ID_ADD_PAGE_BELOW       "Add page below current map boundry"
+    ID_ADD_PAGE_LEFT        "Add page to the left of current map boundry"
+    ID_SHOW_ROBOT_TRAILS    "Show Robot trail on the map"
+    ID_SHOW_GRIDMAP_SQUARES "Show Gridmap Squares on the map"
+    ID_SHOW_SENSOR_READINGS "Show Sensor Readings on the map"
+    ID_MAP_ZOOM_050         "zoom 50%"
+    ID_MAP_ZOOM_100         "zoom 100%"
+    ID_MAP_ZOOM_150         "zoom 150%"
+    ID_MAP_ZOOM_200         "zoom 200%"
+    ID_MAP_ZOOM_400         "zoom 400%"
+    ID_ZOOM_MAP_025         "25% zoom"
+END
+
+STRINGTABLE
+BEGIN
+    ID_SET_CURRENT_LOCATION "Resets Robot's view of the world"
+    ID_EXPORT_TO_FILE       "export to text file"
+    ID_IMPORT_TO_FILE       "Import from Text file"
+    ID_ROTATE_MAP           "Rotate all objects on the map, relative to North"
+    ID_CLEAR_MOUSE_TRAIL    "Clear Recorded Robot Mouse Trail"
+    ID_CLEAR_SENSOR_READINGS "Clear Recorded Robot Sensor Readings"
+END
+
+STRINGTABLE
+BEGIN
+    ID_C                    "Continue Movement after User Override"
+    ID_ARM_MOVEMENT         "Pre-defined Arm movements"
+    ID_ARM_CONTROL_DLG      "Open Arm Control Dialog"
+END
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#endif //_WIN32
+#include "res\Turtle.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
+#include "afxprint.rc"       // printing/print preview resources
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

@@ -1,0 +1,39 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Loki", "Loki\Loki.vcxproj", "{C30B4C4A-7FF7-4BE5-A174-C8839765782A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Turtle", "Turtle\Turtle.vcxproj", "{07A738B8-BA68-4A37-A7AA-E4683B501A82}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TeleOpControl", "TeleOpControl\TeleOpControl.vcxproj", "{577C159A-2C71-4DBF-989E-EA34C1F15FDA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+		RemoteDbg|Win32 = RemoteDbg|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C30B4C4A-7FF7-4BE5-A174-C8839765782A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C30B4C4A-7FF7-4BE5-A174-C8839765782A}.Debug|Win32.Build.0 = Debug|Win32
+		{C30B4C4A-7FF7-4BE5-A174-C8839765782A}.Release|Win32.ActiveCfg = Release|Win32
+		{C30B4C4A-7FF7-4BE5-A174-C8839765782A}.Release|Win32.Build.0 = Release|Win32
+		{C30B4C4A-7FF7-4BE5-A174-C8839765782A}.RemoteDbg|Win32.ActiveCfg = RemoteDbg|Win32
+		{C30B4C4A-7FF7-4BE5-A174-C8839765782A}.RemoteDbg|Win32.Build.0 = RemoteDbg|Win32
+		{07A738B8-BA68-4A37-A7AA-E4683B501A82}.Debug|Win32.ActiveCfg = Debug|Win32
+		{07A738B8-BA68-4A37-A7AA-E4683B501A82}.Debug|Win32.Build.0 = Debug|Win32
+		{07A738B8-BA68-4A37-A7AA-E4683B501A82}.Release|Win32.ActiveCfg = Release|Win32
+		{07A738B8-BA68-4A37-A7AA-E4683B501A82}.Release|Win32.Build.0 = Release|Win32
+		{07A738B8-BA68-4A37-A7AA-E4683B501A82}.RemoteDbg|Win32.ActiveCfg = Release|Win32
+		{07A738B8-BA68-4A37-A7AA-E4683B501A82}.RemoteDbg|Win32.Build.0 = Release|Win32
+		{577C159A-2C71-4DBF-989E-EA34C1F15FDA}.Debug|Win32.ActiveCfg = Debug|Win32
+		{577C159A-2C71-4DBF-989E-EA34C1F15FDA}.Debug|Win32.Build.0 = Debug|Win32
+		{577C159A-2C71-4DBF-989E-EA34C1F15FDA}.Release|Win32.ActiveCfg = Release|Win32
+		{577C159A-2C71-4DBF-989E-EA34C1F15FDA}.Release|Win32.Build.0 = Release|Win32
+		{577C159A-2C71-4DBF-989E-EA34C1F15FDA}.RemoteDbg|Win32.ActiveCfg = Release|Win32
+		{577C159A-2C71-4DBF-989E-EA34C1F15FDA}.RemoteDbg|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

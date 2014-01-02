@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<grammar xml:lang="en-US"
+tag-format="semantics-ms/1.0" version="1.0"
+xmlns="http://www.w3.org/2001/06/grammar">
+
+
+  <rule id="OregonCities" scope="public">
+    <one-of>     
+      
+      <item> 	Portland    	  <tag>  $.Param="PORTLAND"</tag> </item>
+      <item> 	Eugene	        <tag>  $.Param="EUGENE"</tag> </item>
+      <item> 	Salem	          <tag>  $.Param="SALEM"</tag> </item>
+      <item> 	Gresham	        <tag>  $.Param="GRESHAM"</tag> </item>
+      <item> 	Hillsboro	      <tag>  $.Param="HILLSBORO"</tag> </item>
+      <item> 	Beaverton	      <tag>  $.Param="BEAVERTON"</tag> </item>
+      <item> 	Bend	          <tag>  $.Param="BEND"</tag> </item>
+      <item> 	Medford	        <tag>  $.Param="MEDFORD"</tag> </item>
+      <item> 	Springfield	    <tag>  $.Param="SPRINGFIELD"</tag> </item>
+      <item> 	Corvallis	      <tag>  $.Param="CORVALLIS"</tag> </item>
+      <item> 	Albany	        <tag>  $.Param="ALBANY"</tag> </item>
+      <item> 	Tigard	        <tag>  $.Param="TIGARD"</tag> </item>
+      <item> 	Lake Oswego	    <tag>  $.Param="LAKEOSWEGO"</tag> </item>
+      <item> 	Keizer	        <tag>  $.Param="KEIZER"</tag> </item>
+      <item> 	Grants Pass	    <tag>  $.Param="GRANTSPASS"</tag> </item>
+      <item> 	McMinnville	    <tag>  $.Param="MCMINNVILLE"</tag> </item>
+      <item> 	Oregon City	    <tag>  $.Param="OREGONCITY"</tag> </item>
+      <item> 	Redmond	        <tag>  $.Param="REDMOND"</tag> </item>
+      <item> 	Tualatin	      <tag>  $.Param="TUALATIN"</tag> </item>
+      <item> 	West Linn	      <tag>  $.Param="WESTLINN"</tag> </item>
+      <item> 	Woodburn	      <tag>  $.Param="WOODBURN"</tag> </item>
+      <item> 	Newberg	        <tag>  $.Param="NEWBERG"</tag> </item>
+      <item> 	Roseburg	      <tag>  $.Param="ROSEBURG"</tag> </item>
+      <item> 	Forest Grove	  <tag>  $.Param="FORESTGROVE"</tag> </item>
+      <item> 	Klamath Falls	  <tag>  $.Param="KLAMATHFALLS"</tag> </item>
+      <item> 	Milwaukie	      <tag>  $.Param="MILWAUKIE"</tag> </item>
+      <item> 	Ashland	        <tag>  $.Param="ASHLAND"</tag> </item>
+      <item> 	Wilsonville	    <tag>  $.Param="WILSONVILLE"</tag> </item>
+      <item> 	Sherwood	      <tag>  $.Param="SHERWOOD"</tag> </item>
+      <item> 	CentralPoint	  <tag>  $.Param="CENTRALPOINT"</tag> </item>
+      <item> 	Hermiston	      <tag>  $.Param="HERMISTON"</tag> </item>
+      <item> 	Pendleton	      <tag>  $.Param="PENDLETON"</tag> </item>
+      <item> 	Coos Bay	      <tag>  $.Param="COOSBAY"</tag> </item>
+      <item> 	Trout dale	    <tag>  $.Param="TROUTDALE"</tag> </item>
+      <item> 	Canby	          <tag>  $.Param="CANBY"</tag> </item>
+      <item> 	Lebanon	        <tag>  $.Param="LEBANON"</tag> </item>
+      <item> 	Dallas	        <tag>  $.Param="DALLAS"</tag> </item>
+      <item> 	The Dalles	    <tag>  $.Param="THEDALLES"</tag> </item>
+      <item> 	Happy Valley	  <tag>  $.Param="HAPPYVALLEY"</tag> </item>
+      <item> 	La Grande	      <tag>  $.Param="LAGRANDE"</tag> </item>
+      <item> 	Saint Helens	  <tag>  $.Param="SAINTHELENS"</tag> </item>
+      <item> 	Cornelius	      <tag>  $.Param="CORNELIUS"</tag> </item>
+      <item> 	Gladstone	      <tag>  $.Param="GLADSTONE"</tag> </item>
+      <item> 	Ontario	        <tag>  $.Param="ONTARIO"</tag> </item>
+      <item> 	Damascus	      <tag>  $.Param="DAMASCUS"</tag> </item>
+      <item> 	Newport	        <tag>  $.Param="NEWPORT"</tag> </item>
+      <item> 	BakerCity	      <tag>  $.Param="BAKERCITY"</tag> </item>
+      <item> 	Sandy	          <tag>  $.Param="SANDY"</tag> </item>
+      <item> 	Cottage Grove	  <tag>  $.Param="COTTAGEGROVE"</tag> </item>
+      <item> 	Monmouth	<tag>  $.Param="MONMOUTH"</tag> </item>
+      <item> 	NorthBend	<tag>  $.Param="NORTHBEND"</tag> </item>
+      <item> 	Astoria	<tag>  $.Param="ASTORIA"</tag> </item>
+      <item> 	Silverton	<tag>  $.Param="SILVERTON"</tag> </item>
+      <item> 	Prineville	<tag>  $.Param="PRINEVILLE"</tag> </item>
+      <item> 	SweetHome	<tag>  $.Param="SWEETHOME"</tag> </item>
+      <item> 	Fairview	<tag>  $.Param="FAIRVIEW"</tag> </item>
+      <item> 	Independence	<tag>  $.Param="INDEPENDENCE"</tag> </item>
+      <item> 	EaglePoint	<tag>  $.Param="EAGLEPOINT"</tag> </item>
+      <item> 	Florence	<tag>  $.Param="FLORENCE"</tag> </item>
+      <item> 	Molalla	<tag>  $.Param="MOLALLA"</tag> </item>
+      <item> 	LincolnCity	<tag>  $.Param="LINCOLNCITY"</tag> </item>
+      <item> 	Sutherlin	<tag>  $.Param="SUTHERLIN"</tag> </item>
+      <item> 	Stayton	<tag>  $.Param="STAYTON"</tag> </item>
+      <item> 	HoodRiver	<tag>  $.Param="HOODRIVER"</tag> </item>
+      <item> 	Milton-Freewater	<tag>  $.Param="MILTON-FREEWATER"</tag> </item>
+      <item> 	Umatilla	<tag>  $.Param="UMATILLA"</tag> </item>
+      <item> 	Scappoose	<tag>  $.Param="SCAPPOOSE"</tag> </item>
+      <item> 	Seaside	<tag>  $.Param="SEASIDE"</tag> </item>
+      <item> 	Brookings	<tag>  $.Param="BROOKINGS"</tag> </item>
+      <item> 	Madras	<tag>  $.Param="MADRAS"</tag> </item>
+      <item> 	Sheridan	<tag>  $.Param="SHERIDAN"</tag> </item>
+      <item> 	Talent	<tag>  $.Param="TALENT"</tag> </item>
+      <item> 	JunctionCity	<tag>  $.Param="JUNCTIONCITY"</tag> </item>
+      <item> 	Winston	<tag>  $.Param="WINSTON"</tag> </item>
+      <item> 	Warrenton	<tag>  $.Param="WARRENTON"</tag> </item>
+      <item> 	Creswell	<tag>  $.Param="CRESWELL"</tag> </item>
+      <item> 	Tillamook	<tag>  $.Param="TILLAMOOK"</tag> </item>
+      <item> 	Philomath	<tag>  $.Param="PHILOMATH"</tag> </item>
+      <item> 	Veneta	<tag>  $.Param="VENETA"</tag> </item>
+      <item> 	Phoenix	<tag>  $.Param="PHOENIX"</tag> </item>
+      <item> 	Reedsport	<tag>  $.Param="REEDSPORT"</tag> </item>
+      <item> 	WoodVillage	<tag>  $.Param="WOODVILLAGE"</tag> </item>
+      <item> 	Coquille	<tag>  $.Param="COQUILLE"</tag> </item>
+      <item> 	Lafayette	<tag>  $.Param="LAFAYETTE"</tag> </item>
+      <item> 	Aumsville	<tag>  $.Param="AUMSVILLE"</tag> </item>
+      <item> 	Harrisburg	<tag>  $.Param="HARRISBURG"</tag> </item>
+      <item> 	Toledo	<tag>  $.Param="TOLEDO"</tag> </item>
+      <item> 	MyrtleCreek	<tag>  $.Param="MYRTLECREEK"</tag> </item>
+      <item> 	Mt.Angel	<tag>  $.Param="MT.ANGEL"</tag> </item>
+      <item> 	Nyssa	<tag>  $.Param="NYSSA"</tag> </item>
+      <item> 	Boardman	<tag>  $.Param="BOARDMAN"</tag> </item>
+      <item> 	Oakridge	<tag>  $.Param="OAKRIDGE"</tag> </item>
+      <item> 	Hubbard	<tag>  $.Param="HUBBARD"</tag> </item>
+      <item> 	Dundee	<tag>  $.Param="DUNDEE"</tag> </item>
+      <item> 	KingCity	<tag>  $.Param="KINGCITY"</tag> </item>
+      <item> 	Jefferson	<tag>  $.Param="JEFFERSON"</tag> </item>
+      <item> 	Bandon	<tag>  $.Param="BANDON"</tag> </item>
+      <item> 	ShadyCove	<tag>  $.Param="SHADYCOVE"</tag> </item>
+      <item> 	Estacada	<tag>  $.Param="ESTACADA"</tag> </item>
+      <item> 	Burns	<tag>  $.Param="BURNS"</tag> </item>
+      <item> 	Jacksonville	<tag>  $.Param="JACKSONVILLE"</tag> </item>
+      <item> 	Sublimity	<tag>  $.Param="SUBLIMITY"</tag> </item>
+      <item> 	Dayton	<tag>  $.Param="DAYTON"</tag> </item>
+      <item> 	Gervais	<tag>  $.Param="GERVAIS"</tag> </item>
+      <item> 	MyrtlePoint	<tag>  $.Param="MYRTLEPOINT"</tag> </item>
+      <item> 	Lakeview	<tag>  $.Param="LAKEVIEW"</tag> </item>
+      <item> 	GoldBeach	<tag>  $.Param="GOLDBEACH"</tag> </item>
+      <item> 	RogueRiver	<tag>  $.Param="ROGUERIVER"</tag> </item>
+      <item> 	Union	<tag>  $.Param="UNION"</tag> </item>
+      <item> 	Vernonia	<tag>  $.Param="VERNONIA"</tag> </item>
+      <item> 	Stanfield	<tag>  $.Param="STANFIELD"</tag> </item>
+      <item> 	Sisters	<tag>  $.Param="SISTERS"</tag> </item>
+      <item> 	Waldport	<tag>  $.Param="WALDPORT"</tag> </item>
+      <item> 	Carlton	<tag>  $.Param="CARLTON"</tag> </item>
+      <item> 	Willamina	<tag>  $.Param="WILLAMINA"</tag> </item>
+      <item> 	NorthPlains	<tag>  $.Param="NORTHPLAINS"</tag> </item>
+      <item> 	ColumbiaCity	<tag>  $.Param="COLUMBIACITY"</tag> </item>
+      <item> 	Enterprise	<tag>  $.Param="ENTERPRISE"</tag> </item>
+      <item> 	Rainier	<tag>  $.Param="RAINIER"</tag> </item>
+      <item> 	Canyonville	<tag>  $.Param="CANYONVILLE"</tag> </item>
+      <item> 	CaveJunction	<tag>  $.Param="CAVEJUNCTION"</tag> </item>
+      <item> 	Vale	<tag>  $.Param="VALE"</tag> </item>
+      <item> 	MillCity	<tag>  $.Param="MILLCITY"</tag> </item>
+      <item> 	Turner	<tag>  $.Param="TURNER"</tag> </item>
+      <item> 	Irrigon	<tag>  $.Param="IRRIGON"</tag> </item>
+      <item> 	Banks	<tag>  $.Param="BANKS"</tag> </item>
+      <item> 	JohnDay	<tag>  $.Param="JOHNDAY"</tag> </item>
+      <item> 	Clatskanie	<tag>  $.Param="CLATSKANIE"</tag> </item>
+      <item> 	Elgin	<tag>  $.Param="ELGIN"</tag> </item>
+      <item> 	CannonBeach	<tag>  $.Param="CANNONBEACH"</tag> </item>
+      <item> 	Lakeside	<tag>  $.Param="LAKESIDE"</tag> </item>
+      <item> 	Brownsville	<tag>  $.Param="BROWNSVILLE"</tag> </item>
+      <item> 	LaPine	<tag>  $.Param="LAPINE"</tag> </item>
+      <item> 	Amity	<tag>  $.Param="AMITY"</tag> </item>
+      <item> 	Hines	<tag>  $.Param="HINES"</tag> </item>
+      <item> 	PilotRock	<tag>  $.Param="PILOTROCK"</tag> </item>
+      <item> 	Gearhart	<tag>  $.Param="GEARHART"</tag> </item>
+      <item> 	DepoeBay	<tag>  $.Param="DEPOEBAY"</tag> </item>
+      <item> 	Millersburg	<tag>  $.Param="MILLERSBURG"</tag> </item>
+      <item> 	Culver	<tag>  $.Param="CULVER"</tag> </item>
+      <item> 	Durham	<tag>  $.Param="DURHAM"</tag> </item>
+      <item> 	RockawayBeach	<tag>  $.Param="ROCKAWAYBEACH"</tag> </item>
+      <item> 	DunesCity	<tag>  $.Param="DUNESCITY"</tag> </item>
+      <item> 	BayCity	<tag>  $.Param="BAYCITY"</tag> </item>
+      <item> 	Heppner	<tag>  $.Param="HEPPNER"</tag> </item>
+      <item> 	GoldHill	<tag>  $.Param="GOLDHILL"</tag> </item>
+      <item> 	Siletz	<tag>  $.Param="SILETZ"</tag> </item>
+      <item> 	Riddle	<tag>  $.Param="RIDDLE"</tag> </item>
+      <item> 	Tangent	<tag>  $.Param="TANGENT"</tag> </item>
+      <item> 	CascadeLocks	<tag>  $.Param="CASCADELOCKS"</tag> </item>
+      <item> 	Lyons	<tag>  $.Param="LYONS"</tag> </item>
+      <item> 	Drain	<tag>  $.Param="DRAIN"</tag> </item>
+      <item> 	PortOrford	<tag>  $.Param="PORTORFORD"</tag> </item>
+      <item> 	Athena	<tag>  $.Param="ATHENA"</tag> </item>
+      <item> 	Joseph	<tag>  $.Param="JOSEPH"</tag> </item>
+      <item> 	Yoncalla	<tag>  $.Param="YONCALLA"</tag> </item>
+      <item> 	Lowell	<tag>  $.Param="LOWELL"</tag> </item>
+      <item> 	Coburg	<tag>  $.Param="COBURG"</tag> </item>
+      <item> 	Yamhill	<tag>  $.Param="YAMHILL"</tag> </item>
+      <item> 	IslandCity	<tag>  $.Param="ISLANDCITY"</tag> </item>
+      <item> 	Donald	<tag>  $.Param="DONALD"</tag> </item>
+      <item> 	FallsCity	<tag>  $.Param="FALLSCITY"</tag> </item>
+      <item> 	Oakland	<tag>  $.Param="OAKLAND"</tag> </item>
+      <item> 	Aurora	<tag>  $.Param="AURORA"</tag> </item>
+      <item> 	Halsey	<tag>  $.Param="HALSEY"</tag> </item>
+      <item> 	PrairieCity	<tag>  $.Param="PRAIRIECITY"</tag> </item>
+      <item> 	Glendale	<tag>  $.Param="GLENDALE"</tag> </item>
+      <item> 	Merrill	<tag>  $.Param="MERRILL"</tag> </item>
+      <item> 	AdairVillage	<tag>  $.Param="ADAIRVILLAGE"</tag> </item>
+      <item> 	Scio	<tag>  $.Param="SCIO"</tag> </item>
+      <item> 	Wallowa	<tag>  $.Param="WALLOWA"</tag> </item>
+      <item> 	Malin	<tag>  $.Param="MALIN"</tag> </item>
+      <item> 	Garibaldi	<tag>  $.Param="GARIBALDI"</tag> </item>
+      <item> 	MaywoodPark	<tag>  $.Param="MAYWOODPARK"</tag> </item>
+      <item> 	Chiloquin	<tag>  $.Param="CHILOQUIN"</tag> </item>
+      <item> 	Metolius	<tag>  $.Param="METOLIUS"</tag> </item>
+      <item> 	CanyonCity	<tag>  $.Param="CANYONCITY"</tag> </item>
+      <item> 	Yachats	<tag>  $.Param="YACHATS"</tag> </item>
+      <item> 	Echo	<tag>  $.Param="ECHO"</tag> </item>
+      <item> 	Powers	<tag>  $.Param="POWERS"</tag> </item>
+      <item> 	Condon	<tag>  $.Param="CONDON"</tag> </item>
+      <item> 	Weston	<tag>  $.Param="WESTON"</tag> </item>
+      <item> 	Gaston	<tag>  $.Param="GASTON"</tag> </item>
+      <item> 	Monroe	<tag>  $.Param="MONROE"</tag> </item>
+      <item> 	Dufur	<tag>  $.Param="DUFUR"</tag> </item>
+      <item> 	Manzanita	<tag>  $.Param="MANZANITA"</tag> </item>
+      <item> 	Arlington	<tag>  $.Param="ARLINGTON"</tag> </item>
+      <item> 	JohnsonCity	<tag>  $.Param="JOHNSONCITY"</tag> </item>
+      <item> 	Cove	<tag>  $.Param="COVE"</tag> </item>
+      <item> 	MountVernon	<tag>  $.Param="MOUNTVERNON"</tag> </item>
+      <item> 	Fossil	<tag>  $.Param="FOSSIL"</tag> </item>
+      <item> 	Gates	<tag>  $.Param="GATES"</tag> </item>
+      <item> 	Bonanza	<tag>  $.Param="BONANZA"</tag> </item>
+      <item> 	NorthPowder	<tag>  $.Param="NORTHPOWDER"</tag> </item>
+      <item> 	Huntington	<tag>  $.Param="HUNTINGTON"</tag> </item>
+      <item> 	Mosier	<tag>  $.Param="MOSIER"</tag> </item>
+      <item> 	ButteFalls	<tag>  $.Param="BUTTEFALLS"</tag> </item>
+      <item> 	St.Paul	<tag>  $.Param="ST.PAUL"</tag> </item>
+     
+      
+    </one-of>
+  </rule>
+
+ <rule id="OtherCities" scope="public">
+    <one-of>     
+      <item> 	Seattle    	  <tag>  $.Param1="SEATTLE"   </tag> <tag>  $.Param2="WASHINGTON"</tag> </item>
+      <item> 	Long View  	  <tag>  $.Param1="LONGVIEW"  </tag> <tag>  $.Param2="WASHINGTON"</tag> </item>
+      <item> 	L A 	        <tag>  $.Param1="LA"        </tag> <tag>  $.Param2="CALIFORNIA"</tag> </item>
+      <item> 	Los Angeles   <tag>  $.Param1="LA"        </tag> <tag>  $.Param2="CALIFORNIA"</tag> </item>
+    </one-of>
+  </rule>
+
+</grammar>
+

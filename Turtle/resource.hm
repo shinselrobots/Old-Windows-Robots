@@ -1,0 +1,6 @@
+// Microsoft Visual C++ generated Help ID include file.
+// Used by Robot.rc
+//
+#define HIDC_BOTH_ARM_POS_PRESET        0x806b0541    // IDD_SETUP_FORM
+#define HIDC_L_ARM_POS_PRESET           0x806b0536    // IDD_SETUP_FORM
+#define HIDC_R_ARM_POS_PRESET           0x806b0520    // IDD_SETUP_FORM
