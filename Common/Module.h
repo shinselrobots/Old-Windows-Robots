@@ -443,11 +443,19 @@ protected:
 	BOOL		m_CliffSensorsEnabled;
 	int			m_CompassCorrection;
 
-#if ( ROBOT_SERVER == 1 ) //////////////// SERVER ONLY //////////////////
-	ArmControl *m_pArmControlRight;
-	ArmControl *m_pArmControlLeft;
-#endif
+
+//////////////// SERVER ONLY //////////////////
+#if ( ROBOT_SERVER == 1 )
+
+	#if ( ROBOT_HAS_RIGHT_ARM == 1 )
+		ArmControl *m_pArmControlRight;
+	#endif
+	#if ( ROBOT_HAS_LEFT_ARM == 1 )
+		ArmControl *m_pArmControlLeft;
+	#endif
+
 	SCANNER_SUMMARY_T m_LaserSummary;
+#endif
 
 };
 
@@ -511,10 +519,15 @@ protected:
 
 
 	// TODO - THIS NEEDED FOR TEMP DEBUG ONLY:
-#if ( ROBOT_SERVER == 1 )	// This module used for Robot Server only
+#if ( ROBOT_SERVER == 1 )
 
-	ArmControl				*m_pArmControlRight;
-	ArmControl				*m_pArmControlLeft;
+	#if ( ROBOT_HAS_RIGHT_ARM == 1 )
+		ArmControl *m_pArmControlRight;
+	#endif
+	#if ( ROBOT_HAS_LEFT_ARM == 1 )
+		ArmControl *m_pArmControlLeft;
+	#endif
+
 #endif
 
 };
@@ -861,9 +874,15 @@ protected:
 	int			m_SideAvoidDistanceTenthInches;
 	int			m_LastObjectDirection;
 	BOOL		m_ArmsInSafePosition;
-#if ( ROBOT_SERVER == 1 )	// This module used for Robot Server only
-	ArmControl	*m_pArmControlRight;
-	ArmControl	*m_pArmControlLeft;
+
+#if ( ROBOT_SERVER == 1 )
+
+	#if ( ROBOT_HAS_RIGHT_ARM == 1 )
+		ArmControl *m_pArmControlRight;
+	#endif
+	#if ( ROBOT_HAS_LEFT_ARM == 1 )
+		ArmControl *m_pArmControlLeft;
+	#endif
 #endif
 
 };

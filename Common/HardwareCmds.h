@@ -54,12 +54,12 @@
 #define HW_SET_CAMERA_ZOOM_ABS				0x27 // Zoom Level (range 0 to 64)
 #define HW_SET_CAMERA_ABS_PAN_TILT_SPEED	0x28 // Speed (0-22)
 #define HW_SET_CAMERA_MODE					0x29 // Mode			Value
-#define HW_SET_CAMERA_NECK_ABS				0x2A // Position		-
-#define HW_SET_CAMERA_SIDETILT_ABS			0x2B // Position 		-
-#define HW_SET_CAMERA_FORWARD_ABS			0x2C
-#define HW_GET_CAMERA_BULK_SERVO_STATUS		0x2D //	Just dumps status to the log
-#define HW_SET_BULK_HEAD_POSITION			0x2E // Uses global g_DynaServoCmd[] buffer
-#define HW_SET_BULK_KINECT_POSITION			0x2F // Uses global g_DynaServoCmd[] buffer
+#define HW_SET_CAMERA_SIDETILT_ABS			0x2A // Position 		-
+#define HW_SET_CAMERA_FORWARD_ABS			0x2B
+#define HW_GET_CAMERA_BULK_SERVO_STATUS		0x2C //	Just dumps status to the log
+#define HW_SET_BULK_HEAD_POSITION			0x2D // Uses global g_DynaServoCmd[] buffer
+#define HW_SET_BULK_KINECT_POSITION			0x2E // Uses global g_DynaServoCmd[] buffer
+#define HW_SET_CAMERA_STOP					0x2F // Stop current head motion		-
 
 #define HW_CAMERA_MAX_COMMAND				0x2F // For sending to the right thread!
 

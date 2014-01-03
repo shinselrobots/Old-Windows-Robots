@@ -468,6 +468,20 @@ void HeadControl::ExecutePositionAndSpeed( int  nOwner )
 }
 
 //-----------------------------------------------------------------------------
+// Name: Stop
+// Desc: Tell Head servos to stop moving immediately
+//-----------------------------------------------------------------------------
+void HeadControl::Stop( int  nOwner )
+{
+	if( !CheckAndSetOwner( nOwner ) )
+	{
+		return;	// Higher priority task has control
+	}
+
+	// Shortcut - post directly to the Dynamixel DynaServoComm thread
+	PostThreadMessage( g_dwSmartServoCommThreadId, (WM_ROBOT_MESSAGE_BASE+HW_SET_CAMERA_STOP), 0, 0 );
+}
+//-----------------------------------------------------------------------------
 // Name: SetServoCompliance
 // Desc: Set compliance slope of the specified servo
 // This is how accurate the servo will track to requested, but may also put extra stress on the servo.

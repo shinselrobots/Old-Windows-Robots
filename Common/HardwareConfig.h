@@ -63,7 +63,7 @@
 	#define SENSOR_HALF_FOV_DEGREES_US							 150	// 1/2 of Sensor Field Of View in tenth degrees
 	#define SENSOR_HALF_FOV_DEGREES_IR							 20	// This is actually bigger then sensor, but robot movement provides ambiguity
 
-	#define VERTICAL_IR_DETECT_RANGE_TENTH_INCHES	 300	// Detect tables, etc that robot might run into
+	//#define VERTICAL_IR_DETECT_RANGE_TENTH_INCHES	 300	// Detect tables, etc that robot might run into
 
 	#define REAR_RIGHT				(-REAR_IR_ANGLE)
 	#define SIDE_RIGHT				 SIDE_SENSOR_ANGLE
@@ -174,7 +174,7 @@
 	#define SENSOR_HALF_FOV_DEGREES_US							 150	// 1/2 of Sensor Field Of View in tenth degrees
 	#define SENSOR_HALF_FOV_DEGREES_IR							 20	// This is actually bigger then sensor, but robot movement provides ambiguity
 
-	#define VERTICAL_IR_DETECT_RANGE_TENTH_INCHES	 300	// Detect tables, etc that robot might run into
+	//#define VERTICAL_IR_DETECT_RANGE_TENTH_INCHES	 300	// Detect tables, etc that robot might run into
 
 
 	#define REAR_RIGHT				(-REAR_IR_ANGLE)
@@ -290,7 +290,7 @@
 	#define SENSOR_HALF_FOV_DEGREES_US							 150	// 1/2 of Sensor Field Of View in tenth degrees
 	#define SENSOR_HALF_FOV_DEGREES_IR							 20	// This is actually bigger then sensor, but robot movement provides ambiguity
 
-	#define VERTICAL_IR_DETECT_RANGE_TENTH_INCHES	 300	// Detect tables, etc that robot might run into
+	//#define VERTICAL_IR_DETECT_RANGE_TENTH_INCHES	 300	// Detect tables, etc that robot might run into
 
 
 	#define REAR_RIGHT				(-REAR_IR_ANGLE)
@@ -304,8 +304,11 @@
 
 	#define IR_HEAD_TRACKING_RANGE_TENTH_INCHES					410 // Tenth_Inches - Head will track any object closer then this
 	#define IR_TRACKING_FUDGE_TENTH_INCHES						 60 // Tenth_Inches
-	#define IR_ELBOW_HIT_RANGE_TENTH_INCHES						 20 // Tenth_Inches - distance from front of claw tip (used by elbow sensor to detect impending arm collisions)
 	#define CLAW_DETECT_TRIGGER_DISTANCE_TENTH_INCHES			 60	// Tenth_Inches
+
+#if( ROBOT_HAS_LEFT_ARM || ROBOT_HAS_RIGHT_ARM )
+
+	#define IR_ELBOW_HIT_RANGE_TENTH_INCHES						 20 // Tenth_Inches - distance from front of claw tip (used by elbow sensor to detect impending arm collisions)
 
 	// Arm Length measurements defined in ArmControl.cpp
 	// Arm Sensor measurements
@@ -313,6 +316,7 @@
 	#define FOREARM_IR_TO_WRIST_OBSTRUCTION_TENTH_INCHES_R		 80.0	// Tenth_Inches - clear space even when wrist rotated
 	#define FOREARM_IR_TO_FINGER_TIP_TENTH_INCHES_L				130.0	// Tenth_Inches
 	#define FOREARM_IR_TO_FINGER_TIP_TENTH_INCHES_R				102.5	// Tenth_Inches
+#endif
 
 	#define GRID_MAP_AVOID_OBJECT_DISTANCE						  60	// Tenth_Inches - Avoid objects closer then this distance to the robot
 

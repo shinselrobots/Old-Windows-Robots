@@ -985,7 +985,7 @@ OLD -----------------
 	//////////////////////////////////////////////////////////////
 	// ARM SERVOS - Includes Shoulder Joint (even though it's not a Dyna Servo)
 
-	#define ROBOT_HAS_RIGHT_ARM			 			TRUE
+	#define ROBOT_HAS_RIGHT_ARM			 			FALSE
 
 	#define DYNA_RIGHT_ARM_ELBOW_ROTATE_SERVO_ID	   5
 	#define DYNA_RIGHT_ARM_ELBOW_BEND_SERVO_ID		   6
@@ -995,7 +995,7 @@ OLD -----------------
 	#define DYNA_RIGHT_ARM_WRIST_SERVO_ID			   8
 	#define DYNA_RIGHT_ARM_CLAW_SERVO_ID			   9
 
-	#define ROBOT_HAS_LEFT_ARM			 			TRUE
+	#define ROBOT_HAS_LEFT_ARM			 			FALSE
 
 	#define DYNA_LEFT_ARM_ELBOW_ROTATE_SERVO_ID		  10
 	#define DYNA_LEFT_ARM_ELBOW_BEND_SERVO_ID		  11
@@ -1018,6 +1018,7 @@ OLD -----------------
 	//////////////////////////////////////////////////////////////
 	// Common Values in TICKS
 	// Right Arm
+/*** NO LONGER USED ***
 	#define DYNA_RIGHT_ARM_ELBOW_ROTATE_MAX			 930	// Rotate Max Clockwise (140 degrees)
 	#define DYNA_RIGHT_ARM_ELBOW_ROTATE_MIN			   0	// Rotate Max Counter-clockwise (-140 degrees)
 
@@ -1058,7 +1059,7 @@ OLD -----------------
 
 //	#define CAMERA_PAN_SERVO_RATIO			10	// TODO-MUST Pixel value to camera movement divisor
 //	#define CAMERA_TILT_SERVO_RATIO			10
-
+***/
 
 	#define CAMERA_PAN_SERVO_INCREMENT		 10		// ticks per reading
 	#define CAMERA_PAN_SERVO_CENTER			511		// Trim: Left = larger number

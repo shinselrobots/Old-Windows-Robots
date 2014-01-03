@@ -90,17 +90,20 @@ void CBehaviorModule::HeadTiltTest( )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CBehaviorModule::HandleUserHeadMovementCmd( WPARAM wParam, LPARAM lParam )
 {
-	//IGNORE_UNUSED_PARAM (lParam);
+	// wParam is the Pan/Tilt Enum
+	// lParam is the speed
+	#define HEAD_PAN_TENTHDEGREES_LIMIT_RIGHT		900		// for Pan, limit to less than maximum
+	#define HEAD_PAN_TENTHDEGREES_LIMIT_LEFT		(-900)	// for Pan, limit to less than maximum
 
 	int  m_nCameraPanTiltCmd = wParam;	// Tells info on movement direction
-	int  nPanTiltIncrement = lParam*10;	// in TenthDegrees - (example: speed 5 = 50 tenthdegrees = 5.0 degrees)
+	int nCameraPanTiltSpeed = lParam;
+	//int  nPanTiltIncrement = lParam*10;	// in TenthDegrees - (example: speed 5 = 50 tenthdegrees = 5.0 degrees)
 
-	// lParam is the speed, but ignored for now
 	//IGNORE_UNUSED_PARAM (lParam);
 
 	// Set default to current position
-	int NewPanPosition, NewTiltPosition, SideTilt;
-	m_pHeadControl->GetHeadPosition( NewPanPosition, NewTiltPosition, SideTilt );
+	int CurrentPanPosition, CurrentTiltPosition, CurrentSideTilt;
+	m_pHeadControl->GetHeadPosition( CurrentPanPosition, CurrentTiltPosition, CurrentSideTilt );
 
 	// Convert command to servo movement	
 	//int  nPanTiltIncrement = m_pHeadControl->GetUserHeadSpeed();	// in TenthDegrees - (example: speed 5 = 50 tenthdegrees = 5.0 degrees)
@@ -109,61 +112,61 @@ void CBehaviorModule::HandleUserHeadMovementCmd( WPARAM wParam, LPARAM lParam )
 	{
 		case CAMERA_PAN_STOP:
 		{
-			m_pHeadControl->ReleaseOwner( HEAD_OWNER_USER_CONTROL );
+			// Set target to current position.
+			m_pHeadControl->Stop( HEAD_OWNER_USER_CONTROL );
+			Sleep(1); // allow thread switch
+			m_pHeadControl->GetHeadPosition( CurrentPanPosition, CurrentTiltPosition, CurrentSideTilt );
+			m_pHeadControl->SetHeadPosition( HEAD_OWNER_USER_CONTROL, CurrentPanPosition, CurrentTiltPosition, NOP );
+			//nCameraPanTiltSpeed = 0;
 			return;
 		}
 		case CAMERA_PAN_UP:
 		{
-			NewTiltPosition += nPanTiltIncrement;
+			m_pHeadControl->SetHeadPosition( HEAD_OWNER_USER_CONTROL, CurrentPanPosition, CAMERA_TILT_TENTHDEGREES_MAX_UP, NOP );
 			break;
 		}
 		case CAMERA_PAN_DOWN:
 		{
-			NewTiltPosition -= nPanTiltIncrement;
+			m_pHeadControl->SetHeadPosition( HEAD_OWNER_USER_CONTROL, CurrentPanPosition, CAMERA_TILT_TENTHDEGREES_MAX_DOWN, NOP );
 			break;
 		}
 
 		case CAMERA_PAN_LEFT:
 		{
-			NewPanPosition -= nPanTiltIncrement;
+			m_pHeadControl->SetHeadPosition( HEAD_OWNER_USER_CONTROL, HEAD_PAN_TENTHDEGREES_LIMIT_LEFT, CurrentTiltPosition, NOP );
 			break;
 		}
 
 		case CAMERA_PAN_RIGHT:
 		{
-			NewPanPosition += nPanTiltIncrement;
+			m_pHeadControl->SetHeadPosition( HEAD_OWNER_USER_CONTROL, HEAD_PAN_TENTHDEGREES_LIMIT_RIGHT, CurrentTiltPosition, NOP );
 			break;
 		}
 
 		// Combo Pan/Tilt commands
 		case CAMERA_PAN_UP_LEFT:
 		{
-			NewTiltPosition += nPanTiltIncrement;
-			NewPanPosition -= nPanTiltIncrement;
+			m_pHeadControl->SetHeadPosition( HEAD_OWNER_USER_CONTROL, HEAD_PAN_TENTHDEGREES_LIMIT_LEFT, CAMERA_TILT_TENTHDEGREES_MAX_UP, NOP );
 			break;
 		}
 		case CAMERA_PAN_UP_RIGHT:
 		{
-			NewTiltPosition += nPanTiltIncrement;
-			NewPanPosition += nPanTiltIncrement;
+			m_pHeadControl->SetHeadPosition( HEAD_OWNER_USER_CONTROL, HEAD_PAN_TENTHDEGREES_LIMIT_RIGHT, CAMERA_TILT_TENTHDEGREES_MAX_UP, NOP );
 			break;
 		}
 		case CAMERA_PAN_DOWN_LEFT:
 		{
-			NewTiltPosition -= nPanTiltIncrement;
-			NewPanPosition -= nPanTiltIncrement;
+			m_pHeadControl->SetHeadPosition( HEAD_OWNER_USER_CONTROL, HEAD_PAN_TENTHDEGREES_LIMIT_LEFT, CAMERA_TILT_TENTHDEGREES_MAX_DOWN, NOP );
 			break;
 		}
 		case CAMERA_PAN_DOWN_RIGHT:
 		{
-			NewTiltPosition -= nPanTiltIncrement;
-			NewPanPosition += nPanTiltIncrement;
+			m_pHeadControl->SetHeadPosition( HEAD_OWNER_USER_CONTROL, HEAD_PAN_TENTHDEGREES_LIMIT_RIGHT, CAMERA_TILT_TENTHDEGREES_MAX_DOWN, NOP );
 			break;
 		}
 		case CAMERA_PAN_ABS_CENTER:
 		{
-			NewTiltPosition = 0;
-			NewPanPosition = 0;
+			m_pHeadControl->SetHeadPosition( HEAD_OWNER_USER_CONTROL, CAMERA_PAN_CENTER, CAMERA_TILT_CENTER, NOP );
 			break;
 		}
 		default:
@@ -173,8 +176,7 @@ void CBehaviorModule::HandleUserHeadMovementCmd( WPARAM wParam, LPARAM lParam )
 		break;
 	}
 
-	m_pHeadControl->SetHeadSpeed( HEAD_OWNER_USER_CONTROL, SERVO_SPEED_MED, SERVO_SPEED_MED, SERVO_SPEED_MED );
-	m_pHeadControl->SetHeadPosition( HEAD_OWNER_USER_CONTROL, NewPanPosition, NewTiltPosition, NOP );
+	m_pHeadControl->SetHeadSpeed( HEAD_OWNER_USER_CONTROL, nCameraPanTiltSpeed, nCameraPanTiltSpeed, nCameraPanTiltSpeed );
 	m_pHeadControl->ExecutePositionAndSpeed( HEAD_OWNER_USER_CONTROL );
 
 }

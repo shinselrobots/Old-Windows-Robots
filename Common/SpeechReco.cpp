@@ -439,6 +439,9 @@ if( m_bPlaySimonSays && !m_bSimonSays )
 			SpeechSendCommand( WM_ROBOT_SET_ACTION_CMD, ACTION_MODE_NONE, (DWORD)0 );	// Right/Left arm, Movement to execute, TODO-MUST This is not what Behavior code says!!
 			RobotSleep(5, pDomainSpeakThread); // Let the command run first
 
+			// Tell head to stop moving if it was
+			// SpeechSendCommand( WM_ROBOT_USER_CAMERA_PAN_CMD, (DWORD)CAMERA_PAN_STOP, 5 );
+
 			if( bCurrentlyMoving )
 			{
 				Speak( "Stopping" );	// Acknowledge if we were moving
@@ -450,6 +453,8 @@ if( m_bPlaySimonSays && !m_bSimonSays )
 
 			// Tell arms to stop and go to home postion too
 			SpeechSendCommand( WM_ROBOT_SET_ARM_MOVEMENT, (DWORD)BOTH_ARMS, (DWORD)ARM_MOVEMENT_HOME1 );	// Right/Left arm, Movement to execute, 
+
+
 			SpeechSendCommand( WM_ROBOT_USER_OVERRIDE_CMD, SET_USER_NORMAL, 0 ); // Rest owner back
 			break;
 		}
@@ -841,7 +846,7 @@ if( m_bPlaySimonSays && !m_bSimonSays )
 		case SpeechCmd_LookUp:
 		{
 			ROBOT_DISPLAY( TRUE, "SpeechReco Command Recognized: Look Up")
-			SpeechSendCommand( WM_ROBOT_USER_CAMERA_PAN_CMD, (DWORD)CAMERA_PAN_UP, 5 );	//I THINK Speed is ignored, but set to 5 for now...
+			SpeechSendCommand( WM_ROBOT_USER_CAMERA_PAN_CMD, (DWORD)CAMERA_PAN_UP, 5 );
 			break;
 		}
 

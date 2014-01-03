@@ -535,6 +535,8 @@ void CBehaviorModule::ProcessMessage(
 		case WM_ROBOT_USER_CAMERA_PAN_CMD:
 		{
 			g_bCmdRecognized = TRUE;
+			// wParam = Pan/Tilt Command enumeration
+			// lParam = Speed
 			// Send Command to tell camera to move Pan and Tilt
 			// This command controls both Pan and Tilt
 			HandleUserHeadMovementCmd(wParam, lParam );
@@ -687,7 +689,7 @@ void CBehaviorModule::ProcessMessage(
 		{
 			// Tell camera to go to ABSOLUTE PAN position specified in TENTHDEGREES
 			// wParam = position to move to
-			// lParam = speed
+			// lParam = movement speed
 			g_bCmdRecognized = TRUE;
 			m_pHeadControl->SetHeadPosition( HEAD_OWNER_USER_CONTROL, wParam, NOP, NOP );	// Pan only
 			if( 0 != lParam )
@@ -707,6 +709,7 @@ void CBehaviorModule::ProcessMessage(
 		{
 			// Tell camera to go to ABSOLUTE TILT position specified in TENTHDEGREES
 			// wParam = position to move to
+			// lParam = movement speed
 
 			g_bCmdRecognized = TRUE;
 			if( 0 != lParam )
@@ -985,6 +988,10 @@ void CBehaviorModule::ProcessMessage(
 						break;
 					}
 
+					default:
+					{
+						ROBOT_DISPLAY( TRUE, "ERROR! BAD ACTION MODE! (%02X)", m_CurrentActionMode )
+					}
 
 				}	// switch m_CurrentActionMode
 			} // If !ACTION_MODE_NONE

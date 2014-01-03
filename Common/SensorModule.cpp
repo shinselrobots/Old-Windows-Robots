@@ -56,8 +56,13 @@ CSensorModule::CSensorModule( CDriveControlModule *pDriveControlModule )
 	m_GPSNavigationEnabled = FALSE;
 	m_CliffSensorsEnabled = FALSE;
 
+#if( ROBOT_HAS_RIGHT_ARM )
 	m_pArmControlRight = new ArmControl( RIGHT_ARM );	// For arm position information
+#endif
+
+#if( ROBOT_HAS_LEFT_ARM )
 	m_pArmControlLeft = new ArmControl( LEFT_ARM );	// For arm position information
+#endif
 
 	// Note: Initial robot location set by DEFAULT_ROBOT_START_POSITION_X,Y in Robot.cpp with other global initialization
 
@@ -65,8 +70,12 @@ CSensorModule::CSensorModule( CDriveControlModule *pDriveControlModule )
 
 CSensorModule::~CSensorModule()
 {
+	#if( ROBOT_HAS_RIGHT_ARM )
 		SAFE_DELETE(m_pArmControlRight);
+	#endif
+	#if( ROBOT_HAS_LEFT_ARM )
 		SAFE_DELETE(m_pArmControlLeft);
+	#endif
 }
 
 void CSensorModule::SetCompassCorrection( int CompassCorrection )
@@ -2397,6 +2406,7 @@ int	CSensorModule::GetObjectDirection( int  SummaryLeft, int  SummaryRight,
 ///////////////////////////////////////////////////////////////////////////////
 int  CSensorModule::ReadElbowSensorsLeft( )
 {
+#if( ROBOT_HAS_LEFT_ARM )
 
 	if( ARM_L_HW_BUMPER_OBJECT_ELBOW )
 	{
@@ -2437,10 +2447,15 @@ int  CSensorModule::ReadElbowSensorsLeft( )
 	// Wrist not rotated
 	return 0;	// Hit!
 
+#else
+	return NO_OBJECT_IN_RANGE;
+#endif
+
 }
 ///////////////////////////////////////////////////////////////////////////////
 int  CSensorModule::ReadElbowSensorsRight( )
 {
+#if( ROBOT_HAS_RIGHT_ARM )
 
 	if( ARM_R_HW_BUMPER_OBJECT_ELBOW )
 	{
@@ -2480,6 +2495,10 @@ int  CSensorModule::ReadElbowSensorsRight( )
 */
 	// Wrist not rotated
 	return 0;	// Hit!
+
+#else
+	return NO_OBJECT_IN_RANGE;
+#endif
 
 }
 
@@ -3438,14 +3457,15 @@ void CSensorModule::DoSensorFusion()
 				// Last scan was within 1 second
 				__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, psh_csKinectSummaryDataLock);
 				EnterCriticalSection(&g_csKinectSummaryDataLock);
+		// Teleop has no arms!
 		//		g_pSensorSummary->nLeftRearZone =			__min( g_pSensorSummary->nLeftRearZone, g_pKinectSummary->nLeftRearZone );	
 		///		g_pSensorSummary->bLeftCliff =				g_pKinectSummary->bLeftCliff;
 				g_pSensorSummary->nLeftSideZone =			__min( g_pSensorSummary->nLeftSideZone, g_pKinectSummary->nLeftSideZone );	 
 				g_pSensorSummary->nLeftFrontSideZone =		__min( g_pSensorSummary->nLeftFrontSideZone, g_pKinectSummary->nLeftFrontSideZone );	 
-				g_pSensorSummary->nLeftArmZone =			__min( g_pSensorSummary->nLeftArmZone, g_pKinectSummary->nLeftArmZone );	// Object in front of Arm
+		//		g_pSensorSummary->nLeftArmZone =			__min( g_pSensorSummary->nLeftArmZone, g_pKinectSummary->nLeftArmZone );	// Object in front of Arm
 				g_pSensorSummary->nLeftFrontZone =			__min( g_pSensorSummary->nLeftFrontZone, g_pKinectSummary->nLeftFrontZone );
 				g_pSensorSummary->nRightFrontZone =			__min( g_pSensorSummary->nRightFrontZone, g_pKinectSummary->nRightFrontZone );
-				g_pSensorSummary->nRightArmZone =			__min( g_pSensorSummary->nRightArmZone, g_pKinectSummary->nRightArmZone ); // Object in front of Arm
+		//		g_pSensorSummary->nRightArmZone =			__min( g_pSensorSummary->nRightArmZone, g_pKinectSummary->nRightArmZone ); // Object in front of Arm
 				g_pSensorSummary->nRightFrontSideZone =		__min( g_pSensorSummary->nRightFrontSideZone, g_pKinectSummary->nRightFrontSideZone );
 				g_pSensorSummary->nRightSideZone =			__min( g_pSensorSummary->nRightSideZone, g_pKinectSummary->nRightSideZone );
 		///		g_pSensorSummary->bRightCliff =				g_pKinectSummary->bRightCliff;
@@ -3471,15 +3491,18 @@ void CSensorModule::DoSensorFusion()
 
 
 		// Check Bumpers
-/*		if( HW_BUMPER_HIT_FRONT )
+		if( HW_BUMPER_HIT_FRONT )
 		{		
-			// Only one front HW bumper on Loki
 			g_pSensorSummary->nLeftFrontZone = 0; // Collision!
 			g_pSensorSummary->nRightFrontZone = 0; // Collision!
-			ROBOT_DISPLAY( TRUE, "SensorModule: BUMPER HIT!  Front Bumper!\n" )
-			SpeakText( "Sorry" );	
 		}
-*/
+		else
+		{
+			if( HW_BUMPER_HIT_SIDE_LEFT )
+				g_pSensorSummary->nLeftFrontZone = 0; // Collision!
+			if( HW_BUMPER_HIT_SIDE_RIGHT )
+				g_pSensorSummary->nRightFrontZone = 0; // Collision!
+		}
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Now, continue combining sensor info for front sensors
@@ -3487,10 +3510,10 @@ void CSensorModule::DoSensorFusion()
 		// Start with analog sensors, then digital.  Look for closest object on each front area (left and right).
 
 		g_pSensorSummary->nClosestObjectFrontLeft = __min( g_pSensorSummary->nClosestObjectFrontLeft, g_pSensorSummary->nLeftFrontZone ); // Front IR, Laser, and bumpers
-		g_pSensorSummary->nClosestObjectFrontLeft = __min( g_pSensorSummary->nClosestObjectFrontLeft, g_pSensorSummary->nLeftArmZone );
+		// g_pSensorSummary->nClosestObjectFrontLeft = __min( g_pSensorSummary->nClosestObjectFrontLeft, g_pSensorSummary->nLeftArmZone );
 
 		g_pSensorSummary->nClosestObjectFrontRight = __min( g_pSensorSummary->nClosestObjectFrontRight, g_pSensorSummary->nRightFrontZone );
-		g_pSensorSummary->nClosestObjectFrontRight = __min( g_pSensorSummary->nClosestObjectFrontRight, g_pSensorSummary->nRightArmZone );
+		// g_pSensorSummary->nClosestObjectFrontRight = __min( g_pSensorSummary->nClosestObjectFrontRight, g_pSensorSummary->nRightArmZone );
 
 		if( abs((int)(g_pSensorSummary->nClosestObjectFrontRight - g_pSensorSummary->nClosestObjectFrontLeft) ) < IR_RANGE_FUDGE_AMOUNT_TENTH_INCHES )
 		{
@@ -3529,8 +3552,7 @@ void CSensorModule::DoSensorFusion()
 		// REAR SENSORS
 		// CLIFF SENSOR
 
-		// Loki has 2 IR Cliff Sensors
-		/*		
+		// Kobuki base has 2 IR Cliff Sensors
 		if( m_CliffSensorsEnabled )
 		{
 			if( IR_BUMPER_CLIFF_LEFT || IR_BUMPER_CLIFF_RIGHT )
@@ -3542,24 +3564,21 @@ void CSensorModule::DoSensorFusion()
 					// Cliff on both sides  Oh no!  what to do?
 					g_pSensorSummary->bLeftCliff = TRUE;
 					g_pSensorSummary->bRightCliff = TRUE;
-					ROBOT_DISPLAY( TRUE, "SensorModule: ERROR!!!! Cliff on Both Sides!!!\n" )
-					SpeakText( "Error. Cliff on both sides" );	
+					ROBOT_DISPLAY( TRUE, "SensorModule: Cliff on Both Sides!!!\n" )
+					//SpeakText( "Error. Cliff on both sides" );	
 
 				}
 				else if( IR_BUMPER_CLIFF_LEFT )
 				{		
 					g_pSensorSummary->bLeftCliff = TRUE;
 					ROBOT_DISPLAY( TRUE, "SensorModule: Cliff Left Side!\n" )
-					SpeakText( "Cliff Left" );	
-
-
+					//SpeakText( "Cliff Left" );	
 				}
 				else if( IR_BUMPER_CLIFF_RIGHT )
 				{		
 					g_pSensorSummary->bRightCliff = TRUE;
 					ROBOT_DISPLAY( TRUE, "SensorModule: Cliff Right Side!\n" )
-					SpeakText( "Cliff Right" );	
-
+					//SpeakText( "Cliff Right" );	
 				}
 				else
 				{
@@ -3568,8 +3587,8 @@ void CSensorModule::DoSensorFusion()
 				}
 			}
 		}
-		*/
-		// SIDE SENSORS
+
+		// SIDE SENSORS TODO-MUST-TELEOP
 		// Loki has IR side sensors and side bumpers
 
 		// Handle analog sensors first

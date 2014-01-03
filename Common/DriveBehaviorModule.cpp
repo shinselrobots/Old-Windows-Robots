@@ -663,12 +663,20 @@ CAvoidObjectModule::CAvoidObjectModule( CDriveControlModule *pDriveControlModule
 	m_SideAvoidDistanceTenthInches = SIDE_THREAT_NORM_THRESHOLD;
 	gAvoidanceTimer = 0;
 	m_LastObjectDirection = 0;
-	#if ( ROBOT_SERVER == 1 ) //////////////// SERVER ONLY //////////////////
+
+#if ( ROBOT_SERVER == 1 ) //////////////// SERVER ONLY //////////////////
+	m_ArmsInSafePosition = FALSE;
+	m_pKinectServoControl = NULL;
 	m_pKinectServoControl = new KinectServoControl;
-		m_ArmsInSafePosition = FALSE;
-		m_pArmControlRight = new ArmControl( RIGHT_ARM );
-		m_pArmControlLeft = new ArmControl( LEFT_ARM );
+
+	#if( ROBOT_HAS_RIGHT_ARM )
+		m_pArmControlRight = new ArmControl( RIGHT_ARM );	// For arm position information
 	#endif
+
+	#if( ROBOT_HAS_LEFT_ARM )
+		m_pArmControlLeft = new ArmControl( LEFT_ARM );	// For arm position information
+	#endif
+#endif
 
 }
 
@@ -677,8 +685,13 @@ CAvoidObjectModule::~CAvoidObjectModule()
 	ROBOT_LOG( TRUE, "~CAvoidObjectModule()\n" )
 #if ( ROBOT_SERVER == 1 )	// This module used for Robot Server only
 	SAFE_DELETE( m_pKinectServoControl );
-	SAFE_DELETE( m_pArmControlRight );
-	SAFE_DELETE( m_pArmControlLeft );
+
+	#if( ROBOT_HAS_RIGHT_ARM )
+		SAFE_DELETE(m_pArmControlRight);
+	#endif
+	#if( ROBOT_HAS_LEFT_ARM )
+		SAFE_DELETE(m_pArmControlLeft);
+	#endif
 #endif
 }
 
@@ -733,7 +746,7 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 			CString MsgString;
 
 
-	/// TODO-MUST DAVES FORCED OFF FOR NOW!		if( DISABLED == m_AvoidanceState )
+			if( DISABLED == m_AvoidanceState )
 			{
 				// This module is disabled
 				return;
@@ -763,9 +776,9 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 				// Move Kinect into position to detect people, if no higher owner has control
 				if( gAvoidanceTimer == 0 ) 
 				{
-	#if ( ROBOT_SERVER == 1 ) //////////////// SERVER ONLY //////////////////
-					m_pKinectServoControl->SetTiltPosition( KINECT_TILT_OWNER_COLLISION_AVOIDANCE, KINECT_HUMAN_DETECT_START_POSITION );
-#endif
+					#if ( ROBOT_SERVER == 1 ) //////////////// SERVER ONLY //////////////////
+						m_pKinectServoControl->SetTiltPosition( KINECT_TILT_OWNER_COLLISION_AVOIDANCE, KINECT_HUMAN_DETECT_START_POSITION );
+					#endif
 				}
 
 				return;
@@ -776,9 +789,10 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 			//ROBOT_LOG( TRUE, "speed = %d, Turn = %d\n", DbgSpeed, DbgTurn )
 
 			// Move Kinect into position to detect objects
-	#if ( ROBOT_SERVER == 1 ) //////////////// SERVER ONLY //////////////////
-			m_pKinectServoControl->SetTiltPosition( KINECT_TILT_OWNER_COLLISION_AVOIDANCE, KINECT_OBJECT_AVOIDANCE_POSITION );
-#endif
+			#if ( ROBOT_SERVER == 1 ) //////////////// SERVER ONLY //////////////////
+				m_pKinectServoControl->SetTiltPosition( KINECT_TILT_OWNER_COLLISION_AVOIDANCE, KINECT_OBJECT_AVOIDANCE_POSITION );
+			#endif
+
 			if( IDLE == m_AvoidanceState )
 			{
 				// This module was not in control at last status update
@@ -888,20 +902,25 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 					// Objects close by, raise the arms to a safe position
 					if( !m_ArmsInSafePosition )
 					{
-#if ( ROBOT_SERVER == 1 )	// This module used for Robot Server only
-						m_pArmControlLeft->MoveArmToSafePosition();
-						m_pArmControlRight->MoveArmToSafePosition();
-#endif
+						#if( ROBOT_HAS_LEFT_ARM )
+							m_pArmControlLeft->MoveArmToSafePosition();
+						#endif
+						#if( ROBOT_HAS_RIGHT_ARM )
+							m_pArmControlRight->MoveArmToSafePosition();
+						#endif
 						m_ArmsInSafePosition = TRUE;
 					}
 				}
 				else if( m_ArmsInSafePosition )
 				{
 					// No need to keep them in safe postion anymore
-#if ( ROBOT_SERVER == 1 )	// This module used for Robot Server only
-					m_pArmControlLeft->MoveArmHome();
-					m_pArmControlRight->MoveArmHome();
-#endif
+
+					#if( ROBOT_HAS_LEFT_ARM )
+						m_pArmControlLeft->MoveArmHome();
+					#endif
+					#if( ROBOT_HAS_RIGHT_ARM )
+						m_pArmControlRight->MoveArmHome();
+					#endif
 					m_ArmsInSafePosition = FALSE;
 				}
 

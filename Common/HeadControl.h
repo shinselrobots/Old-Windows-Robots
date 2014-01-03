@@ -26,7 +26,7 @@ public:
 
 	//-----------------------------------------------------------------------------
 	// Name: Set Head Position
-	// Desc: quickly sets precise position of the Head
+	// Desc: quickly sets precise position of the Head in TENTHDEGREES	
 	// Use special value SERVO_NO_CHANGE to skip a given servo
 	//-----------------------------------------------------------------------------
 	void SetHeadPosition( int  nOwner, int Pan, int Tilt, int SideTilt, BOOL TrackingLimited = FALSE );
@@ -104,6 +104,12 @@ public:
 	// Desc: Commits movement and speed for all servos setup previously
 	//-----------------------------------------------------------------------------
 	void ExecutePositionAndSpeed( int  nOwner );
+
+	//-----------------------------------------------------------------------------
+	// Name: Stop
+	// Desc: Tell Head servos to stop moving immediately
+	//-----------------------------------------------------------------------------
+	void HeadControl::Stop( int  nOwner );
 
 	//-----------------------------------------------------------------------------
 	// Name: SetServoCompliance

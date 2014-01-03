@@ -633,8 +633,13 @@ CUserCmdModule::CUserCmdModule( CDriveControlModule *pDriveControlModule )
 	m_NextChatPhrase = 0;
 
 	#if ( ROBOT_SERVER == 1 ) //////////////// SERVER ONLY //////////////////
-		m_pArmControlRight = new ArmControl( RIGHT_ARM );
-		m_pArmControlLeft = new ArmControl( LEFT_ARM );
+		#if( ROBOT_HAS_RIGHT_ARM )
+			m_pArmControlRight = new ArmControl( RIGHT_ARM );	// For arm position information
+		#endif
+
+		#if( ROBOT_HAS_LEFT_ARM )
+			m_pArmControlLeft = new ArmControl( LEFT_ARM );	// For arm position information
+		#endif
 	#endif
 	m_UserOwner = LOCAL_USER_MODULE;	// Normal mode.  Can be switched to OVERRIDE_MODULE if needed
 
@@ -644,8 +649,12 @@ CUserCmdModule::~CUserCmdModule()
 {
 	ROBOT_LOG( TRUE, "~CUserCmdModule()\n" )
 	#if ( ROBOT_SERVER == 1 ) //////////////// SERVER ONLY //////////////////
-		SAFE_DELETE( m_pArmControlRight );
-		SAFE_DELETE( m_pArmControlLeft );
+		#if( ROBOT_HAS_RIGHT_ARM )
+			SAFE_DELETE(m_pArmControlRight);
+		#endif
+		#if( ROBOT_HAS_LEFT_ARM )
+			SAFE_DELETE(m_pArmControlLeft);
+		#endif
 	#endif
 }
 
@@ -1197,12 +1206,16 @@ void CUserCmdModule::ProcessMessage(
 				FPOINT3D_T ArmXYZ;
 				if( LEFT_ARM == wParam )
 				{
-					m_pArmControlLeft->GetTargetArmXYZ( ArmXYZ );
+					#if( ROBOT_HAS_LEFT_ARM )
+						m_pArmControlLeft->GetTargetArmXYZ( ArmXYZ );
+					#endif
 					//ROBOT_LOG( TRUE, "DEBUG: RIGHT ARM X = %4.1f, Y = %4.1f, Z = %4.1f\n", ArmX, ArmY, ArmZ )
 				}
 				else
 				{
-					m_pArmControlRight->GetTargetArmXYZ( ArmXYZ );
+					#if( ROBOT_HAS_RIGHT_ARM )
+						m_pArmControlRight->GetTargetArmXYZ( ArmXYZ );
+					#endif
 					//ROBOT_LOG( TRUE, "DEBUG: LEFT ARM X = %4.1f, Y = %4.1f, Z = %4.1f\n", ArmX, ArmY, ArmZ )
 				}
 

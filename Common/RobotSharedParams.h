@@ -97,7 +97,7 @@ enum WM_ROBOT_MESSAGES {
 
 		WM_ROBOT_CAMERA_POWER_CMD,					// User Pan/Tilt commands
 		WM_ROBOT_CAMERA_INITIALIZE_CMD,			
-		WM_ROBOT_USER_CAMERA_PAN_CMD,		
+		WM_ROBOT_USER_CAMERA_PAN_CMD,				// wParam = Pan/Tilt Enum, lParam = movement speed		
 		WM_ROBOT_USER_CAMERA_ZOOM_CMD,		
 		WM_ROBOT_SET_HEAD_POSITION,					// BULK Head command.  wParam not used. lParam = Set Speed too (True/False) 
 		WM_ROBOT_USER_CAMERA_PAN_TILT_SPEED_CMD,	// wParam = speed

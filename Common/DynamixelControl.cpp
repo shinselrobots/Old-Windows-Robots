@@ -359,7 +359,8 @@ void CDynaControl::SetAllCameraServosSpeed( int  Speed )
 	if( NUMBER_OF_DYNA_SERVOS_IN_HEAD >=2 )
 		SetServoSpeed( DYNA_CAMERA_TILT_SERVO_ID, Speed );	
 	if( NUMBER_OF_DYNA_SERVOS_IN_HEAD >=1 )
-		SetServoSpeed( DYNA_CAMERA_PAN_SERVO_ID, Speed );	
+		SetServoSpeed( DYNA_CAMERA_PAN_SERVO_ID, Speed );
+
 	SetServoSpeed( DYNA_KINECT_SCANNER_SERVO_ID, Speed );	
 
 }
@@ -372,7 +373,8 @@ void CDynaControl::SetAllCameraServosMaxTorque( int  MaxTorque )
 	if( NUMBER_OF_DYNA_SERVOS_IN_HEAD >=2 )
 		SetServoMaxTorque( DYNA_CAMERA_TILT_SERVO_ID, MaxTorque );	
 	if( NUMBER_OF_DYNA_SERVOS_IN_HEAD >=1 )
-		SetServoMaxTorque( DYNA_CAMERA_PAN_SERVO_ID, MaxTorque );	
+		SetServoMaxTorque( DYNA_CAMERA_PAN_SERVO_ID, MaxTorque );
+
 	SetServoMaxTorque( DYNA_KINECT_SCANNER_SERVO_ID, MaxTorque );	
 
 }
@@ -423,11 +425,39 @@ void CDynaControl::PauseMotion( BOOL bPause )
 		// Restore speed and position values to all servos - resume normal movement
 		HandleCommand( HW_SET_BULK_ARM_POSITION, RIGHT_ARM, TRUE, 0, 0 );
 
-		//SetAllCameraServosSpeed (0);
+		//SetAllCameraServosSpeed (DYNA_VELOCITY_SLOW);
 		//SetServoSpeed( DYNA_KINECT_SCANNER_SERVO_ID, 150 );	// Max = 0x03FF = 1023
 
 	}
 }
+
+void CDynaControl::CameraStop( )
+{
+	// Stop motion for camera head Pan/Tilt servos
+	ROBOT_LOG( TRUE, "\n============= Stopping Camera Head Servo motion =============\n" )
+
+	SetAllCameraServosSpeed( DYNA_VELOCITY_STOP );
+	Sleep(10);
+
+	// Now, set target position to current position
+	if( g_BulkServoCmd[DYNA_CAMERA_PAN_SERVO_ID].Enable )
+	{
+		GetServoStatus( DYNA_CAMERA_PAN_SERVO_ID );
+		g_BulkServoCmd[DYNA_CAMERA_PAN_SERVO_ID].PositionTenthDegrees = g_BulkServoStatus[DYNA_CAMERA_PAN_SERVO_ID].PositionTenthDegrees;
+		int PositionTicks = TenthDegreeToTicks( DYNA_CAMERA_PAN_SERVO_ID, g_BulkServoCmd[DYNA_CAMERA_PAN_SERVO_ID].PositionTenthDegrees ); 
+		SetServoPosition( DYNA_CAMERA_PAN_SERVO_ID, PositionTicks );	// ID, position (0-03FF)
+	}
+
+	if( g_BulkServoCmd[DYNA_CAMERA_TILT_SERVO_ID].Enable )
+	{
+		GetServoStatus( DYNA_CAMERA_TILT_SERVO_ID );
+		g_BulkServoCmd[DYNA_CAMERA_TILT_SERVO_ID].PositionTenthDegrees = g_BulkServoStatus[DYNA_CAMERA_TILT_SERVO_ID].PositionTenthDegrees;
+		int PositionTicks = TenthDegreeToTicks( DYNA_CAMERA_PAN_SERVO_ID, g_BulkServoCmd[DYNA_CAMERA_PAN_SERVO_ID].PositionTenthDegrees ); 
+		SetServoPosition( DYNA_CAMERA_PAN_SERVO_ID, PositionTicks );	// ID, position (0-03FF)
+	}
+
+}
+
 
 
 void CDynaControl::AddCheckSum(int  nParamBytes)
@@ -457,13 +487,13 @@ void CDynaControl::GotoSleepPosition() // Sleeping Position
 	if( ROBOT_TYPE != LOKI )
 	{
 		SetServoSpeed( DYNA_KINECT_SCANNER_SERVO_ID, 100 );	// Max = 0x03FF = 1023
-		//SetAllCameraServosSpeed(100); // Max = 0x03FF = 1023
+		//SetAllCameraServosSpeed(DYNA_VELOCITY_MED_SLOW); // Max = 0x03FF = 1023
 		PositionTicks = TenthDegreeToTicks( DYNA_KINECT_SCANNER_SERVO_ID, KINECT_SLEEP_POSITION ); // NOT: KINECT_TILT_CENTER
 		SetServoPosition( DYNA_KINECT_SCANNER_SERVO_ID, PositionTicks );	// ID, position (0-03FF)
 	}
 	else
 	{
-		SetAllCameraServosSpeed(100); // Max = 0x03FF = 1023
+		SetAllCameraServosSpeed(DYNA_VELOCITY_MED_SLOW); // Max = 0x03FF = 1023
 
 		// Point head forward before tilting down to sleep
 		PositionTicks = TenthDegreeToTicks( DYNA_CAMERA_PAN_SERVO_ID, CAMERA_PAN_CENTER );
@@ -496,27 +526,23 @@ void CDynaControl::GotoSleepPosition() // Sleeping Position
 			// Handle possible RX64 Servo Separately
 			g_BulkServoCmd[DYNA_RIGHT_ARM_ELBOW_BEND_SERVO_ID].PositionTenthDegrees = RIGHT_ARM_ELBOW_BEND_HOME2_LOCK * 10;
 			PositionTicks = TenthDegreeToTicks( DYNA_RIGHT_ARM_ELBOW_BEND_SERVO_ID, RIGHT_ARM_ELBOW_BEND_HOME2_LOCK * 10 ); 
-			CheckServoLimit(DYNA_RIGHT_ARM_ELBOW_BEND_SERVO_ID, PositionTicks);
 			SetServoPositionAndSpeed( DYNA_RIGHT_ARM_ELBOW_BEND_SERVO_ID, PositionTicks, DynaServoSpeed );
 
 			// Now handle AX12 Servos
 			g_BulkServoCmd[DYNA_RIGHT_ARM_ELBOW_ROTATE_SERVO_ID].PositionTenthDegrees = RIGHT_ARM_ELBOW_ROTATE_HOME2 * 10;
 			PositionTicks = TenthDegreeToTicks( DYNA_RIGHT_ARM_ELBOW_ROTATE_SERVO_ID, RIGHT_ARM_ELBOW_ROTATE_HOME2 * 10 ); 
-			CheckServoLimit(DYNA_RIGHT_ARM_ELBOW_ROTATE_SERVO_ID, PositionTicks);
 			ServoIDArray[0] = DYNA_RIGHT_ARM_ELBOW_ROTATE_SERVO_ID;															// ID
 			ServoValueArray[0] = PositionTicks;																				// Position (0-03FF)
 			ServoSpeedArray[0] = DYNA_VELOCITY_MED;	// Speed
 
 			g_BulkServoCmd[DYNA_RIGHT_ARM_WRIST_SERVO_ID].PositionTenthDegrees = RIGHT_ARM_WRIST_ROTATE_HOME2 * 10;
 			PositionTicks = TenthDegreeToTicks( DYNA_RIGHT_ARM_WRIST_SERVO_ID, RIGHT_ARM_WRIST_ROTATE_HOME2 * 10 ); 
-			CheckServoLimit(DYNA_RIGHT_ARM_WRIST_SERVO_ID, PositionTicks);
 			ServoIDArray[1] = DYNA_RIGHT_ARM_WRIST_SERVO_ID;	// ID
 			ServoValueArray[1] = PositionTicks;
 			ServoSpeedArray[1] = DYNA_VELOCITY_MED;
 
 			g_BulkServoCmd[DYNA_RIGHT_ARM_CLAW_SERVO_ID].PositionTenthDegrees = RIGHT_ARM_CLAW_HOME2 * 10;
 			PositionTicks = TenthDegreeToTicks( DYNA_RIGHT_ARM_CLAW_SERVO_ID, RIGHT_ARM_CLAW_HOME2  * 10 ); 
-			CheckServoLimit(DYNA_RIGHT_ARM_CLAW_SERVO_ID, PositionTicks);
 			ServoIDArray[2] = DYNA_RIGHT_ARM_CLAW_SERVO_ID;	// ID
 			ServoValueArray[2] = PositionTicks;
 			ServoSpeedArray[2] = DYNA_VELOCITY_MED;
@@ -539,27 +565,23 @@ void CDynaControl::GotoSleepPosition() // Sleeping Position
 			// TODO: #if ( DYNA_SERVO_RX64_INSTALLED == 1 )
 			g_BulkServoCmd[DYNA_LEFT_ARM_ELBOW_BEND_SERVO_ID].PositionTenthDegrees = LEFT_ARM_ELBOW_BEND_HOME2_LOCK * 10;
 			PositionTicks = TenthDegreeToTicks( DYNA_LEFT_ARM_ELBOW_BEND_SERVO_ID, LEFT_ARM_ELBOW_BEND_HOME2_LOCK * 10 ); 
-			CheckServoLimit(DYNA_LEFT_ARM_ELBOW_BEND_SERVO_ID, PositionTicks);
 			SetServoPositionAndSpeed( DYNA_LEFT_ARM_ELBOW_BEND_SERVO_ID, PositionTicks, DynaServoSpeed );
 
 			// Now handle AX12 Servos
 			g_BulkServoCmd[DYNA_LEFT_ARM_ELBOW_ROTATE_SERVO_ID].PositionTenthDegrees = LEFT_ARM_ELBOW_ROTATE_HOME2 * 10;
 			PositionTicks = TenthDegreeToTicks( DYNA_LEFT_ARM_ELBOW_ROTATE_SERVO_ID, LEFT_ARM_ELBOW_ROTATE_HOME2 * 10 ); 
-			CheckServoLimit(DYNA_LEFT_ARM_ELBOW_ROTATE_SERVO_ID, PositionTicks);
 			ServoIDArray[0] = DYNA_LEFT_ARM_ELBOW_ROTATE_SERVO_ID;															// ID
 			ServoValueArray[0] = PositionTicks;																				// Position (0-03FF)
 			ServoSpeedArray[0] = DYNA_VELOCITY_MED;	// Speed
 
 			g_BulkServoCmd[DYNA_LEFT_ARM_WRIST_SERVO_ID].PositionTenthDegrees = LEFT_ARM_WRIST_ROTATE_HOME2_LOCK * 10;
 			PositionTicks = TenthDegreeToTicks( DYNA_LEFT_ARM_WRIST_SERVO_ID, LEFT_ARM_WRIST_ROTATE_HOME2_LOCK * 10 ); 
-			CheckServoLimit(DYNA_LEFT_ARM_WRIST_SERVO_ID, PositionTicks);
 			ServoIDArray[1] = DYNA_LEFT_ARM_WRIST_SERVO_ID;	// ID
 			ServoValueArray[1] = PositionTicks;
 			ServoSpeedArray[1] = DYNA_VELOCITY_MED_FAST; // Move wrist fast to get claw out of the way for shutdown
 
 			g_BulkServoCmd[DYNA_LEFT_ARM_CLAW_SERVO_ID].PositionTenthDegrees = LEFT_ARM_CLAW_HOME2 * 10;
 			PositionTicks = TenthDegreeToTicks( DYNA_LEFT_ARM_CLAW_SERVO_ID, LEFT_ARM_CLAW_HOME2  * 10 ); 
-			CheckServoLimit(DYNA_LEFT_ARM_CLAW_SERVO_ID, PositionTicks);
 			ServoIDArray[2] = DYNA_LEFT_ARM_CLAW_SERVO_ID;	// ID
 			ServoValueArray[2] = PositionTicks;
 			ServoSpeedArray[2] = DYNA_VELOCITY_MED;
@@ -579,7 +601,7 @@ void CDynaControl::GotoStartupPosition() // Home Position
 	
 	ROBOT_LOG( TRUE, "Moving servos to startup Positions\n" )
 
-	SetAllCameraServosSpeed(200); // Max = 0x03FF = 1023
+	SetAllCameraServosSpeed(DYNA_VELOCITY_MED); // Max = 0x03FF = 1023
 
 	if( NUMBER_OF_DYNA_SERVOS_IN_HEAD >=3 )
 	{
@@ -609,7 +631,7 @@ void CDynaControl::GotoStartupPosition() // Home Position
 		int  ServoValueArray[NUMBER_OF_DYNA_AX12_SERVOS_PER_ARM];		// Values to set
 		int  ServoSpeedArray[NUMBER_OF_DYNA_AX12_SERVOS_PER_ARM];		// Speed to set
 
-		int  DynaServoSpeed = ServoSpeedToDynaServoSpeed( DYNA_VELOCITY_MED_SLOW );
+		int  DynaServoSpeed = ServoSpeedToDynaServoSpeed( SERVO_SPEED_MED_SLOW );
 
 		///////////////////////////////
 		// Right Arm
@@ -623,27 +645,23 @@ void CDynaControl::GotoStartupPosition() // Home Position
 			// Handle RX64 Servo Separately
 			g_BulkServoCmd[DYNA_RIGHT_ARM_ELBOW_BEND_SERVO_ID].PositionTenthDegrees = RIGHT_ARM_ELBOW_BEND_HOME1 * 10;
 			PositionTicks = TenthDegreeToTicks( DYNA_RIGHT_ARM_ELBOW_BEND_SERVO_ID, RIGHT_ARM_ELBOW_BEND_HOME1 * 10 ); 
-			CheckServoLimit(DYNA_RIGHT_ARM_ELBOW_BEND_SERVO_ID, PositionTicks);
 			SetServoPositionAndSpeed( DYNA_RIGHT_ARM_ELBOW_BEND_SERVO_ID, PositionTicks, DynaServoSpeed );
 
 			// Now handle AX12 Servos
 			g_BulkServoCmd[DYNA_RIGHT_ARM_ELBOW_ROTATE_SERVO_ID].PositionTenthDegrees = RIGHT_ARM_ELBOW_ROTATE_HOME1 * 10;
 			PositionTicks = TenthDegreeToTicks( DYNA_RIGHT_ARM_ELBOW_ROTATE_SERVO_ID, RIGHT_ARM_ELBOW_ROTATE_HOME1 * 10 ); 
-			CheckServoLimit(DYNA_RIGHT_ARM_ELBOW_ROTATE_SERVO_ID, PositionTicks);
 			ServoIDArray[0] = DYNA_RIGHT_ARM_ELBOW_ROTATE_SERVO_ID;															// ID
 			ServoValueArray[0] = PositionTicks;																				// Position (0-03FF)
 			ServoSpeedArray[0] = DYNA_VELOCITY_MED_SLOW;	// Speed
 
 			g_BulkServoCmd[DYNA_RIGHT_ARM_WRIST_SERVO_ID].PositionTenthDegrees = RIGHT_ARM_WRIST_ROTATE_HOME1 * 10;
 			PositionTicks = TenthDegreeToTicks( DYNA_RIGHT_ARM_WRIST_SERVO_ID, RIGHT_ARM_WRIST_ROTATE_HOME1 * 10 ); 
-			CheckServoLimit(DYNA_RIGHT_ARM_WRIST_SERVO_ID, PositionTicks);
 			ServoIDArray[1] = DYNA_RIGHT_ARM_WRIST_SERVO_ID;	// ID
 			ServoValueArray[1] = PositionTicks;
 			ServoSpeedArray[1] = DYNA_VELOCITY_MED_SLOW;
 
 			g_BulkServoCmd[DYNA_RIGHT_ARM_CLAW_SERVO_ID].PositionTenthDegrees = RIGHT_ARM_CLAW_HOME1 * 10;
 			PositionTicks = TenthDegreeToTicks( DYNA_RIGHT_ARM_CLAW_SERVO_ID, RIGHT_ARM_CLAW_HOME1  * 10 ); 
-			CheckServoLimit(DYNA_RIGHT_ARM_CLAW_SERVO_ID, PositionTicks);
 			ServoIDArray[2] = DYNA_RIGHT_ARM_CLAW_SERVO_ID;	// ID
 			ServoValueArray[2] = PositionTicks;
 			ServoSpeedArray[2] = DYNA_VELOCITY_MED_SLOW;
@@ -665,27 +683,23 @@ void CDynaControl::GotoStartupPosition() // Home Position
 			// Handle RX64 Servo Separately
 			g_BulkServoCmd[DYNA_LEFT_ARM_ELBOW_BEND_SERVO_ID].PositionTenthDegrees = LEFT_ARM_ELBOW_BEND_HOME1 * 10;
 			PositionTicks = TenthDegreeToTicks( DYNA_LEFT_ARM_ELBOW_BEND_SERVO_ID, LEFT_ARM_ELBOW_BEND_HOME1 * 10 ); 
-			CheckServoLimit(DYNA_LEFT_ARM_ELBOW_BEND_SERVO_ID, PositionTicks);
 			SetServoPositionAndSpeed( DYNA_LEFT_ARM_ELBOW_BEND_SERVO_ID, PositionTicks, DynaServoSpeed );
 
 			// Now handle AX12 Servos
 			g_BulkServoCmd[DYNA_LEFT_ARM_ELBOW_ROTATE_SERVO_ID].PositionTenthDegrees = LEFT_ARM_ELBOW_ROTATE_HOME1 * 10;
 			PositionTicks = TenthDegreeToTicks( DYNA_LEFT_ARM_ELBOW_ROTATE_SERVO_ID, LEFT_ARM_ELBOW_ROTATE_HOME1 * 10 ); 
-			CheckServoLimit(DYNA_LEFT_ARM_ELBOW_ROTATE_SERVO_ID, PositionTicks);
 			ServoIDArray[0] = DYNA_LEFT_ARM_ELBOW_ROTATE_SERVO_ID;															// ID
 			ServoValueArray[0] = PositionTicks;																				// Position (0-03FF)
 			ServoSpeedArray[0] = DYNA_VELOCITY_MED_SLOW;	// Speed
 
 			g_BulkServoCmd[DYNA_LEFT_ARM_WRIST_SERVO_ID].PositionTenthDegrees = LEFT_ARM_WRIST_ROTATE_HOME1 * 10;
 			PositionTicks = TenthDegreeToTicks( DYNA_LEFT_ARM_WRIST_SERVO_ID, LEFT_ARM_WRIST_ROTATE_HOME1 * 10 ); 
-			CheckServoLimit(DYNA_LEFT_ARM_WRIST_SERVO_ID, PositionTicks);
 			ServoIDArray[1] = DYNA_LEFT_ARM_WRIST_SERVO_ID;	// ID
 			ServoValueArray[1] = PositionTicks;
 			ServoSpeedArray[1] = DYNA_VELOCITY_MED_FAST;
 
 			g_BulkServoCmd[DYNA_LEFT_ARM_CLAW_SERVO_ID].PositionTenthDegrees = LEFT_ARM_CLAW_HOME1 * 10;
 			PositionTicks = TenthDegreeToTicks( DYNA_LEFT_ARM_CLAW_SERVO_ID, LEFT_ARM_CLAW_HOME1  * 10 ); 
-			CheckServoLimit(DYNA_LEFT_ARM_CLAW_SERVO_ID, PositionTicks);
 			ServoIDArray[2] = DYNA_LEFT_ARM_CLAW_SERVO_ID;	// ID
 			ServoValueArray[2] = PositionTicks;
 			ServoSpeedArray[2] = DYNA_VELOCITY_MED_SLOW;
@@ -816,218 +830,7 @@ BOOL CDynaControl::DisplayServoError( int  ServoID, int  nError)
 	return NewFatalError;
 }
 
-void CDynaControl::CheckServoLimit( int  ServoID, int  &PositionTicks )
-{
-	// Make sure servo command is within absolute max tick limits (more than this and something breaks!
 
-	// WE NOW check using degrees, so skip all this!
-	return;
-
-	// DEBUG
-//	ROBOT_LOG( TRUE, " SERVO LIMIT DEBUG: Servo %d = %d Ticks\n",ServoID, PositionTicks )
-/***
-	CString MsgString;
-
-	switch( ServoID )
-	{
-		case DYNA_RIGHT_ARM_ELBOW_ROTATE_SERVO_ID:
-		{
-			if( PositionTicks > DYNA_RIGHT_ARM_ELBOW_ROTATE_MAX )
-			{
-				MsgString.Format( "ERROR! DYNA_RIGHT_ARM_ELBOW_ROTATE_SERVO_ID exceeds MAX tick limit (%d, %d)", PositionTicks, DYNA_RIGHT_ARM_ELBOW_ROTATE_MAX);
-				ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
-				PositionTicks = DYNA_RIGHT_ARM_ELBOW_ROTATE_MAX;
-
-			}
-			else if( PositionTicks < DYNA_RIGHT_ARM_ELBOW_ROTATE_MIN)
-			{
-				MsgString.Format( "ERROR! DYNA_RIGHT_ARM_ELBOW_ROTATE_SERVO_ID below MIN tick limit (%d, %d)", PositionTicks, DYNA_RIGHT_ARM_ELBOW_ROTATE_MIN);
-				ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
-				PositionTicks = DYNA_RIGHT_ARM_ELBOW_ROTATE_MIN;
-			}
-			break;
-		}
-		case DYNA_RIGHT_ARM_ELBOW_BEND_SERVO_ID:
-		{
-			if( PositionTicks > DYNA_RIGHT_ARM_ELBOW_BEND_MAX )
-			{
-				MsgString.Format( "ERROR! DYNA_RIGHT_ARM_ELBOW_BEND_SERVO_ID exceeds MAX tick limit (%d, %d)", PositionTicks, DYNA_RIGHT_ARM_ELBOW_BEND_MAX);
-				ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
-//				PositionTicks = DYNA_RIGHT_ARM_ELBOW_BEND_MAX;
-			}
-			else if( PositionTicks < DYNA_RIGHT_ARM_ELBOW_BEND_MIN)
-			{
-				MsgString.Format( "ERROR! DYNA_RIGHT_ARM_ELBOW_BEND_SERVO_ID below MIN tick limit (%d, %d)", PositionTicks, DYNA_RIGHT_ARM_ELBOW_BEND_MIN);
-				ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
-//				PositionTicks = DYNA_RIGHT_ARM_ELBOW_BEND_MIN;
-			}
-			break;
-		}
-		case DYNA_RIGHT_ARM_WRIST_SERVO_ID:
-		{
-			if( PositionTicks > DYNA_RIGHT_ARM_WRIST_ROTATE_MAX )
-			{
-				MsgString.Format( "ERROR! DYNA_RIGHT_ARM_WRIST_SERVO_ID exceeds MAX tick limit (%d, %d)", PositionTicks, DYNA_RIGHT_ARM_WRIST_ROTATE_MAX);
-				ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
-				PositionTicks = DYNA_RIGHT_ARM_WRIST_ROTATE_MAX;
-			}
-			else if( PositionTicks < DYNA_RIGHT_ARM_WRIST_ROTATE_MIN)
-			{
-				MsgString.Format( "ERROR! DYNA_RIGHT_ARM_WRIST_SERVO_ID below MIN tick limit (%d, %d)", PositionTicks, DYNA_RIGHT_ARM_WRIST_ROTATE_MIN);
-				ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
-				PositionTicks = DYNA_RIGHT_ARM_WRIST_ROTATE_MIN;
-			}
-			break;
-		}
-		case DYNA_RIGHT_ARM_CLAW_SERVO_ID:
-		{
-			if( PositionTicks > DYNA_RIGHT_ARM_CLAW_OPEN_MAX ) 
-			{
-				MsgString.Format( "ERROR! DYNA_RIGHT_ARM_CLAW_SERVO_ID exceeds MAX tick limit (%d, %d)", PositionTicks, DYNA_RIGHT_ARM_CLAW_OPEN_MAX);
-				ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
-				PositionTicks = DYNA_RIGHT_ARM_CLAW_OPEN_MAX;
-			}
-			else if( PositionTicks < DYNA_RIGHT_ARM_CLAW_CLOSED_MIN)
-			{
-				MsgString.Format( "ERROR! DYNA_RIGHT_ARM_CLAW_SERVO_ID below MIN tick limit (%d, %d)", PositionTicks, DYNA_RIGHT_ARM_CLAW_CLOSED_MIN);
-				ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
-				PositionTicks = DYNA_RIGHT_ARM_CLAW_CLOSED_MIN;
-			}
-			break;
-		}
-		case DYNA_LEFT_ARM_ELBOW_ROTATE_SERVO_ID:
-		{
-			if( PositionTicks > DYNA_LEFT_ARM_ELBOW_ROTATE_MAX )
-			{
-				MsgString.Format( "ERROR! DYNA_LEFT_ARM_ELBOW_ROTATE_SERVO_ID exceeds MAX tick limit (%d, %d)", PositionTicks, DYNA_LEFT_ARM_ELBOW_ROTATE_MAX);
-				ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
-				PositionTicks = DYNA_LEFT_ARM_ELBOW_ROTATE_MAX;
-			}
-			else if( PositionTicks < DYNA_LEFT_ARM_ELBOW_ROTATE_MIN)
-			{
-				MsgString.Format( "ERROR! DYNA_LEFT_ARM_ELBOW_ROTATE_SERVO_ID below MIN tick limit (%d, %d)", PositionTicks, DYNA_LEFT_ARM_ELBOW_ROTATE_MIN);
-				ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
-				PositionTicks = DYNA_LEFT_ARM_ELBOW_ROTATE_MIN;
-			}
-			break;
-		}
-		case DYNA_LEFT_ARM_ELBOW_BEND_SERVO_ID:
-		{
-			if( PositionTicks > DYNA_LEFT_ARM_ELBOW_BEND_MAX )
-			{
-				MsgString.Format( "ERROR! DYNA_LEFT_ARM_ELBOW_BEND_SERVO_ID exceeds MAX tick limit (%d, %d)", PositionTicks, DYNA_LEFT_ARM_ELBOW_BEND_MAX);
-				ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
-				PositionTicks = DYNA_LEFT_ARM_ELBOW_BEND_MAX;
-			}
-			else if( PositionTicks < DYNA_LEFT_ARM_ELBOW_BEND_MIN)
-			{
-				MsgString.Format( "ERROR! DYNA_LEFT_ARM_ELBOW_BEND_SERVO_ID below MIN tick limit (%d, %d)", PositionTicks, DYNA_LEFT_ARM_ELBOW_BEND_MIN);
-				ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
-//				PositionTicks = DYNA_LEFT_ARM_ELBOW_BEND_MIN;
-			}
-			break;
-		}
-		case DYNA_LEFT_ARM_WRIST_SERVO_ID:
-		{
-			if( PositionTicks > DYNA_LEFT_ARM_WRIST_ROTATE_MAX )
-			{
-				MsgString.Format( "ERROR! DYNA_LEFT_ARM_WRIST_SERVO_ID exceeds MAX tick limit (%d, %d)", PositionTicks, DYNA_LEFT_ARM_WRIST_ROTATE_MAX);
-				ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
-				PositionTicks = DYNA_LEFT_ARM_WRIST_ROTATE_MAX;
-			}
-			else if( PositionTicks < DYNA_LEFT_ARM_WRIST_ROTATE_MIN)
-			{
-				MsgString.Format( "ERROR! DYNA_LEFT_ARM_WRIST_SERVO_ID below MIN tick limit (%d, %d)", PositionTicks, DYNA_LEFT_ARM_WRIST_ROTATE_MIN);
-				ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
-				PositionTicks = DYNA_LEFT_ARM_WRIST_ROTATE_MIN;
-			}
-			break;
-		}
-		case DYNA_LEFT_ARM_CLAW_SERVO_ID:
-		{
-			if( PositionTicks > DYNA_LEFT_ARM_CLAW_OPEN_MAX )
-			{
-				MsgString.Format( "ERROR! DYNA_LEFT_ARM_CLAW_SERVO_ID exceeds MAX tick limit (%d, %d)", PositionTicks, DYNA_LEFT_ARM_CLAW_OPEN_MAX);
-				ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
-				PositionTicks = DYNA_LEFT_ARM_CLAW_OPEN_MAX;
-			}
-			else if( PositionTicks < DYNA_LEFT_ARM_CLAW_CLOSED_MIN)
-			{
-				MsgString.Format( "ERROR! DYNA_LEFT_ARM_CLAW_SERVO_ID below MIN tick limit (%d, %d)", PositionTicks, DYNA_LEFT_ARM_CLAW_CLOSED_MIN);
-				ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
-				PositionTicks = DYNA_LEFT_ARM_CLAW_CLOSED_MIN;
-			}
-			break;
-		}
-		case DYNA_CAMERA_PAN_SERVO_ID:
-		{
-			if( PositionTicks > DYNA_CAMERA_SERVO_MAX_LEFT )
-			{
-				MsgString.Format( "ERROR! DYNA_CAMERA_PAN_SERVO_ID exceeds MAX tick limit (%d, %d)", PositionTicks, DYNA_CAMERA_SERVO_MAX_LEFT);
-				ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
-				PositionTicks = DYNA_CAMERA_SERVO_MAX_LEFT;
-			}
-			else if( PositionTicks < DYNA_CAMERA_SERVO_MAX_RIGHT)
-			{
-				MsgString.Format( "ERROR! DYNA_CAMERA_PAN_SERVO_ID below MIN tick limit (%d, %d)", PositionTicks, DYNA_CAMERA_SERVO_MAX_RIGHT);
-				ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
-				PositionTicks = DYNA_CAMERA_SERVO_MAX_RIGHT;
-			}
-			break;
-		}
-		case DYNA_CAMERA_TILT_SERVO_ID:
-		{
-			if( PositionTicks > DYNA_CAMERA_SERVO_MAX_DOWN )
-			{
-				MsgString.Format( "ERROR! DYNA_CAMERA_TILT_SERVO_ID exceeds DYNA_CAMERA_SERVO_MAX_DOWN tick limit (%d, %d)", PositionTicks, DYNA_CAMERA_SERVO_MAX_DOWN);
-				ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
-				//PositionTicks = DYNA_CAMERA_SERVO_MAX_DOWN;
-			}
-			else if( PositionTicks < DYNA_CAMERA_SERVO_MAX_UP)
-			{
-				MsgString.Format( "ERROR! DYNA_CAMERA_TILT_SERVO_ID below DYNA_CAMERA_SERVO_MAX_UP tick limit (%d, %d)", PositionTicks, DYNA_CAMERA_SERVO_MAX_UP);
-				ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
-				PositionTicks = DYNA_CAMERA_SERVO_MAX_UP;
-			}
-
-			break;
-		}
-		case DYNA_CAMERA_SIDETILT_SERVO_ID:
-		{
-			if( PositionTicks > CAMERA_SIDETILT_SERVO_MAX_RIGHT )
-			{
-				ROBOT_DISPLAY( TRUE, "ERROR! DYNA_CAMERA_PAN_SERVO_ID exceeds CAMERA_SIDETILT_SERVO_MAX_RIGHT" )
-				PositionTicks = CAMERA_SIDETILT_SERVO_MAX_RIGHT;
-			}
-			else if( PositionTicks < CAMERA_SIDETILT_SERVO_MAX_LEFT)
-			{
-				ROBOT_DISPLAY( TRUE, "ERROR! DYNA_CAMERA_PAN_SERVO_ID below CAMERA_SIDETILT_SERVO_MAX_LEFT" )
-				PositionTicks = CAMERA_SIDETILT_SERVO_MAX_LEFT;
-			}
-			break;
-		}		
-		case DYNA_KINECT_SCANNER_SERVO_ID:
-		{
-			if( PositionTicks > LASER_TILT_SERVO_MAX_UP )
-			{
-				ROBOT_DISPLAY( TRUE, "ERROR! DYNA_KINECT_SCANNER_SERVO_ID exceeds LASER_TILT_SERVO_MAX_UP" )
-				PositionTicks = LASER_TILT_SERVO_MAX_UP;
-			}
-			else if( PositionTicks < LASER_TILT_SERVO_MAX_DOWN)
-			{
-				ROBOT_DISPLAY( TRUE, "ERROR! DYNA_KINECT_SCANNER_SERVO_ID below LASER_TILT_SERVO_MAX_DOWN" )
-				PositionTicks = LASER_TILT_SERVO_MAX_DOWN;
-			}
-			break;
-		}
-
-		default:
-		{
-			ROBOT_ASSERT(0); // unhandled servo
-		}
-	}
-***/
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Commands
@@ -1213,7 +1016,7 @@ void CDynaControl::SetServoMaxTorque( int  ServoID, int  MaxTorque )
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void CDynaControl::SetServoPosition( int  ServoID, int  Position )
+void CDynaControl::SetServoPosition( int  ServoID, int  Position ) // in SERVO TICKS
 {
 	// send command to move servo immediately (not sync'd with other commands
 	//ROBOT_LOG( TRUE,"DYNA - SET POSITION ID %d = %08lX\n", ServoID, Position)
@@ -2625,6 +2428,14 @@ void CDynaControl::HandleCommand( int  Request, int  Param1, int  Param2, int  O
 			break;
 		}
 
+
+		case HW_SET_CAMERA_STOP:
+		{
+			CameraStop();
+			break;
+		}
+
+
 		case HW_SET_SERVO_POS_TICKS:
 		{	
 			if( (0 == Param1) || (Param1 > DYNA_ID_MAX) )
@@ -2766,6 +2577,7 @@ void CDynaControl::HandleCommand( int  Request, int  Param1, int  Param2, int  O
 			ROBOT_LOG( TRUE,"Debug Camera - sent Tilt Command, Position = %d\n", NewTiltPositionTenthDegrees )
 			break;
 		}
+
 
 		case HW_SET_CAMERA_PAN_TILT_ABS:
 		{
@@ -3228,11 +3040,9 @@ void CDynaControl::HandleCommand( int  Request, int  Param1, int  Param2, int  O
 				{
 					// Yes, send a command to this servo
 					//ROBOT_LOG( TRUE,"\nDYNA DEBUG: UPDATE Servo %d\n", ServoID)
-					// 1. Convert each value from TenthDegrees to Servo Ticks	
+					// Convert each value from TenthDegrees to Servo Ticks	
 					PositionTicks = TenthDegreeToTicks( ServoID, g_BulkServoCmd[ServoID].PositionTenthDegrees ); 
-					// 2. Make sure all servos are within limits
-					CheckServoLimit(ServoID, PositionTicks);
-					// 3. Place data into servo array to send via broadcast to the servos
+					// Place data into servo array to send via broadcast to the servos
 					ServoIDArray[nServoToSet] = ServoID;														// ID
 					ServoValueArray[nServoToSet] = PositionTicks;												// Position (0-03FF)
 					ServoSpeedArray[nServoToSet] = ServoSpeedToDynaServoSpeed( g_BulkServoCmd[ServoID].Speed );	// Speed
@@ -3307,7 +3117,6 @@ void CDynaControl::HandleCommand( int  Request, int  Param1, int  Param2, int  O
 	
 
 				PositionTicks = TenthDegreeToTicks( DYNA_KINECT_SCANNER_SERVO_ID, g_BulkServoCmd[DYNA_KINECT_SCANNER_SERVO_ID].PositionTenthDegrees ); 
-				//CheckServoLimit(DYNA_KINECT_SCANNER_SERVO_ID, PositionTicks);
 				// Indicate to the system that the servo position has been handled (reset for next time)
 				g_BulkServoCmd[DYNA_KINECT_SCANNER_SERVO_ID].Update = FALSE;
 
@@ -3600,11 +3409,9 @@ void CDynaControl::PrepMultiServoData( int  ServoID, int  &nServoToSet, int  *Se
 	{
 		// Yes, send a command to this servo
 		//ROBOT_LOG( TRUE,"\nDYNA DEBUG: UPDATE Servo %d\n", ServoID)
-		// 1. Convert each value from TenthDegrees to Servo Ticks	
+		// Convert each value from TenthDegrees to Servo Ticks	
 		PositionTicks = TenthDegreeToTicks( ServoID, m_BulkServoCmdCopy[ServoID].PositionTenthDegrees ); 
-		// 2. Make sure all servos are within limits
-		//CheckServoLimit(ServoID, PositionTicks);
-		// 3. Place data into servo array to send via broadcast to the servos
+		// Place data into servo array to send via broadcast to the servos
 		ServoIDArray[nServoToSet] = ServoID;														// ID
 		ServoValueArray[nServoToSet] = PositionTicks;												// Position (0-03FF)
 		ServoSpeedArray[nServoToSet] = ServoSpeedToDynaServoSpeed( m_BulkServoCmdCopy[ServoID].Speed );	// Speed
@@ -3641,13 +3448,10 @@ void CDynaControl::HandleRX64Servo( int  ServoID, BOOL SetSpeed )
 		// Yes, send a command to this servo
 		//ROBOT_LOG( TRUE,"\nDYNA DEBUG: UPDATE Servo %d\n", ServoID)
 
-		// 1. Convert the value from TenthDegrees to Servo Ticks	
+		// Convert the value from TenthDegrees to Servo Ticks	
 		PositionTicks = TenthDegreeToTicks( ServoID, m_BulkServoCmdCopy[ServoID].PositionTenthDegrees );
 
-		// 2. Make sure servo is within limits
-		CheckServoLimit(ServoID, PositionTicks);
-
-		// 3. Format command and send to the servo
+		// Format command and send to the servo
 		if( SetSpeed )
 		{
 			//  set the speed of the servo too

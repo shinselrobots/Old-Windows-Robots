@@ -78,7 +78,7 @@
 
 
 // Dynamixel Speed mappings
-#define DYNA_VELOCITY_STOP					 0 
+#define DYNA_VELOCITY_STOP					 1  // WARNING! 0 = MAX SPEED!! 
 #define DYNA_VELOCITY_EXTREMELY_SLOW	     5
 #define DYNA_VELOCITY_VERY_SLOW			    15
 #define DYNA_VELOCITY_SLOW				    30
@@ -136,6 +136,7 @@ public:
 void	Init();
 void	HandleCommand( int  Request, int  Param1, int  Param2, int  Option1, int  Option2 );
 void	PauseMotion( BOOL bPause ); // Handle global pause
+void	CameraStop(); // Stop Pan/Tilt motion
 
 // Make Private?
 void	AddCheckSum( int  DataBytes );
@@ -151,7 +152,6 @@ int 	TenthDegreeToTicks( int  ServoID, int TenthDegrees );
 int 	DynaServoSpeedToServoSpeed( int  DynaServoSpeed );
 int 	ServoSpeedToDynaServoSpeed( int  ServoSpeed );
 double	CentigradeToFahrenheit( double Centigrade );
-void	CheckServoLimit( int  ServoID, int  &PositionTicks );
 void	PrepMultiServoData( int  ServoID, int  &nServoToSet, int  *ServoIDArray, int  *ServoValueArray, int  *ServoSpeedArray );
 void	HandleRX64Servo( int  ServoID,  BOOL SetSpeed );
 
