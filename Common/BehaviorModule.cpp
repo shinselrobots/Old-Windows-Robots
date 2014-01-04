@@ -4136,10 +4136,9 @@ void CBehaviorModule::ActionFindDock( )
 #if DEBUG_DOCK == 1
 	DisplayDockSensorStatus();
 #endif	
-	
 
 	// Trap bumper or charging, as long as we are not in a "almost done" state.
-	if( (DOCK_TASK_BACKUP != m_CurrentTask) && (DOCK_TASK_DONE != m_CurrentTask ) )
+	if( (DOCK_TASK_BACKUP != m_CurrentTask) && (DOCK_TASK_DONE != m_CurrentTask )  && (DOCK_TASK_DELAY_CHECK_CHARGE_SOURCE != m_CurrentTask ) )
 	{
 		if( (0 != g_pKobukiStatus->BatteryChargeSourceEnum) ||  (0 != g_SensorStatus.HWBumper)  )
 		{
@@ -4149,6 +4148,8 @@ void CBehaviorModule::ActionFindDock( )
 				m_pDriveCtrl->Stop(BEHAVIOR_GOAL_MODULE, ACCELERATION_INSTANT);
 			}
 			ROBOT_LOG( TRUE,"Bumper hit or charging. Checking charge source..." )
+			gBehaviorTimer = 2; // tenth seconds - delay .2 second between each check (repeats multiple times)
+			ChargeSourceDelayCount = 0;
 			m_CurrentTask = DOCK_TASK_DELAY_CHECK_CHARGE_SOURCE;
 		}
 	}
@@ -4402,9 +4403,11 @@ void CBehaviorModule::ActionFindDock( )
 			if( 0 == g_pKobukiStatus->BatteryChargeSourceEnum )
 			{
 				// Not charging
-				if( ChargeSourceDelayCount++ < 20 )
+				if( ChargeSourceDelayCount++ < 5 )
 				{
 					ROBOT_LOG( TRUE,"DOCK_TASK_DELAY_CHECK_CHARGE_SOURCE Count = %d", ChargeSourceDelayCount )
+					gBehaviorTimer = 2; // tenth seconds
+
 					break; // keep waiting
 				}
 				else
@@ -4415,6 +4418,7 @@ void CBehaviorModule::ActionFindDock( )
 
 					// Dock hit but did not get in good charging position  Backup and retry again
 					ROBOT_LOG( DEBUG_DOCK,"Backing up to retry" )
+					ChargeSourceDelayCount = 0;
 					m_pDriveCtrl->SetMoveDistance( BEHAVIOR_GOAL_MODULE, SPEED_REV_SLOW, TURN_CENTER, DOCK_BACKUP_DISTANCE_TENTH_INCHES, STOP_AFTER );
 					m_CurrentTask = DOCK_TASK_BACKUP;
 				}

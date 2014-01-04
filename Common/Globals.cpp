@@ -729,44 +729,46 @@ DWORD WINAPI TimerThreadProc( LPVOID NotUsed )
 				{
 					gServoOverHeatTimer--;
 				}
-				#if ( ROBOT_TYPE == LOKI )
-					if( gArmTimerLeft != 0 ) 
-					{
-						//ROBOT_LOG( TRUE,"GLOBAL gArmTimerLeft = %ld\n", gArmTimerLeft)
-						gArmTimerLeft--;
-					}
+				if( gHeadNodTimer != 0 ) 
+				{
+					gHeadNodTimer--;
+				}
+				if( gHeadIdleTimer != 0 ) 
+				{
+					//ROBOT_LOG( TRUE,"GLOBAL gHeadIdleTimer = %ld\n", gHeadIdleTimer)
+					gHeadIdleTimer--;
+				}
+				if( gBehaviorTimer != 0 ) 
+				{
+					gBehaviorTimer--;
+				}
+
+				#if ( ROBOT_HAS_RIGHT_ARM == 1 )
 					if( gArmTimerRight != 0 ) 
 					{
 						gArmTimerRight--;
 					}
-					if( gBehaviorTimer != 0 ) 
-					{
-						gBehaviorTimer--;
-					}
-					if( gHeadNodTimer != 0 ) 
-					{
-						gHeadNodTimer--;
-					}
-
 					// Arm Servo count-down Stall Timers (initialized to TIMER_NOT_SET)
 					if( g_BulkServoStatus[KERR_RIGHT_ARM_SHOULDER_SERVO_ID].StallTimer >= 0 )		g_BulkServoStatus[KERR_RIGHT_ARM_SHOULDER_SERVO_ID].StallTimer--;
 					if( g_BulkServoStatus[DYNA_RIGHT_ARM_ELBOW_ROTATE_SERVO_ID].StallTimer >= 0 )	g_BulkServoStatus[DYNA_RIGHT_ARM_ELBOW_ROTATE_SERVO_ID].StallTimer--;
 					if( g_BulkServoStatus[DYNA_RIGHT_ARM_ELBOW_BEND_SERVO_ID].StallTimer >= 0 )		g_BulkServoStatus[DYNA_RIGHT_ARM_ELBOW_BEND_SERVO_ID].StallTimer--;
 					if( g_BulkServoStatus[DYNA_RIGHT_ARM_WRIST_SERVO_ID].StallTimer >= 0 )			g_BulkServoStatus[DYNA_RIGHT_ARM_WRIST_SERVO_ID].StallTimer--;
 					if( g_BulkServoStatus[DYNA_RIGHT_ARM_CLAW_SERVO_ID].StallTimer >= 0 )			g_BulkServoStatus[DYNA_RIGHT_ARM_CLAW_SERVO_ID].StallTimer--;
+				#endif // ROBOT_HAS_RIGHT_ARM
 
+				#if ( ROBOT_HAS_LEFT_ARM == 1 )
+					if( gArmTimerLeft != 0 ) 
+					{
+						//ROBOT_LOG( TRUE,"GLOBAL gArmTimerLeft = %ld\n", gArmTimerLeft)
+						gArmTimerLeft--;
+					}
+					// Arm Servo count-down Stall Timers (initialized to TIMER_NOT_SET)
 					if( g_BulkServoStatus[KERR_LEFT_ARM_SHOULDER_SERVO_ID].StallTimer >= 0 )		g_BulkServoStatus[KERR_LEFT_ARM_SHOULDER_SERVO_ID].StallTimer--;
 					if( g_BulkServoStatus[DYNA_LEFT_ARM_ELBOW_ROTATE_SERVO_ID].StallTimer >= 0 )	g_BulkServoStatus[DYNA_LEFT_ARM_ELBOW_ROTATE_SERVO_ID].StallTimer--;
 					if( g_BulkServoStatus[DYNA_LEFT_ARM_ELBOW_BEND_SERVO_ID].StallTimer >= 0 )		g_BulkServoStatus[DYNA_LEFT_ARM_ELBOW_BEND_SERVO_ID].StallTimer--;
 					if( g_BulkServoStatus[DYNA_LEFT_ARM_WRIST_SERVO_ID].StallTimer >= 0 )			g_BulkServoStatus[DYNA_LEFT_ARM_WRIST_SERVO_ID].StallTimer--;
 					if( g_BulkServoStatus[DYNA_LEFT_ARM_CLAW_SERVO_ID].StallTimer >= 0 )			g_BulkServoStatus[DYNA_LEFT_ARM_CLAW_SERVO_ID].StallTimer--;
-
-					if( gHeadIdleTimer != 0 ) 
-					{
-						//ROBOT_LOG( TRUE,"GLOBAL gHeadIdleTimer = %ld\n", gHeadIdleTimer)
-						gHeadIdleTimer--;
-					}
-				#endif // ROBOT_TYPE == LOKI
+				#endif // ROBOT_HAS_LEFT_ARM
 
 
 				if( gHeadMoveTimeout != 0 ) 
