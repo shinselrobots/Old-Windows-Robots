@@ -997,7 +997,9 @@ void CBehaviorModule::ProcessMessage(
 			} // If !ACTION_MODE_NONE
 			else
 			{
-				// Do Idle processing
+				// Do Idle processing for Humanoid robots only
+				#if ( ROBOT_TYPE == LOKI )
+
 				if( gEnableIdleMovements )
 				{
 					if( (gHeadIdle) && (0 == gHeadIdleTimer) )
@@ -1014,6 +1016,7 @@ void CBehaviorModule::ProcessMessage(
 						m_pArmControlLeft->DoIdleArmMovement();
 					}
 				}
+				#endif
 			}
 
 			if( (0 != m_CurrentTask) || (0 != m_TaskState) )
