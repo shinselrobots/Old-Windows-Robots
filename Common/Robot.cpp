@@ -622,7 +622,7 @@ int CRobotApp::ExitInstance()
 	if( INVALID_HANDLE_VALUE != g_hTimerThread) 
 	{
 		ROBOT_LOG( TRUE,  "OnDestroy: Waiting for Timer Thread to exit...\n" )
-		WaitForSingleObject( g_hTimerThread, INFINITE );
+		WaitForSingleObject( g_hTimerThread, 1000 );
 		CloseHandle( g_hTimerThread );
 	}
 	
@@ -630,14 +630,14 @@ int CRobotApp::ExitInstance()
 	if( INVALID_HANDLE_VALUE != g_hControlThread) 
 	{
 		ROBOT_LOG( TRUE,  "OnDestroy: Waiting for Control Thread to exit...\n" )
-		WaitForSingleObject( g_hControlThread, INFINITE );
+		WaitForSingleObject( g_hControlThread, 2000 );
 		CloseHandle( g_hControlThread );
 	}
 
 	if( INVALID_HANDLE_VALUE != g_hSoundThread) 
 	{
 		ROBOT_LOG( TRUE,  "OnDestroy: Waiting for Sound Thread to exit...\n" )
-		WaitForSingleObject( g_hSoundThread, INFINITE );
+		WaitForSingleObject( g_hSoundThread, 1000 );
 		CloseHandle( g_hSoundThread );
 	}
 
