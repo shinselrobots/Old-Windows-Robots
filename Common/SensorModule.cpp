@@ -1289,6 +1289,9 @@ void CSensorModule::ProcessMessage(
 
 				//////////////////////////////////////////////////////////////////////////
 				// Kobuki Cliff Sensors
+				g_SensorStatus.Cliff = g_pKobukiStatus->Cliff;
+
+				// TODO - FIX THIS!
 				if( g_pKobukiStatus->Cliff & 0x01 ) // Right Cliff
 				{					
 					g_SensorStatus.IRBumper |= IR_BUMPER_CLIFF_RIGHT_MASK;
@@ -3431,6 +3434,7 @@ void CSensorModule::DoSensorFusion()
 		g_pSensorSummary->nLeftArmZone =			NO_OBJECT_IN_RANGE;	// Object in front of Arm
 		g_pSensorSummary->nLeftFrontZone =			NO_OBJECT_IN_RANGE;
 		g_pSensorSummary->MotionDetectedDirection =	MOTION_DETECTED_NONE;	//////// Center
+		g_pSensorSummary->bFrontCliff =				FALSE;
 		g_pSensorSummary->nRightFrontZone =			NO_OBJECT_IN_RANGE;
 		g_pSensorSummary->nRightArmZone =			NO_OBJECT_IN_RANGE; // Object in front of Arm
 		g_pSensorSummary->nRightFrontSideZone =		NO_OBJECT_IN_RANGE;
@@ -3552,7 +3556,7 @@ void CSensorModule::DoSensorFusion()
 		// REAR SENSORS
 		// CLIFF SENSOR
 
-		// Kobuki base has 2 IR Cliff Sensors
+		// Kobuki base has 3 IR Cliff Sensors, only 2 handled - TODO-MUST
 		if( m_CliffSensorsEnabled )
 		{
 			if( IR_BUMPER_CLIFF_LEFT || IR_BUMPER_CLIFF_RIGHT )
@@ -3587,6 +3591,43 @@ void CSensorModule::DoSensorFusion()
 				}
 			}
 		}
+
+		bool RightDrop = g_SensorStatus.WheelDrop && 0x01;
+		bool LeftDrop = g_SensorStatus.WheelDrop && 0x02;
+
+
+		// Kobuki also has wheel drop sensors - these always work
+		if ( 0 != g_SensorStatus.WheelDrop )
+		{
+			if( RightDrop && LeftDrop )
+			{
+				// Cliff on both sides
+				g_pSensorSummary->bLeftCliff = TRUE;
+				g_pSensorSummary->bRightCliff = TRUE;
+				ROBOT_DISPLAY( TRUE, "SensorModule: Cliff on Both Sides!!!\n" )
+				//SpeakText( "Error. Cliff on both sides" );	
+
+			}
+			else if( LeftDrop )
+			{		
+				g_pSensorSummary->bLeftCliff = TRUE;
+				ROBOT_DISPLAY( TRUE, "SensorModule: Cliff Left Side!\n" )
+				//SpeakText( "Cliff Left" );	
+			}
+			else if( RightDrop )
+			{		
+				g_pSensorSummary->bRightCliff = TRUE;
+				ROBOT_DISPLAY( TRUE, "SensorModule: Cliff Right Side!\n" )
+				//SpeakText( "Cliff Right" );	
+			}
+			else
+			{
+				// Logic Error
+				ROBOT_ASSERT(0);
+			}
+
+		}
+
 
 		// SIDE SENSORS TODO-MUST-TELEOP
 		// Loki has IR side sensors and side bumpers

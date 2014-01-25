@@ -515,7 +515,7 @@ void Setup::OnInitialUpdate()
 
 	// Enable Dynamixel Servo Power
 	CheckDlgButton( IDC_DYNA_USB_ENABLE, GetDocument()->m_bEnableDynaServos );
-	if( GetDocument()->m_bEnableDynaServos )
+//	if( GetDocument()->m_bEnableDynaServos )
 	{
 		g_DynaPowerEnabled = TRUE; // Allows enabling, even though the thread has not started yet
 		g_DynaSubSystemStatus = SUBSYSTEM_WAITING;
@@ -525,11 +525,13 @@ void Setup::OnInitialUpdate()
 			g_RX64SubSystemStatus = SUBSYSTEM_DISABLED;
 		#endif
 	}
+	/**
 	else
 	{
 		g_DynaPowerEnabled = FALSE;
 		g_DynaSubSystemStatus = SUBSYSTEM_DISABLED;
 	}
+	***/
 
 	if( ROBOT_TYPE == TURTLE )
 	{

@@ -382,6 +382,7 @@ protected:
 #define FORWARD1		0x07
 #define	TURNING1		0x08
 #define FINAL_MOVE		0x09
+#define	AVOIDING		0x0A
 #define DISABLED		0xFF	// Module Disabled
 
 

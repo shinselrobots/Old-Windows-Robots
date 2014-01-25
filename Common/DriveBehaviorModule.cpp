@@ -798,13 +798,13 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 				// This module was not in control at last status update
 				// Save the last commanded speed
 				m_PriorSpeed = m_pDriveCtrl->GetCurrentSpeed();
-				Speed = m_PriorSpeed;	// Use this speed as default while avoiding.  May be overriden below.
+			// NOT USED	Speed = m_PriorSpeed;	// Use this speed as default while avoiding.  May be overriden below.
 			}
 			else
 			{
 				// This module was in control at last status update
 				// Restore the prior speed for use in calculations below
-				Speed = m_PriorSpeed;
+			// NOT USED	Speed = m_PriorSpeed;
 			}
 
 			// Side threshold is controlled by a persistance to avoid thrashing
@@ -896,7 +896,7 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 				}
 
 				// Going Forward
-				Turn = 0;
+
 				ROBOT_LOG(TRUE, "DEBUG: nFrontObjectDistance = %d", g_pSensorSummary->nFrontObjectDistance )
 
 				// See if we should move arms out of harms way
@@ -923,6 +923,8 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 				}
 
 				// Start Avoidance Behavior
+				Turn = 0;
+				BOOL ChangeSpeedOrDirection = TRUE;
 
 				if( DetectAndHandleCliff(Turn, Speed) )
 				{
@@ -1031,11 +1033,16 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 					}
 					ROBOT_LOG( TRUE, "AVOID_OBJECT_MODULE: Turn %d to avoid object on side\n", Turn )
 				}
+				else
+				{
+					// Nothing to avoid
+					ChangeSpeedOrDirection = FALSE; 
+				}
 
 
 				////////////////////////////////////////////////////////////////////////
 				// Now, do the speed and turn changes!
-				if( 0 != Turn )
+				if( ChangeSpeedOrDirection )
 				{
 					// Object found.  Avoidance is needed
 					ROBOT_LOG( TRUE, "AVOID_OBJECT_MODULE: Turn = %d, Speed = %d\n", Turn, Speed )
@@ -1047,8 +1054,11 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 						RobotSleep(3000, pDomainControlThread);
 						RobotSleep(100, pDomainControlThread); // put break here
 					#endif
-					m_AvoidanceState = TURNING1;
-					ROBOT_DISPLAY( TRUE, "Avoidance State: TURNING1" )
+					if( 0 != Turn )
+					{
+						m_AvoidanceState = AVOIDING;
+					}
+					ROBOT_DISPLAY( TRUE, "Avoidance State: AVOIDING" )
 
 				} 
 /***
@@ -1084,6 +1094,7 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 					m_AvoidanceState = IDLE;
 					m_pDriveCtrl->ReleaseOwner( AVOID_OBJECT_MODULE );
 				}
+
 			///////////////////////////////////////////////////////////////////////////////////////////////////////////
 			#else
 				#error BAD SENSOR_CONFIG_TYPE!  
@@ -1132,6 +1143,7 @@ void CAvoidObjectModule::CheckArmSafePosition()
 
 BOOL CAvoidObjectModule::DetectAndHandleCliff( int &Turn, int &Speed )
 {
+
 	if( g_pSensorSummary->bLeftCliff || g_pSensorSummary->bRightCliff )
 	{
 		// Cliff detected!

@@ -386,7 +386,8 @@ typedef struct
 	int		LeftHandRawPressureR;		// is called before each use.  Use GetPressureLoadPercent to get final value
 	int		DockSensorRight;			
 	int		DockSensorCenter;			// IR sensors for the Kobuki Dock
-	int		DockSensorLeft;	
+	int		DockSensorLeft;
+	int		Cliff;
 	int		WheelDrop;
 
 
@@ -442,7 +443,8 @@ typedef struct
 	int 		nLeftFrontSideZone;	
 	int 		nLeftArmZone;
 	int 		nLeftFrontZone;		
-	int 		MotionDetectedDirection; ////// Robot Center
+	int 		MotionDetectedDirection; 
+	BOOL		bFrontCliff;		////// Robot Center
 	int 		nRightFrontZone;
 	int 		nRightArmZone;	
 	int 		nRightFrontSideZone;	
