@@ -66,8 +66,8 @@
 	#define SERVO_CONTROL_TYPE			PIC_SERVO_CONTROL
 	#define OTHER_SERVO_CONTROL_TYPE	DYNA_SERVO_CONTROL
 	#define SENSOR_CONFIG_TYPE			SENSOR_CONFIG_LOKI
-	#define ROBOT_DATA_PATH	"C:\\Dev\\_Robot\\LokiData"
-	#define ROBOT_COMMON_PATH L"C:\\Dev\\_Robot\\Common"
+	#define ROBOT_DATA_PATH	"C:\\Dev\\Robots\\LokiData"
+	#define ROBOT_COMMON_PATH L"C:\\Dev\\Robots\\Common"
 	#define DYNA_SERVO_RX64_INSTALLED	0 // Set to 0 if no RX64 servos used
 
 
@@ -78,8 +78,8 @@
 	#define CAMERA_CONTROL_TYPE			EXTERN_SERVO_CONTROL
 	#define OTHER_SERVO_CONTROL_TYPE	EXTERN_SERVO_CONTROL
 	#define SENSOR_CONFIG_TYPE			SENSOR_CONFIG_CARBOT
-	#define ROBOT_DATA_PATH	"C:\\Dev\\_Robot\\SeekerData"
-	#define ROBOT_COMMON_PATH L"C:\\Dev\\_Robot\\Common"
+	#define ROBOT_DATA_PATH	"C:\\Dev\\Robots\\SeekerData"
+	#define ROBOT_COMMON_PATH L"C:\\Dev\\Robots\\Common"
 
 
 #elif ROBOT_TYPE == TURTLE
@@ -90,8 +90,8 @@
 	#define SERVO_CONTROL_TYPE			DYNA_SERVO_CONTROL
 	#define OTHER_SERVO_CONTROL_TYPE	DYNA_SERVO_CONTROL
 	#define SENSOR_CONFIG_TYPE			SENSOR_CONFIG_TELEOP	// <============= Change this depending upon Base used!
-	#define ROBOT_DATA_PATH	"C:\\Dev\\_Robot\\TurtleData"
-	#define ROBOT_COMMON_PATH L"C:\\Dev\\_Robot\\Common"
+	#define ROBOT_DATA_PATH	"C:\\Dev\\Robots\\TurtleData"
+	#define ROBOT_COMMON_PATH L"C:\\Dev\\Robots\\Common"
 
 #else
 	#error BAD ROBOT_TYPE

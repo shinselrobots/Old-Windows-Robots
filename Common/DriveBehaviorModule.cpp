@@ -881,48 +881,26 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 			///////////////////////////////////////////////////////////////////////////////////////////////////////////
 			#elif ( (SENSOR_CONFIG_TYPE == SENSOR_CONFIG_LOKI) || (SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TURTLE) || (SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TELEOP) )
 
-				// Handle backing up case
-				if( (m_pDriveCtrl->GetCurrentSpeed() < 0 ) && (g_pSensorSummary->nRearObjectDistance <= REAR_THREAT_THRESHOLD) )
+				if( m_pDriveCtrl->GetCurrentSpeed() < 0 )
 				{
-					// Backing up, and Object detected in the way!
-					ROBOT_LOG( TRUE, "Rear object detected while backing up" )
-					// Just stop when this happens, and cancel any avoidance behavior
-					m_pDriveCtrl->SetSpeedAndTurn( AVOID_OBJECT_MODULE, SPEED_STOP, TURN_CENTER );
-					m_AvoidanceState = IDLE;
+					// Backing up!
+					if( g_pSensorSummary->nRearObjectDistance <= REAR_THREAT_THRESHOLD )
+					{
+						// Backing up, and Object detected in the way!
+						ROBOT_LOG( TRUE, "Rear object detected while backing up" )
+						// Just stop when this happens, and cancel any avoidance behavior
+						m_pDriveCtrl->SetSpeedAndTurn( AVOID_OBJECT_MODULE, SPEED_STOP, TURN_CENTER );
+						m_AvoidanceState = IDLE;
+					}
 					break;
 				}
 
+				// Going Forward
 				Turn = 0;
 				ROBOT_LOG(TRUE, "DEBUG: nFrontObjectDistance = %d", g_pSensorSummary->nFrontObjectDistance )
 
 				// See if we should move arms out of harms way
-				if(	(g_pSensorSummary->nFrontObjectDistance <= PROTECT_ARMS_FRONT_THREAT_THRESHOLD) ||
-					(g_pSensorSummary->nSideObjectDistance < PROTECT_ARMS_SIDE_THREAT_THRESHOLD) )
-				{
-					// Objects close by, raise the arms to a safe position
-					if( !m_ArmsInSafePosition )
-					{
-						#if( ROBOT_HAS_LEFT_ARM )
-							m_pArmControlLeft->MoveArmToSafePosition();
-						#endif
-						#if( ROBOT_HAS_RIGHT_ARM )
-							m_pArmControlRight->MoveArmToSafePosition();
-						#endif
-						m_ArmsInSafePosition = TRUE;
-					}
-				}
-				else if( m_ArmsInSafePosition )
-				{
-					// No need to keep them in safe postion anymore
-
-					#if( ROBOT_HAS_LEFT_ARM )
-						m_pArmControlLeft->MoveArmHome();
-					#endif
-					#if( ROBOT_HAS_RIGHT_ARM )
-						m_pArmControlRight->MoveArmHome();
-					#endif
-					m_ArmsInSafePosition = FALSE;
-				}
+				CheckArmSafePosition();
 
 				if(	(g_pSensorSummary->nFrontObjectDistance <= AvoidObjectDistanceTenthInches) ||
 					(g_pSensorSummary->nSideObjectDistance < m_SideAvoidDistanceTenthInches) )
@@ -967,7 +945,7 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 						Turn = TURN_RIGHT_MED;	// hard turn
 					}
 					Speed = SPEED_FWD_SLOW;	// force a pivot turn
-
+ 
 				}
 				else if( DetectAndHandleDoorway(Turn, Speed) )
 				{
@@ -1012,13 +990,31 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 							}
 							else
 							{
-								ROBOT_LOG( TRUE, "AVOID_OBJECT_MODULE: Object Dead Ahead!  What should I do?\n" )
-								ROBOT_LOG( TRUE, "AVOID_OBJECT_MODULE: Slowing Down in case I crash!\n" )
+								int RandomNumber = ((3 * rand()) / RAND_MAX);
+								if( RandomNumber >= 2 )
+								{
+									Turn = TURN_LEFT_MED_SLOW;
+									ROBOT_LOG( TRUE, "AVOID_OBJECT_MODULE: Object Dead Ahead!  Random Turn Left!\n" )
+								}
+								else
+								{
+									Turn = TURN_RIGHT_MED_SLOW;
+									ROBOT_LOG( TRUE, "AVOID_OBJECT_MODULE: Object Dead Ahead!  Random Turn Right!\n" )
+								}
+
 								Speed = SPEED_FWD_MED_SLOW;
 								//Turn = TURN_RIGHT_MED_SLOW; // when in doubt, turn right
 							}
 						}
 					}	// End of object dead ahead
+
+					// If object is very close, stop and force a turn on axis
+					if( g_pSensorSummary->nFrontObjectDistance <= FRONT_ZONE_THREAT_MIN_THRESHOLD )
+					{
+						Speed = SPEED_STOP;
+					}
+
+
 				}	// End object somewhere in front of us. 
 				else if( g_pSensorSummary->nSideObjectDistance < m_SideAvoidDistanceTenthInches )
 				{
@@ -1055,6 +1051,7 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 					ROBOT_DISPLAY( TRUE, "Avoidance State: TURNING1" )
 
 				} 
+/***
 				else if( TURNING1 == m_AvoidanceState )
 				{
 					// We had been turning to avoid an object, and the way is clear now.
@@ -1079,6 +1076,7 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 						m_pDriveCtrl->ReleaseOwner( AVOID_OBJECT_MODULE );
 					}
 				}
+***/
 				else if( m_pDriveCtrl->IsOwner(AVOID_OBJECT_MODULE) )
 				{
 					// No objects to avoid, but this module has control from last time.  Release control now
@@ -1095,6 +1093,42 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 	}
 }
 
+void CAvoidObjectModule::CheckArmSafePosition()
+{
+	// See if we should move arms out of harms way
+	if(	(g_pSensorSummary->nFrontObjectDistance <= PROTECT_ARMS_FRONT_THREAT_THRESHOLD) ||
+		(g_pSensorSummary->nSideObjectDistance < PROTECT_ARMS_SIDE_THREAT_THRESHOLD) )
+	{
+		// Objects close by, raise the arms to a safe position
+		if( !m_ArmsInSafePosition )
+		{
+			#if ( ROBOT_SERVER == 1 )
+				#if( ROBOT_HAS_LEFT_ARM )
+					m_pArmControlLeft->MoveArmToSafePosition();
+				#endif
+				#if( ROBOT_HAS_RIGHT_ARM )
+					m_pArmControlRight->MoveArmToSafePosition();
+				#endif
+			#endif
+			m_ArmsInSafePosition = TRUE;
+		}
+	}
+	else if( m_ArmsInSafePosition )
+	{
+		// No need to keep them in safe postion anymore
+
+		#if ( ROBOT_SERVER == 1 )
+			#if( ROBOT_HAS_LEFT_ARM )
+				m_pArmControlLeft->MoveArmHome();
+			#endif
+			#if( ROBOT_HAS_RIGHT_ARM )
+				m_pArmControlRight->MoveArmHome();
+			#endif
+		#endif
+		m_ArmsInSafePosition = FALSE;
+	}
+
+}
 
 BOOL CAvoidObjectModule::DetectAndHandleCliff( int &Turn, int &Speed )
 {

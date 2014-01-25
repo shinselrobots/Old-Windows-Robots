@@ -690,20 +690,18 @@ void CRobotCmdView::OnStopButton()
 	pSlider->SetPos(m_nSpeedSlider);
 	strText.Format("0");
 	SetDlgItemText(IDC_MOTOR_SPEED_STATIC, strText);
-	// Send the command to the motor control
+	OnCenterButton();	// Center the wheels on Stop command
+
+	// Set the motor control state
 	g_MotorCurrentSpeedCmd = 0;	// Stop
 	g_MotorCurrentTurnCmd = 0;	// Center
 
-	SendCommand( WM_ROBOT_JOYSTICK_DRIVE_CMD, 0, 0 );
-	OnCenterButton();	// Center the wheels on Stop command
+	// Manual Stop button will override collision and avoidance behaviors, causing an immediate stop
+	SendCommand( WM_ROBOT_SET_USER_PRIORITY, SET_USER_LOCAL_AND_STOP, 0 );
+	//SendCommand( WM_ROBOT_JOYSTICK_DRIVE_CMD, 0, 0 );
 
 	// Cancel any current behavior
 	SendCommand( WM_ROBOT_SET_ACTION_CMD, ACTION_MODE_NONE, 0 );
-
-
-	// Manual Stop button will override collision and avoidance behaviors, causing an immediate stop
-	//SendCommand( WM_ROBOT_USER_OVERRIDE_CMD, SET_USER_OVERRIDE_AND_STOP, 0 );
-	//OnPausePath();	// Also pause current path that is running!
 
 }
 
@@ -2914,7 +2912,7 @@ void CRobotCmdView::OnStopPanicStop()
 	g_MotorCurrentTurnCmd = 0;	// Center
 	// Note - DO NOT send directly to the motor thread. Sometimes command going
 	// to Arduino, sometimes to ER1 or Servo controller.
-	SendCommand( WM_ROBOT_USER_OVERRIDE_CMD, SET_USER_OVERRIDE_AND_STOP, 0 );
+	SendCommand( WM_ROBOT_SET_USER_PRIORITY, SET_USER_LOCAL_AND_STOP, 0 );
 
 	// Update the GUI
 	CheckDlgButton(IDC_OVERRIDE_MODE, 1);
@@ -3089,7 +3087,7 @@ if( 'S' == g_LastKey )
 	// When user presses Stop, supress other modules, so they don't keep robot moving!
 //	SendCommand( WM_ROBOT_SUPPRESS_MODULE, 
 //		AVOID_OBJECT_MODULE, SUPPRESS ); // Modules, Suppress/UnSupress
-	SendCommand( WM_ROBOT_USER_OVERRIDE_CMD, 1, 0 );	// 1 = Set Panic Stop
+	SendCommand( WM_ROBOT_SET_USER_PRIORITY, SET_USER_LOCAL_AND_STOP, 0 );
 	SendCommand( WM_ROBOT_EXECUTE_PATH, PATH_EXECUTE_PAUSE,	1 ); // lParam: 1 = Wait for bumper to start, 0 = Don't wait
 
 }
@@ -3166,7 +3164,7 @@ void CRobotCmdView::OnKey_C()
 	{
 		g_MotorCurrentTurnCmd = TURN_RIGHT_MAX;
 	}
-	SendCommand( WM_ROBOT_USER_OVERRIDE_CMD, 0, 0 );	// 0 = Release Override
+	//SendCommand( WM_ROBOT_SET_USER_PRIORITY, SET_USER_LOCAL_AND_STOP, 0 );
 	SendCommand( WM_ROBOT_EXECUTE_PATH, PATH_EXECUTE_RESUME,	0 );
 
 }
@@ -3263,6 +3261,14 @@ void CRobotCmdView::OnBnClickedLocalUser()
 	// True = all commands issued as LOCAL user, otherwise as Remote user.  
 	// Allow testing Local/Remote behavior over Remote Desktop
 	m_LocalUser = IsDlgButtonChecked(IDC_LOCAL_USER_CB);
+	if( m_LocalUser )
+	{
+		SendCommand( WM_ROBOT_SET_USER_PRIORITY, SET_USER_LOCAL, 0 );
+	}
+	else
+	{
+		SendCommand( WM_ROBOT_SET_USER_PRIORITY, SET_USER_REMOTE, 0 );
+	}
 
 }
 

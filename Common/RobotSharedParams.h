@@ -36,12 +36,10 @@
 #define SUPPRESS							0x00
 #define UNSUPPRESS							0x01
 
-// Parameter for WM_ROBOT_USER_OVERRIDE_CMD
-//#define SET_USER_RELEASED				0x00						
-#define SET_USER_NORMAL					0x01
-#define SET_USER_OVERRIDE				0x02
-#define SET_USER_OVERRIDE_AND_STOP		0x03
-//#define SET_USER_OVERRIDE_STATE_SENT	0x04	// Special state just for keypress tracking
+// Parameter for WM_ROBOT_SET_USER_PRIORITY
+#define SET_USER_REMOTE					0x01
+#define SET_USER_LOCAL					0x02
+#define SET_USER_LOCAL_AND_STOP			0x03
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -55,7 +53,7 @@ enum WM_ROBOT_MESSAGES {
 		WM_ROBOT_JOYSTICK_DRIVE_CMD,
 		WM_ROBOT_DRIVE_LOCAL_CMD,					// FUTURE: User has local, direct control of the robot, 
 		WM_ROBOT_DRIVE_REMOTE_CMD,					// FUTURE: or is remote (can't see robot directly)
-		WM_ROBOT_USER_OVERRIDE_CMD,					// Override command for User control of the robot (PANIC stop)
+		WM_ROBOT_SET_USER_PRIORITY,					// Override command for User control of the robot (PANIC stop)
 		WM_ROBOT_GET_SERVO_STATUS,				
 
 		// HW Responses
@@ -129,7 +127,6 @@ enum WM_ROBOT_MESSAGES {
 		WM_ROBOT_ENABLE_AVOIDANCE_MODULE,	
 		WM_ROBOT_SET_AVOID_OBJ_RANGE,		
 		WM_ROBOT_SET_SCAN_DISTANCE_CMD,		
-		WM_ROBOT_SET_PATH_SPEED_INCREASE,	
 		WM_ROBOT_SET_COMPASS_CAL_MODE,		
 		WM_ROBOT_SET_COMPASS_CAL_POINT,		
 		WM_ROBOT_ENABLE_RADAR_SCAN_CMD,		

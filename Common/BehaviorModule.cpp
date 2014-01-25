@@ -237,7 +237,7 @@ void CBehaviorModule::ProcessMessage(
 		// Behavior modes - what to do while standing around
 		// Some of these are mutually exclusive!
 
-		case WM_ROBOT_USER_OVERRIDE_CMD:
+		case WM_ROBOT_SET_USER_PRIORITY:
 		{
 			g_bCmdRecognized = TRUE;
 			// This command only comes from a user doing manual control
@@ -245,10 +245,10 @@ void CBehaviorModule::ProcessMessage(
 			// wParam = action to take
 
 
-			if( SET_USER_OVERRIDE_AND_STOP == wParam )
+			if( SET_USER_LOCAL_AND_STOP == wParam )
 			{
 				// Other modules will handle the stop.  For Behavior module, this means cancel current behavior and go back to idle
-				// Example: SpeechSendCommand( WM_ROBOT_USER_OVERRIDE_CMD, SET_USER_OVERRIDE_AND_STOP, 0 ); // FORCE STOP, no matter what!
+				// Example: SpeechSendCommand( WM_ROBOT_SET_USER_PRIORITY, SET_USER_LOCAL_AND_STOP, 0 ); // FORCE STOP, no matter what!
 				m_CurrentActionMode = ACTION_MODE_NONE;
 				m_CurrentTask = TASK_NONE;
 				m_TaskState = 0;

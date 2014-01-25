@@ -122,6 +122,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Common\ArmControl.h" />
+    <ClInclude Include="..\Common\CameraCommon.h" />
     <ClInclude Include="..\Common\ChildFrm.h" />
     <ClInclude Include="..\Common\ClientOrServer.h" />
     <ClInclude Include="..\Common\Config.h" />

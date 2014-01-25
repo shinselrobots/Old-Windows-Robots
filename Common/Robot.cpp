@@ -453,7 +453,7 @@ BOOL CRobotApp::InitInstance()
 	// cmdInfo.m_strFileName = "..\\RobotData/Setup.rsd";		// File to open at startup!
 	// cmdInfo.m_strFileName = "..\\RobotData\\Map.rmp";
 
-	//cmdInfo.m_strFileName = "C:\\Dev\\_Robot\\RobotData\\Setup.rsd";		// File to open at startup!
+	//cmdInfo.m_strFileName = "C:\\Dev\\Robots\\RobotData\\Setup.rsd";		// File to open at startup!
 
 	cmdInfo.m_strFileName = ROBOT_DATA_PATH "\\Setup.rsd";
 	if (!ProcessShellCommand(cmdInfo))

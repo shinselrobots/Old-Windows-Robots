@@ -246,10 +246,19 @@ BOOL CDriveControlModule::RobotStopped()
 ///////////////////////////////////////////////////////////////////////////////
 // Commands to Motors
 ///////////////////////////////////////////////////////////////////////////////
+// 
+// Negotiate speed and turn between modules, then execute
+// Note: lower priority modules can suppress higher priority modules
+// and lower priority modules can also do safer things:
+// - Request to go slower (even stop)
+// - Request to turn tighter
+
 
 void CDriveControlModule::Stop(int  Module, int Acceleration)
 {
-	if( CheckAndSetOwner(Module) )
+	int Result = CheckAndSetOwner(Module);
+	if( (MODULE_OWNERSHIP_REQUEST_SUCCESS == Result)   ||
+		(MODULE_HIGHER_PRIORITY_HAS_CONTROL == Result) )  // allow lower priority modules to still call stop
 	{
 		m_DriveOwner = Module;	
 		m_Command = HW_SET_MOTOR_STOP;
@@ -270,8 +279,10 @@ void CDriveControlModule::Stop(int  Module, int Acceleration)
 
 void CDriveControlModule::Brake(int  Module, int Acceleration)
 {
-	// Note: Once a Brake operation starts, the Arduino won't abort until done.
-	if( CheckAndSetOwner(Module) )
+	// Used only for Seeker CarBot.  Note: Once a Brake operation starts, the Pic won't abort until done.
+	int Result = CheckAndSetOwner(Module);
+	if( (MODULE_OWNERSHIP_REQUEST_SUCCESS == Result)   ||
+		(MODULE_HIGHER_PRIORITY_HAS_CONTROL == Result) )  // allow lower priority modules to still call brake
 	{
 		m_DriveOwner = Module;	
 		m_Command = HW_SET_MOTOR_BRAKE;
@@ -292,6 +303,7 @@ void CDriveControlModule::Brake(int  Module, int Acceleration)
 BOOL CDriveControlModule::SetTurnRotation( int  Module, int Speed, int Turn, int TurnAmountDegrees, BOOL StopAfterTurn )
 {
 	// Note: A SetTurnRotation can be over ridden by another command, which will abort the turn.
+	// Lower priority modules will NOT override.  They can't do a set turn if higher priory has control
 	// Turn direction set by TurnAmountDegrees.  Amount set by ABS TurnAmountDegrees
 
 	int  AbsTurnAmountDegrees = abs(TurnAmountDegrees);
@@ -299,7 +311,7 @@ BOOL CDriveControlModule::SetTurnRotation( int  Module, int Speed, int Turn, int
 	m_MoveDistanceRemaining = 0;
 	m_TurnRotationRemaining = 0;
 	
-	if( !CheckAndSetOwner(Module) )
+	if( MODULE_OWNERSHIP_REQUEST_SUCCESS != CheckAndSetOwner(Module) )
 	{
 		return FALSE; // Failed to set turn
 	}
@@ -308,13 +320,7 @@ BOOL CDriveControlModule::SetTurnRotation( int  Module, int Speed, int Turn, int
 	m_DriveOwner = Module;	
 	m_Command = HW_SET_SPEED_AND_TURN;
 	m_Acceleration = ACCELERATION_MEDIUM;
-	/*
 	// TODO - Speed not currently used, assumes rotate in place.  add calc to allow complex turns?
-	if( Speed >= 0 ) 
-		m_Speed = Speed + g_SpeedIncrease;	// Forward
-	else 
-		m_Speed = Speed - g_SpeedIncrease;	// Reverse
-	*/
 
 	if( AbsTurnAmountDegrees > 360 )
 	{
@@ -359,8 +365,9 @@ BOOL CDriveControlModule::SetTurnRotation( int  Module, int Speed, int Turn, int
 BOOL CDriveControlModule::SetTurnToCompassDirection( int  Module, int Speed, int Turn, int DesiredCompassHeading, BOOL StopAfterTurn )
 {
 	// Note: A SetTurnRotation can be over ridden by another command, which will abort the turn.
+	// Lower priority modules will NOT override.  They can't do a setturn if higher priory has control
 
-	if( !CheckAndSetOwner(Module) )
+	if( MODULE_OWNERSHIP_REQUEST_SUCCESS != CheckAndSetOwner(Module) )
 	{
 		return FALSE; // Failed to set mode
 	}
@@ -370,13 +377,7 @@ BOOL CDriveControlModule::SetTurnToCompassDirection( int  Module, int Speed, int
 	m_Command = HW_SET_SPEED_AND_TURN;
 	m_Acceleration = ACCELERATION_MEDIUM;
 
-	/*
 	// TODO - Speed not currently used, assumes rotate in place.  add calc to allow complex turns?
-	if( Speed >= 0 ) 
-		m_Speed = Speed + g_SpeedIncrease;	// Forward
-	else 
-		m_Speed = Speed - g_SpeedIncrease;	// Reverse
-	*/
 
 	// calculate direction of turn.  Positive is right turn, Negative is Left turn
 	int TurnDegrees = CalculateTurn(g_SensorStatus.CompassHeading, DesiredCompassHeading);
@@ -410,7 +411,8 @@ BOOL CDriveControlModule::SetTurnToCompassDirection( int  Module, int Speed, int
 BOOL CDriveControlModule::SetMoveDistance( int  Module, int Speed, int Turn, int  DistanceTenthInches, BOOL StopAfterMove, int Acceleration )
 {
 	// Note: A SetMoveDistance can be over ridden by another command, which will abort the move dist.
-	if( !CheckAndSetOwner(Module) )
+	// Lower priority modules will NOT override.  They can't do a SetMove if higher priory has control
+	if( MODULE_OWNERSHIP_REQUEST_SUCCESS != CheckAndSetOwner(Module) )
 	{
 		return FALSE; // failed to set move
 	}
@@ -420,10 +422,7 @@ BOOL CDriveControlModule::SetMoveDistance( int  Module, int Speed, int Turn, int
 		CString MsgString, ModuleName;
 		m_DriveOwner = Module;	
 		m_Command = HW_SET_SPEED_AND_TURN;
-		if( Speed >= 0 ) 
-			m_Speed = Speed + g_SpeedIncrease;	// Forward
-		else 
-			m_Speed = Speed - g_SpeedIncrease;	// Reverse
+		m_Speed = Speed;
 		m_Acceleration = Acceleration;
 		m_TrackCompassHeading = 0;
 		m_TurnRotationRemaining = 0;
@@ -444,16 +443,15 @@ BOOL CDriveControlModule::SetMoveDistance( int  Module, int Speed, int Turn, int
 
 void CDriveControlModule::SetSpeed( int  Module, int Speed, int Acceleration )
 {
-	if( CheckAndSetOwner(Module) )
+	// Lower priority modules can reduce speed, but not increase it.
+	int Result = CheckAndSetOwner(Module);
+	if( MODULE_OWNERSHIP_REQUEST_SUCCESS == Result )
 	{
 		CString MsgString, ModuleName;
 		m_DriveOwner = Module;	
 		m_Command = HW_SET_SPEED_AND_TURN;	
-		// Set the speed.  Drive control keeps track of the last turn
-		if( Speed >= 0 ) 
-			m_Speed = Speed + g_SpeedIncrease;	// Forward
-		else 
-			m_Speed = Speed - g_SpeedIncrease;	// Reverse
+		// Set the speed.  Drive control keeps track of the last speed
+		m_Speed = Speed;
 		m_Acceleration = Acceleration;
 		m_MoveDistanceRemaining = 0;
 		m_TurnRotationRemaining = 0;
@@ -462,12 +460,42 @@ void CDriveControlModule::SetSpeed( int  Module, int Speed, int Acceleration )
 		MsgString.Format( "%s: New Speed Requested: %d", ModuleName, Speed );
 		ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
 		ExecuteCommand();
+
+	}
+	else if( MODULE_HIGHER_PRIORITY_HAS_CONTROL == Result )  
+	{
+		// allow lower priority modules to still call this function under limited circumstances
+		if( (0 == m_TurnRotationRemaining) && // don't interrupt "SetTurn" commands
+			(0 == m_MoveDistanceRemaining) ) // don't interrupt "SetMove" commands
+		{
+			if( ((m_Speed > 0) && (Speed < m_Speed)) ||	// moving forward
+				((m_Speed < 0) && (Speed > m_Speed))  )	// moving backward
+			{
+				// Slower speed requested by lower priory module
+				CString MsgString, ModuleName;
+				m_DriveOwner = Module;	
+				m_Command = HW_SET_SPEED_AND_TURN;	
+				// Set the speed.  Drive control keeps track of the last speed
+				m_Speed = Speed;
+				m_Acceleration = Acceleration;
+				m_MoveDistanceRemaining = 0;
+				m_TurnRotationRemaining = 0;
+				m_TrackCompassHeading = 0;
+				ModuleNumberToName( Module, ModuleName );
+				MsgString.Format( "%s: New Speed Requested: %d", ModuleName, Speed );
+				ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
+				ExecuteCommand();
+			}
+		}
 	}
 }
+
 void CDriveControlModule::SetTurn( int  Module, int Turn, int Acceleration )
 {
 	CString MsgString, ModuleName;
-	if( CheckAndSetOwner(Module) )
+	int Result = CheckAndSetOwner(Module);
+
+	if( MODULE_OWNERSHIP_REQUEST_SUCCESS == Result) 
 	{
 		m_DriveOwner = Module;
 		m_Command = HW_SET_SPEED_AND_TURN;
@@ -481,20 +509,44 @@ void CDriveControlModule::SetTurn( int  Module, int Turn, int Acceleration )
 		MsgString.Format( "%s: New Turn Requested: %d",ModuleName, Turn );
 		ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
 		ExecuteCommand();
+
+	}	
+	else if( MODULE_HIGHER_PRIORITY_HAS_CONTROL == Result )  
+	{
+		// allow lower priority modules to still call this function under limited circumstances
+		if( (0 == m_TurnRotationRemaining) && // don't interrupt "SetTurn" commands
+			(0 == m_MoveDistanceRemaining) ) // don't interrupt "SetMove" commands
+		{
+			if( ((m_Turn > 0) && (Turn > m_Turn)) ||	// turning right
+				((m_Turn < 0) && (Turn < m_Turn))  )	// turning left
+			{
+				// Extra turn requested by lower priory module
+				m_DriveOwner = Module;
+				m_Command = HW_SET_SPEED_AND_TURN;
+				if( Turn < TURN_LEFT_MAX ) Turn = TURN_LEFT_MAX;	// Negative = Left
+				if( Turn > TURN_RIGHT_MAX ) Turn = TURN_RIGHT_MAX;	// Positive = Right
+				m_Turn = Turn ;	// Set the turn.  Drive control keeps track of the last speed
+				m_MoveDistanceRemaining = 0;
+				m_TrackCompassHeading = 0;
+				m_TurnRotationRemaining = 0;
+				ModuleNumberToName( Module, ModuleName );
+				MsgString.Format( "%s: New Low Priority Turn Requested: %d",ModuleName, Turn );
+				ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
+				ExecuteCommand();
+			}
+		}
 	}
 }
+
 void CDriveControlModule::SetSpeedAndTurn( int  Module, int Speed, int Turn, int Acceleration )
 {
-	if( CheckAndSetOwner(Module) )
+	CString MsgString, ModuleName;
+	int Result = CheckAndSetOwner(Module);
+	if( MODULE_OWNERSHIP_REQUEST_SUCCESS == Result) 
 	{
 		m_DriveOwner = Module;	
 		m_Command = HW_SET_SPEED_AND_TURN;
-		if( 0 == Speed ) 
-			m_Speed = Speed; // Stop!
-		else if( Speed > 0 ) 
-			m_Speed = Speed + g_SpeedIncrease;	// Forward
-		else if( Speed < 0 ) 
-			m_Speed = Speed - g_SpeedIncrease;	// Reverse
+		m_Speed = Speed;
 		m_Acceleration = Acceleration;
 		m_Turn = Turn;
 		m_MoveDistanceRemaining = 0;
@@ -506,6 +558,54 @@ void CDriveControlModule::SetSpeedAndTurn( int  Module, int Speed, int Turn, int
 			ModuleName, Speed, Turn );
 		ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
 		ExecuteCommand();
+
+	}
+	else if( MODULE_HIGHER_PRIORITY_HAS_CONTROL == Result )  
+	{
+		// allow lower priority modules to still call this function under limited circumstances
+		if( (0 == m_TurnRotationRemaining) && // don't interrupt "SetTurn" commands
+			(0 == m_MoveDistanceRemaining) ) // don't interrupt "SetMove" commands
+		{
+			BOOL ChangeRequested = FALSE;
+
+			if( ((m_Speed > 0) && (Speed < m_Speed)) ||	// moving forward
+				((m_Speed < 0) && (Speed > m_Speed))  )	// moving backward
+			{
+				// Slower speed requested by lower priory module
+				ChangeRequested = TRUE;
+				CString MsgString, ModuleName;
+				// Set the speed.  Drive control keeps track of the last speed
+				m_Speed = Speed;
+				m_Acceleration = Acceleration;
+				ModuleNumberToName( Module, ModuleName );
+				MsgString.Format( "%s: New Low Priority Speed Requested: %d", ModuleName, Speed );
+				ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
+			}
+
+			if( ((m_Turn > 0) && (Turn > m_Turn)) ||	// turning right
+				((m_Turn < 0) && (Turn < m_Turn))  )	// turning left
+			{
+				// Extra turn requested by lower priory module
+				ChangeRequested = TRUE;
+				if( Turn < TURN_LEFT_MAX ) Turn = TURN_LEFT_MAX;	// Negative = Left
+				if( Turn > TURN_RIGHT_MAX ) Turn = TURN_RIGHT_MAX;	// Positive = Right
+				m_Turn = Turn ;	// Set the turn.  Drive control keeps track of the last speed
+				ModuleNumberToName( Module, ModuleName );
+				MsgString.Format( "%s: New Low Priority Turn Requested: %d",ModuleName, Turn );
+				ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
+			}
+
+			if( ChangeRequested )
+			{
+				// Change requested by lower priory module
+				m_DriveOwner = Module;
+				m_Command = HW_SET_SPEED_AND_TURN;
+				m_MoveDistanceRemaining = 0;
+				m_TrackCompassHeading = 0;
+				m_TurnRotationRemaining = 0;
+				ExecuteCommand();
+			}
+		}
 	}
 }
 
@@ -518,7 +618,7 @@ BOOL CDriveControlModule::CheckAndSetOwner( int  NewOwner )
 		// Owner reasking for control
 		// Silently reset timer for how long to maintain control
 		gDriveControlOwnerTimer = 20;	// 1/10 seconds
-		return TRUE;
+		return MODULE_OWNERSHIP_REQUEST_SUCCESS;
 	}
 
 	CString MsgString, NewOwnerName, CurrentOwnerName;
@@ -534,15 +634,14 @@ BOOL CDriveControlModule::CheckAndSetOwner( int  NewOwner )
 	}
 
 
-	if( (0 != (m_ModulesSuppressed & NewOwner)) )// &&
-//		(OVERRIDE_MODULE != NewOwner) )				// Override Module can not be Suppressed!
+	if( (0 != (m_ModulesSuppressed & NewOwner)) )
 	{
 		// Module is suppressed
 		ModuleNumberToName( NewOwner, NewOwnerName );
 		ModuleNumberToName( m_DriveOwner, CurrentOwnerName );
 		MsgString.Format("Request by %s Rejected: Suppressed by %s",NewOwnerName, CurrentOwnerName );
 		ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
-		return FALSE;
+		return MODULE_SUPPRESSED;
 	}
 
 	if( NewOwner < m_DriveOwner )
@@ -553,7 +652,7 @@ BOOL CDriveControlModule::CheckAndSetOwner( int  NewOwner )
 		MsgString.Format( "Request by %s Rejected: %s has control",NewOwnerName, CurrentOwnerName );
 		ROBOT_LOG( TRUE,  (LPCTSTR)MsgString )
 		ROBOT_LOG( TRUE,"gDriveControlOwnerTimer = %d\n", gDriveControlOwnerTimer)
-		return FALSE;
+		return MODULE_HIGHER_PRIORITY_HAS_CONTROL;
 	}
 
 	// No one with higher priority has control.
@@ -576,7 +675,7 @@ BOOL CDriveControlModule::CheckAndSetOwner( int  NewOwner )
 	// Requesting module has control now
 	// Indicate on the GUI who is in control
 	SendResponse( WM_ROBOT_DISPLAY_SINGLE_ITEM, ROBOT_RESPONSE_DRIVE_MODULE_OWNER, m_DriveOwner );
-	return TRUE;
+	return MODULE_OWNERSHIP_REQUEST_SUCCESS;
 
 }
 

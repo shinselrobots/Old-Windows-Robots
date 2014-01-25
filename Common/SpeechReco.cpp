@@ -421,7 +421,7 @@ if( m_bPlaySimonSays && !m_bSimonSays )
 				m_bEnableMotorsForSpeechCommands = FALSE;
 				g_MotorCurrentSpeedCmd = SPEED_STOP;
 				g_MotorCurrentTurnCmd = 0;	// Center
-				SpeechSendCommand( WM_ROBOT_USER_OVERRIDE_CMD, SET_USER_OVERRIDE_AND_STOP, 0 ); // FORCE STOP, no matter what!
+				SpeechSendCommand( WM_ROBOT_SET_USER_PRIORITY, SET_USER_LOCAL_AND_STOP, 0 ); // FORCE STOP, no matter what!
 				RobotSleep(5, pDomainSpeakThread); // Let the command run first
 				Speak( "Ok, I have disabled my wheel motors" );	
 			}
@@ -435,7 +435,7 @@ if( m_bPlaySimonSays && !m_bSimonSays )
 			// Note that since this is the STOP command, we don't care about m_bEnableMotorsForSpeechCommands
 			g_MotorCurrentSpeedCmd = SPEED_STOP;
 			g_MotorCurrentTurnCmd = 0;	// Center
-			SpeechSendCommand( WM_ROBOT_USER_OVERRIDE_CMD, SET_USER_OVERRIDE_AND_STOP, 0 ); // FORCE STOP, no matter what!
+			SpeechSendCommand( WM_ROBOT_SET_USER_PRIORITY, SET_USER_LOCAL_AND_STOP, 0 ); // FORCE STOP, no matter what!
 			SpeechSendCommand( WM_ROBOT_SET_ACTION_CMD, ACTION_MODE_NONE, (DWORD)0 );	// Right/Left arm, Movement to execute, TODO-MUST This is not what Behavior code says!!
 			RobotSleep(5, pDomainSpeakThread); // Let the command run first
 
@@ -455,7 +455,7 @@ if( m_bPlaySimonSays && !m_bSimonSays )
 			SpeechSendCommand( WM_ROBOT_SET_ARM_MOVEMENT, (DWORD)BOTH_ARMS, (DWORD)ARM_MOVEMENT_HOME1 );	// Right/Left arm, Movement to execute, 
 
 
-			SpeechSendCommand( WM_ROBOT_USER_OVERRIDE_CMD, SET_USER_NORMAL, 0 ); // Rest owner back
+			SpeechSendCommand( WM_ROBOT_SET_USER_PRIORITY, SET_USER_REMOTE, 0 ); // Rest owner back
 			break;
 		}
 

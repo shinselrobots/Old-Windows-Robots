@@ -299,7 +299,6 @@ BEGIN_MESSAGE_MAP(Setup, CFormView)
 	ON_BN_CLICKED(IDC_CAMERA_PWR_OFF, OnCameraPwrOff)
 	ON_BN_CLICKED(IDC_CONNECT_TO_IP_CAMERA, OnConnectToIpCamera)
 	ON_CBN_SELCHANGE(IDC_AVOID_OBJ_RANGE, OnSelchangeAvoidObjRange)
-	ON_CBN_SELCHANGE(IDC_PATH_SPEED_ADDER, OnSelchangePathSpeedAdder)
 	ON_CBN_SELCHANGE(IDC_CAMERA_TRACKING_COLOR_THRESHOLD, OnSelchangeCameraTrackingColorThreshold)
 	ON_BN_CLICKED(IDC_CAMERA_SCAN_DISTANCE_BTN, OnCameraScanDistanceBtn)
 	ON_BN_CLICKED(IDC_CAMERA_MANUAL_COLOR_CAL_BTN, OnCameraManualColorCalBtn)
@@ -754,9 +753,6 @@ void Setup::OnInitialUpdate()
 
 	pComboBox = (CComboBox*) GetDlgItem(IDC_AVOID_OBJ_RANGE);
 	pComboBox->SetCurSel( (OBJECT_AVOID_DEFAULT_FEET) );
-
-	pComboBox = (CComboBox*) GetDlgItem(IDC_PATH_SPEED_ADDER);
-	pComboBox->SetCurSel( 0 );
 
 	pComboBox = (CComboBox*) GetDlgItem(IDC_CAMERA_TRACKING_COLOR_THRESHOLD);
 	pComboBox->SetCurSel( CAMERA_THRESHOLD_DEFAULT );
@@ -1523,15 +1519,6 @@ void Setup::OnSelchangeAvoidObjRange()
 	int nRange = pComboBox->GetCurSel();
 	ROBOT_LOG( TRUE, "Requesting New Avoid Obj Range: %d feet\n", nRange )
 	SendCommand( WM_ROBOT_SET_AVOID_OBJ_RANGE, 0, (DWORD)nRange );
-}
-
-void Setup::OnSelchangePathSpeedAdder() 
-{
-	UpdateData(TRUE); // Get values from the GUI
-	CComboBox* pComboBox = (CComboBox*) GetDlgItem(IDC_PATH_SPEED_ADDER);
-	int nSpeedIncrease = pComboBox->GetCurSel();
-	ROBOT_LOG( TRUE, "Requesting Path Speed Increase: %d feet\n", nSpeedIncrease )
-	SendCommand( WM_ROBOT_SET_PATH_SPEED_INCREASE, 0, (DWORD)nSpeedIncrease );
 }
 
 void Setup::OnSelchangeCameraTrackingColorThreshold() 

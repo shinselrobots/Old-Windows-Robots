@@ -281,7 +281,7 @@ enum CAMERA_STATE {
 ////////////////////////////////////////////////////////////////////////////////
 // Module Identifiers, in priority order (bigger number = higher priority)
 // But, lower priority modules may suppress higher priority modules (brain planning suppresses reflex)
-#define	OVERRIDE_MODULE			0x80	// Emergency Override, used to stop robot
+//#define	OVERRIDE_MODULE			0x80	// Emergency Override, used to stop robot
 #define	LOCAL_USER_MODULE		0x40	// Local direct control
 #define	COLLISION_MODULE		0x20
 #define	AVOID_OBJECT_MODULE		0x10
@@ -291,6 +291,16 @@ enum CAMERA_STATE {
 #define	GRID_NAV_MODULE			0x01
 #define	NO_MODULE				0x00
 
+////////////////////////////////////////////////////////////////////////////////
+// Results of Owner Priority Check
+enum MODULE_OWNER_TEST_RESULT_T {
+		MODULE_SUPPRESSED = 0,				// Module Suppressed.  No action
+		MODULE_HIGHER_PRIORITY_HAS_CONTROL,	// Possible to negotiate speed and turn	
+		MODULE_OWNERSHIP_REQUEST_SUCCESS,		 
+};
+// SUPPRESSED - do nothing
+// HIGHER_OWNER - negotiate speed and turn
+// SUCCESS - use value
 ////////////////////////////////////////////////////////////////////////////////
 enum HEAD_SERVO_OWNERS {
 		HEAD_OWNER_NONE = 0,		// Lowest Priority
@@ -317,6 +327,8 @@ enum KINECT_SERVO_OWNERS {
 		KINECT_TILT_OWNER_TRACK_OBJECT,		
 		KINECT_TILT_OWNER_USER_CONTROL		// Highest Priority
 };
+
+
 
 
 // All motor modules except for User:
@@ -1132,7 +1144,6 @@ extern int					g_LastSpeedSetByKeyboard;
 
 extern int					g_MotorCurrentSpeedCmd;
 extern int					g_MotorCurrentTurnCmd;
-extern int 					g_SpeedIncrease;				// Amount to add to base speed.  Use when executing paths
 extern int 					g_GlobalMaxAvoidObjectDetectionFeet;	// Max range of objects to detect for Avoidance behavior
 extern int 					g_SegmentAvoidObjectRangeTenthInches;	// Max range for Avoidance behavior, for CURRENT SEGMENT!
 

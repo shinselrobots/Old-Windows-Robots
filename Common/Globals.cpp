@@ -39,8 +39,8 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 // Auto launch Camera OpenCV Application
-#define ENABLE_CAMERA_APP			0	// set value to 1 to allow app communication
-#define AUTO_LAUNCH_CAMERA_APP		0	// set value to 1 to auto launch
+#define ENABLE_CAMERA_APP			1	// set value to 1 to allow app communication
+#define AUTO_LAUNCH_CAMERA_APP		1	// set value to 1 to auto launch
 #if (ENABLE_CAMERA_APP == 1)
 	FIND_WINDOW_HANDLE_STRUCT_T CameraFWHS; // global to this file
 #endif
@@ -400,7 +400,6 @@ int					g_SpeedSetByKeyboard = SPEED_FWD_MED_SLOW;
 int					g_LastSpeedSetByKeyboard = SPEED_FWD_MED_SLOW;
 int					g_MotorCurrentSpeedCmd = 0;
 int					g_MotorCurrentTurnCmd = 0;
-int 				g_SpeedIncrease = 0;				// Amount to add to base speed.  Use when executing paths
 int 				g_GlobalMaxAvoidObjectDetectionFeet = OBJECT_AVOID_DEFAULT_FEET;	// Max range of objects to detect for Avoidance behavior
 int 				g_SegmentAvoidObjectRangeTenthInches = 0xFFFFF;	// Max range for Avoidance behavior, for CURRENT SEGMENT!
 
@@ -1713,9 +1712,6 @@ void ModuleNumberToName(int  Module, CString &ModuleString)
 {
 	switch( Module )
 	{		
-		case OVERRIDE_MODULE:
-			ModuleString = "OVERRIDE_MODULE";
-			break;
 		case LOCAL_USER_MODULE:
 			ModuleString = "LOCAL_USER_MODULE";
 			break;
@@ -2156,16 +2152,16 @@ void LaunchKinectApp()
 
 
 	if( !CreateProcess(
-		//"C:\\Dev\\_Robot\\RobotKinectViewer\\bin\\Debug\\RobotKinectViewer.exe",	//  __in_opt     LPCTSTR lpApplicationName,
-		"C:\\Dev\\_Robot\\RobotKinectViewer\\bin\\Release\\RobotKinectViewer.exe",	//  __in_opt     LPCTSTR lpApplicationName,
+		//"C:\\Dev\\Robots\\RobotKinectViewer\\bin\\Debug\\RobotKinectViewer.exe",	//  __in_opt     LPCTSTR lpApplicationName,
+		"C:\\Dev\\Robots\\RobotKinectViewer\\bin\\Release\\RobotKinectViewer.exe",	//  __in_opt     LPCTSTR lpApplicationName,
 		"",											//  __inout_opt  LPTSTR lpCommandLine,
 		0,											//  __in_opt     LPSECURITY_ATTRIBUTES lpProcessAttributes,
 		0,											//  __in_opt     LPSECURITY_ATTRIBUTES lpThreadAttributes,
 		false,										//  __in         BOOL bInheritHandles,
 		CREATE_DEFAULT_ERROR_MODE,					//  __in         DWORD dwCreationFlags,
 		0,											//  __in_opt     LPVOID lpEnvironment,
-		//"C:\\Dev\\_Robot\\RobotKinectViewer\\bin\\Debug",	 //  __in_opt     LPCTSTR lpCurrentDirectory,
-		"C:\\Dev\\_Robot\\RobotKinectViewer\\bin\\Release",	 //  __in_opt     LPCTSTR lpCurrentDirectory,
+		//"C:\\Dev\\Robots\\RobotKinectViewer\\bin\\Debug",	 //  __in_opt     LPCTSTR lpCurrentDirectory,
+		"C:\\Dev\\Robots\\RobotKinectViewer\\bin\\Release",	 //  __in_opt     LPCTSTR lpCurrentDirectory,
 		&StartupInfo,								// __in         LPSTARTUPINFO lpStartupInfo,
 		&(KinectFWHS.ProcessInfo) )		//  __out        LPPROCESS_INFORMATION lpProcessInformation
 	)
@@ -2292,16 +2288,16 @@ void LaunchCameraApp()
 
 
 		if( !CreateProcess(
-			//"C:\\Dev\\_Robot\\RobotCamera\\Release\\RobotCamera.exe",	//  __in_opt     LPCTSTR lpApplicationName,
-			"C:\\Dev\\_Robot\\RobotCamera\\Debug\\RobotCamera.exe",	//  __in_opt     LPCTSTR lpApplicationName,
+			//"C:\\Dev\\Robots\\RobotCamera\\Release\\RobotCamera.exe",	//  __in_opt     LPCTSTR lpApplicationName,
+			"C:\\Dev\\Robots\\RobotCamera\\Debug\\RobotCamera.exe",	//  __in_opt     LPCTSTR lpApplicationName,
 			"",											//  __inout_opt  LPTSTR lpCommandLine,
 			0,											//  __in_opt     LPSECURITY_ATTRIBUTES lpProcessAttributes,
 			0,											//  __in_opt     LPSECURITY_ATTRIBUTES lpThreadAttributes,
 			false,										//  __in         BOOL bInheritHandles,
 			CREATE_DEFAULT_ERROR_MODE,					//  __in         DWORD dwCreationFlags,
 			0,											//  __in_opt     LPVOID lpEnvironment,
-			//"C:\\Dev\\_Robot\\RobotCamera\\Release",	//  __in_opt     LPCTSTR lpCurrentDirectory,
-			"C:\\Dev\\_Robot\\RobotCamera\\Debug",		//  __in_opt     LPCTSTR lpCurrentDirectory,
+			//"C:\\Dev\\Robots\\RobotCamera\\Release",	//  __in_opt     LPCTSTR lpCurrentDirectory,
+			"C:\\Dev\\Robots\\RobotCamera\\Debug",		//  __in_opt     LPCTSTR lpCurrentDirectory,
 			&StartupInfo,								// __in         LPSTARTUPINFO lpStartupInfo,
 			&(CameraFWHS.ProcessInfo) )					//  __out        LPPROCESS_INFORMATION lpProcessInformation
 		)
@@ -2429,14 +2425,14 @@ void LaunchKobukiApp()
 
 
 		if( !CreateProcess(
-			"C:\\Dev\\_Robot\\KobukiControl\\Release\\KobukiControl.exe",	//  __in_opt     LPCTSTR lpApplicationName,
+			"C:\\Dev\\Robots\\KobukiControl\\Release\\KobukiControl.exe",	//  __in_opt     LPCTSTR lpApplicationName,
 			"",											//  __inout_opt  LPTSTR lpCommandLine,
 			0,											//  __in_opt     LPSECURITY_ATTRIBUTES lpProcessAttributes,
 			0,											//  __in_opt     LPSECURITY_ATTRIBUTES lpThreadAttributes,
 			false,										//  __in         BOOL bInheritHandles,
 			CREATE_DEFAULT_ERROR_MODE,					//  __in         DWORD dwCreationFlags,
 			0,											//  __in_opt     LPVOID lpEnvironment,
-			"C:\\Dev\\_Robot\\KobukiControl\\Release",	//  __in_opt     LPCTSTR lpCurrentDirectory,
+			"C:\\Dev\\Robots\\KobukiControl\\Release",	//  __in_opt     LPCTSTR lpCurrentDirectory,
 			&StartupInfo,								// __in         LPSTARTUPINFO lpStartupInfo,
 			&(KobukiFWHS.ProcessInfo) )					//  __out        LPPROCESS_INFORMATION lpProcessInformation
 		)

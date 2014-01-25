@@ -2749,14 +2749,14 @@ void CMapView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				// Need to take control with key press
 				ROBOT_LOG( TRUE,  "KEY - Taking Control - Sending SET_USER_NORMAL\n" );
 				SendCommand( WM_ROBOT_EXECUTE_PATH, PATH_EXECUTE_PAUSE,	0 );	// Pause any path that might be going on, to allow user to take control
-				SendCommand( WM_ROBOT_USER_OVERRIDE_CMD, SET_USER_NORMAL, 0 );	// normal operation, Avoid and Collision active
+				SendCommand( WM_ROBOT_SET_USER_PRIORITY, SET_USER_LOCAL, 0 );	// normal operation, Avoid and Collision active
 				m_LastOverrideState = SET_USER_OVERRIDE_STATE_SENT;
 			}
 			else if( SET_USER_OVERRIDE_AND_STOP == m_LastOverrideState)
 			{
 				// Temporary override had been set with stop command.  Resume normal on key press
 				ROBOT_LOG( TRUE,  "KEY - Resuming from Stop - Sending SET_USER_NORMAL\n" );
-				SendCommand( WM_ROBOT_USER_OVERRIDE_CMD, SET_USER_NORMAL, 0 );
+				SendCommand( WM_ROBOT_SET_USER_PRIORITY, SET_USER_NORMAL, 0 );
 				m_LastOverrideState = SET_USER_OVERRIDE_STATE_SENT;
 			}
 			break;
@@ -2779,7 +2779,7 @@ FORCE_SPEED_CHANGE:
 		{
 			ROBOT_LOG( TRUE,  "KEY - Override All selected - Sending SET_USER_OVERRIDE\n" );
 			SendCommand( WM_ROBOT_EXECUTE_PATH, PATH_EXECUTE_PAUSE,	1 ); // lParam: 1 = Wait for bumper to start, 0 = Don't wait
-			SendCommand( WM_ROBOT_USER_OVERRIDE_CMD, SET_USER_OVERRIDE, 0 );
+			SendCommand( WM_ROBOT_SET_USER_PRIORITY, SET_USER_OVERRIDE, 0 );
 			m_LastOverrideState = SET_USER_OVERRIDE_STATE_SENT;
 			break;
 		}
@@ -2787,7 +2787,7 @@ FORCE_SPEED_CHANGE:
 		case KEY_R:	// Release Override (if active) and User Control
 		{
 			ROBOT_LOG( TRUE,  "KEY - Release Override selected - Sending SET_USER_RELEASED\n" );
-			SendCommand( WM_ROBOT_USER_OVERRIDE_CMD, SET_USER_RELEASED, 0 );
+			SendCommand( WM_ROBOT_SET_USER_PRIORITY, SET_USER_RELEASED, 0 );
 			SendCommand( WM_ROBOT_EXECUTE_PATH, PATH_EXECUTE_RESUME,	0 ); 
 			m_LastOverrideState = SET_USER_RELEASED;
 			break;
@@ -2856,7 +2856,7 @@ FORCE_SPEED_CHANGE:
 			g_MotorCurrentSpeedCmd = SPEED_STOP;
 			g_MotorCurrentTurnCmd = 0;	// Center
 			// Manual Stop button will override collision and avoidance behaviors, causing an immediate stop
-			SendCommand( WM_ROBOT_USER_OVERRIDE_CMD, SET_USER_OVERRIDE_AND_STOP, 0 );
+			SendCommand( WM_ROBOT_SET_USER_PRIORITY, SET_USER_LOCAL_AND_STOP, 0 );
 			//SendCommand( WM_ROBOT_EXECUTE_PATH, PATH_EXECUTE_PAUSE,	1 ); // lParam: 1 = Wait for bumper to start, 0 = Don't wait
 			//m_LastOverrideState = SET_USER_OVERRIDE_AND_STOP;
 			break;

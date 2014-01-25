@@ -118,7 +118,7 @@ DWORD WINAPI ControlThreadProc( LPVOID NotUsed )
 				if( !MotorsPaused )
 				{
 					// Not yet paused, so stop motors now (issue one-time command)
-					pDriveControlModule->Stop( OVERRIDE_MODULE );
+					pDriveControlModule->Stop( LOCAL_USER_MODULE );
 					MotorsPaused = TRUE;
 				}
 

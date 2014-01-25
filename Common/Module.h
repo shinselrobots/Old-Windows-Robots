@@ -322,7 +322,7 @@ public:
 	int  SetTachometerTarget( int TargetSpeed );
 	void BrakeControl();
 
-	BOOL CheckAndSetOwner( int  Module );
+	int CheckAndSetOwner( int  Module );	// returns MODULE_OWNER_TEST_RESULT_T
 	BOOL IsOwner( int  Module );
 	BOOL ReleaseOwner( int  Module );
 	void SuppressModule( int  Module );
@@ -495,6 +495,8 @@ public:
 	CUserCmdModule( CDriveControlModule *pDriveControlModule );
 	~CUserCmdModule();
 	void ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam );
+	void HandleAndroidInput( );
+
 
 protected:
 	CDriveControlModule	   *m_pDriveCtrl;
@@ -512,7 +514,7 @@ protected:
 	LPCTSTR				 m_pSharedMemory;		// Shared memory for communicating with the Camera App
 	HANDLE				 m_hCameraRequestEvent;	// Event for communicating with the Camera App
 	CAMERA_REQUEST_T	 m_CameraRequest;
-	UINT				 m_UserOwner;			// switches between normal LOCAL_USER_MODULE or OVERRIDE_MODULE if needed.
+	UINT				 m_UserOwner;			// switches between LOCAL_USER_MODULE or REMOTE_USER_MODULE if needed.
 
 
 
@@ -861,6 +863,7 @@ public:
 
 	void					 ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam );
 	BOOL					 DetectAndHandleCliff( int &Turn, int &Speed );
+	void					 CheckArmSafePosition();
 	BOOL					 DetectAndHandleDoorway( int &DoorwayWidth, int &DoorwayCenter);
 #if ( ROBOT_SERVER == 1 )	// This module used for Robot Server only
 	KinectServoControl		*m_pKinectServoControl;

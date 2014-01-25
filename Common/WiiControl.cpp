@@ -240,7 +240,7 @@ void WiiControl::Update()
 			if( !m_bWiiHasMotorControl )
 			{
 				// Wii does not currently have control, force override
-				SendCommand( WM_ROBOT_USER_OVERRIDE_CMD, SET_USER_OVERRIDE, 0 );
+				SendCommand( WM_ROBOT_SET_USER_PRIORITY, SET_USER_LOCAL, 0 );
 			}
 			g_MotorCurrentSpeedCmd = WiiSpeed;
 			g_MotorCurrentTurnCmd = WiiTurn;
@@ -255,7 +255,7 @@ void WiiControl::Update()
 				// WiiMote Had control, but now button released. Force a stop
 				g_MotorCurrentSpeedCmd = 0;
 				g_MotorCurrentTurnCmd = 0;
-				SendCommand( WM_ROBOT_USER_OVERRIDE_CMD, SET_USER_NORMAL, 0 );
+				SendCommand( WM_ROBOT_SET_USER_PRIORITY, SET_USER_LOCAL_AND_STOP, 0 );
 				m_bWiiHasMotorControl = FALSE;
 			}
 		} // B pressed

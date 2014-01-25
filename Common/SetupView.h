@@ -178,7 +178,6 @@ protected:
 	afx_msg void OnCameraPwrOff();
 	afx_msg void OnConnectToIpCamera();
 	afx_msg void OnSelchangeAvoidObjRange();
-	afx_msg void OnSelchangePathSpeedAdder();
 	afx_msg void OnSelchangeCameraTrackingColorThreshold();
 	afx_msg void OnCameraScanDistanceBtn();
 	afx_msg void OnCameraManualColorCalBtn();
