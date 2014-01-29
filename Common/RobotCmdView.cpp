@@ -927,25 +927,25 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 #if( ROBOT_TYPE == TURTLE )
 
 	// Note, Left and Right wheel drops not use; wheels bolted in place for stability
-	if( g_piRobotStatus->WheelDropCaster != LastWheelDropCaster )
+	if( g_pIRobotStatus->WheelDropCaster != LastWheelDropCaster )
 	{
-		strText = ( (g_piRobotStatus->WheelDropCaster == 0) ? _T("Caster OK") : _T("Caster Drop") );
+		strText = ( (g_pIRobotStatus->WheelDropCaster == 0) ? _T("Caster OK") : _T("Caster Drop") );
 		SetDlgItemText( IDC_CASTER_DROP, (LPCTSTR)strText );
-		LastWheelDropCaster = g_piRobotStatus->WheelDropCaster;
+		LastWheelDropCaster = g_pIRobotStatus->WheelDropCaster;
 	}
 
-	if( g_piRobotStatus->BumperLeft != LastBumperLeft )
+	if( g_pIRobotStatus->BumperLeft != LastBumperLeft )
 	{
-		strText = ( (g_piRobotStatus->BumperLeft == 0) ? _T("Left Bumper") : _T("Left Hit") );
+		strText = ( (g_pIRobotStatus->BumperLeft == 0) ? _T("Left Bumper") : _T("Left Hit") );
 		SetDlgItemText( IDC_STAT_BMPR_LEFT, (LPCTSTR)strText );
-		LastBumperLeft = g_piRobotStatus->BumperLeft;
+		LastBumperLeft = g_pIRobotStatus->BumperLeft;
 	}
 
-	if( g_piRobotStatus->BumperRight != LastBumperRight )
+	if( g_pIRobotStatus->BumperRight != LastBumperRight )
 	{
-		strText = ( (g_piRobotStatus->BumperRight == 0) ? _T("Right Bumper") : _T("Right Hit") );
+		strText = ( (g_pIRobotStatus->BumperRight == 0) ? _T("Right Bumper") : _T("Right Hit") );
 		SetDlgItemText( IDC_STAT_BMPR_RIGHT, (LPCTSTR)strText );
-		LastBumperRight = g_piRobotStatus->BumperRight;
+		LastBumperRight = g_pIRobotStatus->BumperRight;
 	}
 
 
@@ -1160,7 +1160,7 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 			LastConnectedToPIC = g_ArduinoSubSystemStatus;
 		}
 
-		if( g_SensorStatus.StatusFlags & HW_STATUS_WATCHDOG_EXPIRED )
+		if( g_pFullSensorStatus->StatusFlags & HW_STATUS_WATCHDOG_EXPIRED )
 		{			
 			// Watchdog timer expired.
 			strText.Format( _T("ERR") );
@@ -1187,7 +1187,7 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 			}
 		}
 
-		if( g_SensorStatus.StatusFlags & HW_STATUS_POWER_ON_INDICATOR ) 
+		if( g_pFullSensorStatus->StatusFlags & HW_STATUS_POWER_ON_INDICATOR ) 
 		{	
 			strText.Format( _T("ON") );
 			SetDlgItemText( IDC_STAT_POWER, (LPCTSTR)strText );
@@ -1198,13 +1198,13 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 			SetDlgItemText( IDC_STAT_POWER, (LPCTSTR)strText );
 		}
 
-		//TODO: g_SensorStatus.ThermalArray[];
+		//TODO: g_pFullSensorStatus->ThermalArray[];
 
 		///////////////////////////////////////////////////////////////////////////////
 		#if SENSOR_CONFIG_TYPE == SENSOR_CONFIG_CARBOT
 
 
-			double BatteryVoltage = (double)g_SensorStatus.Battery0 / 100.0;	// convert from hundredths of a volt
+			double BatteryVoltage = (double)g_pFullSensorStatus->Battery0 / 100.0;	// convert from hundredths of a volt
 
 			strText.Format( _T("%2.1f"), BatteryVoltage );
 			SetDlgItemText( IDC_STAT_BATTERY, (LPCTSTR)strText ); 
@@ -1254,7 +1254,7 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 		///////////////////////////////////////////////////////////////////////////////
 		#elif SENSOR_CONFIG_TYPE == SENSOR_CONFIG_LOKI
 
-			double BatteryVoltage = (double)g_SensorStatus.Battery0 / 100.0;	// convert from hundredths of a volt
+			double BatteryVoltage = (double)g_pFullSensorStatus->Battery0 / 100.0;	// convert from hundredths of a volt
 
 			strText.Format( _T("%2.1f"), BatteryVoltage );
 			SetDlgItemText( IDC_STAT_BATTERY, (LPCTSTR)strText ); 
@@ -1311,25 +1311,25 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 
 			ROBOT_ASSERT(0); // TODO g_pKobukiStatus
 
-			// Note: iRobotCreate data in g_piRobotStatus, not g_SensorStatus
-			int BatteryChargeLevel = ( g_piRobotStatus->BatteryCapacity != 0 ? 
-				(g_piRobotStatus->BatteryCharge * 100) / g_piRobotStatus->BatteryCapacity : 0 );
+			// Note: iRobotCreate data in g_pIRobotStatus, not g_pFullSensorStatus
+			int BatteryChargeLevel = ( g_pIRobotStatus->BatteryCapacity != 0 ? 
+				(g_pIRobotStatus->BatteryCharge * 100) / g_pIRobotStatus->BatteryCapacity : 0 );
 
 
 			strText.Format( _T("%d %%"), BatteryChargeLevel );
 			SetDlgItemText( IDC_STAT_BATTERY, (LPCTSTR)strText );
 			SetDlgItemText( IDC_BATTERY_WARNING_TEXT, (LPCTSTR)strText ); // KLUDGE!
 
-			strText.Format( _T("%2.2f volts"), (float)g_piRobotStatus->BatteryVoltage / 1000.0 );
+			strText.Format( _T("%2.2f volts"), (float)g_pIRobotStatus->BatteryVoltage / 1000.0 );
 			SetDlgItemText( IDC_STAT_BATTERY_VOLTS, (LPCTSTR)strText );
 
-			strText = ( g_piRobotStatus->InHomeBase ? "Yes" : "No" );
+			strText = ( g_pIRobotStatus->InHomeBase ? "Yes" : "No" );
 			SetDlgItemText( IDC_STAT_BASE_DOCKED, (LPCTSTR)strText );
 
-			strText = ( g_piRobotStatus->ChargingPlugInserted ? "Yes" : "No" );
+			strText = ( g_pIRobotStatus->ChargingPlugInserted ? "Yes" : "No" );
 			SetDlgItemText( IDC_STAT_PLUG_INSERTED, (LPCTSTR)strText );
 
-			strText.Format( _T("%d"), g_piRobotStatus->BatteryCurrent );
+			strText.Format( _T("%d"), g_pIRobotStatus->BatteryCurrent );
 			SetDlgItemText( IDC_STAT_CURRENT_DRAW, (LPCTSTR)strText );
 
 
@@ -1386,9 +1386,9 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 		///////////////////////////////////////////////////////////////////////////////
 		#elif SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TELEOP
 
-			// Note: Teleop Robot data in g_KobukiStatus, not g_SensorStatus
-			//int BatteryChargeLevel = ( g_piRobotStatus->BatteryCapacity != 0 ? 
-			//	(g_piRobotStatus->BatteryCharge * 100) / g_piRobotStatus->BatteryCapacity : 0 );
+			// Note: Teleop Robot data in g_KobukiStatus, not g_pFullSensorStatus
+			//int BatteryChargeLevel = ( g_pIRobotStatus->BatteryCapacity != 0 ? 
+			//	(g_pIRobotStatus->BatteryCharge * 100) / g_pIRobotStatus->BatteryCapacity : 0 );
 
 
 			strText.Format( _T("%3d%%"), (int)g_pKobukiStatus->BatteryPercent );
@@ -1413,10 +1413,10 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 			strText.Format( _T("%2.1f volts"), g_pKobukiStatus->BatteryVoltage );
 			SetDlgItemText( IDC_STAT_BATTERY_VOLTS, (LPCTSTR)strText );
 
-			//strText = ( g_piRobotStatus->InHomeBase ? "Yes" : "No" );
+			//strText = ( g_pIRobotStatus->InHomeBase ? "Yes" : "No" );
 			//SetDlgItemText( IDC_STAT_BASE_DOCKED, (LPCTSTR)strText );
 
-			//strText = ( g_piRobotStatus->ChargingPlugInserted ? "Yes" : "No" );
+			//strText = ( g_pIRobotStatus->ChargingPlugInserted ? "Yes" : "No" );
 
 			switch( g_pKobukiStatus->BatteryChargeStateEnum )
 			{
@@ -1431,7 +1431,7 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 			}
 			SetDlgItemText( IDC_STAT_PLUG_INSERTED, (LPCTSTR)strText );
 
-			//strText.Format( _T("%d"), g_piRobotStatus->BatteryCurrent );
+			//strText.Format( _T("%d"), g_pIRobotStatus->BatteryCurrent );
 			//SetDlgItemText( IDC_STAT_CURRENT_DRAW, (LPCTSTR)strText );
 
 
@@ -1503,17 +1503,17 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 		else
 		{
 			bFlip = 1;
-			strText.Format( _T("%d"), g_SensorStatus.LastError );
+			strText.Format( _T("%d"), g_pFullSensorStatus->LastError );
 		}
 		SetDlgItemText( IDC_STAT_LAST_ERROR, (LPCTSTR)strText ); 
 
 		// Debug Code
-		strText.Format( _T("%d"), g_SensorStatus.DebugCode );
+		strText.Format( _T("%d"), g_pFullSensorStatus->DebugCode );
 		SetDlgItemText( IDC_STAT_DEBUG, (LPCTSTR)strText );
 
-		// Bumper Status
-		strText.Format( _T("%02X %02X"), g_SensorStatus.HWBumper, g_SensorStatus.IRBumper );
-		SetDlgItemText( IDC_BUMPER_DISPLAY, (LPCTSTR)strText );
+		// Bumper Status - no longer used like this
+		//strText.Format( _T("%02X %02X"), g_pFullSensorStatus->HWBumper, g_pFullSensorStatus->IRBumper );
+		//SetDlgItemText( IDC_BUMPER_DISPLAY, (LPCTSTR)strText );
 
 //		strText.Format( "%d", foobar );
 
@@ -1523,31 +1523,31 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 
 		int TempIRArray[FIXED_IR_SAMPLES];	
 
-		strText.Format( _T("%d"), (g_SensorStatus.IR[0] / 10) );	// Left Side
+		strText.Format( _T("%d"), (g_pFullSensorStatus->IR[0] / 10) );	// Left Side
 		SetDlgItemText( IDC_STAT_IR0,(LPCTSTR)strText );
-		TempIRArray[0] = g_SensorStatus.IR[0];
+		TempIRArray[0] = g_pFullSensorStatus->IR[0];
 
-		strText.Format( _T("%d"), (g_SensorStatus.IR[1] / 10) );	// Forward Low Mounted
+		strText.Format( _T("%d"), (g_pFullSensorStatus->IR[1] / 10) );	// Forward Low Mounted
 		SetDlgItemText( IDC_STAT_IR1,(LPCTSTR)strText );
-		TempIRArray[1] = g_SensorStatus.IR[1];
+		TempIRArray[1] = g_pFullSensorStatus->IR[1];
 
 		// DISABLED FOR LOKI
-//		strText.Format( _T("%d"), (g_SensorStatus.IR[2] / 10) );	// Forward Head Mounted
+//		strText.Format( _T("%d"), (g_pFullSensorStatus->IR[2] / 10) );	// Forward Head Mounted
 //		SetDlgItemText( IDC_STAT_IR2,(LPCTSTR)strText );
-		TempIRArray[2] = g_SensorStatus.IR[2];
+		TempIRArray[2] = g_pFullSensorStatus->IR[2];
 
-//		strText.Format( _T("%d"), (g_SensorStatus.IR[3] / 10) );	// Forward Head Mounted
+//		strText.Format( _T("%d"), (g_pFullSensorStatus->IR[3] / 10) );	// Forward Head Mounted
 //		SetDlgItemText( IDC_STAT_IR3,(LPCTSTR)strText );
-		TempIRArray[3] = g_SensorStatus.IR[3];
+		TempIRArray[3] = g_pFullSensorStatus->IR[3];
 
 
-		strText.Format( _T("%d"), (g_SensorStatus.IR[4] / 10) );	// Forward Low Mounted
+		strText.Format( _T("%d"), (g_pFullSensorStatus->IR[4] / 10) );	// Forward Low Mounted
 		SetDlgItemText( IDC_STAT_IR4,(LPCTSTR)strText );
-		TempIRArray[4] = g_SensorStatus.IR[4];
+		TempIRArray[4] = g_pFullSensorStatus->IR[4];
 
-		strText.Format( _T("%d"), (g_SensorStatus.IR[5] / 10) );	// Right Side
+		strText.Format( _T("%d"), (g_pFullSensorStatus->IR[5] / 10) );	// Right Side
 		SetDlgItemText( IDC_STAT_IR5,(LPCTSTR)strText );
-		TempIRArray[5] = g_SensorStatus.IR[5];
+		TempIRArray[5] = g_pFullSensorStatus->IR[5];
 
 		m_RadarDisplay.SetData( 
 			FIXED_IR_ARRAY,		// IR Array #1 (only one implemented for now)
@@ -1566,33 +1566,33 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 
 			UINT TempUSArray[FIXED_US_SAMPLES];
 
-			strText.Format( _T("%u"), g_SensorStatus.US[1] );	// Side Left
+			strText.Format( _T("%u"), g_pFullSensorStatus->US[1] );	// Side Left
 			SetDlgItemText( IDC_STAT_US5, (LPCTSTR)strText );
-			TempUSArray[0] = g_SensorStatus.US[1];
+			TempUSArray[0] = g_pFullSensorStatus->US[1];
 
-			strText.Format( _T("%u"), g_SensorStatus.US[2] );	// Angle Left
+			strText.Format( _T("%u"), g_pFullSensorStatus->US[2] );	// Angle Left
 			SetDlgItemText( IDC_STAT_US3, (LPCTSTR)strText );
-			TempUSArray[0] = g_SensorStatus.US[2];
+			TempUSArray[0] = g_pFullSensorStatus->US[2];
 
-			strText.Format( _T("%u"), g_SensorStatus.US[3] );	// Front Left
+			strText.Format( _T("%u"), g_pFullSensorStatus->US[3] );	// Front Left
 			SetDlgItemText( IDC_STAT_US1, (LPCTSTR)strText );
-			TempUSArray[0] = g_SensorStatus.US[3];
+			TempUSArray[0] = g_pFullSensorStatus->US[3];
 
-			strText.Format( _T("%u"), g_SensorStatus.US[0] );	// Camera (center)
+			strText.Format( _T("%u"), g_pFullSensorStatus->US[0] );	// Camera (center)
 			SetDlgItemText( IDC_STAT_US0, (LPCTSTR)strText );
-			TempUSArray[1] = g_SensorStatus.US[0];
+			TempUSArray[1] = g_pFullSensorStatus->US[0];
 
-			strText.Format( _T("%u"), g_SensorStatus.US[4] );	// Front Right
+			strText.Format( _T("%u"), g_pFullSensorStatus->US[4] );	// Front Right
 			SetDlgItemText( IDC_STAT_US2, (LPCTSTR)strText );
-			TempUSArray[2] = g_SensorStatus.US[4];
+			TempUSArray[2] = g_pFullSensorStatus->US[4];
 
-			strText.Format( _T("%u"), g_SensorStatus.US[5] );	// Angle Left
+			strText.Format( _T("%u"), g_pFullSensorStatus->US[5] );	// Angle Left
 			SetDlgItemText( IDC_STAT_US4, (LPCTSTR)strText );
-			TempUSArray[0] = g_SensorStatus.US[5];
+			TempUSArray[0] = g_pFullSensorStatus->US[5];
 
-			strText.Format( _T("%u"), g_SensorStatus.US[6] );	// Side Left
+			strText.Format( _T("%u"), g_pFullSensorStatus->US[6] );	// Side Left
 			SetDlgItemText( IDC_STAT_US6, (LPCTSTR)strText );
-			TempUSArray[0] = g_SensorStatus.US[6];
+			TempUSArray[0] = g_pFullSensorStatus->US[6];
 
 			m_RadarDisplay.SetData( 
 				FIXED_US_ARRAY,		// US Array #1
@@ -1604,17 +1604,17 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 
 			int TempUSArray[FIXED_US_SAMPLES];
 
-			strText.Format( _T("%u"), g_SensorStatus.US[1] );	// Front Left
+			strText.Format( _T("%u"), g_pFullSensorStatus->US[1] );	// Front Left
 			SetDlgItemText( IDC_STAT_US1, (LPCTSTR)strText );
-			TempUSArray[0] = g_SensorStatus.US[1];
+			TempUSArray[0] = g_pFullSensorStatus->US[1];
 
-			strText.Format( _T("%u"), g_SensorStatus.US[0] );	// Camera (center)
+			strText.Format( _T("%u"), g_pFullSensorStatus->US[0] );	// Camera (center)
 			SetDlgItemText( IDC_STAT_US0, (LPCTSTR)strText );
-			TempUSArray[1] = g_SensorStatus.US[0];
+			TempUSArray[1] = g_pFullSensorStatus->US[0];
 
-			strText.Format( _T("%u"), g_SensorStatus.US[2] );	// Front Right
+			strText.Format( _T("%u"), g_pFullSensorStatus->US[2] );	// Front Right
 			SetDlgItemText( IDC_STAT_US2, (LPCTSTR)strText );
-			TempUSArray[2] = g_SensorStatus.US[2];
+			TempUSArray[2] = g_pFullSensorStatus->US[2];
 
 			m_RadarDisplay.SetData( 
 				FIXED_US_ARRAY,		// US Array #1
@@ -1628,7 +1628,7 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 			CStatic * pTextBox = 0;
 
 			pTextBox = (CStatic*) GetDlgItem(IDC_STAT_IR_BUMPER_LOW_FRONT_LEFT);
-			if( IR_BUMPER_OBJECT_FRONT_LEFT )
+			if( g_pFullSensorStatus->IRBumperFrontLeft )
 			{
 				//Beep(1000,500);
 				SetDlgItemText( IDC_STAT_IR_BUMPER_LOW_FRONT_LEFT, IrHit );
@@ -1641,7 +1641,7 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 			}
 
 			pTextBox = (CStatic*) GetDlgItem(IDC_STAT_IR_BUMPER_LOW_FRONT_RIGHT);
-			if( IR_BUMPER_OBJECT_FRONT_RIGHT )
+			if( g_pFullSensorStatus->IRBumperFrontRight )
 			{
 				//Beep(1000,500);
 				SetDlgItemText( IDC_STAT_IR_BUMPER_LOW_FRONT_RIGHT, IrHit );
@@ -1654,7 +1654,7 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 			}
 
 			pTextBox = (CStatic*) GetDlgItem(IDC_STAT_CLIFF_LEFT);
-			if( IR_BUMPER_CLIFF_LEFT )
+			if( g_pFullSensorStatus->CliffLeft )
 			{
 				SetDlgItemText( IDC_STAT_CLIFF_LEFT, "CLIFF" );
 				pTextBox->EnableWindow(1);// Enable
@@ -1666,7 +1666,7 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 			}
 
 			pTextBox = (CStatic*) GetDlgItem(IDC_STAT_CLIFF_RIGHT);
-			if( IR_BUMPER_CLIFF_RIGHT )
+			if( g_pFullSensorStatus->CliffRight )
 			{
 				SetDlgItemText( IDC_STAT_CLIFF_RIGHT, "CLIFF" );
 				pTextBox->EnableWindow(1);// Enable
@@ -1678,7 +1678,7 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 			}
 
 			pTextBox = (CStatic*) GetDlgItem(IDC_STAT_IR_BUMPER_LOW_REAR_LEFT);
-			if( IR_BUMPER_OBJECT_REAR_LEFT )
+			if( g_pFullSensorStatus->IRBumperRearLeft  )
 			{
 				SetDlgItemText( IDC_STAT_IR_BUMPER_LOW_REAR_LEFT, IrHit );
 				pTextBox->EnableWindow(1);// Enable
@@ -1690,7 +1690,7 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 			}
 
 			pTextBox = (CStatic*) GetDlgItem(IDC_STAT_IR_BUMPER_LOW_REAR_RIGHT);
-			if( IR_BUMPER_OBJECT_REAR_RIGHT )
+			if( g_pFullSensorStatus->IRBumperRearRight )
 			{
 				SetDlgItemText( IDC_STAT_IR_BUMPER_LOW_REAR_RIGHT, IrHit );
 				pTextBox->EnableWindow(1);// Enable
@@ -1702,7 +1702,7 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 			}
 
 			pTextBox = (CStatic*) GetDlgItem(IDC_STAT_PIR_LEFT);
-			if( PIR_MOTION_DETECTED_LEFT )
+			if( g_pFullSensorStatus->PIRMotionLeft )
 			{
 				SetDlgItemText( IDC_STAT_PIR_LEFT, "PIR" );
 				pTextBox->EnableWindow(1);// Enable
@@ -1714,7 +1714,7 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 			}
 
 			pTextBox = (CStatic*) GetDlgItem(IDC_STAT_PIR_RIGHT);
-			if( PIR_MOTION_DETECTED_RIGHT )
+			if( g_pFullSensorStatus->PIRMotionRight )
 			{
 				SetDlgItemText( IDC_STAT_PIR_RIGHT, "PIR" );
 				pTextBox->EnableWindow(1);// Enable
@@ -1729,7 +1729,7 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 // TODO:	if( ARM_L_IR_BUMPER_INSIDE_CLAW )
 //				SetDlgItemText( IDC_IR_BUMPER_ARM_R_INSIDE_CLAW, "Claw" );
 
-
+			/*
 			pTextBox = (CStatic*) GetDlgItem(IDC_IR_BUMPER_ARM_L_ELBOW);
 			if( (ARM_L_IR_BUMPER_OBJECT_ELBOW) || (ARM_L_HW_BUMPER_OBJECT_ELBOW) ) // Indicate hit on IR or HW Bumper!
 			{
@@ -1753,9 +1753,10 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 				SetDlgItemText( IDC_IR_BUMPER_ARM_R_ELBOW, NoHit );
 				pTextBox->EnableWindow(0);// Disable
 			}
+			*/
 
 			pTextBox = (CStatic*) GetDlgItem(IDC_IR_BUMPER_ARM_L_FINGER_R);
-			if( ARM_L_IR_BUMPER_OBJECT_FINGER_R )
+			if( g_pFullSensorStatus->ArmLeftBumperFingerRight )
 			{
 				SetDlgItemText( IDC_IR_BUMPER_ARM_L_FINGER_R, "Finger" );
 				pTextBox->EnableWindow(1);// Enable
@@ -1768,7 +1769,7 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 			}
 
 			pTextBox = (CStatic*) GetDlgItem(IDC_IR_BUMPER_ARM_L_FINGER_L);
-			if( ARM_L_IR_BUMPER_OBJECT_FINGER_L )
+			if( g_pFullSensorStatus->ArmLeftBumperFingerLeft )
 			{
 				SetDlgItemText( IDC_IR_BUMPER_ARM_L_FINGER_L, "Finger" );
 				pTextBox->EnableWindow(1);// Enable
@@ -1785,7 +1786,7 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 
 			// Hardware Switch Bumpers
 			pTextBox = (CStatic*) GetDlgItem(IDC_STAT_BMPR_FRONT);
-			if( HW_BUMPER_HIT_FRONT )
+			if( g_pNavSensorSummary->BumperHitFront() )
 			{
 				SetDlgItemText( IDC_STAT_BMPR_FRONT, BmprHit );
 				pTextBox->EnableWindow(1);// Enable
@@ -1797,7 +1798,7 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 			}
 
 			pTextBox = (CStatic*) GetDlgItem(IDC_STAT_BMPR_REAR);
-			if( HW_BUMPER_HIT_REAR )
+			if( g_pFullSensorStatus->HWBumperRear )
 			{
 				SetDlgItemText( IDC_STAT_BMPR_REAR, BmprHit );
 				pTextBox->EnableWindow(1);// Enable
@@ -1809,7 +1810,7 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 			}
 
 			pTextBox = (CStatic*) GetDlgItem(IDC_STAT_BMPR_LEFT);
-			if( HW_BUMPER_HIT_SIDE_LEFT )
+			if( g_pFullSensorStatus->HWBumperSideLeft )
 			{
 				SetDlgItemText( IDC_STAT_BMPR_LEFT, BmprHit );
 				pTextBox->EnableWindow(1);// Enable
@@ -1821,7 +1822,7 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 			}
 
 			pTextBox = (CStatic*) GetDlgItem(IDC_STAT_BMPR_RIGHT);
-			if( HW_BUMPER_HIT_SIDE_RIGHT )
+			if( g_pFullSensorStatus->HWBumperSideRight )
 			{
 				SetDlgItemText( IDC_STAT_BMPR_RIGHT, BmprHit );
 				pTextBox->EnableWindow(1);// Enable
@@ -1837,10 +1838,10 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 			
 			// Range Sensors in Head
 			// Compensate for fact that Head sensors are set back from front of robot
-			strText.Format( _T("%u"), (g_SensorStatus.IR[2] - HEAD_IR_OFFSET_FROM_FRONT_TENTH_INCHES) / 10 );	// Right Long Range IR in Head
+			strText.Format( _T("%u"), (g_pFullSensorStatus->IR[2] - HEAD_IR_OFFSET_FROM_FRONT_TENTH_INCHES) / 10 );	// Right Long Range IR in Head
 			SetDlgItemText( IDC_IR_HEAD_R, (LPCTSTR)strText );
 
-			strText.Format( _T("%u"), (g_SensorStatus.IR[3] - HEAD_IR_OFFSET_FROM_FRONT_TENTH_INCHES) /10 );	// Left Long Range IR in Head
+			strText.Format( _T("%u"), (g_pFullSensorStatus->IR[3] - HEAD_IR_OFFSET_FROM_FRONT_TENTH_INCHES) /10 );	// Left Long Range IR in Head
 			SetDlgItemText( IDC_IR_HEAD_L, (LPCTSTR)strText );
 
 
@@ -1863,22 +1864,22 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 		///////////////////////////////////////////////////////////////////////////////
 
 		// Odometer
-		strText.Format( _T("%d"), (int)(g_SensorStatus.OdometerTenthInches / 10.0) );
+		strText.Format( _T("%d"), (int)(g_pFullSensorStatus->OdometerTenthInches / 10.0) );
 		SetDlgItemText( IDC_STAT_ODOMETER, (LPCTSTR)strText );
 
 
 //		#if MOTOR_CONTROL_TYPE != ER1_MOTOR_CONTROL
 			// Motor Tic Counts
-			strText.Format( _T("%d"), g_SensorStatus.Tachometer );
+			strText.Format( _T("%d"), g_pFullSensorStatus->Tachometer );
 			SetDlgItemText( IDC_STAT_TACH, (LPCTSTR)strText );
 //		#endif
 
 		// Display approx heading direction
 		// WARNING - THIS IS ACTUALLY DEGREES FROM WHERE KOBUKI WAS POINTING WHEN POWERED ON!
-		SetDlgItemText( IDC_COMPASS_DIR, _T( DegreesToCompassRoseString(g_SensorStatus.CompassHeading) ) );
+		SetDlgItemText( IDC_COMPASS_DIR, _T( DegreesToCompassRoseString(g_pFullSensorStatus->CompassHeading) ) );
 
 		// Show range to closest object
-		strText.Format( _T("%4.1f"), g_pSensorSummary->nFrontObjectDistance );
+		strText.Format( _T("%4.1f"), g_pNavSensorSummary->nFrontObjectDistance );
 		SetDlgItemText( IDC_STAT_NEAREST_OBJECT_DISTANCE, (LPCTSTR)strText );
 
 		// Show position of the Kinect sensor 
@@ -1893,24 +1894,19 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 		//Rear    = (gCompass + 180)%360;
 		//printf( "I2C: Fwd=%04lu R=%04lu L=%4lu, Rev=%4lu\r ", gCompass, Right90, Left90, Rear );  
 
-		if( g_SensorStatus.CompassHeading > 360 )
+		if( g_pFullSensorStatus->CompassHeading > 360 )
 		{
-			//TODO-CAR ROBOT_LOG( TRUE,   "ERROR!  Invalid Compass value: %d\n"), g_SensorStatus.CompassHeading );
+			//TODO-CAR ROBOT_LOG( TRUE,   "ERROR!  Invalid Compass value: %d\n"), g_pFullSensorStatus->CompassHeading );
 		}
-		if( g_SensorStatus.CompassError > 0 )
-		{
-			//TODO-CAR ROBOT_LOG( TRUE,   "WARNING:  Number of Compass Error reads: %d\n"), g_SensorStatus.CompassError );
-		}
-
 	
-		strText.Format( _T("%d"), g_SensorStatus.CompassHeading );
+		strText.Format( _T("%d"), g_pFullSensorStatus->CompassHeading );
 		SetDlgItemText( IDC_STAT_COMPASS, (LPCTSTR)strText );
 
-		strText.Format( _T("%d"), g_SensorStatus.CompassError );
-		SetDlgItemText( IDC_STAT_COMPASS_ERROR, (LPCTSTR)strText );
+		//strText.Format( _T("%d"), g_pFullSensorStatus->CompassError );
+		//SetDlgItemText( IDC_STAT_COMPASS_ERROR, (LPCTSTR)strText );
 
 		// Video Processing Frame Rate
-		//strText.Format( _T("%000.2f"), g_SensorStatus.VideoFPS );
+		//strText.Format( _T("%000.2f"), g_pFullSensorStatus->VideoFPS );
 		//SetDlgItemText( IDC_STAT_FPS, (LPCTSTR)strText );
 
 
@@ -1928,13 +1924,13 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 		#elif (ROBOT_TYPE == CARBOT) 
 		// Check status of the RC Kill Switch and Button2
 
-		if( (g_SensorStatus.StatusFlags & HW_STATUS_RC_BUTTON_PWR_ENABLE) )
+		if( (g_pFullSensorStatus->StatusFlags & HW_STATUS_RC_BUTTON_PWR_ENABLE) )
 			strText.Format( _T("ON") );
 		else
 			strText.Format( _T("OFF") );
 		SetDlgItemText( IDC_RC1_STATUS, (LPCTSTR)strText );
 
-		if( (g_SensorStatus.StatusFlags & HW_STATUS_RC_BUTTON_2) )
+		if( (g_pFullSensorStatus->StatusFlags & HW_STATUS_RC_BUTTON_2) )
 			strText.Format( _T("ON") );
 		else
 			strText.Format( _T("OFF") );
@@ -3392,32 +3388,32 @@ HBRUSH CRobotCmdView::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 		/*
 		case IDC_LEFT_WHEEL_DROP:
 		{	
-			if( !g_piRobotStatus->WheelDropLeft )
+			if( !g_pIRobotStatus->WheelDropLeft )
 				Status = SUBSYSTEM_CONNECTED;
 			break;
 		}
 		case IDC_RIGHT_WHEEL_DROP:
 		{	
-			if( !g_piRobotStatus->WheelDropRight )
+			if( !g_pIRobotStatus->WheelDropRight )
 				Status = SUBSYSTEM_CONNECTED;
 			break;
 		}
 		*/
 		case IDC_CASTER_DROP:
 		{	
-			if( !g_piRobotStatus->WheelDropCaster )
+			if( !g_pIRobotStatus->WheelDropCaster )
 				Status = SUBSYSTEM_CONNECTED;
 			break;
 		}
 		case IDC_STAT_BMPR_LEFT:
 		{	
-			if( !g_piRobotStatus->BumperLeft )
+			if( !g_pIRobotStatus->BumperLeft )
 				Status = SUBSYSTEM_CONNECTED;
 			break;
 		}
 		case IDC_STAT_BMPR_RIGHT:
 		{	
-			if( !g_piRobotStatus->BumperRight )
+			if( !g_pIRobotStatus->BumperRight )
 				Status = SUBSYSTEM_CONNECTED;
 			break;
 		}

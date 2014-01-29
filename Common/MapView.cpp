@@ -1057,8 +1057,8 @@ void CMapView::OnDraw(CDC* pDC)
 	int CrossSize = (int)(SIZE_OF_TARGET * m_MC_MapZoom);
 
 	// first, see if we have arrived at the target. If so, erase the target
-	if( (abs(m_RW_TargetPoint.x - g_SensorStatus.CurrentLocation.x) < 120) &&	// within 1 foot of target
-		(abs(m_RW_TargetPoint.y - g_SensorStatus.CurrentLocation.y) < 120) )
+	if( (abs(m_RW_TargetPoint.x - g_pFullSensorStatus->CurrentLocation.x) < 120) &&	// within 1 foot of target
+		(abs(m_RW_TargetPoint.y - g_pFullSensorStatus->CurrentLocation.y) < 120) )
 	{
 		// Close enough, erase the target
 		m_RW_TargetPoint.x = 0;
@@ -1081,13 +1081,13 @@ void CMapView::OnDraw(CDC* pDC)
 	/////////////////////////////////////////////////////////////////////////////
 	// Draw the curent position of the Robot, as indicated by ER1 Stepper Motors (differential drive)
 	/*** DOES NOT WORK RIGHT NOW
-	if(	(0 != g_SensorStatus.CurrentLocationMotor.x) &&	(0 != g_SensorStatus.CurrentLocationMotor.y) )
+	if(	(0 != g_pFullSensorStatus->CurrentLocationMotor.x) &&	(0 != g_pFullSensorStatus->CurrentLocationMotor.y) )
 	{
 		// Check the Robot is within current Map.  Expand Map if needed
-		UpdateBoundry( g_SensorStatus.CurrentLocationMotor );
+		UpdateBoundry( g_pFullSensorStatus->CurrentLocationMotor );
 
 		// Translate from Real World to Map Coordinates, including inverting Y axis
-		MCRobot = TranslateRWtoMC( g_SensorStatus.CurrentLocationMotor );
+		MCRobot = TranslateRWtoMC( g_pFullSensorStatus->CurrentLocationMotor );
 
 		// Assumes GDI orientation, with Y=0 at the top
 		pDC->SelectObject( &penRobotER1MotorTrail );
@@ -1104,14 +1104,14 @@ void CMapView::OnDraw(CDC* pDC)
 			((-1 != gGPSOriginLat) || (-1 != gGPSOriginLong)) ) // Need anchor point
 		{
 			// Check the Robot is within current Map.  Expand Map if needed
-			UpdateBoundry( g_SensorStatus.CurrentLocationGPS );
+			UpdateBoundry( g_pFullSensorStatus->CurrentLocationGPS );
 
 			// DRAW GPS
 			// Translate from Real World to Map Coordinates, including inverting Y axis
-			if( !((0 == g_SensorStatus.CurrentLocationGPS.x) && (0 == g_SensorStatus.CurrentLocationGPS.y)) )
+			if( !((0 == g_pFullSensorStatus->CurrentLocationGPS.x) && (0 == g_pFullSensorStatus->CurrentLocationGPS.y)) )
 			{
 				// Only draw if GPS connected
-				POINT rwCurrentLocationGPS = { (LONG)(g_SensorStatus.CurrentLocationGPS.x), (LONG)(g_SensorStatus.CurrentLocationGPS.y) };
+				POINT rwCurrentLocationGPS = { (LONG)(g_pFullSensorStatus->CurrentLocationGPS.x), (LONG)(g_pFullSensorStatus->CurrentLocationGPS.y) };
 				MCRobot = TranslateRWtoMC( rwCurrentLocationGPS );
 				// Assumes GDI orientation, with Y=0 at the top
 				pDC->SelectObject( &penRobotIcon );
@@ -1123,16 +1123,16 @@ void CMapView::OnDraw(CDC* pDC)
 
 	/////////////////////////////////////////////////////////////////////////////
 	// Draw the curent position of the Robot, as indicated by Compass and Odometer
-	if(	(0 != g_SensorStatus.CurrentLocation.x) &&	(0 != g_SensorStatus.CurrentLocation.y) )
+	if(	(0 != g_pFullSensorStatus->CurrentLocation.x) &&	(0 != g_pFullSensorStatus->CurrentLocation.y) )
 	{
 		// Check the Robot is within current Map.  Expand Map if needed
-		UpdateBoundry( g_SensorStatus.CurrentLocation );
+		UpdateBoundry( g_pFullSensorStatus->CurrentLocation );
 
 		// Translate from Real World to Map Coordinates, including inverting Y axis
-		//RWRobot = g_SensorStatus.CurrentLocation;
+		//RWRobot = g_pFullSensorStatus->CurrentLocation;
 
-		RWRobot.x = (LONG)(g_SensorStatus.CurrentLocation.x);
-		RWRobot.y = (LONG)(g_SensorStatus.CurrentLocation.y);
+		RWRobot.x = (LONG)(g_pFullSensorStatus->CurrentLocation.x);
+		RWRobot.y = (LONG)(g_pFullSensorStatus->CurrentLocation.y);
 
 
 		MCRobot = TranslateRWtoMC( RWRobot );
@@ -1149,11 +1149,11 @@ void CMapView::OnDraw(CDC* pDC)
 		pDC->Ellipse( (MCRobot.x - Radius), (MCRobot.y + Radius), MCRobot.x + Radius, MCRobot.y - Radius);
 
 		// Draw direction indicator
-		if( g_SensorStatus.CompassHeading <= 360 )
+		if( g_pFullSensorStatus->CompassHeading <= 360 )
 		{
 			// Convert Degrees to Radians then do the math
 			//double TwoPi = 2.0 * 3.141592;
-			double DirectionRadians = (double)g_SensorStatus.CompassHeading * DEGREES_TO_RADIANS;
+			double DirectionRadians = (double)g_pFullSensorStatus->CompassHeading * DEGREES_TO_RADIANS;
 			dX = HEADING_LINE_LEN * m_MC_MapZoom * sin( DirectionRadians );	// Returns negative numbers as needed
 			dY = HEADING_LINE_LEN * m_MC_MapZoom * cos( DirectionRadians );
 			
@@ -1179,9 +1179,9 @@ void CMapView::OnDraw(CDC* pDC)
 		pDC->SelectObject( &penIRSensor );	// IR Sensors
 		for( SensorNumber = 0; SensorNumber < NUM_IR_SENSORS; SensorNumber++ )
 		{
-			if( g_SensorStatus.IR[SensorNumber] < NO_OBJECT_IN_RANGE )	// Don't paint out of range sensor values
+			if( g_pFullSensorStatus->IR[SensorNumber] < NO_OBJECT_IN_RANGE )	// Don't paint out of range sensor values
 			{
-				PaintSensor( pDC, RWRobot, g_SensorStatus.CompassHeading, SensorOffsetDegrees_IR[SensorNumber], SENSOR_HALF_FOV_DEGREES_IR, g_SensorStatus.IR[SensorNumber] );
+				PaintSensor( pDC, RWRobot, g_pFullSensorStatus->CompassHeading, SensorOffsetDegrees_IR[SensorNumber], SENSOR_HALF_FOV_DEGREES_IR, g_pFullSensorStatus->IR[SensorNumber] );
 			}
 		}
 
@@ -1189,9 +1189,9 @@ void CMapView::OnDraw(CDC* pDC)
 		pDC->SelectObject( &penUSSensor );	// Ultrasonic Sensors
 		for( SensorNumber = 0; SensorNumber < NUM_US_SENSORS; SensorNumber++ )
 		{
-			if( g_SensorStatus.US[SensorNumber] < NO_OBJECT_IN_RANGE )	// Don't paint out of range sensor values
+			if( g_pFullSensorStatus->US[SensorNumber] < NO_OBJECT_IN_RANGE )	// Don't paint out of range sensor values
 			{
-				PaintSensor( pDC, RWRobot, g_SensorStatus.CompassHeading, SensorOffsetDegrees_US[SensorNumber], SENSOR_HALF_FOV_DEGREES_US, g_SensorStatus.US[SensorNumber] );
+				PaintSensor( pDC, RWRobot, g_pFullSensorStatus->CompassHeading, SensorOffsetDegrees_US[SensorNumber], SENSOR_HALF_FOV_DEGREES_US, g_pFullSensorStatus->US[SensorNumber] );
 			}
 		}
 
@@ -1286,10 +1286,10 @@ void CMapView::OnLButtonDown(UINT nFlags, CPoint point)
 		// Good for fixing the robot when it is confused! :-)
 		SendCommand( WM_ROBOT_SET_CURRENT_LOCATION, RWPoint.x, RWPoint.y);
 		// Force the global value to be updated immediately
-		g_SensorStatus.CurrentLocation.x = RWPoint.x;	// Get new Map absolute X,Y
-		g_SensorStatus.CurrentLocation.y = RWPoint.y;
-		g_SensorStatus.CurrentLocationMotor.x = RWPoint.x;	// Get new Map absolute X,Y
-		g_SensorStatus.CurrentLocationMotor.y = RWPoint.y;
+		g_pFullSensorStatus->CurrentLocation.x = RWPoint.x;	// Get new Map absolute X,Y
+		g_pFullSensorStatus->CurrentLocation.y = RWPoint.y;
+		g_pFullSensorStatus->CurrentLocationMotor.x = RWPoint.x;	// Get new Map absolute X,Y
+		g_pFullSensorStatus->CurrentLocationMotor.y = RWPoint.y;
 
 
 	}
@@ -1670,7 +1670,7 @@ void CMapView::OnUpdate(CView* pSender, LPARAM lHint, CObject* pHint)
 			if( UPDATE_GPS_POINT == lHint )
 			{
 				// Request to update most recent GPS location
-				POINT MCRobot = TranslateRWtoMC( g_SensorStatus.CurrentLocationGPS );
+				POINT MCRobot = TranslateRWtoMC( g_pFullSensorStatus->CurrentLocationGPS );
 				CRect rectInvalid(
 					(MCRobot.x-200),		// Left
 					(MCRobot.y+200),		// Top
@@ -1683,7 +1683,7 @@ void CMapView::OnUpdate(CView* pSender, LPARAM lHint, CObject* pHint)
 			else if( UPDATE_TICK_POINT == lHint )
 			{
 				// Request to update most recent location, including sensor readings!
-				POINT MCRobot = TranslateRWtoMC( g_SensorStatus.CurrentLocation );
+				POINT MCRobot = TranslateRWtoMC( g_pFullSensorStatus->CurrentLocation );
 				CRect rectInvalid(
 					(int)(MCRobot.x-(400.0*m_MC_MapZoom)),		// Left	(20in if just robot, 60 to include sensor readings)
 					(int)(MCRobot.y+(400.0*m_MC_MapZoom)),		// Top
@@ -1864,7 +1864,7 @@ LRESULT CMapView::OnMapDisplayBulkItem(WPARAM Item, LPARAM lParam)
 
 	
 		// Values are stored in Real World coordinates
-		POINT RWRobot = { (int)g_SensorStatus.CurrentLocation.x, (int)g_SensorStatus.CurrentLocation.y };
+		POINT RWRobot = { (int)g_pFullSensorStatus->CurrentLocation.x, (int)g_pFullSensorStatus->CurrentLocation.y };
 
 		if( (RWRobot.x != m_LastRobotPos.x) ||		// Don't store repeated identical values
 			(RWRobot.y != m_LastRobotPos.y) ||
@@ -1879,14 +1879,14 @@ LRESULT CMapView::OnMapDisplayBulkItem(WPARAM Item, LPARAM lParam)
 			// Save sensor reading into Map database
 			// Sensor reading are based upon current heading and position of the robot
 			// NOTE! Robot only records sensor values ONCE if not moving!
-			if( g_SensorStatus.CompassHeading <= 360 )
+			if( g_pFullSensorStatus->CompassHeading <= 360 )
 			{
 				// Sensors only make sense if we know what direction we are heading!
-				// The sensor info itself is in the global g_SensorStatus
+				// The sensor info itself is in the global g_pFullSensorStatus
 //				ROBOT_LOG( TRUE,  "MAP DEBUG - Adding Sensor Data!\n" );
 				pDoc->AddSensorData(
 					RWRobot,			// Location
-					g_SensorStatus.CompassHeading );	// Heading
+					g_pFullSensorStatus->CompassHeading );	// Heading
 
 				nDebugSensor++;
 //				ROBOT_LOG( TRUE,  "MAP DEBUG - Added %d Sensor Data items to DOC!\n", nDebugSensor);
@@ -1894,7 +1894,7 @@ LRESULT CMapView::OnMapDisplayBulkItem(WPARAM Item, LPARAM lParam)
 			}
 			else
 			{
-				ROBOT_LOG( TRUE,  "MAP DOC ERROR!  - g_SensorStatus.CompassHeading > 360!!!\n" );
+				ROBOT_LOG( TRUE,  "MAP DOC ERROR!  - g_pFullSensorStatus->CompassHeading > 360!!!\n" );
 			}
 
 			pDoc->UpdateAllViews(NULL, UPDATE_TICK_POINT, this);	// TODO: should this be CurrentGPSPoint????
@@ -1904,7 +1904,7 @@ LRESULT CMapView::OnMapDisplayBulkItem(WPARAM Item, LPARAM lParam)
 	}
 	else if( ROBOT_RESPONSE_GPS_DATA  == Item )
 	{
-		// Handle GPS data.  Note that g_SensorStatus.CurrentLocationGPS has already been updated
+		// Handle GPS data.  Note that g_pFullSensorStatus->CurrentLocationGPS has already been updated
 		// by Module to indicate the Real World location for other modules (not used by
 		// this function)
 

@@ -182,9 +182,6 @@
     <ClInclude Include="..\Common\WiiMoteCommon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RobotType.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\Common\DrawDevice.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -227,6 +224,9 @@
     <ClInclude Include="..\Common\CameraCommon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\Common\HWInterfaceTeleop.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -263,9 +263,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\HeadControl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Common\HWInterface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\KerrControl.cpp">
@@ -377,10 +374,22 @@
     <ClCompile Include="..\Common\SetupView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Common\MotorControlKobuki.cpp">
+    <ClCompile Include="..\Common\DriveBehaviorModule.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Common\DriveBehaviorModule.cpp">
+    <ClCompile Include="..\Common\HWInterfaceArduino.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\HWInterfaceKobuki.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\HWInterfaceOther.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\SensorModuleTeleop.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\SensorModuleTurtle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

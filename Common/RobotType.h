@@ -53,6 +53,11 @@
 #define SERVO_CONFIG_CARBOT				1
 #define SERVO_CONFIG_TURTLE				2
 
+// Hardware Sensor and Control Interface Types (sensors, lights, etc.)
+#define HW_INTERFACE_ARDUINO		0
+#define HW_INTERFACE_KOBUKI			1
+#define HW_INTERFACE_PIC			2
+
 // Sensor Configuraitons (varies by robot)
 #define SENSOR_CONFIG_LOKI				0
 #define SENSOR_CONFIG_CARBOT			1
@@ -60,7 +65,7 @@
 #define SENSOR_CONFIG_TELEOP			3
 
 #if ROBOT_TYPE == LOKI
-	#define HW_INTERFACE_TYPE			PIC_INTERFACE_BOARD
+	#define HW_INTERFACE_TYPE			HW_INTERFACE_ARDUINO
 	#define MOTOR_CONTROL_TYPE			POLOLU_TREX_MOTOR_CONTROL // ARDUINO_MOTOR_CONTROL
 	#define CAMERA_CONTROL_TYPE			DYNA_SERVO_CONTROL
 	#define SERVO_CONTROL_TYPE			PIC_SERVO_CONTROL
@@ -70,9 +75,8 @@
 	#define ROBOT_COMMON_PATH L"C:\\Dev\\Robots\\Common"
 	#define DYNA_SERVO_RX64_INSTALLED	0 // Set to 0 if no RX64 servos used
 
-
 #elif ROBOT_TYPE == CARBOT
-	#define PIC_CODE_VERSION			22
+	#define HW_INTERFACE_TYPE			HW_INTERFACE_PIC
 	#define MOTOR_CONTROL_TYPE			EXTERN_SERVO_CONTROL
 	#define SERVO_CONTROL_TYPE			EXTERN_SERVO_CONTROL
 	#define CAMERA_CONTROL_TYPE			EXTERN_SERVO_CONTROL
@@ -83,7 +87,7 @@
 
 
 #elif ROBOT_TYPE == TURTLE
-	#define PIC_CODE_VERSION			0	// No PIC used
+	#define HW_INTERFACE_TYPE			HW_INTERFACE_KOBUKI		// <============= Change this depending upon Base used!
 	#define MOTOR_CONTROL_TYPE			KOBUKI_MOTOR_CONTROL	// <============= Change this depending upon Base used!
 //	#define MOTOR_CONTROL_TYPE			IROBOT_MOTOR_CONTROL	// <============= Change this depending upon Base used!
 	#define CAMERA_CONTROL_TYPE			DYNA_SERVO_CONTROL

@@ -251,7 +251,7 @@ int					g_nMotorStatusTimer = 0;
 DWORD				g_dwMotorCommThreadId = 0;					// Comm Thread for sending to ER1 or Pololu TReX Motor Controller
 
 // For iRobot Create Base
-IROBOT_STATUS_T*	g_piRobotStatus = NULL;						// Status data updated every 15ms
+IROBOT_STATUS_T*	g_pIRobotStatus = NULL;						// Status data updated every 15ms
 
 // For Kobuki Base
 KOBUKI_STATUS_T*	g_pKobukiStatus  = NULL;			// Status data updated frequently
@@ -387,10 +387,10 @@ BOOL				g_CurrentlySpeaking;	// Indicate to other threads if robot is talking
 BOOL				g_PhraseDoneTokenProcessed; // Threads can queue a token, so they know when speaking has reached a certain point
 
 
+ARDUINO_STATUS_T	g_RawArduinoStatus;				// Initialized in ?
 
 BOOL				g_IRDA_Socket = FALSE;
-ARDUINO_STATUS_T	g_RawArduinoStatus;				// Initialized in ?
-SENSOR_STATUS_T		g_SensorStatus;			// Initialized in ?		// Current status of all sensors
+FullSensorStatus*	g_pFullSensorStatus;			// Initialized in ?		// Current status of all sensors
 HANDLE				g_hCameraCommThread = INVALID_HANDLE_VALUE;
 BOOL				g_DownloadingFirmware = FALSE;
 BOOL				g_PicFirstStatusReceived = FALSE;
@@ -432,7 +432,7 @@ CGridMap*			g_pGridMap;				// Initialized in ?
 // GPS Structure
 GPS_MESSAGE_T*		g_pGPSData;				// Initialized in ? 
 
-SENSOR_SUMMARY_T*	g_pSensorSummary;		// created in Robot.cpp and initialized in DoSensorFusion().  Values in TENTH INCHES!
+NavSensorSummary*	g_pNavSensorSummary;	// created in Robot.cpp and initialized in DoSensorFusion().  Values in TENTH INCHES!
 SCANNER_SUMMARY_T*	g_pLaserSummary;		// created in Robot.cpp and initialized in DoSensorFusion()
 SCANNER_SUMMARY_T*	g_pKinectSummary;		// created in Robot.cpp and initialized in DoSensorFusion()
 
@@ -2525,35 +2525,202 @@ void InitScannerSummaryData( SCANNER_SUMMARY_T* Summary )
 }
 
 /////////////////////////////////////////////////////////////////////////////
-void InitSensorSummaryData( SENSOR_SUMMARY_T* Summary )
+// NavSensorSummary
+// Processed and summarized sensor data
+
+NavSensorSummary::NavSensorSummary()
 {
-	Summary->nFrontObjectDistance =			NO_OBJECT_IN_RANGE;	// Any object in front of and within width of robot, including Arms
-	Summary->nFrontObjectDirection =		NO_OBJECT_IN_RANGE;	// Right or Left of center.  Negative = Left
-	Summary->nSideObjectDistance =			NO_OBJECT_IN_RANGE;	// Closest object on either side
-	Summary->nSideObjectDirection =			NO_OBJECT_IN_RANGE;	// Which side has the closest object
-	Summary->nRearObjectDistance =			NO_OBJECT_IN_RANGE;	// Closest object in the rear
-	Summary->nRearObjectDirection =			NO_OBJECT_IN_RANGE;	// Which side has the closest object
-	Summary->nClosestObjectFrontLeft =		NO_OBJECT_IN_RANGE;
-	Summary->nClosestObjectFrontRight =		NO_OBJECT_IN_RANGE;
-	Summary->nLeftRearZone =				NO_OBJECT_IN_RANGE;
-	Summary->bLeftCliff =						FALSE;
-	Summary->nObjectClawLeft =				NO_OBJECT_IN_RANGE;
-	Summary->nObjectArmLeft =				NO_OBJECT_IN_RANGE;		// compensated for distance in front of robot - REMOVE
-	Summary->nLeftSideZone =				NO_OBJECT_IN_RANGE;	
-	Summary->nLeftFrontSideZone =			NO_OBJECT_IN_RANGE;	
-	Summary->nLeftArmZone =					NO_OBJECT_IN_RANGE;
-	Summary->nLeftFrontZone =				NO_OBJECT_IN_RANGE;		
-	Summary->MotionDetectedDirection =		NO_OBJECT_IN_RANGE; ////// Robot Center
-	Summary->nRightFrontZone =				NO_OBJECT_IN_RANGE;
-	Summary->nRightArmZone =				NO_OBJECT_IN_RANGE;	
-	Summary->nRightFrontSideZone =			NO_OBJECT_IN_RANGE;	
-	Summary->nRightSideZone =				NO_OBJECT_IN_RANGE;	
-	Summary->nObjectArmRight =				NO_OBJECT_IN_RANGE;	// compensated for distance in front of robot - REMOVE
-	Summary->nObjectClawRight =				NO_OBJECT_IN_RANGE;
-	Summary->bRightCliff =						FALSE;
-	Summary->nRightRearZone =				NO_OBJECT_IN_RANGE;
+	InitializeDefaults();
+}
+
+bool NavSensorSummary::CliffDetected()
+{
+	if( bCliffLeft || bCliffFront || bCliffRight || bWheelDropLeft || bWheelDropRight )
+	{
+		return true;
+	}
+	return false;
+}
+
+bool NavSensorSummary::CliffFront()
+{
+	if( bCliffFront || (bCliffLeft &&  bCliffRight) )
+	{
+		return true;
+	}
+	return false;
+}
+
+bool NavSensorSummary::BumperHitFront()
+{
+	if( bHWBumperFront )
+	{
+		return true;
+	}
+	return false;
+}
+
+
+void NavSensorSummary::InitializeDefaults()
+{
+	// Note, if sensor not installed, override with SENSOR_DISABLED after calling this function!
+	// summary
+	nFrontObjectDistance =			NO_OBJECT_IN_RANGE;	// Any object in front of and within width of robot, including Arms
+	nFrontObjectDirection =			NO_OBJECT_IN_RANGE;	// Right or Left of center.  Negative = Left
+	nSideObjectDistance =			NO_OBJECT_IN_RANGE;
+	nSideObjectDirection =			NO_OBJECT_IN_RANGE;
+	nRearObjectDistance =			NO_OBJECT_IN_RANGE;	
+	nRearObjectDirection =			NO_OBJECT_IN_RANGE;	
+	nClosestObjectFrontLeft =		NO_OBJECT_IN_RANGE;
+	nClosestObjectFrontRight =		NO_OBJECT_IN_RANGE;
+
+	bCliffLeft =					false;
+	bCliffFront =					false;
+	bCliffRight =					false;
+	bWheelDropLeft =				false;
+	bWheelDropRight =				false;
+	bHWBumperFront =				false;
+
+	// zones
+	nLeftRearZone =					NO_OBJECT_IN_RANGE;
+	nObjectClawLeft =				NO_OBJECT_IN_RANGE;
+	nObjectArmLeft =				NO_OBJECT_IN_RANGE;		// compensated for distance in front of robot - REMOVE
+	nLeftSideZone =					NO_OBJECT_IN_RANGE;	
+	nLeftFrontSideZone =			NO_OBJECT_IN_RANGE;	
+	nLeftArmZone =					NO_OBJECT_IN_RANGE;
+	nLeftFrontZone =				NO_OBJECT_IN_RANGE;
+
+	MotionDetectedDirection =		MOTION_DETECTED_NONE; ////// Robot Center
+
+	nRightFrontZone =				NO_OBJECT_IN_RANGE;
+	nRightArmZone =					NO_OBJECT_IN_RANGE;	
+	nRightFrontSideZone =			NO_OBJECT_IN_RANGE;	
+	nRightSideZone =				NO_OBJECT_IN_RANGE;	
+	nObjectArmRight =				NO_OBJECT_IN_RANGE;	// compensated for distance in front of robot - REMOVE
+	nObjectClawRight =				NO_OBJECT_IN_RANGE;
+	nRightRearZone =				NO_OBJECT_IN_RANGE;
 
 }
+
+/////////////////////////////////////////////////////////////////////////////
+// NavSensorSummary
+// Processed and summarized sensor data
+FullSensorStatus::FullSensorStatus()
+{
+	InitializeDefaults();
+}
+
+
+void FullSensorStatus::InitializeDefaults()
+{
+	// Note, if sensor not installed, override with SENSOR_DISABLED after calling this function!
+
+
+	// Basic Data
+	StatusFlags =				0;			// Typically From Arduino
+	LastError =					0;			// Typically From Arduino
+	DebugCode =					0;			// Typically From Arduino
+	Battery0 =					0;			// Typically From Arduino
+	Battery1 =					0;			// Typically From Arduino
+
+	// Cliff and Wheel drops
+	CliffFront =				false;
+	CliffRight =				false;
+	CliffLeft =					false;
+	WheelDropRight =			false;
+	WheelDropLeft =				false;
+
+	// TODO remove this?
+	//Cliff=						0;
+	//WheelDrop=					0;
+
+
+	// Hardware Bumpers, IR range switches, and pressure sensors
+	//	int 	HWBumper;					// Typically From Arduino
+	//	int 	IRBumper;					// Typically From Arduino
+	//	int 	IRBumper2;					// Calculated from Vertical IR detector range
+	HWBumperFront =				false;
+	HWBumperRear =				false;
+	HWBumperSideLeft =			false;
+	HWBumperSideRight =			false;
+
+	IRBumperFrontLeft =			false;
+	IRBumperFrontRight =		false;
+	IRBumperRearLeft =			false;
+	IRBumperRearRight =			false;
+	IRBumperSideLeft =			false;
+	IRBumperSideRight =			false;
+
+	ArmRightBumperElbow =		false;
+	ArmLeftBumperElbow =		false;
+	ArmLeftBumperFingerLeft =	false;
+	ArmLeftBumperFingerRight =	false;
+	ArmLeftBumperInsideClaw =	false;
+
+	// TODO - remove this?
+	//ArmBumperL =				0;			// Typically From Arduino
+	//ArmBumperR =				0;			// Typically From Arduino
+
+	LeftHandRawPressureL =		0;			// Pressure values are only useable if CalibratePressureSensors 
+	LeftHandRawPressureR =		0;			// is called before each use.  Use GetPressureLoadPercent to get final value
+
+	// Heading and Odometry
+	CompassHeading =			0;			// Typically From Arduino
+	//CompassError =				0;			// Typically From Arduino
+	OdometerTenthInches =		0.0;		// Typically From Arduino or ER1 Pilot
+	OdometerUpdateTenthInches =	0.0;		// Calculated from Arduino or ER1 data
+	Tachometer =				0;			// Typically From Arduino or ER1 Pilot
+	TachometerTicksL =			0;			// Typically From Arduino, provided feedback for Motor Speed Control
+	TachometerTicksR =			0;			// Typically From Arduino, provided feedback for Motor Speed Control
+//	TurnAngleUpdate =			0.0;		// Calculated from ER1 motor positions
+	DistanceToWaypoint =		0.0;		// Calculated
+	CalculatedMotorHeading =	0.0;		// Calculated from motor movements (ER1)
+	CurrentLocation.x =			0.0;		// Calculated from compass and odometer
+	CurrentLocation.y =			0.0;		// Calculated from compass and odometer
+	CurrentLocationMotor.x =	0.0;		// Calculated from motor movements (ER1)
+	CurrentLocationMotor.y =	0.0;		// Calculated from motor movements (ER1)
+	CurrentLocationGPS.x =		0.0;		// Current location of robot as indicated by GPS
+	CurrentLocationGPS.y =		0.0;		// Current location of robot as indicated by GPS
+
+	// Kobuki Dock 
+	DockSensorRight =			0;				
+	DockSensorCenter =			0;			// IR sensors for the Kobuki Dock
+	DockSensorLeft =			0;	
+
+	// From Android Phone
+	AndroidConnected =			false;
+	AndroidAccEnabled =			false;
+	AndroidCommand =			0;			// Commands received from Android phone over Bluetooth
+	AndroidCompass =			0;			// X,Y,Z data received from Android phone over Bluetooth
+	AndroidRoll =				0;	
+	AndroidPitch =				0;	
+
+	// Other Sensors and state
+	PIRMotionLeft =				false;
+	PIRMotionRight =			false;
+	ThermalPosition =			0;			// TPS - Position of thermal object detected.  Negative = left of center
+	TiltAccelX =				0;			// Typically From Arduino.  zero = level
+	TiltAccelY =				0;	 		// Typically From Arduino.  zero = level
+//	VideoFPS;								// How quickly video frames are processed
+	AuxLightsOn =				false;		// Track if the Aux lights are on or off
+
+
+	// Analog Sensors,  Typically From Arduino
+	for( int i=0; i < NUM_US_SENSORS; i++ ) 
+		US[i] = NO_OBJECT_IN_RANGE;
+
+	for( int i=0; i < NUM_IR3_SENSORS; i++ ) 
+		IR3[i] = NO_OBJECT_IN_RANGE;
+
+	for( int i=0; i < NUM_IR_SENSORS; i++ ) 
+		IR[i] = NO_OBJECT_IN_RANGE;
+
+	for( int i=0; i < 9; i++ )							// TPS Thermal sensor - 9 elements
+		ThermalArray[i] = NO_OBJECT_IN_RANGE;
+
+}
+
+
 
 /////////////////////////////////////////////////////////////////////////////
 // Do a sleep, but track when sleeping in Intel Platform Analyzer

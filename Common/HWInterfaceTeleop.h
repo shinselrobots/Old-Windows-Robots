@@ -10,7 +10,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Teleop Sensor Configuration:
 
-	#define NUMBER_OF_WHEEL_ODOMETERS							  2		// LOKI has a Right and Left Odometer
+	#define NUMBER_OF_WHEEL_ODOMETERS							  2		// has a Right and Left Odometer
 
 	// WARNING! If you change these, you must update SensorOffsetDegrees in Globals.cpp!
 	#define NUM_IR_SENSORS										  6	// 2 head mounted LR, 2 front facing LR, 2 side mounted SR
@@ -31,6 +31,8 @@
 
 
 	////////////////////////////////////////////////////////////////
+	// ALSO USED FOR SIMULATION - TODO - FIX THIS
+	//
 	#ifndef __ARDUINO_TARGET	// Arduino Compiler does not understand pack
 	#pragma pack( 1 )
 	#endif
@@ -62,11 +64,17 @@
 	#pragma pack( 4 )
 	#endif
 
+
+
+	/*
 // I2C-IT Sensors
 #define ARM_L_IR_SENSOR_CLAW		g_SensorStatus.IR3[0]
 #define ARM_L_IR_SENSOR_ELBOW		g_SensorStatus.IR3[1]
 #define ARM_R_IR_SENSOR_CLAW		g_SensorStatus.IR3[2]
 #define ARM_R_IR_SENSOR_ELBOW		g_SensorStatus.IR3[3]
+	*/
+
+/*
 
 // HW Bumpers.  Arduino uses: gStatus_HW_Bumper
 #define HW_BUMPER_FRONT_MASK				0x01	// Bit 0 mask
@@ -112,8 +120,9 @@
 #define ARM_R_HW_BUMPER_ELBOW_MASK			0x20	// Bit 5 mask	- HW Bumper switch on Elbow!
 //#define ARM_R_IR_BUMPER_FINGER_L_MASK		0x40	// Bit 6 mask
 //#define ARM_R_IR_BUMPER_FINGER_R_MASK		0x80	// Bit 7 mask
+*/
 
-
+/*
 // Bumper Macros
 #define IR_BUMPER_RANGE						 100	// Tenth_Inches - detection distance for IR bumpers
 #define IR_BUMPER_OBJECT_FRONT_LEFT			(  g_SensorStatus.IRBumper & IR_BUMPER_FRONT_LEFT_MASK   )
@@ -153,7 +162,9 @@
 #define ARM_L_IR_BUMPER_FINGER_L_MASK		0x40	// Bit 6 mask
 #define ARM_L_IR_BUMPER_FINGER_R_MASK		0x80	// Bit 7 mask
 
+*/
 
+/*
 ////////////////////////////////////////////////////////////////
 // Packet Structure for Comands to Arduino
 #ifndef __ARDUINO_TARGET	// Arduino Compiler does not understand pack
@@ -181,7 +192,7 @@ typedef struct
 #define SIO_SYNC_1							0x5F
 #define CMD_TERM_CHAR						0xC4	// Serial Command termination character (use for check)
 #define SERIAL_CMD_SIZE 					   8	// Fixed length of a command from the Host to the Arduino
-
+*/
 
 
 #endif	//__ROBOT_HW_INTERFACE_TELEOP_H__

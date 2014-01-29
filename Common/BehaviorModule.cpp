@@ -674,7 +674,7 @@ void CBehaviorModule::ProcessMessage(
 			else
 			{
 				ROBOT_LOG( TRUE,"LOOK_AT_SOUND_CMD: FOUND PLAYER %2d at ANGLE: X=%3d Y=%3d, :\n", PlayerFound, PanAngleTenthDegrees/10, TiltAngleTenthDegrees/10 )
-				g_LastHumanCompassDirection = g_SensorStatus.CompassHeading + (PanAngleTenthDegrees/10);
+				g_LastHumanCompassDirection = g_pFullSensorStatus->CompassHeading + (PanAngleTenthDegrees/10);
 				if( g_LastHumanCompassDirection > 360 ) g_LastHumanCompassDirection -= 360;
 				else if( g_LastHumanCompassDirection < 0 ) g_LastHumanCompassDirection += 360;
 			}
@@ -1729,7 +1729,7 @@ void CBehaviorModule::TaskGetLightSaber()
 			case 2: // Wait for Claw sensor to detect something
 					// (will usually note person's hand as they provide the object)
 			{
-				if( g_pSensorSummary->nObjectClawRight < CLAW_DETECT_TRIGGER_DISTANCE_TENTH_INCHES  )	// 
+				if( g_pNavSensorSummary->nObjectClawRight < CLAW_DETECT_TRIGGER_DISTANCE_TENTH_INCHES  )	// 
 				{
 					// Object detected.  Close claw.
 					ROBOT_LOG( TRUE,"Hand Object detected. Closing Claw\n")
@@ -2548,14 +2548,14 @@ void CBehaviorModule::ActionTurnToCompassDir( int nCompassRose )
 			// Send command to turn
 			int DesiredCompassHeading = CompassRoseToDegrees( nCompassRose );
 			// calculate direction of turn.  Positive is right turn, Negative is Left turn
-			int TurnDegrees = CalculateTurn(g_SensorStatus.CompassHeading, DesiredCompassHeading);
+			int TurnDegrees = CalculateTurn(g_pFullSensorStatus->CompassHeading, DesiredCompassHeading);
 /*			if( TurnDegrees > 0 )
 			{
 				if( !m_pDriveCtrl->SetTurnRotation( BEHAVIOR_GOAL_MODULE, SPEED_STOP, TURN_RIGHT_MED_SLOW, TurnDegrees) )
 				{
 					error - fix this
 				}
-				ROBOT_LOG( TRUE, "Turning Right from %d to %d degrees", g_SensorStatus.CompassHeading, DesiredCompassHeading )
+				ROBOT_LOG( TRUE, "Turning Right from %d to %d degrees", g_pFullSensorStatus->CompassHeading, DesiredCompassHeading )
 			}
 			else
 			{
@@ -2563,7 +2563,7 @@ void CBehaviorModule::ActionTurnToCompassDir( int nCompassRose )
 				{
 					error - fix this
 				}
-				ROBOT_LOG( TRUE, "Turning Left from %d to %d degrees", g_SensorStatus.CompassHeading, DesiredCompassHeading )
+				ROBOT_LOG( TRUE, "Turning Left from %d to %d degrees", g_pFullSensorStatus->CompassHeading, DesiredCompassHeading )
 			}
 */
 			if( !m_pDriveCtrl->SetTurnToCompassDirection( BEHAVIOR_GOAL_MODULE, SPEED_STOP, TURN_RIGHT_MED_SLOW, DesiredCompassHeading, TRUE ) )
@@ -2969,7 +2969,7 @@ void CBehaviorModule::ActionFreakOut( ) //danger!
 			g_SpeechRecoBlocked = TRUE; // block speech reco while arms are moving (due to motor noise)
 
 			// Remember which way we are pointing now, so we can return to that position.
-			StartingDirection = g_SensorStatus.CompassHeading;
+			StartingDirection = g_pFullSensorStatus->CompassHeading;
 			// Send command to turn in a complete circle
 			if( !m_pDriveCtrl->SetTurnRotation( BEHAVIOR_GOAL_MODULE, SPEED_FWD_SLOW, TURN_LEFT_MED, 350, TRUE ) )
 			{
@@ -3886,10 +3886,10 @@ void CBehaviorModule::ActionPointToCompassDir( int nCompassRose )
 		{
 			// Send command to turn
 			// Remember which way we are pointing now, so we can return to that position.
-			StartingDirection = g_SensorStatus.CompassHeading;
+			StartingDirection = g_pFullSensorStatus->CompassHeading;
 			int DesiredCompassHeading = CompassRoseToDegrees( nCompassRose );
 			// calculate direction of turn.  Positive is right turn, Negative is Left turn
-			int TurnDegrees = CalculateTurn(g_SensorStatus.CompassHeading, DesiredCompassHeading);
+			int TurnDegrees = CalculateTurn(g_pFullSensorStatus->CompassHeading, DesiredCompassHeading);
 
 			// Note "TURN_" just sets speed.  Turn direction is determined by DriveCtrl.
 			if( !m_pDriveCtrl->SetTurnToCompassDirection( BEHAVIOR_GOAL_MODULE, SPEED_STOP, TURN_RIGHT_MED_SLOW, DesiredCompassHeading, TRUE ) )
@@ -4017,7 +4017,7 @@ enum DOCK_DIRECTION {
 void DisplayDockSensorStatus( )
 {
 #if DEBUG_DOCK == 1
-	int SensorValue = g_SensorStatus.DockSensorLeft;
+	int SensorValue = g_pFullSensorStatus->DockSensorLeft;
 	if( 0 != SensorValue )
 	{
 		TRACE("          LEFT SENSOR: ");
@@ -4029,7 +4029,7 @@ void DisplayDockSensorStatus( )
 			TRACE(" Right Zone ");
 		TRACE("\n");
 	}			
-	SensorValue = g_SensorStatus.DockSensorCenter;
+	SensorValue = g_pFullSensorStatus->DockSensorCenter;
 	if( 0 != SensorValue )
 	{
 		TRACE("          CENTER SENSOR: ");
@@ -4041,7 +4041,7 @@ void DisplayDockSensorStatus( )
 			TRACE(" Right Zone ");
 		TRACE("\n");
 	}			
-	SensorValue = g_SensorStatus.DockSensorRight;
+	SensorValue = g_pFullSensorStatus->DockSensorRight;
 	if( 0 != SensorValue )
 	{
 		TRACE("          RIGHT SENSOR: ");
@@ -4065,14 +4065,14 @@ int CBehaviorModule::StartTurnToFaceDock( )
 
 	ROBOT_LOG( DEBUG_DOCK,"Starting turn to face dock" )
 
-	if( (0 != g_SensorStatus.DockSensorCenter) )
+	if( (0 != g_pFullSensorStatus->DockSensorCenter) )
 	{
 		///////////////////////////////////////////////////////////////////
 		// Facing the dock already.  Drive to the dock
 		m_pDriveCtrl->SetSpeedAndTurn( BEHAVIOR_GOAL_MODULE, SPEED_FWD_SLOW, TURN_CENTER );
 		return DOCK_TASK_DRIVING_TO_DOCK;
 	}
-	else if( 0 != g_SensorStatus.DockSensorLeft )
+	else if( 0 != g_pFullSensorStatus->DockSensorLeft )
 	{
 		///////////////////////////////////////////////////////////////////
 		// Left sensor facing the Dock. Turn towards dock
@@ -4088,7 +4088,7 @@ int CBehaviorModule::StartTurnToFaceDock( )
 			return DOCK_TASK_LOOKING_FOR_DOCK_WITH_CENTER_SENSOR;
 		}
 	}
-	else if( 0 != g_SensorStatus.DockSensorRight )
+	else if( 0 != g_pFullSensorStatus->DockSensorRight )
 	{
 		///////////////////////////////////////////////////////////////////
 		// Right sensor facing the Dock. Turn towards dock
@@ -4143,7 +4143,7 @@ void CBehaviorModule::ActionFindDock( )
 	// Trap bumper or charging, as long as we are not in a "almost done" state.
 	if( (DOCK_TASK_BACKUP != m_CurrentTask) && (DOCK_TASK_DONE != m_CurrentTask )  && (DOCK_TASK_DELAY_CHECK_CHARGE_SOURCE != m_CurrentTask ) )
 	{
-		if( (0 != g_pKobukiStatus->BatteryChargeSourceEnum) ||  (0 != g_SensorStatus.HWBumper)  )
+		if( (0 != g_pKobukiStatus->BatteryChargeSourceEnum) ||  g_pNavSensorSummary->BumperHitFront()  )
 		{
 			// Bumper hit or Charging!  See if we have arrived!
 			if( !m_pDriveCtrl->RobotStopped() )
@@ -4193,8 +4193,8 @@ void CBehaviorModule::ActionFindDock( )
 
 			ROBOT_LOG( DEBUG_DOCK,"DOCK_TASK_START_LOOKING_FOR_DOCK" )
 
-			if( (KOBUKI_BASE_NEAR_CENTER & g_SensorStatus.DockSensorLeft) || (KOBUKI_BASE_NEAR_CENTER & g_SensorStatus.DockSensorCenter) || (KOBUKI_BASE_NEAR_CENTER & g_SensorStatus.DockSensorRight) ||
-				(KOBUKI_BASE_FAR_CENTER & g_SensorStatus.DockSensorLeft) || (KOBUKI_BASE_FAR_CENTER & g_SensorStatus.DockSensorCenter) || (KOBUKI_BASE_FAR_CENTER & g_SensorStatus.DockSensorRight) )
+			if( (KOBUKI_BASE_NEAR_CENTER & g_pFullSensorStatus->DockSensorLeft) || (KOBUKI_BASE_NEAR_CENTER & g_pFullSensorStatus->DockSensorCenter) || (KOBUKI_BASE_NEAR_CENTER & g_pFullSensorStatus->DockSensorRight) ||
+				(KOBUKI_BASE_FAR_CENTER & g_pFullSensorStatus->DockSensorLeft) || (KOBUKI_BASE_FAR_CENTER & g_pFullSensorStatus->DockSensorCenter) || (KOBUKI_BASE_FAR_CENTER & g_pFullSensorStatus->DockSensorRight) )
 			{
 				// In the center region. Turn towards dock
 				m_CurrentTask = StartTurnToFaceDock();
@@ -4222,20 +4222,20 @@ void CBehaviorModule::ActionFindDock( )
 			// See if we spotted the beacon
 
 			// DEBUG ONLY!!!
-			if( (0 != g_SensorStatus.DockSensorLeft) || (0 != g_SensorStatus.DockSensorCenter) || ( 0 != g_SensorStatus.DockSensorRight) )
+			if( (0 != g_pFullSensorStatus->DockSensorLeft) || (0 != g_pFullSensorStatus->DockSensorCenter) || ( 0 != g_pFullSensorStatus->DockSensorRight) )
 			{
 				ROBOT_LOG( DEBUG_DOCK,"Dock Detected" )
 			}
 
-			if( (KOBUKI_BASE_NEAR_CENTER & g_SensorStatus.DockSensorLeft) || (KOBUKI_BASE_NEAR_CENTER & g_SensorStatus.DockSensorCenter) || (KOBUKI_BASE_NEAR_CENTER & g_SensorStatus.DockSensorRight) ||
-				(KOBUKI_BASE_FAR_CENTER  & g_SensorStatus.DockSensorLeft) || (KOBUKI_BASE_FAR_CENTER  & g_SensorStatus.DockSensorCenter) || (KOBUKI_BASE_FAR_CENTER  & g_SensorStatus.DockSensorRight) )
+			if( (KOBUKI_BASE_NEAR_CENTER & g_pFullSensorStatus->DockSensorLeft) || (KOBUKI_BASE_NEAR_CENTER & g_pFullSensorStatus->DockSensorCenter) || (KOBUKI_BASE_NEAR_CENTER & g_pFullSensorStatus->DockSensorRight) ||
+				(KOBUKI_BASE_FAR_CENTER  & g_pFullSensorStatus->DockSensorLeft) || (KOBUKI_BASE_FAR_CENTER  & g_pFullSensorStatus->DockSensorCenter) || (KOBUKI_BASE_FAR_CENTER  & g_pFullSensorStatus->DockSensorRight) )
 			{
 				// In the center region. Turn to face dock
 				ROBOT_LOG( DEBUG_DOCK,"Dock Detected, and I am in the Center Zone!" )
 				m_CurrentTask = StartTurnToFaceDock();
 				break;
 			}
-			else if( (KOBUKI_BASE_NEAR_LEFT & g_SensorStatus.DockSensorLeft) || (KOBUKI_BASE_FAR_LEFT & g_SensorStatus.DockSensorLeft)  )
+			else if( (KOBUKI_BASE_NEAR_LEFT & g_pFullSensorStatus->DockSensorLeft) || (KOBUKI_BASE_FAR_LEFT & g_pFullSensorStatus->DockSensorLeft)  )
 			{
 				// In left zone, with left sensor facing the base.
 
@@ -4246,7 +4246,7 @@ void CBehaviorModule::ActionFindDock( )
 				m_pDriveCtrl->SetMoveDistance( BEHAVIOR_GOAL_MODULE, SPEED_FWD_SLOW, -2, SEEK_DOCK_CENTER_MAX_DISTANCE_TENTH_INCHES, STOP_AFTER ); // Curve slightly to keep sensor pointing at base
 				m_CurrentTask = DOCK_TASK_DRIVING_TO_CENTER_ZONE;
 			}
-			else if( (KOBUKI_BASE_NEAR_RIGHT & g_SensorStatus.DockSensorRight) || (KOBUKI_BASE_FAR_RIGHT & g_SensorStatus.DockSensorRight) )
+			else if( (KOBUKI_BASE_NEAR_RIGHT & g_pFullSensorStatus->DockSensorRight) || (KOBUKI_BASE_FAR_RIGHT & g_pFullSensorStatus->DockSensorRight) )
 			{
 				// In right zone, with right sensor facing the base.
 
@@ -4271,8 +4271,8 @@ void CBehaviorModule::ActionFindDock( )
 		{
 			ROBOT_LOG( DEBUG_DOCK,"DOCK_TASK_DRIVING_TO_CENTER_ZONE" )
 			// Dock found, driving forward to find the center zone in front of the dock
-			if( (KOBUKI_BASE_NEAR_CENTER & g_SensorStatus.DockSensorLeft) || (KOBUKI_BASE_NEAR_CENTER & g_SensorStatus.DockSensorCenter) || (KOBUKI_BASE_NEAR_CENTER & g_SensorStatus.DockSensorRight) ||
-				(KOBUKI_BASE_FAR_CENTER & g_SensorStatus.DockSensorLeft) || (KOBUKI_BASE_FAR_CENTER & g_SensorStatus.DockSensorCenter) || (KOBUKI_BASE_FAR_CENTER & g_SensorStatus.DockSensorRight) )
+			if( (KOBUKI_BASE_NEAR_CENTER & g_pFullSensorStatus->DockSensorLeft) || (KOBUKI_BASE_NEAR_CENTER & g_pFullSensorStatus->DockSensorCenter) || (KOBUKI_BASE_NEAR_CENTER & g_pFullSensorStatus->DockSensorRight) ||
+				(KOBUKI_BASE_FAR_CENTER & g_pFullSensorStatus->DockSensorLeft) || (KOBUKI_BASE_FAR_CENTER & g_pFullSensorStatus->DockSensorCenter) || (KOBUKI_BASE_FAR_CENTER & g_pFullSensorStatus->DockSensorRight) )
 			{				
 				// In the center region. Turn to face dock
 				ROBOT_LOG( DEBUG_DOCK,"Dock Detected, and I now am in the Center Zone!" )
@@ -4288,7 +4288,7 @@ void CBehaviorModule::ActionFindDock( )
 				m_CurrentTask = DOCK_TASK_START_LOOKING_FOR_DOCK;
 			}
 			/* 
-			else if( (0 == g_SensorStatus.DockSensorLeft) && (0 == g_SensorStatus.DockSensorCenter) && (0 == g_SensorStatus.DockSensorRight) )
+			else if( (0 == g_pFullSensorStatus->DockSensorLeft) && (0 == g_pFullSensorStatus->DockSensorCenter) && (0 == g_pFullSensorStatus->DockSensorRight) )
 			{
 				// Lost track of the dock!
 				ROBOT_LOG( DEBUG_DOCK,"DOCK_TASK_DRIVING_TO_CENTER_ZONE - Lost track of the Dock!  Starting Over!" )
@@ -4305,7 +4305,7 @@ void CBehaviorModule::ActionFindDock( )
 			// Turn started, keep looking to find the doc with the Front-facing sensor
 			ROBOT_LOG( DEBUG_DOCK,"DOCK_TASK_LOOKING_FOR_DOCK_WITH_CENTER_SENSOR - looking for the dock while rotating" )
 			// Dock found, turning to face towards dock
-			if( 0 != g_SensorStatus.DockSensorCenter )
+			if( 0 != g_pFullSensorStatus->DockSensorCenter )
 			{				
 				///////////////////////////////////////////////////////////////////
 				// Great!  We are Facing the dock. Drive to the Dock
@@ -4328,7 +4328,7 @@ void CBehaviorModule::ActionFindDock( )
 			ROBOT_LOG( DEBUG_DOCK,"DOCK_TASK_DRIVING_TO_DOCK" )
 			// Should be in the Center Zone and Facing towards dock.  Drive to the dock, course correcting as we go
 
-			if( 0 == g_SensorStatus.DockSensorCenter )
+			if( 0 == g_pFullSensorStatus->DockSensorCenter )
 			{
 				// Lost the dock (or sometimes bad sensor reading)
 				if( DriveToDockRetry++  > DRIVE_TO_DOCK_SENSOR_RETRIES )
@@ -4343,7 +4343,7 @@ void CBehaviorModule::ActionFindDock( )
 				DriveToDockRetry = 0;  // reset the counter
 			}
 
-			if( (KOBUKI_BASE_NEAR_LEFT & g_SensorStatus.DockSensorCenter) || (KOBUKI_BASE_NEAR_CENTER & g_SensorStatus.DockSensorCenter) || (KOBUKI_BASE_NEAR_RIGHT & g_SensorStatus.DockSensorCenter))
+			if( (KOBUKI_BASE_NEAR_LEFT & g_pFullSensorStatus->DockSensorCenter) || (KOBUKI_BASE_NEAR_CENTER & g_pFullSensorStatus->DockSensorCenter) || (KOBUKI_BASE_NEAR_RIGHT & g_pFullSensorStatus->DockSensorCenter))
 			{
 				// Close to base, slow down
 				if( BASE_APPROACH_SLOW_SPEED != BaseApproachSpeed )
@@ -4359,10 +4359,10 @@ void CBehaviorModule::ActionFindDock( )
 				*/
 			}
 
-			if( (KOBUKI_BASE_NEAR_LEFT & g_SensorStatus.DockSensorCenter) || (KOBUKI_BASE_FAR_LEFT & g_SensorStatus.DockSensorCenter) )
+			if( (KOBUKI_BASE_NEAR_LEFT & g_pFullSensorStatus->DockSensorCenter) || (KOBUKI_BASE_FAR_LEFT & g_pFullSensorStatus->DockSensorCenter) )
 			{
 				// On the left side of center, bear right
-				if( (KOBUKI_BASE_NEAR_CENTER & g_SensorStatus.DockSensorCenter) || (KOBUKI_BASE_FAR_CENTER & g_SensorStatus.DockSensorCenter) )
+				if( (KOBUKI_BASE_NEAR_CENTER & g_pFullSensorStatus->DockSensorCenter) || (KOBUKI_BASE_FAR_CENTER & g_pFullSensorStatus->DockSensorCenter) )
 				{
 					///////////////////////////////////////////////////////////////////
 					// just slightly off center, very small turn
@@ -4375,10 +4375,10 @@ void CBehaviorModule::ActionFindDock( )
 				}
 
 			}
-			else if( (KOBUKI_BASE_NEAR_RIGHT & g_SensorStatus.DockSensorCenter) || (KOBUKI_BASE_FAR_RIGHT & g_SensorStatus.DockSensorCenter) )
+			else if( (KOBUKI_BASE_NEAR_RIGHT & g_pFullSensorStatus->DockSensorCenter) || (KOBUKI_BASE_FAR_RIGHT & g_pFullSensorStatus->DockSensorCenter) )
 			{
 				// On the right side of center, bear left
-				if( (KOBUKI_BASE_NEAR_CENTER & g_SensorStatus.DockSensorCenter) || (KOBUKI_BASE_FAR_CENTER & g_SensorStatus.DockSensorCenter) )
+				if( (KOBUKI_BASE_NEAR_CENTER & g_pFullSensorStatus->DockSensorCenter) || (KOBUKI_BASE_FAR_CENTER & g_pFullSensorStatus->DockSensorCenter) )
 				{
 					///////////////////////////////////////////////////////////////////
 					// just slightly off center, very small turn
@@ -4390,7 +4390,7 @@ void CBehaviorModule::ActionFindDock( )
 					m_pDriveCtrl->SetSpeedAndTurn( BEHAVIOR_GOAL_MODULE, BaseApproachSpeed, TURN_LEFT_SLOW, BaseApproachAcceleration );
 				}
 			}
-			else if( (KOBUKI_BASE_NEAR_CENTER & g_SensorStatus.DockSensorCenter) || (KOBUKI_BASE_FAR_CENTER & g_SensorStatus.DockSensorCenter) )
+			else if( (KOBUKI_BASE_NEAR_CENTER & g_pFullSensorStatus->DockSensorCenter) || (KOBUKI_BASE_FAR_CENTER & g_pFullSensorStatus->DockSensorCenter) )
 			{
 				// In the center zone, just go straight
 				m_pDriveCtrl->SetSpeedAndTurn( BEHAVIOR_GOAL_MODULE, BaseApproachSpeed, TURN_CENTER, BaseApproachAcceleration );
@@ -5239,7 +5239,7 @@ void CBehaviorModule::ActionOpenDoor()
 					{
 						/*
 						const UINT OPTIMAL_DISTANCE_FROM_DOOR = 12;
-						UINT nDistanceToMove = g_pSensorSummary->nFrontObjectDistance - OPTIMAL_DISTANCE_FROM_DOOR;	// inches
+						UINT nDistanceToMove = g_pNavSensorSummary->nFrontObjectDistance - OPTIMAL_DISTANCE_FROM_DOOR;	// inches
 						// Move body so that the claw is approx "N" inches from the door
 						if ( nDistanceToMove > 0 )
 						{
@@ -5261,7 +5261,7 @@ void CBehaviorModule::ActionOpenDoor()
 				{
 					{
 					/**
-						UINT nDistanceToMove = g_pSensorSummary->nFrontObjectDistance - OPTIMAL_DISTANCE_FROM_DOOR;	// inches???
+						UINT nDistanceToMove = g_pNavSensorSummary->nFrontObjectDistance - OPTIMAL_DISTANCE_FROM_DOOR;	// inches???
 						// Move body so that the claw is approx "N" Tenth inches from the door
 						if ( nDistanceToMove > 0 )
 						{

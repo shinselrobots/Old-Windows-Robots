@@ -1756,9 +1756,9 @@ void CKinectModule::UpdateKinectObjectSummary()
 
 	// Save time-sensitive data to store with the summary
 	m_KinectSummary.SampleTimeStamp = GetTickCount();	// Time laser sample was done
-	m_KinectSummary.RobotLocation.x = g_SensorStatus.CurrentLocation.x;		// Location of robot at the time of the laser scan
-	m_KinectSummary.RobotLocation.y = g_SensorStatus.CurrentLocation.y;		
-	m_KinectSummary.CompassHeading = g_SensorStatus.CompassHeading;		// Heading of robot at the time of the laser scan
+	m_KinectSummary.RobotLocation.x = g_pFullSensorStatus->CurrentLocation.x;		// Location of robot at the time of the laser scan
+	m_KinectSummary.RobotLocation.y = g_pFullSensorStatus->CurrentLocation.y;		
+	m_KinectSummary.CompassHeading = g_pFullSensorStatus->CompassHeading;		// Heading of robot at the time of the laser scan
 
 	// Now find the minimum Y value for each zone
 	for( int i = 0; i < m_FrameInfo->Width; i++ ) 

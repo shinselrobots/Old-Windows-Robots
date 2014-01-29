@@ -128,6 +128,8 @@ void g_PostStatus();	// forward declaration, so we can use it here
 #endif
 ///////////////////////////////////////////////////////////////////
 
+//#define BUMPER_HIT (g_pFullSensorStatus->BumperFront | g_pFullSensorStatus->BumperRight | g_pFullSensorStatus->BumperLeft)
+//#define CLIFF_DETECTED (g_pFullSensorStatus->CliffFront | g_pFullSensorStatus->CliffRight | g_pFullSensorStatus->CliffLeft | g_pFullSensorStatus->WheelDropRight | g_pFullSensorStatus->WheelDropLeft  )
 
 
 // Delete data and set pointer to Null
@@ -339,59 +341,8 @@ enum KINECT_SERVO_OWNERS {
 ////////////////////////////////////////////////////////////////////////////////
 // Structures
 
-// Global Status of all sensors information
 
 
-typedef struct
-{
-	int		CompassHeading;				// From Arduino
-	int		CompassError;				// From Arduino
-	BYTE	StatusFlags;				// From Arduino
-	int 	LastError;					// From Arduino
-	int 	DebugCode;					// From Arduino
-	int 	HWBumper;					// From Arduino
-	int 	IRBumper;					// From Arduino
-	int 	IRBumper2;					// Calculated from Vertical IR detector range
-	int 	ArmBumperL;					// From Arduino
-	int 	ArmBumperR;					// From Arduino
-	int 	Battery0;					// From Arduino
-	int 	Battery1;					// From Arduino
-	int 	US[NUM_US_SENSORS];			// From Arduino
-	int 	IR[NUM_IR_SENSORS];			// From Arduino
-	int 	IR3[NUM_IR3_SENSORS];		// From Arduino
-	int		AccelX;						// From Arduino.  zero = level
-	int		AccelY; 					// From Arduino.  zero = level
-	double	OdometerTenthInches;		// From Arduino or ER1 Pilot
-	int 	Tachometer;					// From Arduino or ER1 Pilot
-	int 	TachometerTicksL;			// From Arduino, provided feedback for Motor Speed Control
-	int 	TachometerTicksR;			// From Arduino, provided feedback for Motor Speed Control
-	double	OdometerUpdateTenthInches;	// Calculated from Arduino or ER1 data
-//	double	TurnAngleUpdate;			// Calculated from ER1 motor positions
-	double	DistanceToWaypoint;			// Calculated
-	double	CalculatedMotorHeading;		// Calculated from motor movements (ER1)
-	FPOINT	CurrentLocation;			// Calculated from compass and odometer
-	FPOINT	CurrentLocationMotor;		// Calculated from motor movements (ER1)
-	FPOINT	CurrentLocationGPS;			// Current location of robot as indicated by GPS
-	double	VideoFPS;					// How quickly video frames are processed
-	int 	ThermalArray[9];			// Value picked up by TPS Thermal sensor
-	int		ThermalPosition;			// Position of thermal object detected.  Negative = left of center
-	BOOL	AuxLightsOn;				// Track if the Aux lights are on or off
-	BOOL	AndroidConnected;
-	BOOL	AndroidAccEnabled;
-	int		AndroidCommand;				// Commands received from Android phone over Bluetooth
-	int		AndroidCompass;				// X,Y,Z data received from Android phone over Bluetooth
-	int		AndroidRoll;
-	int		AndroidPitch;
-	int		LeftHandRawPressureL;		// Pressure values are only useable if CalibratePressureSensors 
-	int		LeftHandRawPressureR;		// is called before each use.  Use GetPressureLoadPercent to get final value
-	int		DockSensorRight;			
-	int		DockSensorCenter;			// IR sensors for the Kobuki Dock
-	int		DockSensorLeft;
-	int		Cliff;
-	int		WheelDrop;
-
-
-} SENSOR_STATUS_T;
 
 typedef struct
 {
@@ -423,38 +374,174 @@ typedef struct
 	double		WristRotateAngle;
 } ARM_SERVOS_POSITION_T;
 
-
-// Sensor Summary.  WARNING - if you change this, update InitSensorSummaryData!  (TODO: Need to make this a class!)
 typedef struct
 {
+	BYTE Cmd;
+	BYTE Param1;
+	BYTE Param2;
+	BYTE Param3;
+	BYTE Param4;
+} SIMULATED_HW_CMD_T;
+
+/////////////////////////////////////////////////////////////////////////////
+// FullSensorStatus
+// Detailed Global Sensor data from each sensor.  Use NavSensorSummary instead when possible.
+class FullSensorStatus
+{
+public:
+				FullSensorStatus();		// Constructor automatically initializes defaults
+	void		InitializeDefaults();	// Set all sensor readings to "no object detected"
+										// If sensor not installed, override with SENSOR_DISABLED after calling this function!
+	// Basic Data
+	BYTE	StatusFlags;				// Typically From Arduino
+	int 	LastError;					// Typically From Arduino
+	int 	DebugCode;					// Typically From Arduino
+	int 	Battery0;					// Typically From Arduino
+	int 	Battery1;					// Typically From Arduino
+
+	// Cliff and Wheel drops
+	bool	CliffFront;
+	bool	CliffRight;
+	bool	CliffLeft;
+	bool	WheelDropRight;
+	bool	WheelDropLeft;
+
+	// TODO remove this?
+	//int		Cliff;
+	//int		WheelDrop;
+
+
+	// Hardware Bumpers, IR range switches, and pressure sensors
+	//	int 	HWBumper;					// Typically From Arduino
+	//	int 	IRBumper;					// Typically From Arduino
+	//	int 	IRBumper2;					// Calculated from Vertical IR detector range
+	bool	HWBumperFront;
+	bool	HWBumperRear;
+	bool	HWBumperSideLeft;
+	bool	HWBumperSideRight;
+
+	bool	IRBumperFrontLeft;
+	bool	IRBumperFrontRight;
+	bool	IRBumperRearLeft;
+	bool	IRBumperRearRight;
+	bool	IRBumperSideLeft;
+	bool	IRBumperSideRight;
+
+	bool	ArmRightBumperElbow;
+	bool	ArmLeftBumperElbow;
+	bool	ArmLeftBumperFingerLeft;
+	bool	ArmLeftBumperFingerRight;
+	bool	ArmLeftBumperInsideClaw;
+
+	// TODO - remove this?
+	//int 	ArmBumperL;					// Typically From Arduino
+	//int 	ArmBumperR;					// Typically From Arduino
+
+	int		LeftHandRawPressureL;		// Pressure values are only useable if CalibratePressureSensors 
+	int		LeftHandRawPressureR;		// is called before each use.  Use GetPressureLoadPercent to get final value
+
+	// Heading and Odometry
+	int		CompassHeading;				// Typically From Arduino
+	//int		CompassError;				// Typically From Arduino
+	double	OdometerTenthInches;		// Typically From Arduino or ER1 Pilot
+	double	OdometerUpdateTenthInches;	// Calculated from Arduino or ER1 data
+	int 	Tachometer;					// Typically From Arduino or ER1 Pilot
+	int 	TachometerTicksL;			// Typically From Arduino, provided feedback for Motor Speed Control
+	int 	TachometerTicksR;			// Typically From Arduino, provided feedback for Motor Speed Control
+//	double	TurnAngleUpdate;			// Calculated from ER1 motor positions
+	double	DistanceToWaypoint;			// Calculated
+	double	CalculatedMotorHeading;		// Calculated from motor movements (ER1)
+	FPOINT	CurrentLocation;			// Calculated from compass and odometer
+	FPOINT	CurrentLocationMotor;		// Calculated from motor movements (ER1)
+	FPOINT	CurrentLocationGPS;			// Current location of robot as indicated by GPS
+
+	// Kobuki Dock 
+	int		DockSensorRight;			
+	int		DockSensorCenter;			// IR sensors for the Kobuki Dock
+	int		DockSensorLeft;
+
+	// From Android Phone
+	BOOL	AndroidConnected;
+	BOOL	AndroidAccEnabled;
+	int		AndroidCommand;				// Commands received from Android phone over Bluetooth
+	int		AndroidCompass;				// X,Y,Z data received from Android phone over Bluetooth
+	int		AndroidRoll;
+	int		AndroidPitch;
+
+	// Other Sensors and state
+	bool	PIRMotionLeft;
+	bool	PIRMotionRight;
+	int 	ThermalArray[9];			// Value picked up by TPS Thermal sensor
+	int		ThermalPosition;			// Position of thermal object detected.  Negative = left of center
+	int		TiltAccelX;					// Typically From Arduino.  zero = level
+	int		TiltAccelY; 				// Typically From Arduino.  zero = level
+//	double	VideoFPS;					// How quickly video frames are processed
+	BOOL	AuxLightsOn;				// Track if the Aux lights are on or off
+
+	//		Analog Sensors
+	int 	US[NUM_US_SENSORS];			// Typically From Arduino
+	int 	IR[NUM_IR_SENSORS];			// Typically From Arduino
+	int 	IR3[NUM_IR3_SENSORS];		// Typically From Arduino
+
+
+};	// FullSensorStatus
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+// NavSensorSummary
+// Processed and summarized sensor data
+class NavSensorSummary
+{
+public:
+				NavSensorSummary();		// Constructor automatically initializes defaults
+	void		InitializeDefaults();	// Set all sensor readings to "no object detected"
+										// If sensor not installed, override with SENSOR_DISABLED after calling this function!
+	bool		CliffDetected();		// Some cliff detected
+	bool		CliffFront();			// Cliff dead ahead
+	bool		BumperHitFront();		// Hit something with the front bumper
+
+	// summary
 	int 		nFrontObjectDistance;	// Any object in front of and within width of robot, including Arms
 	int			nFrontObjectDirection;	// Right or Left of center.  Negative = Left
 	int 		nSideObjectDistance;	// Closest object on either side
 	int			nSideObjectDirection;	// Which side has the closest object
 	int 		nRearObjectDistance;	// Closest object in the rear
 	int			nRearObjectDirection;	// Which side has the closest object
+
 	int 		nClosestObjectFrontLeft;
 	int 		nClosestObjectFrontRight;
+
+	bool		bCliffLeft;
+	bool		bCliffFront;
+	bool		bCliffRight;
+	bool		bWheelDropLeft;
+	bool		bWheelDropRight;
+	bool		bHWBumperFront;
+
+	// zones
 	int 		nLeftRearZone;
-	BOOL		bLeftCliff;
 	int 		nObjectClawLeft;
 	int 		nObjectArmLeft;		// compensated for distance in front of robot - REMOVE
 	int 		nLeftSideZone;	
 	int 		nLeftFrontSideZone;	
 	int 		nLeftArmZone;
 	int 		nLeftFrontZone;		
-	int 		MotionDetectedDirection; 
-	BOOL		bFrontCliff;		////// Robot Center
+
+	int 		MotionDetectedDirection; ////// Robot Center
+
 	int 		nRightFrontZone;
 	int 		nRightArmZone;	
 	int 		nRightFrontSideZone;	
 	int 		nRightSideZone;	
 	int 		nObjectArmRight;	// compensated for distance in front of robot - REMOVE
 	int 		nObjectClawRight;
-	BOOL		bRightCliff;
 	int 		nRightRearZone;
 
-} SENSOR_SUMMARY_T; // Values in TENTH INCHES
+};
+
+
 
 enum IROBOT_BATTERY_CHARGING_STATE {
 	 IROBOT_BATTERY_NOT_CHARGING = 0,
@@ -504,34 +591,33 @@ typedef struct
 	unsigned int	TimeStamp;				// when sensor data was reported
 	double			GyroDegrees;			// From direction robot was facing when Kobuki Base was powered up
 	double			TurnRate;				//
-
 	int				OdometerTicksLeft;		// Raw Encoder ticks
 	int				OdometerTicksRight;		// Raw Encoder ticks
 	int				OdometerLeft;			// tenth inches - distance since power on
 	int				OdometerRight;			// tenth inches - distance since power on
-
 	double			BatteryVoltage;			// 
 	double			BatteryPercent;			//
 	unsigned int	BatteryLevelEnum;		// See enum BatteryLevel
 	unsigned int	BatteryChargeSourceEnum;// See enum BatteryChargeSource
 	unsigned int	BatteryChargeStateEnum;	// See enum BatteryChargeState
-
-	unsigned int	Bumper;					// bit values for Left, Center, Right// 
-	unsigned int	WheelDrop;				// bit values for Left, Right// 
-	unsigned int	Cliff;					// bit values for Left, Center, Right// 
-	unsigned int	OverCurrentErrors;		// bit values for Left, Right// 
+	bool			BumperLeft;
+	bool			BumperFront;
+	bool			BumperRight;
+	bool			CliffLeft;
+	bool			CliffFront;
+	bool			CliffRight;
+	bool			WheelDropLeft;
+	bool			WheelDropRight;
+	bool			MotorStallErrorLeft;
+	bool			MotorStallErrorRight;
 	unsigned int	ButtonPress;			// bit values for button 1,2,3// 
-
 	int				MotorPWMLeft;			// 
 	int				MotorPWMRight;			// 
 	unsigned int	MotorCurrentLeft;		// in 10mA
 	unsigned int	MotorCurrentRight;		// in 10mA
-
-
-	unsigned int	DockRightSignal;		//
-	unsigned int	DockCenterSignal;		//
 	unsigned int	DockLeftSignal;			//
-
+	unsigned int	DockCenterSignal;		//
+	unsigned int	DockRightSignal;		//
 	unsigned int	RightCliffA2D;			//
 	unsigned int	CenterCliffA2D;			//
 	unsigned int	LeftCliffA2D;			//
@@ -868,7 +954,7 @@ void ReportCommError( LPTSTR lpszMessage, DWORD dwCommError );
 
 void InitScannerSummaryData( SCANNER_SUMMARY_T* Summary );
 
-void InitSensorSummaryData( SENSOR_SUMMARY_T* Summary );
+//void InitSensorSummaryData( SENSOR_SUMMARY_T* Summary );
 
 #if GPA_TRACE_ENABLED
 	void RobotSleep( DWORD msSleepTime, __itt_domain *ThreadDomain );
@@ -881,7 +967,11 @@ void InitSensorSummaryData( SENSOR_SUMMARY_T* Summary );
 // Global Variables
 //
 
-extern SENSOR_SUMMARY_T*	g_pSensorSummary;
+extern ARDUINO_STATUS_T		g_RawArduinoStatus;
+
+extern FullSensorStatus*	g_pFullSensorStatus;			// Current status of all sensors
+
+extern NavSensorSummary*	g_pNavSensorSummary;
 extern SCANNER_SUMMARY_T*	g_pLaserSummary;
 extern SCANNER_SUMMARY_T*	g_pKinectSummary;
 
@@ -996,7 +1086,7 @@ extern DWORD				g_dwTrexMotorCommWriteThreadId;	// Comm Thread for sending to Se
 
 
 // For iRobot Create Base
-extern IROBOT_STATUS_T*		g_piRobotStatus;		// Status data updated every 15ms
+extern IROBOT_STATUS_T*		g_pIRobotStatus;		// Status data updated every 15ms
 
 // For Kobuki Base
 extern KOBUKI_STATUS_T*		g_pKobukiStatus;			// Status data updated frequently
@@ -1134,8 +1224,6 @@ extern CLIENT_SOCKET_STRUCT	g_ClientSockStruct;
 // endif
 
 //extern BOOL					g_IRDA_Socket;
-extern ARDUINO_STATUS_T		g_RawArduinoStatus;
-extern SENSOR_STATUS_T		g_SensorStatus;			// Current status of all sensors
 extern HANDLE				g_hCameraCommThread;
 extern BOOL					g_DownloadingFirmware;
 extern BOOL					g_PicFirstStatusReceived;
@@ -1149,9 +1237,9 @@ extern int					g_MotorCurrentTurnCmd;
 extern int 					g_GlobalMaxAvoidObjectDetectionFeet;	// Max range of objects to detect for Avoidance behavior
 extern int 					g_SegmentAvoidObjectRangeTenthInches;	// Max range for Avoidance behavior, for CURRENT SEGMENT!
 
-extern BOOL				g_MotorKludgeRevL; 
-extern BOOL				g_MotorKludgeRevR; 
-
+extern BOOL					g_MotorKludgeRevL; 
+extern BOOL					g_MotorKludgeRevR; 
+	
 extern CString				g_CurrentUserName;				// Person Loki is talking to
 extern CString				g_StatusMessagesToDisplay;
 extern CString				g_StatusMessagesToSend;

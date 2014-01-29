@@ -563,9 +563,9 @@ void CLaserScannerParser::ProcessScanData( int  nDataSamples )
 
 	// Save time-sensitive data
 	m_LaserSummary.SampleTimeStamp = GetTickCount();	// Time laser sample was done
-	m_LaserSummary.RobotLocation.x = g_SensorStatus.CurrentLocation.x;		
-	m_LaserSummary.RobotLocation.y = g_SensorStatus.CurrentLocation.y;		
-	m_LaserSummary.CompassHeading = g_SensorStatus.CompassHeading;		// Heading of robot at the time of the laser scan
+	m_LaserSummary.RobotLocation.x = g_pFullSensorStatus->CurrentLocation.x;		
+	m_LaserSummary.RobotLocation.y = g_pFullSensorStatus->CurrentLocation.y;		
+	m_LaserSummary.CompassHeading = g_pFullSensorStatus->CompassHeading;		// Heading of robot at the time of the laser scan
 
 	//ROBOT_LOG( TRUE,  "\n========= LASER PROCESSED DATA ==================\n\n" )
 	__itt_task_begin(pDomainLaserThread, __itt_null, __itt_null, psh_csLaserDataLock);

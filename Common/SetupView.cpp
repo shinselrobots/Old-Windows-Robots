@@ -324,7 +324,7 @@ BEGIN_MESSAGE_MAP(Setup, CFormView)
 	ON_BN_CLICKED(IDC_OPEN_CAMERA_PORT, OnOpenCameraPort)
 	ON_CBN_SELCHANGE(IDC_CAM_PAN_SPEED, OnSelchangeCamPanSpeed)
 	ON_BN_CLICKED(IDC_CAMERA_POS_ABS_BTN, OnCameraPosAbsBtn)
-	ON_BN_CLICKED(IDC_OPEN_PIC_PORT, OnOpenPicPort)
+	ON_BN_CLICKED(IDC_OPEN_PIC_PORT, OnOpenArduinoPort)
 	ON_BN_CLICKED(IDC_CAMERA_ENABLE_TRACKING_FACE, OnCameraEnableTrackingFace)
 	ON_BN_CLICKED(IDC_CAMERA_ENABLE_TRACKING_COLORS, OnCameraEnableTrackingColors)
 	ON_BN_CLICKED(IDC_CAMERA_ENABLE_TRACKING_CONES, OnCameraEnableTrackingCones)
@@ -635,7 +635,7 @@ void Setup::OnInitialUpdate()
 		if( TURTLE != ROBOT_TYPE )
 		{
 			ROBOT_LOG( TRUE,  "     Arduino PORT\n" )
-			OpenPicPort();
+			OpenArduinoPort();
 		}
 
 		if( ROBOT_TYPE != TURTLE )
@@ -1051,7 +1051,8 @@ void Setup::OpenMotorPort()
 		return;
 
 	#elif( MOTOR_CONTROL_TYPE == KOBUKI_MOTOR_CONTROL )
-		// if controlled through the Kobuki, no separate motor thread needed
+		// Kobuki uses external control program
+		/***
 		ROBOT_DISPLAY( TRUE, "Motor COM Port not needed for KOBUKI_MOTOR_CONTROL" )
 		// Create the thread that will be writing to the Kobuki App
 		HANDLE g_hMotorWriteThread = CreateThread(NULL, 0, MotorCommThreadFunc, (LPVOID)0, 0, &g_dwMotorCommThreadId);
@@ -1063,6 +1064,7 @@ void Setup::OpenMotorPort()
 		{
 			ROBOT_LOG( TRUE,  "Created Motor Comm Write Thread for Kobuki. ID = (0x%x)", g_dwMotorCommThreadId )
 		}
+		***/
 
 	#else
 
@@ -1237,7 +1239,7 @@ void Setup::OpenSmartServoPort()
 
 
 ////////////////////////////////////////////////////////////////////
-void Setup::OpenPicPort()
+void Setup::OpenArduinoPort()
 {
 #if ( ROBOT_SERVER == 1 )		// ROBOT_SERVER code
 	DWORD dwTempThreadId;
@@ -2084,12 +2086,12 @@ void Setup::OnCameraPosAbsBtn()
 
 }
 
-void Setup::OnOpenPicPort() 
+void Setup::OnOpenArduinoPort() 
 {
 	UpdateData(TRUE);	// Force data exchange from GUI to data members
 	GetDocument()->m_strPicSerialPort = m_strPicSerialPort;
 
-	OpenPicPort();
+	OpenArduinoPort();
 	
 	
 }

@@ -366,7 +366,7 @@ void CMapDoc::AddGPSPoint( POINT GPSPos, BYTE FixMode )	// Position and Quality 
 /////////////////////////////////////////////////////////////////////////////
 void CMapDoc::AddSensorData( POINT RWPos, int nHeading )	// Position and Direction
 {
-	// The sensor info is in the global structure: g_SensorStatus
+	// The sensor info is in the global structure: g_pFullSensorStatus
 
 	// Add new CMapSensorStruct to the CTypedPtrList
 	CMapSensorStruct* pMapSensorStruct = new CMapSensorStruct;
@@ -379,21 +379,21 @@ void CMapDoc::AddSensorData( POINT RWPos, int nHeading )	// Position and Directi
 // ROBOT_LOG( TRUE,  "DEBUG MAPVIEW - US SENSORS:  ")
 	for( i = 0; i < NUM_US_SENSORS; i++ )
 	{
-		if( g_SensorStatus.US[i] < NO_OBJECT_IN_RANGE )
+		if( g_pFullSensorStatus->US[i] < NO_OBJECT_IN_RANGE )
 		{
 			ObjectsDetected = TRUE;
 		}
-		pMapSensorStruct->US[i] = g_SensorStatus.US[i]; 
+		pMapSensorStruct->US[i] = g_pFullSensorStatus->US[i]; 
 //		ROBOT_LOG( TRUE,  " %u = %u, ", i, pMapSensorStruct->US[i] )
 	}
 //	ROBOT_LOG( TRUE,  "inches\n" );
 	for( i = 0; i < NUM_IR_SENSORS; i++ )
 	{
-		if( g_SensorStatus.IR[i] < NO_OBJECT_IN_RANGE )
+		if( g_pFullSensorStatus->IR[i] < NO_OBJECT_IN_RANGE )
 		{
 			ObjectsDetected = TRUE;
 		}
-		pMapSensorStruct->IR[i] = g_SensorStatus.IR[i]; 
+		pMapSensorStruct->IR[i] = g_pFullSensorStatus->IR[i]; 
 	}
 
 	if( ObjectsDetected )
@@ -781,8 +781,8 @@ void CMapDoc::Serialize(CArchive& ar)
 	{
 		// Saving Map data to disk
 		// Save current Robot Location (becomes default location when loading the map)
-		w = (WORD)g_SensorStatus.CurrentLocation.x; ar << w;
-		w = (WORD)g_SensorStatus.CurrentLocation.y; ar << w;
+		w = (WORD)g_pFullSensorStatus->CurrentLocation.x; ar << w;
+		w = (WORD)g_pFullSensorStatus->CurrentLocation.y; ar << w;
 #ifdef STORING_SENSOR_AND_ROBOT_TRAILS
 		// Robot Trail
 		nCount = (WORD)m_RobotTrailList.GetCount();
@@ -845,8 +845,8 @@ void CMapDoc::Serialize(CArchive& ar)
 		InitDocument();
 
 		// Restore default position of Robot, based upon where the robot was when the map was saved.
-		ar >> w; g_SensorStatus.CurrentLocation.x = w;
-		ar >> w; g_SensorStatus.CurrentLocation.y = w;
+		ar >> w; g_pFullSensorStatus->CurrentLocation.x = w;
+		ar >> w; g_pFullSensorStatus->CurrentLocation.y = w;
 
 //#define STORING_SENSOR_AND_ROBOT_TRAILS
 #ifdef STORING_SENSOR_AND_ROBOT_TRAILS

@@ -145,7 +145,7 @@ protected:
 	void OpenLaserPort();
 	void OpenCameraPort();
 	void OpenMotorPort();
-	void OpenPicPort();
+	void OpenArduinoPort();
 //	CvCapture* InitVidCap();	// Returns pointer to cap struction if sucessful
 //	void ReleaseVidCap(); 
 	SIZE GetFrameSize( UINT EnumSize ); // Return currently selected frame size 
@@ -203,7 +203,7 @@ protected:
 	afx_msg void OnOpenCameraPort();
 	afx_msg void OnSelchangeCamPanSpeed();
 	afx_msg void OnCameraPosAbsBtn();
-	afx_msg void OnOpenPicPort();
+	afx_msg void OnOpenArduinoPort();
 	afx_msg void OnCameraEnableTrackingFace();
 	afx_msg void OnCameraEnableTrackingColors();
 	afx_msg void OnCameraEnableTrackingCones();

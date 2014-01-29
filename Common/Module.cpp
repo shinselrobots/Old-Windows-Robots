@@ -138,20 +138,12 @@ void CRobotModule::SendHardwareCmd(WORD Request, DWORD wParam, DWORD lParam)
 				if( INVALID_HANDLE_VALUE == g_hMotorCommPort )
 				{
 					// Arduino is not connected, simulate as if it were
-					ARDUINO_CMD_T	SimulatedPicCmd;
-					SimulatedPicCmd.Cmd = Request;
-					SimulatedPicCmd.Param1 = wParam;
-					SimulatedPicCmd.Param2 = lParam;
-					SimulatePic( SimulatedPicCmd );
+					SimulateHardware( Request, wParam, lParam );
 				}
 			#else
 				// all other hardware configurations
 					// Arduino is not connected, simulate as if it were
-					ARDUINO_CMD_T	SimulatedPicCmd;
-					SimulatedPicCmd.Cmd = (BYTE)Request;
-					SimulatedPicCmd.Param1 = (BYTE)wParam;
-					SimulatedPicCmd.Param2 = (BYTE)lParam;
-					SimulatePic( SimulatedPicCmd );
+					SimulateHardware( Request, wParam, lParam );
 			#endif
 			return;
 		}
@@ -356,11 +348,7 @@ void CRobotModule::SendHardwareCmd(WORD Request, DWORD wParam, DWORD lParam)
 		if( 1 == ROBOT_SIMULATION_MODE )
 		{
 			// Arduino is not connected, simulate as if it were
-			ARDUINO_CMD_T	SimulatedPicCmd;
-			SimulatedPicCmd.Cmd = (BYTE)Request;
-			SimulatedPicCmd.Param1 = (BYTE)wParam;
-			SimulatedPicCmd.Param2 = (BYTE)lParam;
-			SimulatePic( SimulatedPicCmd );
+			SimulateHardware( Request, wParam, lParam );
 			return;
 		}
 //	#endif
@@ -378,15 +366,15 @@ signed int CRobotModule::CalculateThreatDirection()
 	// Calculate "average potential" of threats
 
 	// Bumper collisions override other sensors
-	if( CENTER_HIT == g_SensorStatus.Bumper  )
+	if( CENTER_HIT == g_pFullSensorStatus->Bumper  )
 	{		
 		return( 0 );	// Center Hit on Both bumpers
 	}
-	else if( LEFT_HIT == g_SensorStatus.Bumper )
+	else if( LEFT_HIT == g_pFullSensorStatus->Bumper )
 	{		
 		return( -10 );	// Hit on Left bumper (mostly in front, but slightly to one side)
 	}
-	else if( RIGHT_HIT == g_SensorStatus.Bumper )
+	else if( RIGHT_HIT == g_pFullSensorStatus->Bumper )
 	{		
 		return( 10 );	// Hit on Right bumper
 	}
@@ -395,16 +383,16 @@ signed int CRobotModule::CalculateThreatDirection()
 	// Front Sensors get priority
 
 	int nClosestObjectLeft = 255;
-	if( g_pSensorSummary->nClosestObjectFrontLeft < nClosestObjectLeft )
-		nClosestObjectLeft = g_pSensorSummary->nClosestObjectFrontLeft;
-	if( g_pSensorSummary->nClosestObjectSideLeft < nClosestObjectLeft )
-		nClosestObjectLeft = g_pSensorSummary->nClosestObjectSideLeft;
+	if( g_pNavSensorSummary->nClosestObjectFrontLeft < nClosestObjectLeft )
+		nClosestObjectLeft = g_pNavSensorSummary->nClosestObjectFrontLeft;
+	if( g_pNavSensorSummary->nClosestObjectSideLeft < nClosestObjectLeft )
+		nClosestObjectLeft = g_pNavSensorSummary->nClosestObjectSideLeft;
 
 	int nClosestObjectRight = 255;
-	if( g_pSensorSummary->nClosestObjectFrontRight < nClosestObjectRight )
-		nClosestObjectRight = g_pSensorSummary->nClosestObjectFrontRight;
-	if( g_pSensorSummary->nClosestObjectSideRight < nClosestObjectRight )
-		nClosestObjectRight = g_pSensorSummary->nClosestObjectSideRight;
+	if( g_pNavSensorSummary->nClosestObjectFrontRight < nClosestObjectRight )
+		nClosestObjectRight = g_pNavSensorSummary->nClosestObjectFrontRight;
+	if( g_pNavSensorSummary->nClosestObjectSideRight < nClosestObjectRight )
+		nClosestObjectRight = g_pNavSensorSummary->nClosestObjectSideRight;
 
 	// Return the result.  Negative means *threat* to the Left
 	return( nClosestObjectLeft - nClosestObjectRight );
@@ -453,7 +441,7 @@ void CSystemModule::ProcessMessage(
 			g_bCmdRecognized = TRUE;
 
 			// Check for any errors
-			switch( g_SensorStatus.LastError )
+			switch( g_pFullSensorStatus->LastError )
 			{
 				case HW_ARDUINO_NO_ERROR:
 				{
@@ -543,10 +531,10 @@ void CSystemModule::ProcessMessage(
 				default:
 				{
 					CString MsgString;
-					MsgString.Format( ">>>  Arduino Error: UNKNOWN ERROR: %02Xh", g_SensorStatus.LastError );
+					MsgString.Format( ">>>  Arduino Error: UNKNOWN ERROR: %02Xh", g_pFullSensorStatus->LastError );
 					ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString );
 				}
-			}	// end switch( g_SensorStatus.LastError )
+			}	// end switch( g_pFullSensorStatus->LastError )
 
  
 
@@ -676,7 +664,7 @@ void CUserCmdModule::ProcessMessage(
 			// These commands come from the Arduino board (which is connected via BT to the Android phone)
 
 			// Handle Bluetooth Phone control
-			if( g_SensorStatus.AndroidConnected )
+			if( g_pFullSensorStatus->AndroidConnected )
 			{
 				HandleAndroidInput();
 			}	
@@ -893,8 +881,8 @@ void CUserCmdModule::ProcessMessage(
 		{
 			g_bCmdRecognized = TRUE;
 			// Process Odometer Reset command to Arduino
-			g_SensorStatus.OdometerTenthInches = 0;
-			g_SensorStatus.OdometerUpdateTenthInches = 0;
+			g_pFullSensorStatus->OdometerTenthInches = 0;
+			g_pFullSensorStatus->OdometerUpdateTenthInches = 0;
 			SendHardwareCmd( HW_RESET_ODOMETER, 0, (BYTE)lParam );	// 0=off, non-zero = on
 			return;
 		}
@@ -1082,7 +1070,7 @@ void CUserCmdModule::ProcessMessage(
 			g_bCmdRecognized = TRUE;
 			// Send Command to set the Aux Lights On/Off
 			SendHardwareCmd( HW_SET_AUX_LIGHT_POWER, 0, (BYTE)lParam );	// 0=off, 1=on
-			g_SensorStatus.AuxLightsOn = (BOOL)lParam; // keep track of current state
+			g_pFullSensorStatus->AuxLightsOn = (BOOL)lParam; // keep track of current state
 			return;
 		}
 
@@ -1307,7 +1295,7 @@ void CUserCmdModule::ProcessMessage(
 void CUserCmdModule::HandleAndroidInput( )
 {
 
-	switch( g_SensorStatus.AndroidCommand )
+	switch( g_pFullSensorStatus->AndroidCommand )
 	{				
 		case 0: // No new command
 		{
@@ -1455,19 +1443,19 @@ void CUserCmdModule::HandleAndroidInput( )
 		}
 
 		default:
-			ROBOT_LOG( TRUE,  "ERROR! Unhandled Android Button: %d\n", g_SensorStatus.AndroidCommand)
+			ROBOT_LOG( TRUE,  "ERROR! Unhandled Android Button: %d\n", g_pFullSensorStatus->AndroidCommand)
 	}
 					
 
 	// Handle Accelerometer
-	if( g_SensorStatus.AndroidAccEnabled )
+	if( g_pFullSensorStatus->AndroidAccEnabled )
 	{
 		int AndoidCmdSpeed = 0;
 		int AndoidCmdTurn = 0;
 
 		// Pitch can go to over 90 degrees, but then roll does not work well, so max at pitch = 60 degrees
 		// Convert Speed from +/- 60 to +/- 127, but leave guard band at center				
-		int Pitch = g_SensorStatus.AndroidPitch - 10; //  To make it comfortable to hold the phone, "neutral" is 10 degrees up
+		int Pitch = g_pFullSensorStatus->AndroidPitch - 10; //  To make it comfortable to hold the phone, "neutral" is 10 degrees up
 		if( (Pitch > -15) && (Pitch< 10) )
 		{
 			AndoidCmdSpeed = 0;
@@ -1480,13 +1468,13 @@ void CUserCmdModule::HandleAndroidInput( )
 		}
 
 		// Convert Turn from +/- 90 to +/- 64, but leave guard band at center
-		if( (g_SensorStatus.AndroidRoll > -10) && (g_SensorStatus.AndroidRoll < 10) )
+		if( (g_pFullSensorStatus->AndroidRoll > -10) && (g_pFullSensorStatus->AndroidRoll < 10) )
 		{
 			AndoidCmdTurn = 0;
 		}
 		else
 		{					
-			AndoidCmdTurn = (int)( ((double)g_SensorStatus.AndroidRoll * 64.0) / 80.0 ); // slightly less then 90 to ease wrist motion
+			AndoidCmdTurn = (int)( ((double)g_pFullSensorStatus->AndroidRoll * 64.0) / 80.0 ); // slightly less then 90 to ease wrist motion
 			if( AndoidCmdTurn > 64 ) AndoidCmdTurn = 64;
 			if( AndoidCmdTurn < -64 ) AndoidCmdTurn = -64;
 		}

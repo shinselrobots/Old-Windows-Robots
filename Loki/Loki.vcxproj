@@ -253,7 +253,9 @@ xcopy C:\Dev\_Robot\RemoteDbg\Loki.pdb  \\Loki\Dev\_Robot\RemoteDbg /Y</Command>
     <ClCompile Include="..\Common\GridNavModule.cpp" />
     <ClCompile Include="..\Common\HeadBehavior.cpp" />
     <ClCompile Include="..\Common\HeadControl.cpp" />
-    <ClCompile Include="..\Common\HWInterface.cpp" />
+    <ClCompile Include="..\Common\HWInterfaceArduino.cpp" />
+    <ClCompile Include="..\Common\HWInterfaceKobuki.cpp" />
+    <ClCompile Include="..\Common\HWInterfaceOther.cpp" />
     <ClCompile Include="..\Common\KerrControl.cpp" />
     <ClCompile Include="..\Common\KinectModule.cpp" />
     <ClCompile Include="..\Common\LaserDisplayWnd.cpp" />
@@ -279,6 +281,8 @@ xcopy C:\Dev\_Robot\RemoteDbg\Loki.pdb  \\Loki\Dev\_Robot\RemoteDbg /Y</Command>
     <ClCompile Include="..\Common\RobotCmdView.cpp" />
     <ClCompile Include="..\Common\RotateMapDlg.cpp" />
     <ClCompile Include="..\Common\SensorModule.cpp" />
+    <ClCompile Include="..\Common\SensorModuleCarbot.cpp" />
+    <ClCompile Include="..\Common\SensorModuleLoki.cpp" />
     <ClCompile Include="..\Common\ServerSock.cpp" />
     <ClCompile Include="..\Common\SetupDoc.cpp" />
     <ClCompile Include="..\Common\SetupView.cpp" />

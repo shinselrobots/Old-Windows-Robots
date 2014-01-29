@@ -128,20 +128,20 @@ void CWayPointNavModule::LandmarkUpdateLocation()
 	// Note that this will override the last location calculated by SensorModule::UpdateLocation()!
 
 	ROBOT_LOG( TRUE,  "NAVMODULE: Update Location based upon Landmark.  Old = %d,%d ",
-		g_SensorStatus.CurrentLocation.x, g_SensorStatus.CurrentLocation.y)
+		g_pFullSensorStatus->CurrentLocation.x, g_pFullSensorStatus->CurrentLocation.y)
 
 	int WayPointX = (m_pCurrentWaypoint->m_WaypointLocationFeetX * 12) + m_pCurrentWaypoint->m_WaypointLocationInchesX;
 	int WayPointY = (m_pCurrentWaypoint->m_WaypointLocationFeetY * 12) + m_pCurrentWaypoint->m_WaypointLocationInchesY;
 
-	int Distance = g_pSensorSummary->nFrontObjectDistance;		// distance to Landmark;
-	int Direction  = (g_SensorStatus.CompassHeading + 180)%360;	// From cone TO robot!
+	int Distance = g_pNavSensorSummary->nFrontObjectDistance;		// distance to Landmark;
+	int Direction  = (g_pFullSensorStatus->CompassHeading + 180)%360;	// From cone TO robot!
 
 
 	if( Distance < 6 )	// inches
 	{
 		// Collision or too close to matter what direction we are pointing
-		g_SensorStatus.CurrentLocation.x = WayPointX;
-		g_SensorStatus.CurrentLocation.y = WayPointY ;
+		g_pFullSensorStatus->CurrentLocation.x = WayPointX;
+		g_pFullSensorStatus->CurrentLocation.y = WayPointY ;
 	}
 	else
 	{
@@ -152,11 +152,11 @@ void CWayPointNavModule::LandmarkUpdateLocation()
 		
 		if(X>=0) X += 0.5; else X -= 0.5;	// Cast will truncate, this will round instead
 		if(Y>=0) Y += 0.5; else Y -= 0.5;
-		g_SensorStatus.CurrentLocation.x = WayPointX + (int)X;		// Get new Map absolute X,Y
-		g_SensorStatus.CurrentLocation.y = WayPointY + (int)Y;
+		g_pFullSensorStatus->CurrentLocation.x = WayPointX + (int)X;		// Get new Map absolute X,Y
+		g_pFullSensorStatus->CurrentLocation.y = WayPointY + (int)Y;
 	}
 
-	ROBOT_LOG( TRUE,  "New = %d,%d\n", g_SensorStatus.CurrentLocation.x, g_SensorStatus.CurrentLocation.y)
+	ROBOT_LOG( TRUE,  "New = %d,%d\n", g_pFullSensorStatus->CurrentLocation.x, g_pFullSensorStatus->CurrentLocation.y)
 
 }
 
@@ -167,7 +167,7 @@ int CWayPointNavModule::CheckForObject()
 	//BYTE nDistHigh, nDistLow;
 
 	// check for Bumper hit (good indication that we are there :-)!
-	if( HW_BUMPER_HIT_FRONT )
+	if( g_pNavSensorSummary->BumperHitFront() )
 	{		
 		m_pDriveCtrl->Brake( WAY_POINT_NAV_MODULE );	// Stop the robot!
 
@@ -191,7 +191,7 @@ int CWayPointNavModule::CheckForObject()
 	}
 
 	// See if we are close enough yet
-	if( g_pSensorSummary->nFrontObjectDistance <= m_pCurrentWaypoint->m_WaypointLandmarkRange1) 
+	if( g_pNavSensorSummary->nFrontObjectDistance <= m_pCurrentWaypoint->m_WaypointLandmarkRange1) 
 	{	// Close enough. Update Map with this new postion data,
 		// And go to the next waypoint
 
@@ -208,7 +208,7 @@ int CWayPointNavModule::CheckForObject()
 		PostThreadMessage( g_dwCameraVidCapThreadId, 
 			(WM_ROBOT_COLOR_BLOB_LOOK_AHEAD_CMD), FALSE, 0 );	// wParam = Stop
 
-		if( g_pSensorSummary->nFrontObjectDistance <= WAYPOINT_BACKUP_RANGE )
+		if( g_pNavSensorSummary->nFrontObjectDistance <= WAYPOINT_BACKUP_RANGE )
 		{
 			// Got too close too fast!
 			m_pDriveCtrl->Brake( WAY_POINT_NAV_MODULE );
@@ -398,7 +398,7 @@ CheckNavState:
 					// Starting new Path. Path consists of Segments between Waypoints
 					if( m_WaitForStartSwitch )
 					{
-						if( !(g_SensorStatus.StatusFlags & HW_STATUS_RC_BUTTON_2) )
+						if( !(g_pFullSensorStatus->StatusFlags & HW_STATUS_RC_BUTTON_2) )
 						{
 							// Start button on the RC remote not pushed yet
 							ROBOT_DISPLAY( TRUE, "Execute Path: Waiting for Start Switch")
@@ -482,8 +482,8 @@ CheckNavState:
 							m_pSensorModule->SetCompassCorrection( m_pCurrentSegment->m_CompassCorrection );
 
 							//SetSpeedAndTurn( SPEED_STOP, TURN_CENTER );
-							g_SensorStatus.DistanceToWaypoint = CalculateDistanceToWaypoint( 
-								g_SensorStatus.CurrentLocation, m_pCurrentWaypoint );
+							g_pFullSensorStatus->DistanceToWaypoint = CalculateDistanceToWaypoint( 
+								g_pFullSensorStatus->CurrentLocation, m_pCurrentWaypoint );
 
 							ROBOT_DISPLAY( TRUE, "PathState: TURN_TO_NEXT_WAYPOINT")
 							m_NavState = TURN_TO_NEXT_WAYPOINT;
@@ -505,7 +505,7 @@ CheckNavState:
 					// First we turn, then we drive straight toward the waypoint
 
 					int  Heading = CalculateHeadingToWaypoint( 
-						g_SensorStatus.CurrentLocation, m_pCurrentWaypoint );
+						g_pFullSensorStatus->CurrentLocation, m_pCurrentWaypoint );
 					if( RESULT_FAILURE == Heading )
 					{
 						// Can't calculate!  Error already printed. Use Segment info instead!
@@ -521,7 +521,7 @@ CheckNavState:
 						ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
 					}
 					
-					int TurnDegrees = CalculateTurn(g_SensorStatus.CompassHeading, Heading);
+					int TurnDegrees = CalculateTurn(g_pFullSensorStatus->CompassHeading, Heading);
 
 					if( TurnDegrees < 0 )
 					{	// Turn Left
@@ -555,7 +555,7 @@ CheckNavState:
 					ROBOT_DISPLAY( TRUE, "PathState: TURNING_TOWARD_WAYPOINT")
 
 					MsgString.Format( "Begin Turning toward W%u: Target Heading: %03u.  Current: %03u, Turn: %d",
-						m_pCurrentWaypoint->m_WaypointID, Heading, g_SensorStatus.CompassHeading, TurnDegrees );
+						m_pCurrentWaypoint->m_WaypointID, Heading, g_pFullSensorStatus->CompassHeading, TurnDegrees );
 					ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
 					
 					m_NavState = TURNING_TOWARD_WAYPOINT;
@@ -567,11 +567,11 @@ CheckNavState:
 				{
 					// Wait until we are done turning, then accelerate
 
-					int  Heading = CalculateHeadingToWaypoint(g_SensorStatus.CurrentLocation, m_pCurrentWaypoint );
-					int TurnDegrees = CalculateTurn(g_SensorStatus.CompassHeading, Heading );
+					int  Heading = CalculateHeadingToWaypoint(g_pFullSensorStatus->CurrentLocation, m_pCurrentWaypoint );
+					int TurnDegrees = CalculateTurn(g_pFullSensorStatus->CompassHeading, Heading );
 
 					MsgString.Format( "Turning toward W%u: Target Heading: %03u.  Current: %03u, Turn: %d",
-						m_pCurrentWaypoint->m_WaypointID, Heading, g_SensorStatus.CompassHeading, TurnDegrees );
+						m_pCurrentWaypoint->m_WaypointID, Heading, g_pFullSensorStatus->CompassHeading, TurnDegrees );
 					ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
 
 					// See if turn done or we overshoot the turn
@@ -701,9 +701,9 @@ CheckNavState:
 						
 				case DRIVING_TO_WAYPOINT:
 				{
-					g_SensorStatus.DistanceToWaypoint = CalculateDistanceToWaypoint( g_SensorStatus.CurrentLocation, m_pCurrentWaypoint );
-					int  Heading = CalculateHeadingToWaypoint( g_SensorStatus.CurrentLocation, m_pCurrentWaypoint );
-					int TurnDegrees = CalculateTurn( g_SensorStatus.CompassHeading, Heading );
+					g_pFullSensorStatus->DistanceToWaypoint = CalculateDistanceToWaypoint( g_pFullSensorStatus->CurrentLocation, m_pCurrentWaypoint );
+					int  Heading = CalculateHeadingToWaypoint( g_pFullSensorStatus->CurrentLocation, m_pCurrentWaypoint );
+					int TurnDegrees = CalculateTurn( g_pFullSensorStatus->CompassHeading, Heading );
 					int NewTurn;
 					if( "Go Straight" == m_pCurrentSegment->m_SegmentBehavior )
 					{
@@ -717,7 +717,7 @@ CheckNavState:
 						NewTurn = (int)(TurnDegrees * TURN_MULTIPLIER);
 					}
 
-					if( g_SensorStatus.DistanceToWaypoint < WAYPOINT_SENSOR_RANGE)
+					if( g_pFullSensorStatus->DistanceToWaypoint < WAYPOINT_SENSOR_RANGE)
 					{
 						// Slow down when close to the waypoint
 						if( m_pDriveCtrl->GetCurrentSpeed() > SPEED_FWD_MED_SLOW )
@@ -731,12 +731,12 @@ CheckNavState:
 					// or need to change behavior due to proximity to WP.
 
 					MsgString.Format( "Driving to W%u: Distance: %03u ft. Direction: %03u deg.  Current: %03u deg, Turn Needed: %d deg",
-						m_pCurrentWaypoint->m_WaypointID, (g_SensorStatus.DistanceToWaypoint/12), Heading, g_SensorStatus.CompassHeading, TurnDegrees );
+						m_pCurrentWaypoint->m_WaypointID, (g_pFullSensorStatus->DistanceToWaypoint/12), Heading, g_pFullSensorStatus->CompassHeading, TurnDegrees );
 					ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
 
 					if( "Cone" == m_pCurrentWaypoint->m_WaypointLandmarkType1)
 					{
-						if( g_SensorStatus.DistanceToWaypoint <= m_ScanForConeDistance *12)	//Feet
+						if( g_pFullSensorStatus->DistanceToWaypoint <= m_ScanForConeDistance *12)	//Feet
 						{
 							// Go to SEEK_LANDMARK state to close in on a cone
 							ROBOT_DISPLAY( TRUE, "PathState: SEEKING_LANDMARK_WAYPOINT")
@@ -749,7 +749,7 @@ CheckNavState:
 							 (    "" == m_pCurrentWaypoint->m_WaypointLandmarkType1) )
 					{
 						// No Landmark.  Just stop when we get to the right place
-						if( g_SensorStatus.DistanceToWaypoint < WAYPOINT_STOP_RANGE )
+						if( g_pFullSensorStatus->DistanceToWaypoint < WAYPOINT_STOP_RANGE )
 						{
 							// Waypoint reached.  Head to next Waypoint!
 							ROBOT_LOG( TRUE,  "\n------------------------------------------------\n" )	/// Make this stand out in the log file!
@@ -768,7 +768,7 @@ CheckNavState:
 					{
 						// This is a Landmark Waypoint.  
 						// Start looking for Landmark in front of the robot
-						 if( g_SensorStatus.DistanceToWaypoint < WAYPOINT_SENSOR_RANGE)
+						 if( g_pFullSensorStatus->DistanceToWaypoint < WAYPOINT_SENSOR_RANGE)
 						{
 							// Start looking for the landmark
 							m_pDriveCtrl->SuppressModule( AVOID_OBJECT_MODULE );	// Turn off obstacle avoidance
@@ -782,14 +782,14 @@ CheckNavState:
 						}
 					}
 					if( (abs(TurnDegrees) > 90 ) &&
-						( g_SensorStatus.DistanceToWaypoint < WAYPOINT_SENSOR_RANGE) )
+						( g_pFullSensorStatus->DistanceToWaypoint < WAYPOINT_SENSOR_RANGE) )
 					{
 						// OOPS!  We must have just passed the Waypoint!
 						// (if far away, it might just be a glitch)
 						// Assume we are there, and head for the next one!
 						ROBOT_LOG( TRUE,  "\n------------------------------------------------\n" )	/// Make this stand out in the log file!
 						MsgString.Format( "DRIVING_TO_WAYPOINT: Oops! Passed Waypoint.  Heading for next one. Error details: dist = %d, WP Turn = %d",
-							g_SensorStatus.DistanceToWaypoint, TurnDegrees);
+							g_pFullSensorStatus->DistanceToWaypoint, TurnDegrees);
 						ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
 						// Coast until the next Waypoint is calculated...
 						//SetSpeed( SPEED_STOP );	
@@ -811,7 +811,7 @@ CheckNavState:
 							NewTurn = (m_pHeadControl->GetPanPosition() - CAMERA_PAN_CENTER) * CAMERA_TO_WHEEL_SCALE;
 							ROBOT_LOG( TRUE,  "DRIVE_TO_WAYPOINT is Tracking a Cone! WheelTurn = %d\n", NewTurn )
 							m_TrackingCone = TRUE;
-							m_Last_Cone_directon = CalculateCameraDirection( g_SensorStatus.CompassHeading, 
+							m_Last_Cone_directon = CalculateCameraDirection( g_pFullSensorStatus->CompassHeading, 
 								(m_pHeadControl->GetPanPosition() - CAMERA_PAN_CENTER) );
 
 						}
@@ -832,20 +832,20 @@ CheckNavState:
 						{
 							// Track curb/wall on the Left.  Use closest value
 
-							if( g_pSensorSummary->nLeftSideZone > ULTRASONIC_TENTH_INCHES_MAX )
+							if( g_pNavSensorSummary->nLeftSideZone > ULTRASONIC_TENTH_INCHES_MAX )
 							{
 								// Curb/wall out of sensor range.  Do nothing (will track Compass)
-								MsgString.Format( "Follow Left Wall/Curb - Out of Range. Distance = %d",g_pSensorSummary->nLeftSideZone ); 
+								MsgString.Format( "Follow Left Wall/Curb - Out of Range. Distance = %d",g_pNavSensorSummary->nLeftSideZone ); 
 								ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
 							}
 							else
 							{
-								if( g_pSensorSummary->nLeftSideZone > (m_pCurrentSegment->m_SegmentFollowDistance + SEGMENT_FOLLOW_DISTANCE_FUDGE) )
+								if( g_pNavSensorSummary->nLeftSideZone > (m_pCurrentSegment->m_SegmentFollowDistance + SEGMENT_FOLLOW_DISTANCE_FUDGE) )
 								{
 									// too far from the curb/wall, turn toward the curb/wall
 									NewTurn = -SEGMENT_FOLLOW_TURN_AMOUNT;	// Negative = Turn Left
 								}
-								else if( g_pSensorSummary->nLeftSideZone < (m_pCurrentSegment->m_SegmentFollowDistance - SEGMENT_FOLLOW_DISTANCE_FUDGE) )
+								else if( g_pNavSensorSummary->nLeftSideZone < (m_pCurrentSegment->m_SegmentFollowDistance - SEGMENT_FOLLOW_DISTANCE_FUDGE) )
 								{
 									// too close to the curb/wall, turn away from the curb/wall
 									NewTurn = SEGMENT_FOLLOW_TURN_AMOUNT;	// Positive = Turn Right
@@ -855,27 +855,27 @@ CheckNavState:
 									// Tracking parallel to curb/wall.  Center wheels
 									NewTurn = 0;
 								}
-								MsgString.Format( "Tracking Left Wall/Curb. Distance = %d, Turn = %d", g_pSensorSummary->nLeftSideZone, NewTurn );
+								MsgString.Format( "Tracking Left Wall/Curb. Distance = %d, Turn = %d", g_pNavSensorSummary->nLeftSideZone, NewTurn );
 								ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
 							}
 						}
 						else if( SEGMENT_FOLLOW_RIGHT == m_pCurrentSegment->m_SegmentFollowLeftRight )
 						{
 							// Track curb/wall on the Right.
-							if( g_pSensorSummary->nRightSideZone > ULTRASONIC_TENTH_INCHES_MAX )
+							if( g_pNavSensorSummary->nRightSideZone > ULTRASONIC_TENTH_INCHES_MAX )
 							{
 								// Curb/wall out of sensor range.  Do nothing (will track Compass)
-								MsgString.Format( "Follow Right Wall/Curb - Out of Range. Distance = %d", g_pSensorSummary->nRightSideZone ); 
+								MsgString.Format( "Follow Right Wall/Curb - Out of Range. Distance = %d", g_pNavSensorSummary->nRightSideZone ); 
 								ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
 							}
 							else 
 							{
-								if( g_pSensorSummary->nRightSideZone > (m_pCurrentSegment->m_SegmentFollowDistance + SEGMENT_FOLLOW_DISTANCE_FUDGE) )
+								if( g_pNavSensorSummary->nRightSideZone > (m_pCurrentSegment->m_SegmentFollowDistance + SEGMENT_FOLLOW_DISTANCE_FUDGE) )
 								{
 									// too far from the curb/wall, turn toward the curb/wall
 									NewTurn = SEGMENT_FOLLOW_TURN_AMOUNT;	// Positive = Turn Right
 								}
-								else if( g_pSensorSummary->nRightSideZone < (m_pCurrentSegment->m_SegmentFollowDistance - SEGMENT_FOLLOW_DISTANCE_FUDGE) )
+								else if( g_pNavSensorSummary->nRightSideZone < (m_pCurrentSegment->m_SegmentFollowDistance - SEGMENT_FOLLOW_DISTANCE_FUDGE) )
 								{
 									// too close to the curb/wall, turn away from the curb/wall
 									NewTurn = -SEGMENT_FOLLOW_TURN_AMOUNT;	// Negative = Turn Left
@@ -885,7 +885,7 @@ CheckNavState:
 									// Tracking parallel to curb/wall.  Center wheels
 									NewTurn = 0;
 								}
-								MsgString.Format( "Tracking Right Wall/Curb. Distance = %d, Turn = %d", g_pSensorSummary->nRightSideZone, NewTurn );
+								MsgString.Format( "Tracking Right Wall/Curb. Distance = %d, Turn = %d", g_pNavSensorSummary->nRightSideZone, NewTurn );
 								ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
 							}
 						}
@@ -949,7 +949,7 @@ CheckNavState:
 						ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
 						SetTurn( NewTurn );	
 						SetSpeed( SPEED_FWD_SLOW );
-						m_Last_Cone_directon = CalculateCameraDirection( g_SensorStatus.CompassHeading, 
+						m_Last_Cone_directon = CalculateCameraDirection( g_pFullSensorStatus->CompassHeading, 
 							(m_pHeadControl->GetPanPosition() - CAMERA_PAN_CENTER) );
 						//ROBOT_DISPLAY( TRUE, "PathState: SEEKING_LANDMARK_WAYPOINT")
 						// Stay in SCANNING_FOR_CONE1: m_NavState = SEEKING_LANDMARK_WAYPOINT;
@@ -958,12 +958,12 @@ CheckNavState:
 					else
 					{
 						// This close, we should be looking at a cone, but none found.
-						g_SensorStatus.DistanceToWaypoint = CalculateDistanceToWaypoint( g_SensorStatus.CurrentLocation, m_pCurrentWaypoint );
-						int  Heading = CalculateHeadingToWaypoint( g_SensorStatus.CurrentLocation, m_pCurrentWaypoint );
-						int TurnDegrees = CalculateTurn( g_SensorStatus.CompassHeading, Heading );
+						g_pFullSensorStatus->DistanceToWaypoint = CalculateDistanceToWaypoint( g_pFullSensorStatus->CurrentLocation, m_pCurrentWaypoint );
+						int  Heading = CalculateHeadingToWaypoint( g_pFullSensorStatus->CurrentLocation, m_pCurrentWaypoint );
+						int TurnDegrees = CalculateTurn( g_pFullSensorStatus->CompassHeading, Heading );
 						int NewTurn = (int)(TurnDegrees * TURN_MULTIPLIER);
 
-						if( g_SensorStatus.DistanceToWaypoint < 36 )
+						if( g_pFullSensorStatus->DistanceToWaypoint < 36 )
 						{
 							// less then 3 feet away, but can't see cone.
 							// Abort and head for the next one
@@ -980,7 +980,7 @@ CheckNavState:
 							// Assume we are there, and head for the next one!
 							ROBOT_LOG( TRUE,  "\n------------------------------------------------\n" )	/// Make this stand out in the log file!
 							MsgString.Format( "SCANNING_FOR_CONE: Oops! Passed Waypoint.\n        Heading for next one. Error details: dist = %d, WP Turn = %d",
-							g_SensorStatus.DistanceToWaypoint, TurnDegrees);
+							g_pFullSensorStatus->DistanceToWaypoint, TurnDegrees);
 							ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
 							// Coast until the next Waypoint is calculated...
 							SetSpeed( SPEED_STOP );	
@@ -996,7 +996,7 @@ CheckNavState:
 							ROBOT_DISPLAY( TRUE, MsgString )
 							if( NO_HEADING != m_Last_Cone_directon )
 							{
-								TurnDegrees = CalculateTurn( g_SensorStatus.CompassHeading, Heading );
+								TurnDegrees = CalculateTurn( g_pFullSensorStatus->CompassHeading, Heading );
 								NewTurn = (int)(TurnDegrees * TURN_MULTIPLIER);
 							}
 							m_pDriveCtrl->SetMoveDistance( WAY_POINT_NAV_MODULE, SPEED_FWD_SLOW, 
@@ -1032,7 +1032,7 @@ CheckNavState:
 							SetSpeed( SPEED_FWD_SLOW );	
 							MsgString.Format( "SCANNING_FOR_CONE2: Found Cone! WheelTurn = %d", NewTurn );
 							ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
-							m_Last_Cone_directon = CalculateCameraDirection( g_SensorStatus.CompassHeading, 
+							m_Last_Cone_directon = CalculateCameraDirection( g_pFullSensorStatus->CompassHeading, 
 								(m_pHeadControl->GetPanPosition() - CAMERA_PAN_CENTER) );
 							ROBOT_DISPLAY( TRUE, "PathState: SEEKING_LANDMARK_WAYPOINT")
 							m_NavState = SEEKING_LANDMARK_WAYPOINT;
@@ -1053,9 +1053,9 @@ CheckNavState:
 				case SEEKING_LANDMARK_WAYPOINT:
 				{
 					// Heading for a waypoint with a Landmark.
-					g_SensorStatus.DistanceToWaypoint = CalculateDistanceToWaypoint( g_SensorStatus.CurrentLocation, m_pCurrentWaypoint );
-					int  Heading = CalculateHeadingToWaypoint( g_SensorStatus.CurrentLocation, m_pCurrentWaypoint );
-					int TurnDegrees = CalculateTurn( g_SensorStatus.CompassHeading, Heading );
+					g_pFullSensorStatus->DistanceToWaypoint = CalculateDistanceToWaypoint( g_pFullSensorStatus->CurrentLocation, m_pCurrentWaypoint );
+					int  Heading = CalculateHeadingToWaypoint( g_pFullSensorStatus->CurrentLocation, m_pCurrentWaypoint );
+					int TurnDegrees = CalculateTurn( g_pFullSensorStatus->CompassHeading, Heading );
 
 					///////////////////////////////////////////////////////////////////
 					if ( CheckForObject() )
@@ -1066,11 +1066,11 @@ CheckNavState:
 					///////////////////////////////////////////////////////////////////
 					// Ok, not time to stop, so see if we detect the object, and head for it
 
-					g_SensorStatus.DistanceToWaypoint = CalculateDistanceToWaypoint( 
-						g_SensorStatus.CurrentLocation, m_pCurrentWaypoint );
+					g_pFullSensorStatus->DistanceToWaypoint = CalculateDistanceToWaypoint( 
+						g_pFullSensorStatus->CurrentLocation, m_pCurrentWaypoint );
 
 					MsgString.Format( "Seeking Landmark. Dist to WP: %03u ft. Closest Obj: %03u in.",
-						(g_SensorStatus.DistanceToWaypoint/12), g_pSensorSummary->nFrontObjectDistance );
+						(g_pFullSensorStatus->DistanceToWaypoint/12), g_pNavSensorSummary->nFrontObjectDistance );
 					ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
 
 					// Two possible methods:
@@ -1115,7 +1115,7 @@ CheckNavState:
 							ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
 							SetTurn( NewTurn );	
 							SetSpeed( SPEED_FWD_SLOW );
-							m_Last_Cone_directon = CalculateCameraDirection( g_SensorStatus.CompassHeading, 
+							m_Last_Cone_directon = CalculateCameraDirection( g_pFullSensorStatus->CompassHeading, 
 								(m_pHeadControl->GetPanPosition() - CAMERA_PAN_CENTER) );
 							break;
 						}
@@ -1143,14 +1143,14 @@ CheckNavState:
 
 						// Highest priority given to long range IR, pointing slightly inward 
 
-						if( g_pSensorSummary->nFrontObjectDistance <= m_pCurrentWaypoint->m_WaypointLandmarkRange1) 
+						if( g_pNavSensorSummary->nFrontObjectDistance <= m_pCurrentWaypoint->m_WaypointLandmarkRange1) 
 						{
 							// Waypoint reached!!!
 							ROBOT_DISPLAY( TRUE, "Waypoint Reached! Object Found!" )
 
 							SetTurn( TURN_CENTER );	
 							SetSpeed( SPEED_STOP );	
-							g_SensorStatus.DistanceToWaypoint = 0;
+							g_pFullSensorStatus->DistanceToWaypoint = 0;
 							ROBOT_DISPLAY( TRUE, "PathState: GET_NEXT_SEGMENT")
 							m_NavState = GET_NEXT_SEGMENT;									
 							SpeakCannedPhrase( SPEAK_WAYPOINT_REACHED );
@@ -1159,27 +1159,27 @@ CheckNavState:
 						
 						// Not there yet.  Find the object and head for it!
 
-						if( (g_SensorStatus.IR[IR_SENSOR_FRONT_LEFT]  <= IR_LR_DETECT_RANGE_TENTH_INCHES ) ||		
-							(g_SensorStatus.IR[IR_SENSOR_FRONT_RIGHT] <= IR_LR_DETECT_RANGE_TENTH_INCHES ) )		
+						if( (g_pFullSensorStatus->IR[IR_SENSOR_FRONT_LEFT]  <= IR_LR_DETECT_RANGE_TENTH_INCHES ) ||		
+							(g_pFullSensorStatus->IR[IR_SENSOR_FRONT_RIGHT] <= IR_LR_DETECT_RANGE_TENTH_INCHES ) )		
 						{
 							// Forward facing Long Range IR sensors found something!
 							// Turn toward the Object
 
-							if( (g_SensorStatus.IR[IR_SENSOR_FRONT_LEFT]  <= IR_LR_DETECT_RANGE_TENTH_INCHES ) &&		
-								(g_SensorStatus.IR[IR_SENSOR_FRONT_RIGHT] <= IR_LR_DETECT_RANGE_TENTH_INCHES ) )		
+							if( (g_pFullSensorStatus->IR[IR_SENSOR_FRONT_LEFT]  <= IR_LR_DETECT_RANGE_TENTH_INCHES ) &&		
+								(g_pFullSensorStatus->IR[IR_SENSOR_FRONT_RIGHT] <= IR_LR_DETECT_RANGE_TENTH_INCHES ) )		
 							{
 								// Both Long Range Sensors see the object
 								SetTurn( TURN_CENTER );	
 								MsgString.Format( "Heading for IR Object Straight Ahead!  Range L=%d R=%d",
-									g_SensorStatus.IR[IR_SENSOR_FRONT_LEFT], g_SensorStatus.IR[IR_SENSOR_FRONT_RIGHT] );
+									g_pFullSensorStatus->IR[IR_SENSOR_FRONT_LEFT], g_pFullSensorStatus->IR[IR_SENSOR_FRONT_RIGHT] );
 								ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
 							}
-							else if( g_SensorStatus.IR[IR_SENSOR_FRONT_LEFT] <= IR_LR_DETECT_RANGE_TENTH_INCHES )	
+							else if( g_pFullSensorStatus->IR[IR_SENSOR_FRONT_LEFT] <= IR_LR_DETECT_RANGE_TENTH_INCHES )	
 							{
 								// Left IR sees it, but the right does not.  Turn Left
 								SetTurn( TURN_LEFT_SLOW );	
 								MsgString.Format( "Heading for IR Object Ahead Left! Range L=%d R=%d",
-									g_SensorStatus.IR[IR_SENSOR_FRONT_LEFT], g_SensorStatus.IR[IR_SENSOR_FRONT_RIGHT] );
+									g_pFullSensorStatus->IR[IR_SENSOR_FRONT_LEFT], g_pFullSensorStatus->IR[IR_SENSOR_FRONT_RIGHT] );
 								ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
 							}
 							else
@@ -1187,7 +1187,7 @@ CheckNavState:
 								// Right IR sees it, but the left does not.  Turn Right
 								SetTurn( TURN_RIGHT_SLOW );	
 								MsgString.Format( "Heading for IR Object Ahead Right!  Range L=%d R=%d",
-									g_SensorStatus.IR[IR_SENSOR_FRONT_LEFT], g_SensorStatus.IR[IR_SENSOR_FRONT_RIGHT] );
+									g_pFullSensorStatus->IR[IR_SENSOR_FRONT_LEFT], g_pFullSensorStatus->IR[IR_SENSOR_FRONT_RIGHT] );
 								ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
 							}
 							SetSpeed( SPEED_FWD_SLOW );	
@@ -1196,23 +1196,23 @@ CheckNavState:
 						{
 							// Not dead ahead, but picked up by an US sensor
 
-							if( abs((int)(g_SensorStatus.US[US_SENSOR_FRONT_LEFT] - g_SensorStatus.US[US_SENSOR_FRONT_RIGHT]) < US_RANGE_FUDGE_AMOUNT_TENTH_INCHES) )
+							if( abs((int)(g_pFullSensorStatus->US[US_SENSOR_FRONT_LEFT] - g_pFullSensorStatus->US[US_SENSOR_FRONT_RIGHT]) < US_RANGE_FUDGE_AMOUNT_TENTH_INCHES) )
 							{
 								// Both US Sensors see the same object go straight
 								SetTurn( TURN_CENTER );	
 								MsgString.Format( "Heading for US Object Straight Ahead!  Range L=%d R=%d",
-									g_SensorStatus.US[US_SENSOR_FRONT_LEFT], g_SensorStatus.US[US_SENSOR_FRONT_RIGHT] );
+									g_pFullSensorStatus->US[US_SENSOR_FRONT_LEFT], g_pFullSensorStatus->US[US_SENSOR_FRONT_RIGHT] );
 								ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
 							}
-							else if( g_SensorStatus.US[US_SENSOR_FRONT_LEFT] < g_SensorStatus.US[US_SENSOR_FRONT_RIGHT] )
+							else if( g_pFullSensorStatus->US[US_SENSOR_FRONT_LEFT] < g_pFullSensorStatus->US[US_SENSOR_FRONT_RIGHT] )
 							{
 								// Object is closer on the Left, so Turn Left
-								if( g_pSensorSummary->nFrontObjectDistance > IR_LR_DETECT_RANGE_TENTH_INCHES )
+								if( g_pNavSensorSummary->nFrontObjectDistance > IR_LR_DETECT_RANGE_TENTH_INCHES )
 								{
 									// Probably out of range for the Long Range IR sensor.   Do gentle turn
 									SetTurn( TURN_LEFT_SLOW );	
 									MsgString.Format( "Heading for US Object Far Ahead Left!  Range L=%d R=%d",
-										g_SensorStatus.US[US_SENSOR_FRONT_LEFT], g_SensorStatus.US[US_SENSOR_FRONT_RIGHT] );
+										g_pFullSensorStatus->US[US_SENSOR_FRONT_LEFT], g_pFullSensorStatus->US[US_SENSOR_FRONT_RIGHT] );
 									ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
 								}
 								else
@@ -1220,19 +1220,19 @@ CheckNavState:
 									// Close to object, do sharper turn
 									SetTurn( TURN_LEFT_MED_SLOW );
 									MsgString.Format( "Heading for US Object Near Ahead Left!  Range L=%d R=%d",
-										g_SensorStatus.US[US_SENSOR_FRONT_LEFT], g_SensorStatus.US[US_SENSOR_FRONT_RIGHT] );
+										g_pFullSensorStatus->US[US_SENSOR_FRONT_LEFT], g_pFullSensorStatus->US[US_SENSOR_FRONT_RIGHT] );
 									ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
 								}
 							}
 							else
 							{
 								// Turn Right
-								if( g_pSensorSummary->nFrontObjectDistance <= IR_LR_DETECT_RANGE_TENTH_INCHES )
+								if( g_pNavSensorSummary->nFrontObjectDistance <= IR_LR_DETECT_RANGE_TENTH_INCHES )
 								{
 									// Probably out of range for the Long Range IR sensor.   Do gentle turn
 									SetTurn( TURN_RIGHT_SLOW );	
 									MsgString.Format( "Heading for US Object Far Ahead Right!  Range L=%d R=%d",
-										g_SensorStatus.US[US_SENSOR_FRONT_LEFT], g_SensorStatus.US[US_SENSOR_FRONT_RIGHT] );
+										g_pFullSensorStatus->US[US_SENSOR_FRONT_LEFT], g_pFullSensorStatus->US[US_SENSOR_FRONT_RIGHT] );
 									ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
 								}
 								else
@@ -1240,7 +1240,7 @@ CheckNavState:
 									// Close to object, do sharper turn
 									SetTurn( TURN_RIGHT_MED_SLOW );
 									MsgString.Format( "Heading for US Object Near Ahead Right!  Range L=%d R=%d",
-										g_SensorStatus.US[US_SENSOR_FRONT_LEFT], g_SensorStatus.US[US_SENSOR_FRONT_RIGHT] );
+										g_pFullSensorStatus->US[US_SENSOR_FRONT_LEFT], g_pFullSensorStatus->US[US_SENSOR_FRONT_RIGHT] );
 									ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
 								}
 							}

@@ -81,13 +81,6 @@
 	#endif
 
 
-// I2C-IT Sensors
-#define ARM_L_IR_SENSOR_CLAW		g_SensorStatus.IR3[0]
-#define ARM_L_IR_SENSOR_ELBOW		g_SensorStatus.IR3[1]
-#define ARM_R_IR_SENSOR_CLAW		g_SensorStatus.IR3[2]
-#define ARM_R_IR_SENSOR_ELBOW		g_SensorStatus.IR3[3]
-
-
 // HW Bumpers.  Arduino uses: gStatus_HW_Bumper
 #define HW_BUMPER_AVAILABLE_MASK_00			0x00	// Bit 0 mask
 #define HW_BUMPER_AVAILABLE_MASK_02			0x02	// Bit 1 mask
@@ -104,6 +97,8 @@
 
 
 // IR Bumpers.  Arduino uses: gStatus_IR_Bumper
+#define IR_BUMPER_RANGE						 100	// Tenth_Inches - detection distance for IR bumpers
+
 #define IR_BUMPER_FRONT_LEFT_MASK			0x01	// Bit 0 mask
 #define IR_BUMPER_FRONT_RIGHT_MASK			0x02	// Bit 1 mask
 #define IR_BUMPER_CLIFF_LEFT_MASK			0x04	// Bit 2 mask
@@ -135,28 +130,29 @@
 
 
 // Bumper Macros
-#define IR_BUMPER_RANGE						 100	// Tenth_Inches - detection distance for IR bumpers
-#define IR_BUMPER_OBJECT_FRONT_LEFT			(  g_SensorStatus.IRBumper & IR_BUMPER_FRONT_LEFT_MASK   )
-#define IR_BUMPER_OBJECT_FRONT_RIGHT		(  g_SensorStatus.IRBumper & IR_BUMPER_FRONT_RIGHT_MASK  )
-#define IR_BUMPER_CLIFF_LEFT				(  g_SensorStatus.IRBumper & IR_BUMPER_CLIFF_LEFT_MASK   )	// Lack of object = cliff
-#define IR_BUMPER_CLIFF_RIGHT				(  g_SensorStatus.IRBumper & IR_BUMPER_CLIFF_RIGHT_MASK  )
-#define IR_BUMPER_OBJECT_REAR_LEFT			(  g_SensorStatus.IRBumper & IR_BUMPER_REAR_LEFT_MASK    )
-#define IR_BUMPER_OBJECT_REAR_RIGHT			(  g_SensorStatus.IRBumper & IR_BUMPER_REAR_RIGHT_MASK   )
-#define PIR_MOTION_DETECTED_LEFT			(  g_SensorStatus.IRBumper & IR_BUMPER_PIR_LEFT_MASK     )
-#define PIR_MOTION_DETECTED_RIGHT			(  g_SensorStatus.IRBumper & IR_BUMPER_PIR_RIGHT_MASK    )
+	/***
+#define IR_BUMPER_OBJECT_FRONT_LEFT			(  g_pFullSensorStatus->IRBumper & IR_BUMPER_FRONT_LEFT_MASK   )
+#define IR_BUMPER_OBJECT_FRONT_RIGHT		(  g_pFullSensorStatus->IRBumper & IR_BUMPER_FRONT_RIGHT_MASK  )
+#define IR_BUMPER_CLIFF_LEFT				(  g_pFullSensorStatus->IRBumper & IR_BUMPER_CLIFF_LEFT_MASK   )	// Lack of object = cliff
+#define IR_BUMPER_CLIFF_RIGHT				(  g_pFullSensorStatus->IRBumper & IR_BUMPER_CLIFF_RIGHT_MASK  )
+#define IR_BUMPER_OBJECT_REAR_LEFT			(  g_pFullSensorStatus->IRBumper & IR_BUMPER_REAR_LEFT_MASK    )
+#define IR_BUMPER_OBJECT_REAR_RIGHT			(  g_pFullSensorStatus->IRBumper & IR_BUMPER_REAR_RIGHT_MASK   )
+#define PIR_MOTION_DETECTED_LEFT			(  g_pFullSensorStatus->IRBumper & IR_BUMPER_PIR_LEFT_MASK     )
+#define PIR_MOTION_DETECTED_RIGHT			(  g_pFullSensorStatus->IRBumper & IR_BUMPER_PIR_RIGHT_MASK    )
 
-#define ARM_L_HW_BUMPER_OBJECT_ELBOW		(  g_SensorStatus.ArmBumperL & ARM_L_HW_BUMPER_ELBOW_MASK	 )
-#define ARM_L_IR_BUMPER_OBJECT_FINGER_L		(  g_SensorStatus.ArmBumperL & ARM_L_IR_BUMPER_FINGER_L_MASK )
-#define ARM_L_IR_BUMPER_OBJECT_FINGER_R		(  g_SensorStatus.ArmBumperL & ARM_L_IR_BUMPER_FINGER_R_MASK )
-#define ARM_L_IR_BUMPER_INSIDE_CLAW			(  g_SensorStatus.ArmBumperL & ARM_L_BUMPER_INSIDE_CLAW_MASK )
+#define ARM_L_HW_BUMPER_OBJECT_ELBOW		(  g_pFullSensorStatus->ArmBumperL & ARM_L_HW_BUMPER_ELBOW_MASK	 )
+#define ARM_L_IR_BUMPER_OBJECT_FINGER_L		(  g_pFullSensorStatus->ArmBumperL & ARM_L_IR_BUMPER_FINGER_L_MASK )
+#define ARM_L_IR_BUMPER_OBJECT_FINGER_R		(  g_pFullSensorStatus->ArmBumperL & ARM_L_IR_BUMPER_FINGER_R_MASK )
+#define ARM_L_IR_BUMPER_INSIDE_CLAW			(  g_pFullSensorStatus->ArmBumperL & ARM_L_BUMPER_INSIDE_CLAW_MASK )
 
-#define ARM_R_HW_BUMPER_OBJECT_ELBOW		(  g_SensorStatus.ArmBumperR & ARM_R_HW_BUMPER_ELBOW_MASK	 )
+#define ARM_R_HW_BUMPER_OBJECT_ELBOW		(  g_pFullSensorStatus->ArmBumperR & ARM_R_HW_BUMPER_ELBOW_MASK	 )
 
-#define HW_BUMPER_HIT_FRONT					(  g_SensorStatus.HWBumper & HW_BUMPER_FRONT_MASK  )
-#define HW_BUMPER_HIT_REAR					(  g_SensorStatus.HWBumper & HW_BUMPER_REAR_MASK   )
-#define HW_BUMPER_HIT_SIDE_LEFT				(  g_SensorStatus.HWBumper & HW_BUMPER_SIDE_LEFT_MASK   )
-#define HW_BUMPER_HIT_SIDE_RIGHT			(  g_SensorStatus.HWBumper & HW_BUMPER_SIDE_RIGHT_MASK  )
+#define HW_BUMPER_HIT_FRONT					(  g_pFullSensorStatus->HWBumper & HW_BUMPER_FRONT_MASK  )
+#define HW_BUMPER_HIT_REAR					(  g_pFullSensorStatus->HWBumper & HW_BUMPER_REAR_MASK   )
+#define HW_BUMPER_HIT_SIDE_LEFT				(  g_pFullSensorStatus->HWBumper & HW_BUMPER_SIDE_LEFT_MASK   )
+#define HW_BUMPER_HIT_SIDE_RIGHT			(  g_pFullSensorStatus->HWBumper & HW_BUMPER_SIDE_RIGHT_MASK  )
 
+	**/
 
 // Analog Sensors used as bumper sensors
 #define S_FOREARM_BONE_LEN_TENTH_INCHES_L							147.5	// Tenth_Inches
@@ -165,6 +161,11 @@
 #define ARM_L_IR_BUMPER_OBJECT_ELBOW		(  ARM_L_IR_SENSOR_ELBOW < (S_FOREARM_BONE_LEN_TENTH_INCHES_L+IR_ELBOW_HIT_RANGE_TENTH_INCHES)  ) // I2C-IT Sensor: True if object detected within N Tenth_Inches
 #define ARM_R_IR_BUMPER_OBJECT_ELBOW		(  ARM_R_IR_SENSOR_ELBOW < (S_FOREARM_BONE_LEN_TENTH_INCHES_R+IR_ELBOW_HIT_RANGE_TENTH_INCHES)  ) // I2C-IT Sensor: True if object detected within N Tenth_Inches
 
+// I2C-IT Sensors
+#define ARM_L_IR_SENSOR_CLAW		g_pFullSensorStatus->IR3[0]
+#define ARM_L_IR_SENSOR_ELBOW		g_pFullSensorStatus->IR3[1]
+#define ARM_R_IR_SENSOR_CLAW		g_pFullSensorStatus->IR3[2]
+#define ARM_R_IR_SENSOR_ELBOW		g_pFullSensorStatus->IR3[3]
 
 
 

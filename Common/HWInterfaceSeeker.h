@@ -129,23 +129,24 @@
 
 
 // Bumper Macros
-#define IR_BUMPER_OBJECT_FRONT_LEFT		(g_SensorStatus.IRBumper & IR_BUMPER_FRONT_LEFT_MASK)
-#define IR_BUMPER_OBJECT_FRONT_RIGHT	(g_SensorStatus.IRBumper & IR_BUMPER_FRONT_RIGHT_MASK)
-#define IR_BUMPER_CLIFF_LEFT			(!(g_SensorStatus.IRBumper & IR_BUMPER_CLIFF_LEFT_MASK))	// Lack of object = cliff
-#define IR_BUMPER_CLIFF_RIGHT			(!(g_SensorStatus.IRBumper & IR_BUMPER_CLIFF_RIGHT_MASK))
-#define IR_BUMPER_OBJECT_REAR_LEFT		(g_SensorStatus.IRBumper & IR_BUMPER_REAR_LEFT_MASK)
-#define IR_BUMPER_OBJECT_REAR_RIGHT		(g_SensorStatus.IRBumper & IR_BUMPER_REAR_RIGHT_MASK)
+	/*
+#define IR_BUMPER_OBJECT_FRONT_LEFT		(g_pFullSensorStatus->IRBumper & IR_BUMPER_FRONT_LEFT_MASK)
+#define IR_BUMPER_OBJECT_FRONT_RIGHT	(g_pFullSensorStatus->IRBumper & IR_BUMPER_FRONT_RIGHT_MASK)
+#define IR_BUMPER_CLIFF_LEFT			(!(g_pFullSensorStatus->IRBumper & IR_BUMPER_CLIFF_LEFT_MASK))	// Lack of object = cliff
+#define IR_BUMPER_CLIFF_RIGHT			(!(g_pFullSensorStatus->IRBumper & IR_BUMPER_CLIFF_RIGHT_MASK))
+#define IR_BUMPER_OBJECT_REAR_LEFT		(g_pFullSensorStatus->IRBumper & IR_BUMPER_REAR_LEFT_MASK)
+#define IR_BUMPER_OBJECT_REAR_RIGHT		(g_pFullSensorStatus->IRBumper & IR_BUMPER_REAR_RIGHT_MASK)
 
-#define HW_BUMPER_HIT_FRONT_LEFT		(g_SensorStatus.HWBumper & HW_BUMPER_FRONT_LEFT_MASK)
-#define HW_BUMPER_HIT_FRONT_RIGHT		(g_SensorStatus.HWBumper & HW_BUMPER_FRONT_RIGHT_MASK)
-#define HW_BUMPER_HIT_SIDE_LEFT			(g_SensorStatus.HWBumper & HW_BUMPER_SIDE_LEFT_MASK)
-#define HW_BUMPER_HIT_SIDE_RIGHT		(g_SensorStatus.HWBumper & HW_BUMPER_SIDE_RIGHT_MASK)
-#define HW_BUMPER_HIT_REAR				(g_SensorStatus.HWBumper & HW_BUMPER_REAR_MASK)
+#define HW_BUMPER_HIT_FRONT_LEFT		(g_pFullSensorStatus->HWBumper & HW_BUMPER_FRONT_LEFT_MASK)
+#define HW_BUMPER_HIT_FRONT_RIGHT		(g_pFullSensorStatus->HWBumper & HW_BUMPER_FRONT_RIGHT_MASK)
+#define HW_BUMPER_HIT_SIDE_LEFT			(g_pFullSensorStatus->HWBumper & HW_BUMPER_SIDE_LEFT_MASK)
+#define HW_BUMPER_HIT_SIDE_RIGHT		(g_pFullSensorStatus->HWBumper & HW_BUMPER_SIDE_RIGHT_MASK)
+#define HW_BUMPER_HIT_REAR				(g_pFullSensorStatus->HWBumper & HW_BUMPER_REAR_MASK)
 
 #define HW_BUMPER_HIT_FRONT				(HW_BUMPER_HIT_FRONT_RIGHT || HW_BUMPER_HIT_FRONT_LEFT)
+	*/
 
-
-
+/*
 ////////////////////////////////////////////////////////////////
 // Packet Structure for Comands to Arduino
 #ifndef __ARDUINO_TARGET	// Arduino Compiler does not understand pack
@@ -169,7 +170,7 @@ typedef struct
 #pragma pack( 4 )
 #endif
 
-
+*/
 
 
 

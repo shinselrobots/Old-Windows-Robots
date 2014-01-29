@@ -47,6 +47,8 @@ __itt_string_handle* pshHandleArmServoStatusUpdateRight = __itt_string_handle_cr
 // RIGHT ARM INITIAL MOVEMENT
 void CBehaviorModule::HandleArmMovementRequestRight( WPARAM wParam, LPARAM lParam )
 {
+#if ROBOT_HAS_RIGHT_ARM
+
 	__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, pshHandleArmMovementRequestRight);
 		m_ArmMovementRight = lParam;
 		// by default, each movement should complete before the next begins
@@ -369,6 +371,9 @@ void CBehaviorModule::HandleArmMovementRequestRight( WPARAM wParam, LPARAM lPara
 			}
 		} // switch m_ArmMovementRight
 	__itt_task_end(pDomainControlThread);
+
+	#endif // ROBOT_HAS_RIGHT_ARM
+
 }
 
 
@@ -383,6 +388,9 @@ void CBehaviorModule::HandleArmServoStatusUpdateRight( WPARAM wParam, LPARAM lPa
 {
 	IGNORE_UNUSED_PARAM (wParam);
 	IGNORE_UNUSED_PARAM (lParam);
+
+#if ROBOT_HAS_RIGHT_ARM
+
 	__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, pshHandleArmServoStatusUpdateRight);
 
 	if( ARM_MOVEMENT_NONE == m_ArmMovementRight ) 
@@ -717,7 +725,7 @@ void CBehaviorModule::HandleArmServoStatusUpdateRight( WPARAM wParam, LPARAM lPa
 						case 1: // Wait for Claw sensor to detect something
 								// (will usually note person's hand )
 						{
-							if( g_pSensorSummary->nObjectClawRight < CLAW_DETECT_TRIGGER_DISTANCE_TENTH_INCHES )
+							if( g_pNavSensorSummary->nObjectClawRight < CLAW_DETECT_TRIGGER_DISTANCE_TENTH_INCHES )
 							{
 								// Object detected.  
 								int RandomNumber = ((6 * rand()) / RAND_MAX);
@@ -868,7 +876,7 @@ void CBehaviorModule::HandleArmServoStatusUpdateRight( WPARAM wParam, LPARAM lPa
 						case 1: // Wait for Claw sensors to detect something
 								// (will usually note person's hand as they provide the object)
 						{
-							if( g_pSensorSummary->nObjectClawRight < CLAW_DETECT_TRIGGER_DISTANCE_TENTH_INCHES  )	// 
+							if( g_pNavSensorSummary->nObjectClawRight < CLAW_DETECT_TRIGGER_DISTANCE_TENTH_INCHES  )	// 
 							{
 								// Object detected.  Close claw.
 								ROBOT_LOG( TRUE,"Extend Arm: Hand Object detected. Closing Claw\n")
@@ -926,7 +934,7 @@ void CBehaviorModule::HandleArmServoStatusUpdateRight( WPARAM wParam, LPARAM lPa
 						case 1: // Wait for claw sensor to detect something
 								// (will usually note person's hand as they take the object)
 						{
-							if( g_pSensorSummary->nObjectClawRight < CLAW_DETECT_TRIGGER_DISTANCE_TENTH_INCHES  )	// 
+							if( g_pNavSensorSummary->nObjectClawRight < CLAW_DETECT_TRIGGER_DISTANCE_TENTH_INCHES  )	// 
 							{
 								// Object detected.  Open claw.
 								ROBOT_LOG( TRUE,"Extend Arm: Hand Object detected. Opening Claw\n")
@@ -1191,7 +1199,7 @@ void CBehaviorModule::HandleArmServoStatusUpdateRight( WPARAM wParam, LPARAM lPa
 					{
 						gArmTimerRight = 2;	// Give time to settle - 1/10 second per count!
 
-						if( 0 != g_SensorStatus.ArmBumperR )
+						if( 0 != g_pFullSensorStatus->ArmRightBumperElbow )
 						{
 							m_ObjectDetectCount++;
 							ROBOT_LOG( TRUE,"Find Object: Object Detected: %02X  m_ObjectDetectCount = %d\n", 
@@ -1659,7 +1667,7 @@ void CBehaviorModule::HandleArmServoStatusUpdateRight( WPARAM wParam, LPARAM lPa
 						case 3:
 						{
 							// Get distance to door as read by hand sensor.  This will be used as a threshold to detect the handle
-							//m_SensorThreshold = (ARM_R_IR_SENSOR_CLAW?? or g_pSensorSummary->nObjectClawLeft??) - 1; // Distance to door - 1 inch fudge factor for variance
+							//m_SensorThreshold = (ARM_R_IR_SENSOR_CLAW?? or g_pNavSensorSummary->nObjectClawLeft??) - 1; // Distance to door - 1 inch fudge factor for variance
 							m_pArmControlLeft->ExecutePosition();
 							m_ArmMovementStateLeft++;
 							m_ArmWaitForMoveToCompleteLeft = TRUE;
@@ -1669,7 +1677,7 @@ void CBehaviorModule::HandleArmServoStatusUpdateRight( WPARAM wParam, LPARAM lPa
 						{
 							// Was the handle found by the hand sensor?
 							int SensorThreshold = 40; // Tenth inches
-							if( ARM_R_IR_SENSOR_CLAW  <= SensorThreshold ) // TODO!! Check load on elbow - maybe detect that way??
+							if(  ARM_R_IR_SENSOR_CLAW  <= SensorThreshold ) // TODO!! Check load on elbow - maybe detect that way??
 							{
 								// Handle found!  Go to next state
 								m_ArmMovementStateLeft++;
@@ -1750,6 +1758,9 @@ void CBehaviorModule::HandleArmServoStatusUpdateRight( WPARAM wParam, LPARAM lPa
 	}	// if( ARM_MOVEMENT_NONE != m_ArmMovementRight )
 
 __itt_task_end(pDomainControlThread);
+
+	#endif //ROBOT_HAS_RIGHT_ARM
+
 }	// HandleServoStatusUpdateRight
 
 

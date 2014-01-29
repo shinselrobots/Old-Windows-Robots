@@ -225,7 +225,7 @@ DWORD ReceiveServerSocketData( SERVER_SOCKET_STRUCT *SocketStruct )
 				}
 				else
 				{
-					memcpy( &g_SensorStatus, pBulkDataMessage->Data, sizeof(SENSOR_STATUS_T) );
+					memcpy( &g_pFullSensorStatus, pBulkDataMessage->Data, sizeof(SENSOR_STATUS_T) );
 
 					PostMessage( g_RobotCmdViewHWND, (pStatusMessage->MessageType), 
 						pBulkDataMessage->Param1, pBulkDataMessage->Param2 );
@@ -611,15 +611,18 @@ DWORD WINAPI ServerSockSendThreadProc( LPVOID lpParameter )
 			else if( ROBOT_RESPONSE_PIC_STATUS == msg.wParam )
 			{
 				// Handle Status Info from the Arduino
+				ROBOT_LOG( TRUE,  "WARNING!  Server Sock: ROBOT_RESPONSE_PIC_STATUS DISABLED!\n" )
+				/* TODO-MUST - change this to use a simplified block of important information for display on the GUI
 				nMessageLength = sizeof( SENSOR_STATUS_T );
 				pBulkDataMessage->Length = (WORD)nMessageLength;
 				ASSERT(  pBulkDataMessage->Length < (BULK_DATA_SIZE - 1) );
-				memcpy( pBulkDataMessage->Data, &g_SensorStatus, nMessageLength );
+				memcpy( pBulkDataMessage->Data, &g_pFullSensorStatus, nMessageLength );
 
 				nSent = send(	
 					st->sockConnected, 
 					MessageToSend, 
 					nMessageLength+12, 0);
+				*/
 			}
 			else if( ROBOT_RESPONSE_LASER_SCANNER_DATA == msg.wParam )
 			{

@@ -725,7 +725,7 @@ void CGridNavModule::ProcessMessage(
 			ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
 
 			// Find the Path
-			if( SOLVED == g_pGridMap->FindPath( FPointToPoint(g_SensorStatus.CurrentLocation), m_Goal ) )
+			if( SOLVED == g_pGridMap->FindPath( FPointToPoint(g_pFullSensorStatus->CurrentLocation), m_Goal ) )
 			{
 				m_NextCellLocationRW = g_pGridMap->GetNextCellLocationRW();
 				m_NavState = TURN_TO_NEXT_WAYPOINT;	// turn to the direction of the first cell
@@ -868,7 +868,7 @@ void CGridNavModule::ProcessMessage(
 				if( m_pDriveCtrl->CheckAndSetOwner( GRID_NAV_MODULE ) )
 				{
 					// Control regained, recalculate the route to the destination
-					if( SOLVED == g_pGridMap->FindPath( FPointToPoint(g_SensorStatus.CurrentLocation), m_Goal ) )
+					if( SOLVED == g_pGridMap->FindPath( FPointToPoint(g_pFullSensorStatus->CurrentLocation), m_Goal ) )
 					{
 						m_NextCellLocationRW = g_pGridMap->GetNextCellLocationRW();
 						m_NavState = TURN_TO_NEXT_WAYPOINT;	// turn to the direction of the first cell
@@ -888,7 +888,7 @@ void CGridNavModule::ProcessMessage(
 
 CheckNavState:			
 
-			int Distance = CalculateDistance( FPointToPoint(g_SensorStatus.CurrentLocation), m_NextCellLocationRW );
+			int Distance = CalculateDistance( FPointToPoint(g_pFullSensorStatus->CurrentLocation), m_NextCellLocationRW );
 			if( Distance <= (GRID_MAP_RESOLUTION *2) )
 			{
 				// Cell reached.  Head to next cell!
@@ -918,8 +918,8 @@ CheckNavState:
 			//  consider avoid object, but close to goal - could go past goal!
 			//  need concept of distance to goal!  If distance to goal < distance to object, ignore object?
 
-			int  HeadingToNextCell = CalculateAngle( FPointToPoint(g_SensorStatus.CurrentLocation), m_NextCellLocationRW);
-			int TurnDegrees = CalculateTurn(g_SensorStatus.CompassHeading, HeadingToNextCell);
+			int  HeadingToNextCell = CalculateAngle( FPointToPoint(g_pFullSensorStatus->CurrentLocation), m_NextCellLocationRW);
+			int TurnDegrees = CalculateTurn(g_pFullSensorStatus->CompassHeading, HeadingToNextCell);
 
 			switch (m_NavState) 
 			{

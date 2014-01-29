@@ -26,7 +26,7 @@
 #include "micropather.h"		// required here since Map Doc inherits from MicroPanther class "Graph"
 using namespace micropather;
 
-void SimulatePic( ARDUINO_CMD_T PicCmd );			// Implemented in Simulator.cpp
+void SimulateHardware( DWORD Cmd, DWORD Param1, DWORD Param2 ); // Implemented in Simulator.cpp
 
 #define ULTRASONIC_TENTH_INCH_PER_STEP			06.74	// .674 inches per step (measured)
 #define LASER_FIND_AREA_TENTHDEGREES			   60	// 6 degrees
@@ -396,6 +396,7 @@ public:
 
 
 	void ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam );
+	void ProcessSensorStatus(); // different implementations for each robot type
 	void SetCompassCorrection( int CompassCorrection );
 	void UpdateFromTwoOdometers( double OdometerUpdateTenthInchesL, double OdometerUpdateTenthInchesR);
 
@@ -413,6 +414,13 @@ public:
 	int 	ReadElbowSensorsLeft();
 	int 	ReadElbowSensorsRight();
 	void	DoSensorFusion();
+	void	UpdateOdometer();
+
+	#if SENSOR_CONFIG_TYPE == SENSOR_CONFIG_LOKI
+		void	HandleAndroidPhone();
+		void	HandleThermalSensor();
+		void	HandleAnalogSensors();
+	#endif
 
 	void	UpdateLocation();
 	void	CalculateSensorPositionOffset( 

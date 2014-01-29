@@ -140,6 +140,7 @@
     <ClInclude Include="..\Common\HWInterfaceOther.h" />
     <ClInclude Include="..\Common\HWInterfaceParams.h" />
     <ClInclude Include="..\Common\HWInterfaceSeeker.h" />
+    <ClInclude Include="..\Common\HWInterfaceTeleop.h" />
     <ClInclude Include="..\Common\HWInterfaceTurtle.h" />
     <ClInclude Include="..\Common\KerrControl.h" />
     <ClInclude Include="..\Common\Kinect.h" />
@@ -177,7 +178,6 @@
     <ClInclude Include="..\Common\WiiControl.h" />
     <ClInclude Include="..\Common\WiiMoteCommon.h" />
     <ClInclude Include="Resource.h" />
-    <ClInclude Include="RobotType.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
@@ -197,7 +197,9 @@
     <ClCompile Include="..\Common\GridNavModule.cpp" />
     <ClCompile Include="..\Common\HeadBehavior.cpp" />
     <ClCompile Include="..\Common\HeadControl.cpp" />
-    <ClCompile Include="..\Common\HWInterface.cpp" />
+    <ClCompile Include="..\Common\HWInterfaceOther.cpp" />
+    <ClCompile Include="..\Common\HWInterfaceArduino.cpp" />
+    <ClCompile Include="..\Common\HWInterfaceKobuki.cpp" />
     <ClCompile Include="..\Common\KerrControl.cpp" />
     <ClCompile Include="..\Common\KinectInterface.cpp" />
     <ClCompile Include="..\Common\KinectModule.cpp" />
@@ -209,7 +211,6 @@
     <ClCompile Include="..\Common\micropather.cpp" />
     <ClCompile Include="..\Common\Module.cpp" />
     <ClCompile Include="..\Common\MotorControliRobot.cpp" />
-    <ClCompile Include="..\Common\MotorControlKobuki.cpp" />
     <ClCompile Include="..\Common\MotorControlPilot.cpp" />
     <ClCompile Include="..\Common\MotorControlTrex.cpp" />
     <ClCompile Include="..\Common\NavModule.cpp" />
@@ -225,6 +226,8 @@
     <ClCompile Include="..\Common\RobotCmdView.cpp" />
     <ClCompile Include="..\Common\RotateMapDlg.cpp" />
     <ClCompile Include="..\Common\SensorModule.cpp" />
+    <ClCompile Include="..\Common\SensorModuleTeleop.cpp" />
+    <ClCompile Include="..\Common\SensorModuleTurtle.cpp" />
     <ClCompile Include="..\Common\ServerSock.cpp" />
     <ClCompile Include="..\Common\SetupDoc.cpp" />
     <ClCompile Include="..\Common\SetupView.cpp" />

@@ -236,25 +236,25 @@ void CTrexControl::SpeedControl()
 	{
 		// Robot going straight, update the tracking counter
 		// This number shows how much cumlative error has occured
-		m_StraightTracking += g_SensorStatus.TachometerTicksL - g_SensorStatus.TachometerTicksR;
+		m_StraightTracking += g_pFullSensorStatus->TachometerTicksL - g_pFullSensorStatus->TachometerTicksR;
 		TrackingOffset = m_StraightTracking / STRAIGHT_TRACKING_RATIO;
 	}
 
 
 	BOOL RightMotorChanged = SingleWheelSpeedControl( m_MotorSpeedCmdRight, m_MotorSpeedRequestRight, 
-							g_SensorStatus.TachometerTicksR, (m_TachometerTargetRight+TrackingOffset), RIGHT_WHEEL_STR );
+							g_pFullSensorStatus->TachometerTicksR, (m_TachometerTargetRight+TrackingOffset), RIGHT_WHEEL_STR );
 
 
 	BOOL LeftMotorChanged = SingleWheelSpeedControl( m_MotorSpeedCmdLeft, m_MotorSpeedRequestLeft, 
-							g_SensorStatus.TachometerTicksL, (m_TachometerTargetLeft-TrackingOffset), LEFT_WHEEL_STR );
+							g_pFullSensorStatus->TachometerTicksL, (m_TachometerTargetLeft-TrackingOffset), LEFT_WHEEL_STR );
 
 	if( (0 != m_MotorSpeedRequestLeft) || (0 != m_MotorSpeedRequestRight) )
 	{
 		ROBOT_LOG( DEBUG_SPEED_CONTROL, "Right: Request: %3d  Current Cmd: %3d  Target Tach: %3d, Current Tach: %3d", 
-			m_MotorSpeedRequestRight, m_MotorSpeedCmdRight, m_TachometerTargetRight, g_SensorStatus.TachometerTicksR )
+			m_MotorSpeedRequestRight, m_MotorSpeedCmdRight, m_TachometerTargetRight, g_pFullSensorStatus->TachometerTicksR )
 
 		ROBOT_LOG( DEBUG_SPEED_CONTROL, "Left:  Request: %3d  Current Cmd: %3d  Target Tach: %3d, Current Tach: %3d, Straight Tracking: %3d", 
-			m_MotorSpeedRequestLeft, m_MotorSpeedCmdLeft, m_TachometerTargetLeft, g_SensorStatus.TachometerTicksL, m_StraightTracking )
+			m_MotorSpeedRequestLeft, m_MotorSpeedCmdLeft, m_TachometerTargetLeft, g_pFullSensorStatus->TachometerTicksL, m_StraightTracking )
 	}
 
 

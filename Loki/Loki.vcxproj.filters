@@ -269,9 +269,6 @@
     <ClCompile Include="..\Common\HeadControl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Common\HWInterface.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\Common\KerrControl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -378,6 +375,21 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\DriveBehaviorModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\HWInterfaceArduino.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\HWInterfaceKobuki.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\HWInterfaceOther.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\SensorModuleCarbot.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\SensorModuleLoki.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

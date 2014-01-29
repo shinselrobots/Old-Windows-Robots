@@ -1410,8 +1410,8 @@ BOOL ArmControl::CalibratePressureSensors()
 	if(LEFT_ARM == m_ArmNumber )
 	{
 		// Get current values for pressure sensors, and save as a baseline 
-		m_PressureSensorCalibrationL = g_SensorStatus.LeftHandRawPressureL;
-		m_PressureSensorCalibrationR = g_SensorStatus.LeftHandRawPressureR;
+		m_PressureSensorCalibrationL = g_pFullSensorStatus->LeftHandRawPressureL;
+		m_PressureSensorCalibrationR = g_pFullSensorStatus->LeftHandRawPressureR;
 
 		if( (0 == m_PressureSensorCalibrationL) || (0 == m_PressureSensorCalibrationR) )
 		{
@@ -1450,8 +1450,8 @@ int ArmControl::GetPressureLoadPercent()
 
 	if(LEFT_ARM == m_ArmNumber )
 	{
-		int PercentL = 100 - ((g_SensorStatus.LeftHandRawPressureL * 100) / m_PressureSensorCalibrationL);
-		int PercentR = 100 - ((g_SensorStatus.LeftHandRawPressureR * 100) / m_PressureSensorCalibrationR);
+		int PercentL = 100 - ((g_pFullSensorStatus->LeftHandRawPressureL * 100) / m_PressureSensorCalibrationL);
+		int PercentR = 100 - ((g_pFullSensorStatus->LeftHandRawPressureR * 100) / m_PressureSensorCalibrationR);
 		int PercentMax = max(PercentL, PercentR);
 		ROBOT_LOG( TRUE,  " DEBUG Hand pressure measured at: %3d, L=%3d, R=%3d", 
 			PercentMax, PercentL, PercentR )

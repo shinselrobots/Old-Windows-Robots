@@ -15,7 +15,9 @@
 		DWORD WINAPI SoundThreadProc( LPVOID lpParameter );
 		DWORD WINAPI KinectAppSharedMemoryIPCThreadProc( LPVOID lpParameter );
 		DWORD WINAPI CameraAppSharedMemoryIPCThreadProc( LPVOID lpParameter );
+#if( MOTOR_CONTROL_TYPE == KOBUKI_MOTOR_CONTROL )
 		DWORD WINAPI KobukiAppSharedMemoryIPCThreadProc( LPVOID lpParameter );
+#endif
 		DWORD WINAPI SpeakThreadProc( LPVOID lpParameter );
 
 	#endif

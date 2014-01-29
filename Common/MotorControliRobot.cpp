@@ -677,76 +677,76 @@ BOOL CiRobotParser::ParseBuffer( char* iRobotSIOBuf, int dwSIOBytesReceived )
 	//ROBOT_LOG( TRUE, "PacketID = %02X\n", (BYTE)(iRobotSIOBuf[index]) )
 	index++;
 
-	g_piRobotStatus->WheelDropCaster = ( (iRobotSIOBuf[index] & 0x10) != 0 ? 1 : 0 );
-	g_piRobotStatus->WheelDropLeft = ( (iRobotSIOBuf[index] & 0x08) != 0 ? 1 : 0 );
-	g_piRobotStatus->WheelDropRight = ( (iRobotSIOBuf[index] & 0x04) != 0 ? 1 : 0 );
-	g_piRobotStatus->BumperLeft = ( (iRobotSIOBuf[index] & 0x02) != 0 ? 1 : 0 );
-	g_piRobotStatus->BumperRight = ( (iRobotSIOBuf[index] & 0x01) != 0 ? 1 : 0 );
+	g_pIRobotStatus->WheelDropCaster = ( (iRobotSIOBuf[index] & 0x10) != 0 ? 1 : 0 );
+	g_pIRobotStatus->WheelDropLeft = ( (iRobotSIOBuf[index] & 0x08) != 0 ? 1 : 0 );
+	g_pIRobotStatus->WheelDropRight = ( (iRobotSIOBuf[index] & 0x04) != 0 ? 1 : 0 );
+	g_pIRobotStatus->BumperLeft = ( (iRobotSIOBuf[index] & 0x02) != 0 ? 1 : 0 );
+	g_pIRobotStatus->BumperRight = ( (iRobotSIOBuf[index] & 0x01) != 0 ? 1 : 0 );
 	//ROBOT_LOG( TRUE, "WDrop+Bmpr = %02X\n", (BYTE)(iRobotSIOBuf[index]) )
 	index++;
 
-	g_piRobotStatus->WallDetected = iRobotSIOBuf[index++];
-	g_piRobotStatus->CliffLeft = iRobotSIOBuf[index++];
-	g_piRobotStatus->CliffFrontLeft = iRobotSIOBuf[index++];
-	g_piRobotStatus->CliffFrontRight = iRobotSIOBuf[index++];
-	g_piRobotStatus->CliffRight = iRobotSIOBuf[index++];
-	g_piRobotStatus->VirtualWall = iRobotSIOBuf[index++];
-	g_piRobotStatus->OverCurrent = iRobotSIOBuf[index++] & 0x1F;	// Actually 4 separate bits, but we just care if it's non-zero
+	g_pIRobotStatus->WallDetected = iRobotSIOBuf[index++];
+	g_pIRobotStatus->CliffLeft = iRobotSIOBuf[index++];
+	g_pIRobotStatus->CliffFrontLeft = iRobotSIOBuf[index++];
+	g_pIRobotStatus->CliffFrontRight = iRobotSIOBuf[index++];
+	g_pIRobotStatus->CliffRight = iRobotSIOBuf[index++];
+	g_pIRobotStatus->VirtualWall = iRobotSIOBuf[index++];
+	g_pIRobotStatus->OverCurrent = iRobotSIOBuf[index++] & 0x1F;	// Actually 4 separate bits, but we just care if it's non-zero
 	index += 2; // skip unused packets.  On Roomba, these are dirt detector left, right
 
-	g_piRobotStatus->IRcode = iRobotSIOBuf[index++]; // code received from remote control, beacons, home, etc.
+	g_pIRobotStatus->IRcode = iRobotSIOBuf[index++]; // code received from remote control, beacons, home, etc.
 	index++; // skip reading the Create buttons
 
 
 	int  Distance = 0;
 	Distance = iRobotSIOBuf[index++] <<8;
 	Distance += iRobotSIOBuf[index++];
-	g_piRobotStatus->Distance = Distance; // in mm, since last request
+	g_pIRobotStatus->Distance = Distance; // in mm, since last request
 	// TODO-TURTLE - keep running total here!!!
 
 	int  Angle = 0;
 	Angle = iRobotSIOBuf[index++] <<8;
 	Angle += iRobotSIOBuf[index++];
-	g_piRobotStatus->Angle = Angle; // in degrees, since last request
+	g_pIRobotStatus->Angle = Angle; // in degrees, since last request
 	// TODO-TURTLE - keep running total here!!!
 
-	g_piRobotStatus->ChargingState = iRobotSIOBuf[index++];
+	g_pIRobotStatus->ChargingState = iRobotSIOBuf[index++];
 
 	int  Voltage = 0;
 	Voltage = iRobotSIOBuf[index++] <<8;
 	Voltage += iRobotSIOBuf[index++];
-	g_piRobotStatus->BatteryVoltage = Voltage; // in milivolts
+	g_pIRobotStatus->BatteryVoltage = Voltage; // in milivolts
 
 	int  Current = 0;
 	Current = iRobotSIOBuf[index++] <<8;
 	Current += iRobotSIOBuf[index++];
-	g_piRobotStatus->BatteryCurrent = Current; // in miliamps, negative = discharging (which is normal)
+	g_pIRobotStatus->BatteryCurrent = Current; // in miliamps, negative = discharging (which is normal)
 
-	g_piRobotStatus->BatteryTemperature = iRobotSIOBuf[index++];
+	g_pIRobotStatus->BatteryTemperature = iRobotSIOBuf[index++];
 
 	int  Charge = 0;
 	Charge = iRobotSIOBuf[index++] <<8;
 	Charge += iRobotSIOBuf[index++];
-	g_piRobotStatus->BatteryCharge = Charge; // in miliamp Hours, negative = discharging (which is normal)
+	g_pIRobotStatus->BatteryCharge = Charge; // in miliamp Hours, negative = discharging (which is normal)
 
 	int  Capacity = 0;
 	Capacity = iRobotSIOBuf[index++] <<8;
 	Capacity += iRobotSIOBuf[index++];
-	g_piRobotStatus->BatteryCapacity = Capacity; // in miliamp Hours
+	g_pIRobotStatus->BatteryCapacity = Capacity; // in miliamp Hours
 
 	index += 10;	// Skip Signal Strength of sensors (packet ID 27-31, 2 bytes each)
 
-	g_piRobotStatus->ExpansionDigitalInputs = iRobotSIOBuf[index++] & 0x1F; // mask out top 3 bits, not used
+	g_pIRobotStatus->ExpansionDigitalInputs = iRobotSIOBuf[index++] & 0x1F; // mask out top 3 bits, not used
 
 	int  Analog = 0;
 	Analog = iRobotSIOBuf[index++] <<8;
 	Analog += iRobotSIOBuf[index++];
-	g_piRobotStatus->ExpansionAnalogInput = Analog; // Cargo Bay Analog Input, 0=0v, 1023 = 5v
+	g_pIRobotStatus->ExpansionAnalogInput = Analog; // Cargo Bay Analog Input, 0=0v, 1023 = 5v
 
-	g_piRobotStatus->InHomeBase = ( (iRobotSIOBuf[index] &0x02) != 0 ? 1 : 0 );
-	g_piRobotStatus->ChargingPlugInserted = ( (iRobotSIOBuf[index++] &0x01) != 0 ? 1 : 0 );
+	g_pIRobotStatus->InHomeBase = ( (iRobotSIOBuf[index] &0x02) != 0 ? 1 : 0 );
+	g_pIRobotStatus->ChargingPlugInserted = ( (iRobotSIOBuf[index++] &0x01) != 0 ? 1 : 0 );
 
-	g_piRobotStatus->OIMode = iRobotSIOBuf[index++];
+	g_pIRobotStatus->OIMode = iRobotSIOBuf[index++];
 	// 0 = Off, 1=Passive, 2=Safe, 3=Full
 
 	//index += 7;	// Skip feedback info (packet ID 36-42)

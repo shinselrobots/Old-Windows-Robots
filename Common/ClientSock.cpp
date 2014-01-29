@@ -354,13 +354,15 @@ DWORD ReceiveClientSocketData( CLIENT_SOCKET_STRUCT *SocketStruct )
 			}
 			if( ROBOT_RESPONSE_PIC_STATUS == pBulkDataMessage->Param1 )
 			{
+				ROBOT_LOG( TRUE, "ROBOT_RESPONSE_PIC_STATUS DISABLED - To fix \n" )
+				/**
 				if( nMessageLength != sizeof(SENSOR_STATUS_T) )
 				{
 					DisplayClientSocketError("ERROR - Status Block length not correct!" );
 				}
 				else
 				{
-					memcpy( &g_SensorStatus, pBulkDataMessage->Data, sizeof(SENSOR_STATUS_T) );
+					memcpy( &g_pFullSensorStatus, pBulkDataMessage->Data, sizeof(SENSOR_STATUS_T) );
 
 					PostMessage( g_RobotCmdViewHWND, (pStatusMessage->MessageType), 
 						pBulkDataMessage->Param1, pBulkDataMessage->Param2 );
@@ -371,6 +373,7 @@ DWORD ReceiveClientSocketData( CLIENT_SOCKET_STRUCT *SocketStruct )
 					PostMessage( g_RobotSetupViewHWND, (pStatusMessage->MessageType), 
 						pBulkDataMessage->Param1, pBulkDataMessage->Param2 );
 				}
+				**/
 			}
 			else
 			{

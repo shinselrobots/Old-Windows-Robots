@@ -61,22 +61,19 @@ static char THIS_FILE[] = __FILE__;
 ////////////////////////////////////
 
 
-
-
-void SimulatePic( ARDUINO_CMD_T PicCmd )
+void SimulateHardware( DWORD Cmd, DWORD Param1, DWORD Param2 )
 {
 #define int8 BYTE
 #if ( ROBOT_SERVER == 1 )  // Nothing in this file used for client!
 
 	// Act as though the Arduino were connected!
-	// PicCmd is not really Global, it's just the name used in the Arduino
 
 	static int LoopCounter = 0;
 	static boolean gRadarScanEnabled = FALSE;
 	static boolean BrakePending = FALSE;
 
 
-	switch( PicCmd.Cmd )
+	switch( Cmd )
 	{
 
 		case HW_RESET_CPU:
@@ -407,7 +404,7 @@ void SimulatePic( ARDUINO_CMD_T PicCmd )
 
 		case HW_SET_MOTOR_STOP:
 		{
-//			g_RawArduinoStatus.AckMotorCommand = PicCmd.Cmd;
+//			g_RawArduinoStatus.AckMotorCommand = Cmd;
 			SpeedServo = SPEED_STOP;
 			TurnServo = TURN_SERVO_CENTER;
 			sprintf_s(ResponseMsg, "Simulator: AK1:STOP");
@@ -416,7 +413,7 @@ void SimulatePic( ARDUINO_CMD_T PicCmd )
 		}
 		case HW_SET_MOTOR_BRAKE:
 		{
-//			g_RawArduinoStatus.AckMotorCommand = PicCmd.Cmd;
+//			g_RawArduinoStatus.AckMotorCommand = Cmd;
 			SpeedServo = SPEED_STOP;
 			TurnServo = TURN_SERVO_CENTER;
 			sprintf_s(ResponseMsg, "Simulator: AK1:BRAKE");
@@ -429,11 +426,11 @@ void SimulatePic( ARDUINO_CMD_T PicCmd )
 //		case HW_SET_MOVE_DISTANCE:
 		case HW_SET_SPEED_AND_TURN:
 		{
-//			g_RawArduinoStatus.AckMotorCommand = PicCmd.Cmd;
-			int tempSpeed = (signed char)LOWORD(PicCmd.Param1); // Does not use acceleration parameter
+//			g_RawArduinoStatus.AckMotorCommand = Cmd;
+			int tempSpeed = (signed char)LOWORD(Param1); // Does not use acceleration parameter
 			SpeedServo = tempSpeed;
 
-			int tempTurn = (signed char)PicCmd.Param2;
+			int tempTurn = (signed char)Param2;
 			TurnServo = tempTurn;
 
 			if( (SPEED_STOP != SpeedServo) )
@@ -445,15 +442,15 @@ void SimulatePic( ARDUINO_CMD_T PicCmd )
 					MotorForward = TRUE;
 			}
 
-			if( SPEED_STOP == PicCmd.Param1 )
+			if( SPEED_STOP == Param1 )
 			{
 				sprintf_s(ResponseMsg, "Simulator HW_SET_SPEED_AND_TURN: AK1:Motor Stop, TURN %03d", 
-					(PicCmd.Param2));
+					(Param2));
 			}
 			else
 			{
 				sprintf_s(ResponseMsg, "Simulator HW_SET_SPEED_AND_TURN: AK1:SPEED %03d, TURN %03d", 
-					(LOWORD(PicCmd.Param1)-SPEED_STOP), (PicCmd.Param2));
+					(LOWORD(Param1)-SPEED_STOP), (Param2));
 			}
 			ROBOT_DISPLAY( TRUE, ResponseMsg )	// pretend we got a response
 			break;
@@ -462,7 +459,7 @@ void SimulatePic( ARDUINO_CMD_T PicCmd )
 
 /*		case HW_SET_SPEED:
 		{
-			SpeedServo = PicCmd.Param1;
+			SpeedServo = Param1;
 			if( (SPEED_STOP != SpeedServo) )
 			{
 				// Set direction flag used by Odometer
@@ -471,13 +468,13 @@ void SimulatePic( ARDUINO_CMD_T PicCmd )
 				else
 					MotorForward = TRUE;
 			}
-			if( SPEED_STOP == PicCmd.Param1 )
+			if( SPEED_STOP == Param1 )
 			{
 				sprintf_s(ResponseMsg, "Simulator HW_SET_SPEED: AK1:MOTOR STOP" );
 			}
 			else
 			{
-				sprintf_s(ResponseMsg, "Simulator HW_SET_SPEED: AK1:SPEED %03d", (PicCmd.Param1-SPEED_STOP));
+				sprintf_s(ResponseMsg, "Simulator HW_SET_SPEED: AK1:SPEED %03d", (Param1-SPEED_STOP));
 			}
 			ROBOT_DISPLAY( TRUE, ResponseMsg )	// pretend we got a response
 			break;
@@ -486,8 +483,8 @@ void SimulatePic( ARDUINO_CMD_T PicCmd )
 		case HW_SET_TURN:
 		{
 			// Handle turn value, passed in Param1
-			TurnServo = PicCmd.Param1;	// Set servo to requested turn command
-			sprintf_s(ResponseMsg, "Simulator HW_SET_TURN: AK1:TURN %03d", (PicCmd.Param1));
+			TurnServo = Param1;	// Set servo to requested turn command
+			sprintf_s(ResponseMsg, "Simulator HW_SET_TURN: AK1:TURN %03d", (Param1));
 			ROBOT_DISPLAY( TRUE, ResponseMsg )	// pretend we got a response
 			break;
 		}	
@@ -496,7 +493,7 @@ void SimulatePic( ARDUINO_CMD_T PicCmd )
 		{
 			sprintf_s(ResponseMsg, "AK1:RADAR");
 
-			if( 0 == PicCmd.Param2 )
+			if( 0 == Param2 )
 			{
 				gRadarScanEnabled = FALSE;
 			}
@@ -510,7 +507,7 @@ void SimulatePic( ARDUINO_CMD_T PicCmd )
 
 		case HW_SET_LIGHT_POWER:
 		{
-			if( 0 == PicCmd.Param2 )
+			if( 0 == Param2 )
 			{
 				sprintf_s(ResponseMsg, "AK1:TODO:Lights Off");
 				//output_high( PIN_LIGHT_PWR );	// Lights Off
@@ -526,7 +523,7 @@ void SimulatePic( ARDUINO_CMD_T PicCmd )
 
 		case HW_SET_LED_EYES:
 		{
-			if( 1 == PicCmd.Param2 )
+			if( 1 == Param2 )
 			{
 				sprintf_s(ResponseMsg, "AK1:Eyes On");
 			}
@@ -540,7 +537,7 @@ void SimulatePic( ARDUINO_CMD_T PicCmd )
 
 		case HW_SET_SERVO_POWER:
 		{
-			if( 0 == PicCmd.Param2 )
+			if( 0 == Param2 )
 			{
 				sprintf_s(ResponseMsg, "AK1:Servo Power Off");
 			}
@@ -554,13 +551,13 @@ void SimulatePic( ARDUINO_CMD_T PicCmd )
 
 		case HW_SET_CAMERA_PAN_ABS:
 		{
-			sprintf_s(ResponseMsg, "AK1:CAM ABS PAN POS=%02X", PicCmd.Param1);
+			sprintf_s(ResponseMsg, "AK1:CAM ABS PAN POS=%02X", Param1);
 			ROBOT_DISPLAY( TRUE, ResponseMsg )	// pretend we got a response
 			break;
 		}	
 		case HW_SET_CAMERA_TILT_ABS:
 		{
-			sprintf_s(ResponseMsg, "AK1:CAM ABS TILT POS=%02X", PicCmd.Param1);
+			sprintf_s(ResponseMsg, "AK1:CAM ABS TILT POS=%02X", Param1);
 			ROBOT_DISPLAY( TRUE, ResponseMsg )	// pretend we got a response
 			break;
 		}	
@@ -568,13 +565,13 @@ void SimulatePic( ARDUINO_CMD_T PicCmd )
 		case HW_SET_CAMERA_PAN_TILT:
 		{
 			// For slow pan or tilt.  Runs until stopped or Servo end reached.
-			sprintf_s(ResponseMsg, "AK1:CAM Pan=%02X Speed=%02X", PicCmd.Param1, PicCmd.Param2);
+			sprintf_s(ResponseMsg, "AK1:CAM Pan=%02X Speed=%02X", Param1, Param2);
 			ROBOT_DISPLAY( TRUE, ResponseMsg )	// pretend we got a response
 			break;
 		}	
 		case HW_SET_CAMERA_MODE:
 		{
-			sprintf_s(ResponseMsg, "AK1:HW_SET_CAMERA_MODE Mode=%02X, Value=%02X", PicCmd.Param1, PicCmd.Param2);
+			sprintf_s(ResponseMsg, "AK1:HW_SET_CAMERA_MODE Mode=%02X, Value=%02X", Param1, Param2);
 			ROBOT_DISPLAY( TRUE, ResponseMsg )	// pretend we got a response
 			break;
 		}
@@ -584,12 +581,12 @@ void SimulatePic( ARDUINO_CMD_T PicCmd )
 		}
 		default:
 		{
-			sprintf_s(ResponseMsg, "Arduino SIM NAK:Unknown Cmd:%02X %02X %02X\n", PicCmd.Cmd, PicCmd.Param1, PicCmd.Param2);
+			sprintf_s(ResponseMsg, "Arduino SIM NAK:Unknown Cmd:%02X %02X %02X\n", Cmd, Param1, Param2);
 			ROBOT_DISPLAY( TRUE, ResponseMsg )	// pretend we got a response
 		}
 	}	// end SWITCH
 
 #endif	
 
-}	// SimulatePic
+}	// SimulateHardware
 

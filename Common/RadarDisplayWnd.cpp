@@ -248,7 +248,7 @@ void CRadarDisplayWnd::OnPaint()
 	// Note, US[0] camera sensor handled correctly by SensorOffsetDegrees_US
 	for( SensorNumber = 0; SensorNumber < NUM_US_SENSORS; SensorNumber++ )
 	{
-		Distance = g_SensorStatus.US[SensorNumber];
+		Distance = g_pFullSensorStatus->US[SensorNumber];
 		if( (Distance >= (double) DISPLAY_RANGE_MAX_TENTH_INCHES ) ||	(Distance < 9.0) )	// Tenth inches!
 		{
 			continue; // Outside max range of sensor
@@ -272,7 +272,7 @@ void CRadarDisplayWnd::OnPaint()
 
 	for( SensorNumber = 0; SensorNumber < NUM_IR_SENSORS; SensorNumber++ )
 	{
-		Distance = g_SensorStatus.IR[SensorNumber];
+		Distance = g_pFullSensorStatus->IR[SensorNumber];
 		if( (Distance >= IR_LR_TENTH_INCHES_MAX ) ||	(Distance < 9.0) )	// Tenth Inches!
 		{
 			continue; // Outside max range of sensor
@@ -455,11 +455,11 @@ void CRadarDisplayWnd::OnPaint()
 	// Display Detected US Objects!
 	dc.SelectObject( &m_ObjectSizePen );	// Thin Yellow
 
-	int DegreeStart = (DegreeIncrement * g_pSensorSummary->nClosestRadarObjectLeft) +45;
-	int DegreeEnd = (DegreeIncrement * g_pSensorSummary->nClosestRadarObjectRight) +45;
+	int DegreeStart = (DegreeIncrement * g_pNavSensorSummary->nClosestRadarObjectLeft) +45;
+	int DegreeEnd = (DegreeIncrement * g_pNavSensorSummary->nClosestRadarObjectRight) +45;
 	int XStart, XEnd, YStart, YEnd;
 
-	Distance = g_pSensorSummary->nClosestRadarObjectDistance;
+	Distance = g_pNavSensorSummary->nClosestRadarObjectDistance;
 
 	if( Distance < DISPLAY_RANGE_MAX_TENTH_INCHES-10 )
 	{
@@ -513,7 +513,7 @@ void CRadarDisplayWnd::OnPaint()
  
 		// Display Center of Object
 		dc.SelectObject( &m_ObjectCenterPen );	// Thick Yellow
-		Degree = (DegreeIncrement * g_pSensorSummary->nClosestRadarObjectLocation) +45;
+		Degree = (DegreeIncrement * g_pNavSensorSummary->nClosestRadarObjectLocation) +45;
 		if( Degree < 90 )
 		{
 			Radians = Degree * DEGREES_TO_RADIANS;	// convert to radians

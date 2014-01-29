@@ -1534,7 +1534,7 @@ if( m_bPlaySimonSays && !m_bSimonSays )
 		{
 			// "On"/"off" is hard to hear, so we just always toggle!
 			// request to toggle light state
-			if( g_SensorStatus.AuxLightsOn )
+			if( g_pFullSensorStatus->AuxLightsOn )
 			{
 				// lights are on, turn them off
 				ROBOT_DISPLAY( TRUE, "SpeechReco Command Recognized: Lights Off")

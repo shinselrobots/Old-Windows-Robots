@@ -116,44 +116,44 @@ void CDriveControlModule::UpdateTurnRotation(double RotationAngleAmount)
 		if( m_Turn > 0 )
 		{
 			// Turning Right
-			if( (g_SensorStatus.CompassHeading < 90) && (m_LastCompassHeading > 270) )
+			if( (g_pFullSensorStatus->CompassHeading < 90) && (m_LastCompassHeading > 270) )
 			{
 				// Crossing 360 degrees during this sample
-				TurnDelta = (g_SensorStatus.CompassHeading +360) - m_LastCompassHeading;
+				TurnDelta = (g_pFullSensorStatus->CompassHeading +360) - m_LastCompassHeading;
 			}
 			else
 			{
-				TurnDelta = g_SensorStatus.CompassHeading - m_LastCompassHeading;
+				TurnDelta = g_pFullSensorStatus->CompassHeading - m_LastCompassHeading;
 			}
 		}
 		else
 		{
 			// Turning Left
-			if( (g_SensorStatus.CompassHeading > 270) && (m_LastCompassHeading < 90) )
+			if( (g_pFullSensorStatus->CompassHeading > 270) && (m_LastCompassHeading < 90) )
 			{
 				// Crossing 360 degrees during this sample
-				TurnDelta = (m_LastCompassHeading +360) - g_SensorStatus.CompassHeading;
+				TurnDelta = (m_LastCompassHeading +360) - g_pFullSensorStatus->CompassHeading;
 			}
 			else
 			{
-				TurnDelta = m_LastCompassHeading - g_SensorStatus.CompassHeading;
+				TurnDelta = m_LastCompassHeading - g_pFullSensorStatus->CompassHeading;
 			}
 		}
 
 		m_TurnRotationRemaining -= TurnDelta;
-		m_LastCompassHeading = g_SensorStatus.CompassHeading;
+		m_LastCompassHeading = g_pFullSensorStatus->CompassHeading;
 
 		// OK Calculations completed, now see if we are done with the turn
 		if( m_TurnRotationRemaining <= TURN_ROTATION_COMPLETE_COMPENSATION )
 		{
 			// Done! Note that any overshoot simply makes m_TurnRotationRemaining go negative
 			ROBOT_LOG( TRUE, "COMPASS TURN DONE: Compass = %3.2f, Remaining = %3.2f\n", 
-					g_SensorStatus.CompassHeading, m_TurnRotationRemaining )
+					g_pFullSensorStatus->CompassHeading, m_TurnRotationRemaining )
 		}
 		else
 		{
 			ROBOT_LOG( TRUE, "DEBUG: Turn Compass = %d, Remaining = %3.2f\n", 
-				g_SensorStatus.CompassHeading, m_TurnRotationRemaining )
+				g_pFullSensorStatus->CompassHeading, m_TurnRotationRemaining )
 
 			// Slow down when getting close, so we don't overshoot (compass updates are slow to settle)
 			if( (m_TurnRotationRemaining > TURN_ROTATION_COMPLETE_COMPENSATION) && 
@@ -220,18 +220,18 @@ BOOL CDriveControlModule::RobotStopped()
 	// See if the robot is moving or stopped
 
 	#if MOTOR_CONTROL_TYPE == ER1_MOTOR_CONTROL		// For ER1 Robot
-		if( g_SensorStatus.OdometerUpdateTenthInches  < 5.0 )	// TODO-MUST What value should be here?
+		if( g_pFullSensorStatus->OdometerUpdateTenthInches  < 5.0 )	// TODO-MUST What value should be here?
 		{
-			ROBOT_LOG( TRUE, "DEBUG STOPPED???==========> %3.2f, TRUE!\n", g_SensorStatus.OdometerUpdateTenthInches )
+			ROBOT_LOG( TRUE, "DEBUG STOPPED???==========> %3.2f, TRUE!\n", g_pFullSensorStatus->OdometerUpdateTenthInches )
 			return TRUE;
 		}
 		else
 		{
-			ROBOT_LOG( TRUE, "DEBUG STOPPED???==========> %3.2f, FALSE!\n", g_SensorStatus.OdometerUpdateTenthInches )
+			ROBOT_LOG( TRUE, "DEBUG STOPPED???==========> %3.2f, FALSE!\n", g_pFullSensorStatus->OdometerUpdateTenthInches )
 			return FALSE;
 		}
 	#else
-		if( (g_SensorStatus.Tachometer  < 2) && (0 == m_MoveDistanceRemaining) && (0 == m_TurnRotationRemaining) )
+		if( (g_pFullSensorStatus->Tachometer  < 2) && (0 == m_MoveDistanceRemaining) && (0 == m_TurnRotationRemaining) )
 			return TRUE;
 		else
 			return FALSE;
@@ -307,7 +307,7 @@ BOOL CDriveControlModule::SetTurnRotation( int  Module, int Speed, int Turn, int
 	// Turn direction set by TurnAmountDegrees.  Amount set by ABS TurnAmountDegrees
 
 	int  AbsTurnAmountDegrees = abs(TurnAmountDegrees);
-	m_LastCompassHeading = g_SensorStatus.CompassHeading;  // Track changes at each update
+	m_LastCompassHeading = g_pFullSensorStatus->CompassHeading;  // Track changes at each update
 	m_MoveDistanceRemaining = 0;
 	m_TurnRotationRemaining = 0;
 	
@@ -337,7 +337,7 @@ BOOL CDriveControlModule::SetTurnRotation( int  Module, int Speed, int Turn, int
 		if( m_Turn < 0 )
 		{
 			// Turning Left
-			m_TargetCompassHeading = g_SensorStatus.CompassHeading - TurnAmountDegrees;
+			m_TargetCompassHeading = g_pFullSensorStatus->CompassHeading - TurnAmountDegrees;
 			if( m_TargetCompassHeading < 0 )
 			{
 				m_TargetCompassHeading += 360;
@@ -345,7 +345,7 @@ BOOL CDriveControlModule::SetTurnRotation( int  Module, int Speed, int Turn, int
 		}
 		else
 		{	// Turning Right
-			m_TargetCompassHeading = g_SensorStatus.CompassHeading + TurnAmountDegrees;
+			m_TargetCompassHeading = g_pFullSensorStatus->CompassHeading + TurnAmountDegrees;
 			if( m_TargetCompassHeading >= 360 )
 			{
 				m_TargetCompassHeading -= 360;
@@ -380,7 +380,7 @@ BOOL CDriveControlModule::SetTurnToCompassDirection( int  Module, int Speed, int
 	// TODO - Speed not currently used, assumes rotate in place.  add calc to allow complex turns?
 
 	// calculate direction of turn.  Positive is right turn, Negative is Left turn
-	int TurnDegrees = CalculateTurn(g_SensorStatus.CompassHeading, DesiredCompassHeading);
+	int TurnDegrees = CalculateTurn(g_pFullSensorStatus->CompassHeading, DesiredCompassHeading);
 
 	m_StopAfterTurnRotation = StopAfterTurn;
 	m_Speed = 0;
@@ -1143,8 +1143,8 @@ void CDriveControlModule::BrakeControl()
 	if( 0 != gBrakeTimer )	// 100ms timer count down in globals.cpp
 	{
 		// Braking in progress!
-		if( (g_SensorStatus.Tachometer < 4)							||	// Stopped, or nearly so
-			(g_SensorStatus.Tachometer > (m_BrakeLastTachometer + 2)) )	// No longer slowing down!  Probably going in reverse!
+		if( (g_pFullSensorStatus->Tachometer < 4)							||	// Stopped, or nearly so
+			(g_pFullSensorStatus->Tachometer > (m_BrakeLastTachometer + 2)) )	// No longer slowing down!  Probably going in reverse!
 		{
 			// Note the fudge factor applied to avoid thinking braking is done too early
 			// Stop the motor and indicate that Braking is done.
@@ -1158,10 +1158,10 @@ void CDriveControlModule::BrakeControl()
 			gBrakeTimer = 0;
 			SendHardwareCmd(HW_SET_MOTOR_STOP, 0, 0);
 		}
-		else if(g_SensorStatus.Tachometer < m_BrakeLastTachometer)
+		else if(g_pFullSensorStatus->Tachometer < m_BrakeLastTachometer)
 		{
 			// Still slowing down, continue to monitor motor speed
-			m_BrakeLastTachometer = g_SensorStatus.Tachometer;
+			m_BrakeLastTachometer = g_pFullSensorStatus->Tachometer;
 		}
 	}
 }
@@ -1194,7 +1194,7 @@ void CDriveControlModule::SpeedControl()
 	#if (ROBOT_TYPE == CARBOT)
 		// Check if Power is enabled with the RC "dead man switch" control
 		// Note: to debug speed control, disable the this test
-		if( !(g_SensorStatus.StatusFlags & HW_STATUS_RC_BUTTON_PWR_ENABLE) )
+		if( !(g_pFullSensorStatus->StatusFlags & HW_STATUS_RC_BUTTON_PWR_ENABLE) )
 		{
 			// RC Power Button not enabled.  Delay and disable speed control.
 			// Otherwise, causes a speed surge when the power is restored again
@@ -1225,7 +1225,7 @@ void CDriveControlModule::SpeedControl()
 		ROBOT_LOG( TRUE,  " Called\n");
 		return; //DEBUG
 
-		if( g_SensorStatus.Tachometer < m_TachometerTarget-1 )
+		if( g_pFullSensorStatus->Tachometer < m_TachometerTarget-1 )
 		{
 			// Going too slow
 			if( m_MotorForward )
@@ -1245,7 +1245,7 @@ void CDriveControlModule::SpeedControl()
 			SendHardwareCmd( HW_SET_SPEED, m_SpeedCurrentSetting,0 );	
 			gMotorSpeedTimer = SPEED_CHANGE_TIME;		// give time for motors to respond before checking again
 		}
-		else if( g_SensorStatus.Tachometer > m_TachometerTarget+1 )
+		else if( g_pFullSensorStatus->Tachometer > m_TachometerTarget+1 )
 		{
 			// Going too fast
 			if( m_MotorForward )

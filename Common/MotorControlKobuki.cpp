@@ -1,10 +1,17 @@
-// MotorControlKobuki.cpp
+// MotorControlKobuki.cpp - DEPRICATED!!!  DONT USE!
+
 // Interface for the Kobuki Base
+
 
 // This class is used by the thread loop that reads commands from the queue in HWInterface.cpp.
 #include "stdafx.h"
 #include "ClientOrServer.h"
 #if ( ROBOT_SERVER == 1 )	// This module used for Robot Server only
+
+
+#if THIS_WILL_NEVER_HAPPEN // MOVED TO EXTERNAL PROGRAM!!!!
+
+
 
 #include "Globals.h"
 #include "MotorControl.h"
@@ -688,5 +695,6 @@ BOOL CKobukiParser::ParseBuffer( unsigned char* KobukiSIOBuf, int dwSIOBytesRece
 
 }
 
+#endif // THIS_WILL_NEVER_HAPPEN
 
 #endif // ROBOT_SERVER  // Nothing in this file used for client!

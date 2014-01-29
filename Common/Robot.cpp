@@ -185,9 +185,11 @@ BOOL CRobotApp::InitInstance()
 	g_pGPSData = new GPS_MESSAGE_T;
 	memset( g_pGPSData, 0x00, sizeof( GPS_MESSAGE_T ) );
 
-	g_pSensorSummary = new SENSOR_SUMMARY_T;
-	memset( g_pSensorSummary, 0x00, sizeof( SENSOR_SUMMARY_T ) );
-	InitSensorSummaryData( g_pSensorSummary );
+	g_pFullSensorStatus = new FullSensorStatus;	
+	// Class automatically initializes
+
+	g_pNavSensorSummary = new NavSensorSummary;
+	// Class automatically initializes
 
 	g_pKinectObjects2D = new OBJECT_2D_ARRAY_T;
 	memset( g_pKinectObjects2D, 0x00, sizeof( OBJECT_2D_ARRAY_T ) );
@@ -198,8 +200,8 @@ BOOL CRobotApp::InitInstance()
 	g_pLaserScannerData = new LASER_SCANNER_DATA_T;
 	memset( g_pLaserScannerData, 0x00, sizeof( LASER_SCANNER_DATA_T ) );
 
-	g_piRobotStatus = new IROBOT_STATUS_T;
-	memset( g_piRobotStatus, 0x00, sizeof( IROBOT_STATUS_T ) );
+	g_pIRobotStatus = new IROBOT_STATUS_T;
+	memset( g_pIRobotStatus, 0x00, sizeof( IROBOT_STATUS_T ) );
 
 	g_pKobukiStatus = new KOBUKI_STATUS_T;
 	memset( g_pKobukiStatus, 0x00, sizeof( KOBUKI_STATUS_T ) );
@@ -226,23 +228,20 @@ BOOL CRobotApp::InitInstance()
 	g_StatusMessagesToDisplay.Empty();	// CString buffer used for display of Status
 	g_StatusMessagesToSend.Empty();		// CString buffer used for Sending Status to Client
 
-	// Initialize g_SensorStatus
-	memset( &g_SensorStatus, 0x00, sizeof( SENSOR_STATUS_T ) );
-
 	// Initialize human location tracking
 	memset( g_HumanLocationTracking, 0x00, (sizeof(KINECT_HUMAN_TRACKING_T) * KINECT_MAX_HUMANS_TO_TRACK) );
 
 
 #if ( ROBOT_SERVER == 1 )
-	g_SensorStatus.CurrentLocation.x = DEFAULT_ROBOT_START_POSITION_X;
-	g_SensorStatus.CurrentLocation.y = DEFAULT_ROBOT_START_POSITION_Y;
-	g_SensorStatus.CurrentLocationMotor.x = DEFAULT_ROBOT_START_POSITION_X;
-	g_SensorStatus.CurrentLocationMotor.y = DEFAULT_ROBOT_START_POSITION_Y;
+	g_pFullSensorStatus->CurrentLocation.x = DEFAULT_ROBOT_START_POSITION_X;
+	g_pFullSensorStatus->CurrentLocation.y = DEFAULT_ROBOT_START_POSITION_Y;
+	g_pFullSensorStatus->CurrentLocationMotor.x = DEFAULT_ROBOT_START_POSITION_X;
+	g_pFullSensorStatus->CurrentLocationMotor.y = DEFAULT_ROBOT_START_POSITION_Y;
 #else
-	g_SensorStatus.CurrentLocation.x = 0;	// Don't show the robot on client until connected
-	g_SensorStatus.CurrentLocation.y = 0;
-	g_SensorStatus.CurrentLocationMotor.x = 0;
-	g_SensorStatus.CurrentLocationMotor.y = 0;
+	g_pFullSensorStatus->CurrentLocation.x = 0;	// Don't show the robot on client until connected
+	g_pFullSensorStatus->CurrentLocation.y = 0;
+	g_pFullSensorStatus->CurrentLocationMotor.x = 0;
+	g_pFullSensorStatus->CurrentLocationMotor.y = 0;
 #endif
 
 	// Initialize g_ServerSockStruct: SERVER_SOCKET_STRUCT
@@ -321,9 +320,10 @@ BOOL CRobotApp::InitInstance()
 	ROBOT_LOG( TRUE,  "Created Camera App IPC Thread. ID = (0x%x) (CameraAppSharedMemoryIPCThreadProc)", g_dwCameraAppSharedMemoryIPCThreadId )
 
 	// Create Kobuki App shared memory thread
-	g_hKobukiAppSharedMemoryIPCThread = ::CreateThread( NULL, 0, KobukiAppSharedMemoryIPCThreadProc, (LPVOID)0, 0, &g_dwKobukiAppSharedMemoryIPCThreadId );
-	ROBOT_LOG( TRUE,  "Created Kobuki App IPC Thread. ID = (0x%x) (KobukiAppSharedMemoryIPCThreadProc)", g_dwKobukiAppSharedMemoryIPCThreadId )
-
+	#if( MOTOR_CONTROL_TYPE == KOBUKI_MOTOR_CONTROL )
+		g_hKobukiAppSharedMemoryIPCThread = ::CreateThread( NULL, 0, KobukiAppSharedMemoryIPCThreadProc, (LPVOID)0, 0, &g_dwKobukiAppSharedMemoryIPCThreadId );
+		ROBOT_LOG( TRUE,  "Created Kobuki App IPC Thread. ID = (0x%x) (KobukiAppSharedMemoryIPCThreadProc)", g_dwKobukiAppSharedMemoryIPCThreadId )
+	#endif
 
 	// Create the video capture thread - MOVED TO CAMERA MODULE CLASS
 //	g_bRunVidCapThread = TRUE; // When FALSE, tells Vidcap thread to exit
@@ -846,15 +846,17 @@ int CRobotApp::ExitInstance()
 	/// DAVES MOVED TO GLOBAL LOOOP: SetThreadExecutionState(ES_CONTINUOUS); // No extra flags means "stop requiring the display"
 
 	SAFE_DELETE( g_pGPSData );
-	SAFE_DELETE( g_pSensorSummary );
+	SAFE_DELETE( g_pFullSensorStatus );
+	SAFE_DELETE( g_pNavSensorSummary );
 	SAFE_DELETE( g_pLaserSummary );
 	SAFE_DELETE( g_pKinectSummary );	
 
 	SAFE_DELETE( g_pKinectObjects2D );
 	SAFE_DELETE( g_pKinectObjects3D );
 	SAFE_DELETE( g_pLaserScannerData );
-	SAFE_DELETE( g_piRobotStatus );
+	SAFE_DELETE( g_pIRobotStatus );
 	SAFE_DELETE( g_pKobukiStatus );
+	
 	
 
 	TRACE( "                       SHUT DOWN:  Deleting Critical Section Locks \n" );

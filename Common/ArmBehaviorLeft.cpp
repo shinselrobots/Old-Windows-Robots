@@ -74,6 +74,9 @@ DWORD dbgTimeL = GetTickCount();
 //***************************************************************************************************************************************
 void CBehaviorModule::HandleArmMovementRequestLeft( WPARAM wParam, LPARAM lParam )
 {
+
+#if ROBOT_HAS_LEFT_ARM
+
 		__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, pshHandleArmMovementRequestLeft);
 		m_ArmMovementLeft = lParam;
 		// by default, each movement should complete before the next begins
@@ -506,6 +509,8 @@ void CBehaviorModule::HandleArmMovementRequestLeft( WPARAM wParam, LPARAM lParam
 			}
 		} // switch m_ArmMovementLeft
 	__itt_task_end(pDomainControlThread);
+
+	#endif // ROBOT_HAS_LEFT_ARM
 }
 
 
@@ -523,6 +528,9 @@ void CBehaviorModule::HandleArmServoStatusUpdateLeft( WPARAM wParam, LPARAM lPar
 {
 	IGNORE_UNUSED_PARAM (wParam);
 	IGNORE_UNUSED_PARAM (lParam);
+
+#if ROBOT_HAS_LEFT_ARM
+
 		__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, pshHandleArmServoStatusUpdateLeft);
 
 	// Get current X,Y,Z position for debug
@@ -1078,7 +1086,7 @@ void CBehaviorModule::HandleArmServoStatusUpdateLeft( WPARAM wParam, LPARAM lPar
 						case 2: // Wait for claw sensor to detect something
 								// (will usually note person's hand as they provide the object)
 						{
-							if( g_pSensorSummary->nObjectClawLeft < CLAW_DETECT_TRIGGER_DISTANCE_TENTH_INCHES  )	// 
+							if( g_pNavSensorSummary->nObjectClawLeft < CLAW_DETECT_TRIGGER_DISTANCE_TENTH_INCHES  )	// 
 							{
 								// Object detected.  Close claw.
 								ROBOT_LOG( TRUE,"Extend Arm: Fingertip Object detected. Closing Claw\n")
@@ -1194,8 +1202,8 @@ void CBehaviorModule::HandleArmServoStatusUpdateLeft( WPARAM wParam, LPARAM lPar
 						{
 							// TODO-MUST HEAD IR SENSOR NOT WORKING - WORK AROUND: USE FINGER TIP SENSORS
 							// **** TODO-MUST WHY IS I2C-IT IR NOT USED???
-							//if( g_SensorStatus.IR[2] < 160  )	// tenth inches
-							if( ARM_L_IR_BUMPER_OBJECT_FINGER_L || ARM_L_IR_BUMPER_OBJECT_FINGER_R )
+							//if( g_pFullSensorStatus->IR[2] < 160  )	// tenth inches
+							if( g_pFullSensorStatus->ArmLeftBumperFingerLeft || g_pFullSensorStatus->ArmLeftBumperFingerRight )
 							{
 								// Hand detected.  Open claw.
 								ROBOT_LOG( TRUE,"Extend Arm: Head sensors detected hand. Opening Claw\n")
@@ -1929,6 +1937,9 @@ void CBehaviorModule::HandleArmServoStatusUpdateLeft( WPARAM wParam, LPARAM lPar
 	}	// if( ARM_MOVEMENT_NONE != m_ArmMovementLeft )
 
 	__itt_task_end(pDomainControlThread);
+
+	#endif // ROBOT_HAS_LEFT_ARM
+
 }	// HandleServoStatusUpdateLeft
 
 

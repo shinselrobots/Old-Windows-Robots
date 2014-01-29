@@ -149,10 +149,10 @@ typedef struct
 	unsigned int	BatteryChargeSourceEnum;// See enum BatteryChargeSource
 	unsigned int	BatteryChargeStateEnum;	// See enum BatteryChargeState
 
-	unsigned int	Bumper;					// bit values for Left, Center, Right
-	unsigned int	WheelDrop;				// bit values for Left, Right
-	unsigned int	Cliff;					// bit values for Left, Center, Right
-	unsigned int	OverCurrentErrors;		// bit values for Left, Right
+	unsigned int	Bumper;					// bit values:  Right = 1, Front = 2, Left = 4
+	unsigned int	WheelDrop;				// bit values:  Right = 1, Left = 2
+	unsigned int	Cliff;					// bit values:  Right = 1, Front = 2, Left = 4
+	unsigned int	OverCurrentErrors;		// bit values:  Right = 1, Left = 2
 	unsigned int	ButtonPress;			// bit values for button 1,2,3
 
 	int				MotorPWMLeft;			// 

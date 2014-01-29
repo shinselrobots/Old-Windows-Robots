@@ -135,7 +135,7 @@ void CCollisionModule::ProcessMessage(
 
 
 //			MsgString.Format("DEBUG FRONT SENSORS! Range=%d Tenth Inches, Angle=%d",  
-//				g_pSensorSummary->nFrontObjectDistance, g_pSensorSummary->nFrontObjectDirection);
+//				g_pNavSensorSummary->nFrontObjectDistance, g_pNavSensorSummary->nFrontObjectDirection);
 //			ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString );
 
 			if( BRAKING != m_CollisionState )
@@ -144,9 +144,9 @@ void CCollisionModule::ProcessMessage(
 				// even if currently handling another collision.
 /** TODO - is this needed?
 				// Check for object obstructing elbow (the most common collision, since they stick out!
-				if( g_pSensorSummary->bObjectElbowLeft || g_pSensorSummary->bObjectElbowRight )
+				if( g_pNavSensorSummary->bObjectElbowLeft || g_pNavSensorSummary->bObjectElbowRight )
 				{
-					if( g_pSensorSummary->bObjectElbowLeft && g_pSensorSummary->bObjectElbowRight )
+					if( g_pNavSensorSummary->bObjectElbowLeft && g_pNavSensorSummary->bObjectElbowRight )
 					{
 						// collision on both sides  Oh no!  what to do?
 					ROBOT_DISPLAY( TRUE, "COLLISION MODULE: ERROR! Elbow collision on Both Sides!!!\n" )
@@ -154,14 +154,14 @@ void CCollisionModule::ProcessMessage(
 						Turn = TURN_CENTER;	// NO turn, just stop!
 						Speed = SPEED_STOP;	
 					}
-					else if( g_pSensorSummary->bObjectElbowLeft )
+					else if( g_pNavSensorSummary->bObjectElbowLeft )
 					{		
 						ROBOT_DISPLAY( TRUE, "COLLISION MODULE: Arm Left Side!\n" )
 						//SpeakText( "Elbow hit Left" );	
 						Turn = TURN_RIGHT_MED_SLOW;
 						Speed = SPEED_REV_SLOW;	// force a backward pivot turn on opposite wheel
 					}
-					else if( g_pSensorSummary->bObjectElbowRight )
+					else if( g_pNavSensorSummary->bObjectElbowRight )
 					{		
 						ROBOT_DISPLAY( TRUE, "COLLISION MODULE: Arm Right Side!\n" )
 						//SpeakText( "Elbow hit Right" );	
@@ -185,42 +185,42 @@ void CCollisionModule::ProcessMessage(
 				}
 
 ***/
-				if( (g_pSensorSummary->nFrontObjectDistance <= OBJECT_COLLISION) ||
-					(g_pSensorSummary->nSideObjectDistance  <= OBJECT_COLLISION) ||					
-					((g_pSensorSummary->nRearObjectDistance <= OBJECT_COLLISION)&& (m_pDriveCtrl->GetCurrentSpeed() < SPEED_STOP))	) 	// Only look at rear sensor if backing up!
+				if( (g_pNavSensorSummary->nFrontObjectDistance <= OBJECT_COLLISION) ||
+					(g_pNavSensorSummary->nSideObjectDistance  <= OBJECT_COLLISION) ||					
+					((g_pNavSensorSummary->nRearObjectDistance <= OBJECT_COLLISION)&& (m_pDriveCtrl->GetCurrentSpeed() < SPEED_STOP))	) 	// Only look at rear sensor if backing up!
 				{
 					// Collision
 					ROBOT_LOG( TRUE, "COLLISION MODULE: Collision detected\n" )
 
 					CString MsgString, SensorString;
-					if( g_pSensorSummary->nFrontObjectDistance <= OBJECT_COLLISION )
+					if( g_pNavSensorSummary->nFrontObjectDistance <= OBJECT_COLLISION )
 					{
 						// Collision was in front
-						m_CollisionDirection = g_pSensorSummary->nFrontObjectDirection; // Save so later we know where the threat came from.
-						if( HW_BUMPER_HIT_FRONT )
+						m_CollisionDirection = g_pNavSensorSummary->nFrontObjectDirection; // Save so later we know where the threat came from.
+						if( g_pNavSensorSummary->BumperHitFront() )
 							SensorString.Format( "Front Bumper: ");
 						else
 							SensorString.Format( "Front Sensor: ");
 						MsgString.Format("COLLISION! %s Range=%d inches, Angle=%d", SensorString, 
-							g_pSensorSummary->nFrontObjectDistance/10, g_pSensorSummary->nFrontObjectDirection);
+							g_pNavSensorSummary->nFrontObjectDistance/10, g_pNavSensorSummary->nFrontObjectDirection);
 						ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
 					}
-					else if( g_pSensorSummary->nSideObjectDistance <= OBJECT_COLLISION )
+					else if( g_pNavSensorSummary->nSideObjectDistance <= OBJECT_COLLISION )
 					{
 						// Collision was on a side
-						m_CollisionDirection = g_pSensorSummary->nSideObjectDirection; // Save so later we know where the threat came from.
-						if( HW_BUMPER_HIT_SIDE_LEFT || HW_BUMPER_HIT_SIDE_RIGHT )
+						m_CollisionDirection = g_pNavSensorSummary->nSideObjectDirection; // Save so later we know where the threat came from.
+						if( g_pFullSensorStatus->HWBumperSideLeft || g_pFullSensorStatus->HWBumperSideRight )
 							SensorString.Format( "Side Bumper: ");
 						else
 							SensorString.Format( "Side Sensor: ");
 						SensorString.Format("COLLISION! Side Sensor: Range=%d inches, Angle=%d", 
-							g_pSensorSummary->nSideObjectDistance/10, g_pSensorSummary->nSideObjectDirection);
+							g_pNavSensorSummary->nSideObjectDistance/10, g_pNavSensorSummary->nSideObjectDirection);
 						ROBOT_DISPLAY( TRUE, (LPCTSTR)SensorString )
 					}
-					else if( g_pSensorSummary->nRearObjectDistance <= OBJECT_COLLISION )
+					else if( g_pNavSensorSummary->nRearObjectDistance <= OBJECT_COLLISION )
 					{
 						// Collision was at the rear!
-						m_CollisionDirection = g_pSensorSummary->nRearObjectDirection; // Save so later we know where the threat came from.
+						m_CollisionDirection = g_pNavSensorSummary->nRearObjectDirection; // Save so later we know where the threat came from.
 						MsgString.Format("COLLISION! Rear Bumper: Range=%d inches, Angle=%d", 0, m_CollisionDirection);
 						ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
 					}
@@ -454,19 +454,19 @@ void CCollisionModule::ProcessMessage(
 			{
 				case IDLE:	// CARBOT
 				{
-					if( (g_pSensorSummary->nFrontObjectDistance < OBJECT_COLLISION) ||
-						(g_pSensorSummary->nSideObjectDistance < OBJECT_COLLISION) )
+					if( (g_pNavSensorSummary->nFrontObjectDistance < OBJECT_COLLISION) ||
+						(g_pNavSensorSummary->nSideObjectDistance < OBJECT_COLLISION) )
 					{
 						// object very close, or bumper hit
 						ROBOT_LOG( TRUE, "COLLISION MODULE: Collision detected\n" )
 
 						CString MsgString, SensorString;
-						if( g_pSensorSummary->nFrontObjectDistance < g_pSensorSummary->nSideObjectDistance )
+						if( g_pNavSensorSummary->nFrontObjectDistance < g_pNavSensorSummary->nSideObjectDistance )
 						{
 							// Collision was in front
-							m_CollisionDirection = g_pSensorSummary->nFrontObjectDirection; // Save so later we know where the threat came from.
+							m_CollisionDirection = g_pNavSensorSummary->nFrontObjectDirection; // Save so later we know where the threat came from.
 
-							if( HW_BUMPER_HIT_FRONT )
+							if( g_pNavSensorSummary->BumperHitFront() )
 							{
 								SensorString.Format( "Front Bumper: ");
 							}
@@ -478,15 +478,15 @@ void CCollisionModule::ProcessMessage(
 						else
 						{
 							// Collision was on a side
-							m_CollisionDirection = g_pSensorSummary->nSideObjectDirection; // Save so later we know where the threat came from.
+							m_CollisionDirection = g_pNavSensorSummary->nSideObjectDirection; // Save so later we know where the threat came from.
 
 							SensorString.Format("COLLISION! Side Sensor: Range=%d inches, Angle=%d", 
-								g_pSensorSummary->nSideObjectDistance/10, g_pSensorSummary->nSideObjectDirection);
+								g_pNavSensorSummary->nSideObjectDistance/10, g_pNavSensorSummary->nSideObjectDirection);
 							ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
 						}
 
 						MsgString.Format("COLLISION! %s Range=%d inches, Angle=%d", SensorString, 
-							g_pSensorSummary->nFrontObjectDistance/10, g_pSensorSummary->nFrontObjectDirection);
+							g_pNavSensorSummary->nFrontObjectDistance/10, g_pNavSensorSummary->nFrontObjectDirection);
 						ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
 
 
@@ -831,9 +831,9 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 			///////////////////////////////////////////////////////////////////////////////////////////////////////////
 			#if SENSOR_CONFIG_TYPE == SENSOR_CONFIG_CARBOT
 
-				if(	(g_pSensorSummary->nFrontObjectDistance <= AvoidObjectDistanceTenthInches)		||
-					(g_pSensorSummary->nLeftSideZone < m_SideAvoidDistanceTenthInches)			||
-					(g_pSensorSummary->nRightSideZone < m_SideAvoidDistanceTenthInches)		)
+				if(	(g_pNavSensorSummary->nFrontObjectDistance <= AvoidObjectDistanceTenthInches)		||
+					(g_pNavSensorSummary->nLeftSideZone < m_SideAvoidDistanceTenthInches)			||
+					(g_pNavSensorSummary->nRightSideZone < m_SideAvoidDistanceTenthInches)		)
 				{
 					// Object in front or on the side within threshold area to avoid
 					// Ignore current state, we always "reset" when an object to avoid is seen
@@ -846,33 +846,33 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 
 					// First, see if there is a clear path anywhere ahead.  
 					// Order of these is important!  Must check forward first!
-					if( g_pSensorSummary->nLeftFrontZone > AvoidObjectDistanceTenthInches )
+					if( g_pNavSensorSummary->nLeftFrontZone > AvoidObjectDistanceTenthInches )
 					{
 						return -10; // Clear path ahead Left!
 					}
-					if( g_pSensorSummary->nRightFrontZone > AvoidObjectDistanceTenthInches )
+					if( g_pNavSensorSummary->nRightFrontZone > AvoidObjectDistanceTenthInches )
 					{
 						return 10; // Clear path ahead Right!
 					}
-					if( g_pSensorSummary->nLeftArmZone > AvoidObjectDistanceTenthInches )
+					if( g_pNavSensorSummary->nLeftArmZone > AvoidObjectDistanceTenthInches )
 					{
 						return -20; // Clear path ahead Hard Left!
 					}
-					if( g_pSensorSummary->nRightArmZone > AvoidObjectDistanceTenthInches )
+					if( g_pNavSensorSummary->nRightArmZone > AvoidObjectDistanceTenthInches )
 					{
 						return 20; // Clear path ahead Hard Right!
 					}
 
 					// Ok, not so easy.  Try calculating potential threats
 					int ThreatsLeft = 
-						( (NO_OBJECT_IN_RANGE - g_pSensorSummary->nLeftFrontZone)*3 ) + 
-						( (NO_OBJECT_IN_RANGE - g_pSensorSummary->nLeftArmZone)*2 ) + 
-						( (NO_OBJECT_IN_RANGE - g_pSensorSummary->nLeftSideZone)    );
+						( (NO_OBJECT_IN_RANGE - g_pNavSensorSummary->nLeftFrontZone)*3 ) + 
+						( (NO_OBJECT_IN_RANGE - g_pNavSensorSummary->nLeftArmZone)*2 ) + 
+						( (NO_OBJECT_IN_RANGE - g_pNavSensorSummary->nLeftSideZone)    );
 
 					int ThreatsRight = 
-						( (NO_OBJECT_IN_RANGE - g_pSensorSummary->nRightFrontZone)*3 ) + 
-						( (NO_OBJECT_IN_RANGE - g_pSensorSummary->nRightArmZone)*2 ) + 
-						( (NO_OBJECT_IN_RANGE - g_pSensorSummary->nRightSideZone)    );
+						( (NO_OBJECT_IN_RANGE - g_pNavSensorSummary->nRightFrontZone)*3 ) + 
+						( (NO_OBJECT_IN_RANGE - g_pNavSensorSummary->nRightArmZone)*2 ) + 
+						( (NO_OBJECT_IN_RANGE - g_pNavSensorSummary->nRightSideZone)    );
 
 					return( ThreatsRight - ThreatsLeft );
 					****/
@@ -884,7 +884,7 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 				if( m_pDriveCtrl->GetCurrentSpeed() < 0 )
 				{
 					// Backing up!
-					if( g_pSensorSummary->nRearObjectDistance <= REAR_THREAT_THRESHOLD )
+					if( g_pNavSensorSummary->nRearObjectDistance <= REAR_THREAT_THRESHOLD )
 					{
 						// Backing up, and Object detected in the way!
 						ROBOT_LOG( TRUE, "Rear object detected while backing up" )
@@ -897,13 +897,13 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 
 				// Going Forward
 
-				ROBOT_LOG(TRUE, "DEBUG: nFrontObjectDistance = %d", g_pSensorSummary->nFrontObjectDistance )
+				ROBOT_LOG(TRUE, "DEBUG: nFrontObjectDistance = %d", g_pNavSensorSummary->nFrontObjectDistance )
 
 				// See if we should move arms out of harms way
 				CheckArmSafePosition();
 
-				if(	(g_pSensorSummary->nFrontObjectDistance <= AvoidObjectDistanceTenthInches) ||
-					(g_pSensorSummary->nSideObjectDistance < m_SideAvoidDistanceTenthInches) )
+				if(	(g_pNavSensorSummary->nFrontObjectDistance <= AvoidObjectDistanceTenthInches) ||
+					(g_pNavSensorSummary->nSideObjectDistance < m_SideAvoidDistanceTenthInches) )
 				{
 					// Something to avoid
 
@@ -913,7 +913,7 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 /**
 					Speed = Speed - SPEED_FWD_SLOW;	// subtract one "speed level" from current speed
 					if( Speed < SPEED_FWD_SLOW ) Speed = SPEED_FWD_SLOW;
-					if( g_pSensorSummary->nFrontObjectDistance <= AVOIDANCE_SHARP_TURN_RANGE )
+					if( g_pNavSensorSummary->nFrontObjectDistance <= AVOIDANCE_SHARP_TURN_RANGE )
 					{
 						// Object is close!  A sharp turn is needed!
 						ROBOT_LOG( TRUE, "AVOID_OBJECT_MODULE: Forcing sharp turn to avoid close object\n" )
@@ -931,11 +931,11 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 					ROBOT_LOG( TRUE, "AVOID_OBJECT_MODULE: Avoiding Cliff\n" )
 				}
 				// Avoid very close objects in key zones
-				else if( (g_pSensorSummary->nRightArmZone <= ARM_ZONE_THREAT_MIN_THRESHOLD) ||
-						 (g_pSensorSummary->nLeftArmZone <= ARM_ZONE_THREAT_MIN_THRESHOLD) )
+				else if( (g_pNavSensorSummary->nRightArmZone <= ARM_ZONE_THREAT_MIN_THRESHOLD) ||
+						 (g_pNavSensorSummary->nLeftArmZone <= ARM_ZONE_THREAT_MIN_THRESHOLD) )
 				{
 					// close object about to hit an arm
-					if( g_pSensorSummary->nRightArmZone < g_pSensorSummary->nLeftArmZone )
+					if( g_pNavSensorSummary->nRightArmZone < g_pNavSensorSummary->nLeftArmZone )
 					{
 						// closest object is on the right
 						ROBOT_LOG( TRUE, "AVOID_OBJECT_MODULE: Turning Left to avoid object on Front Right Arm Zone\n" )
@@ -954,19 +954,19 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 					ROBOT_LOG( TRUE, "AVOID_OBJECT_MODULE: AVOID_OBJECT_MODULE: Heading for Doorway\n" )
 
 				}				
-				else if( g_pSensorSummary->nFrontObjectDistance <= AvoidObjectDistanceTenthInches )
+				else if( g_pNavSensorSummary->nFrontObjectDistance <= AvoidObjectDistanceTenthInches )
 				{
 					// There is an object somewhere in front of us. 
 					ROBOT_LOG( TRUE, "AVOID_OBJECT_MODULE: FrontObjectDistance = %d, direction = %d\n",
-						g_pSensorSummary->nFrontObjectDistance, g_pSensorSummary->nFrontObjectDirection )
+						g_pNavSensorSummary->nFrontObjectDistance, g_pNavSensorSummary->nFrontObjectDirection )
 
-					if( g_pSensorSummary->nFrontObjectDirection > 0 )
+					if( g_pNavSensorSummary->nFrontObjectDirection > 0 )
 					{
 						// Object to the Right, Turn Left
 						ROBOT_LOG( TRUE, "AVOID_OBJECT_MODULE: Turning Left to avoid object on Front Right\n" )
 						Turn = TURN_LEFT_MED_SLOW;
 					}
-					else if( g_pSensorSummary->nFrontObjectDirection < 0 )
+					else if( g_pNavSensorSummary->nFrontObjectDirection < 0 )
 					{
 						// Object to the Left, Turn Right
 						ROBOT_LOG( TRUE, "AVOID_OBJECT_MODULE: Turning Right to avoid object on Front Left\n" )
@@ -975,16 +975,16 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 					else
 					{
 						// Object Dead Ahead. Check side sensors for a hint
-						if( 0 != g_pSensorSummary->nSideObjectDirection )
+						if( 0 != g_pNavSensorSummary->nSideObjectDirection )
 						{
 							// In range of one of the side sensors ( and both not reading identical)
-							if( g_pSensorSummary->nSideObjectDirection > 0 )
+							if( g_pNavSensorSummary->nSideObjectDirection > 0 )
 							{
 								// Object to the Right, Turn Left
 								ROBOT_LOG( TRUE, "AVOID_OBJECT_MODULE: Object Dead Ahead, turning Left (other object on right side)\n" )
 								Turn = TURN_LEFT_MED_SLOW;
 							}
-							if( g_pSensorSummary->nSideObjectDirection < 0 )
+							if( g_pNavSensorSummary->nSideObjectDirection < 0 )
 							{
 								// Object to the Left, Turn Right
 								ROBOT_LOG( TRUE, "AVOID_OBJECT_MODULE: Object Dead Ahead, turning Right (other object on left side)\n" )
@@ -1011,17 +1011,17 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 					}	// End of object dead ahead
 
 					// If object is very close, stop and force a turn on axis
-					if( g_pSensorSummary->nFrontObjectDistance <= FRONT_ZONE_THREAT_MIN_THRESHOLD )
+					if( g_pNavSensorSummary->nFrontObjectDistance <= FRONT_ZONE_THREAT_MIN_THRESHOLD )
 					{
 						Speed = SPEED_STOP;
 					}
 
 
 				}	// End object somewhere in front of us. 
-				else if( g_pSensorSummary->nSideObjectDistance < m_SideAvoidDistanceTenthInches )
+				else if( g_pNavSensorSummary->nSideObjectDistance < m_SideAvoidDistanceTenthInches )
 				{
 					// No object ahead, but object on the side within threshold area to avoid
-					if( g_pSensorSummary->nSideObjectDirection > 0 )
+					if( g_pNavSensorSummary->nSideObjectDirection > 0 )
 					{
 						// Object to the Right, Turn Left
 						Turn = TURN_LEFT_SLOW; // Leave speed, just a gentle turn
@@ -1107,8 +1107,8 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 void CAvoidObjectModule::CheckArmSafePosition()
 {
 	// See if we should move arms out of harms way
-	if(	(g_pSensorSummary->nFrontObjectDistance <= PROTECT_ARMS_FRONT_THREAT_THRESHOLD) ||
-		(g_pSensorSummary->nSideObjectDistance < PROTECT_ARMS_SIDE_THREAT_THRESHOLD) )
+	if(	(g_pNavSensorSummary->nFrontObjectDistance <= PROTECT_ARMS_FRONT_THREAT_THRESHOLD) ||
+		(g_pNavSensorSummary->nSideObjectDistance < PROTECT_ARMS_SIDE_THREAT_THRESHOLD) )
 	{
 		// Objects close by, raise the arms to a safe position
 		if( !m_ArmsInSafePosition )
@@ -1144,29 +1144,33 @@ void CAvoidObjectModule::CheckArmSafePosition()
 BOOL CAvoidObjectModule::DetectAndHandleCliff( int &Turn, int &Speed )
 {
 
-	if( g_pSensorSummary->bLeftCliff || g_pSensorSummary->bRightCliff )
+	if( g_pNavSensorSummary->CliffDetected() )
 	{
 		// Cliff detected!
 		Speed = SPEED_STOP;	// force a pivot turn
 
-		if( g_pSensorSummary->bLeftCliff && g_pSensorSummary->bRightCliff )
+		if( g_pNavSensorSummary->CliffFront() )
 		{
 			// Cliff on both sides  Oh no!  what to do?
-			ROBOT_DISPLAY( TRUE, "AVOID_OBJECT_MODULE: ERROR! Cliff on Both Sides!!!\n" )
+			ROBOT_DISPLAY( TRUE, "AVOID_OBJECT_MODULE: Cliff Ahead Front!!!\n" )
 			//SpeakText( "Error! Cliff on both sides") );	
 			Turn = TURN_CENTER;	// NO turn, just stop!
 		}
-		else if( g_pSensorSummary->bLeftCliff )
+		else if( g_pNavSensorSummary->bCliffLeft )
 		{		
 			ROBOT_DISPLAY( TRUE, "AVOID_OBJECT_MODULE: Cliff Left Side!\n" )
 			// SpeakText( "Cliff Left" );	
 			Turn = TURN_RIGHT_MED_SLOW;
 		}
-		else if( g_pSensorSummary->bRightCliff )
+		else if( g_pNavSensorSummary->bCliffRight )
 		{		
 			ROBOT_DISPLAY( TRUE, "AVOID_OBJECT_MODULE: Cliff Right Side!\n" )
 			//g_ClientTextToSend = "Cliff Right" );	
 			Turn = TURN_LEFT_MED_SLOW;
+		}
+		else if( g_pNavSensorSummary->bWheelDropLeft || g_pNavSensorSummary->bWheelDropRight )
+		{
+			Turn = TURN_CENTER;	// Wheel dropped!  Just stop so we don't tip over!
 		}
 		else
 		{
@@ -1195,12 +1199,12 @@ BOOL CAvoidObjectModule::DetectAndHandleDoorway( int &Turn, int &Speed )
 	int PreviousX = 0;
 	int PreviousY = 0;
 
-	if( (g_pSensorSummary->nLeftFrontSideZone  > DOOR_SPOTTING_DISTANCE_TENTH_INCHES) ||
-		(g_pSensorSummary->nRightFrontSideZone > DOOR_SPOTTING_DISTANCE_TENTH_INCHES) ) 
+	if( (g_pNavSensorSummary->nLeftFrontSideZone  > DOOR_SPOTTING_DISTANCE_TENTH_INCHES) ||
+		(g_pNavSensorSummary->nRightFrontSideZone > DOOR_SPOTTING_DISTANCE_TENTH_INCHES) ) 
 	{
 		return FALSE; // no door frame found in range
 	}
-	int TargetClearDistance = (__max(g_pSensorSummary->nRightFrontSideZone, g_pSensorSummary->nLeftFrontSideZone) + DOORWAY_MIN_CLEAR_AREA_DEPTH_TENTH_INCHES) ; // tenth inches
+	int TargetClearDistance = (__max(g_pNavSensorSummary->nRightFrontSideZone, g_pNavSensorSummary->nLeftFrontSideZone) + DOORWAY_MIN_CLEAR_AREA_DEPTH_TENTH_INCHES) ; // tenth inches
 
 	NumberOfSamples = g_pLaserScannerData->NumberOfSamples;
 	if( NumberOfSamples <= 0 )

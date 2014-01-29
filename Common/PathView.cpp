@@ -122,8 +122,8 @@ void CPathView::OnInitialUpdate()
 		if( 0 == pWaypointStruct->m_WaypointID )
 		{
 			// Starting Waypoint.  Set robot map position to start here!
-			g_SensorStatus.CurrentLocation.x = (pWaypointStruct->m_WaypointLocationFeetX * 12) + pWaypointStruct->m_WaypointLocationInchesX;
-			g_SensorStatus.CurrentLocation.y = (pWaypointStruct->m_WaypointLocationFeetY * 12) + pWaypointStruct->m_WaypointLocationInchesY;
+			g_pFullSensorStatus->CurrentLocation.x = (pWaypointStruct->m_WaypointLocationFeetX * 12) + pWaypointStruct->m_WaypointLocationInchesX;
+			g_pFullSensorStatus->CurrentLocation.y = (pWaypointStruct->m_WaypointLocationFeetY * 12) + pWaypointStruct->m_WaypointLocationInchesY;
 		}
 	}
 
@@ -624,8 +624,8 @@ void CPathView::OnWaypointAdd()
 	if( 0 == pWaypointStruct->m_WaypointID )
 	{
 		// Starting Waypoint.  Set robot map position to start here!
-		g_SensorStatus.CurrentLocation.x = (pWaypointStruct->m_WaypointLocationFeetX * 12) + pWaypointStruct->m_WaypointLocationInchesX;
-		g_SensorStatus.CurrentLocation.y = (pWaypointStruct->m_WaypointLocationFeetY * 12) + pWaypointStruct->m_WaypointLocationInchesY;
+		g_pFullSensorStatus->CurrentLocation.x = (pWaypointStruct->m_WaypointLocationFeetX * 12) + pWaypointStruct->m_WaypointLocationInchesX;
+		g_pFullSensorStatus->CurrentLocation.y = (pWaypointStruct->m_WaypointLocationFeetY * 12) + pWaypointStruct->m_WaypointLocationInchesY;
 	}
 
 	GetDocument()->m_WaypointList.AddTail(pWaypointStruct);
@@ -655,8 +655,8 @@ void CPathView::OnWaypointInsert()
 	if( 0 == pWaypointStruct->m_WaypointID )
 	{
 		// Starting Waypoint.  Set robot map position to start here!
-		g_SensorStatus.CurrentLocation.x = (pWaypointStruct->m_WaypointLocationFeetX * 12) + pWaypointStruct->m_WaypointLocationInchesX;
-		g_SensorStatus.CurrentLocation.y = (pWaypointStruct->m_WaypointLocationFeetY * 12) + pWaypointStruct->m_WaypointLocationInchesY;
+		g_pFullSensorStatus->CurrentLocation.x = (pWaypointStruct->m_WaypointLocationFeetX * 12) + pWaypointStruct->m_WaypointLocationInchesX;
+		g_pFullSensorStatus->CurrentLocation.y = (pWaypointStruct->m_WaypointLocationFeetY * 12) + pWaypointStruct->m_WaypointLocationInchesY;
 	}
 
 	GetDocument()->m_WaypointList.InsertBefore(pos, pWaypointStruct);
@@ -685,8 +685,8 @@ void CPathView::OnWaypointUpdate()
 	if( 0 == pWaypointStruct->m_WaypointID )
 	{
 		// Starting Waypoint.  Set robot map position to start here!
-		g_SensorStatus.CurrentLocation.x = (pWaypointStruct->m_WaypointLocationFeetX * 12) + pWaypointStruct->m_WaypointLocationInchesX;
-		g_SensorStatus.CurrentLocation.y = (pWaypointStruct->m_WaypointLocationFeetY * 12) + pWaypointStruct->m_WaypointLocationInchesY;
+		g_pFullSensorStatus->CurrentLocation.x = (pWaypointStruct->m_WaypointLocationFeetX * 12) + pWaypointStruct->m_WaypointLocationInchesX;
+		g_pFullSensorStatus->CurrentLocation.y = (pWaypointStruct->m_WaypointLocationFeetY * 12) + pWaypointStruct->m_WaypointLocationInchesY;
 	}
 
 	// Replace the displayed CWaypointStruct in the listbox by removing
@@ -707,8 +707,8 @@ void CPathView::OnWaypointRemove()
 	if( 0 == pWaypointStruct->m_WaypointID )
 	{
 		// Starting Waypoint.  Reset robot map position to default
-		g_SensorStatus.CurrentLocation.x = DEFAULT_ROBOT_START_POSITION_X;
-		g_SensorStatus.CurrentLocation.y = DEFAULT_ROBOT_START_POSITION_X;
+		g_pFullSensorStatus->CurrentLocation.x = DEFAULT_ROBOT_START_POSITION_X;
+		g_pFullSensorStatus->CurrentLocation.y = DEFAULT_ROBOT_START_POSITION_X;
 	}
 
 	// Remove the CWaypointStruct ptr from the CTypedPtrList.
@@ -739,8 +739,8 @@ void CPathView::OnWaypointRemoveAll()
 	GetDocument()->SetModifiedFlag();		// Tell CDocument to prompt to save changes on exit
 
 	// Reset robot map position to default
-	g_SensorStatus.CurrentLocation.x = DEFAULT_ROBOT_START_POSITION_X;
-	g_SensorStatus.CurrentLocation.y = DEFAULT_ROBOT_START_POSITION_Y;
+	g_pFullSensorStatus->CurrentLocation.x = DEFAULT_ROBOT_START_POSITION_X;
+	g_pFullSensorStatus->CurrentLocation.y = DEFAULT_ROBOT_START_POSITION_Y;
 
 	// Remove all of the corresponding formatted strings from the listbox.
 	m_WaypointListBox.ResetContent();
@@ -988,8 +988,8 @@ void CPathView::OnRecalcualteAllWaypoints()
 		if( 0 == pWaypointStruct->m_WaypointID )
 		{
 			// Starting Waypoint.  Set robot map position to start here!
-			g_SensorStatus.CurrentLocation.x = (pWaypointStruct->m_WaypointLocationFeetX * 12) + pWaypointStruct->m_WaypointLocationInchesX;
-			g_SensorStatus.CurrentLocation.y = (pWaypointStruct->m_WaypointLocationFeetY * 12) + pWaypointStruct->m_WaypointLocationInchesY;
+			g_pFullSensorStatus->CurrentLocation.x = (pWaypointStruct->m_WaypointLocationFeetX * 12) + pWaypointStruct->m_WaypointLocationInchesX;
+			g_pFullSensorStatus->CurrentLocation.y = (pWaypointStruct->m_WaypointLocationFeetY * 12) + pWaypointStruct->m_WaypointLocationInchesY;
 		}
 	}
 	

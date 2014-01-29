@@ -263,7 +263,7 @@ void CLaserDisplayWnd::OnPaint()
 	ZoneRect.bottom = (graphRect.bottom) - (int)(YScale * (Y_NEGATIVE_TENTH_INCHES-2));
 	dc.FrameRect( ZoneRect, &m_ZoneOutlineBrush );
 	// Draw current Value as a bar
-	ZoneY = graphRect.bottom - (int)( YScale * (g_pSensorSummary->nRightFrontZone + Y_NEGATIVE_TENTH_INCHES) );
+	ZoneY = graphRect.bottom - (int)( YScale * (g_pNavSensorSummary->nRightFrontZone + Y_NEGATIVE_TENTH_INCHES) );
 	dc.MoveTo( (ZoneRect.left + 0),  ZoneY );		
 	dc.LineTo( (ZoneRect.right - 0), ZoneY );
 //	dc.MoveTo( (graphRect.left + (int)(XScale * (XCenter)) + 3), ZoneY );		
@@ -276,7 +276,7 @@ void CLaserDisplayWnd::OnPaint()
 	ZoneRect.bottom = (graphRect.bottom) - (int)(YScale * (Y_NEGATIVE_TENTH_INCHES-2));
 	dc.FrameRect( ZoneRect, &m_ZoneOutlineBrush );
 	// Draw current Value as a bar
-	ZoneY = graphRect.bottom - (int)( YScale * (g_pSensorSummary->nLeftFrontZone + Y_NEGATIVE_TENTH_INCHES) );
+	ZoneY = graphRect.bottom - (int)( YScale * (g_pNavSensorSummary->nLeftFrontZone + Y_NEGATIVE_TENTH_INCHES) );
 	dc.MoveTo( (ZoneRect.left - 0),  ZoneY );		
 	dc.LineTo( (ZoneRect.right + 0), ZoneY );
 //	dc.MoveTo( (graphRect.left + (int)(XScale * (XCenter-HALF_ROBOT_BODY_WIDTH_TENTH_INCHES)) + 2), ZoneY );		
@@ -289,7 +289,7 @@ void CLaserDisplayWnd::OnPaint()
 	ZoneRect.bottom = (graphRect.bottom) - (int)(YScale * (Y_NEGATIVE_TENTH_INCHES-2));
 	dc.FrameRect( ZoneRect, &m_ZoneOutlineBrush );
 	// Draw current Value as a bar
-	ZoneY = graphRect.bottom - (int)( YScale * (g_pSensorSummary->nRightArmZone + Y_NEGATIVE_TENTH_INCHES) );
+	ZoneY = graphRect.bottom - (int)( YScale * (g_pNavSensorSummary->nRightArmZone + Y_NEGATIVE_TENTH_INCHES) );
 	dc.MoveTo( (ZoneRect.left + 0),  ZoneY );		
 	dc.LineTo( (ZoneRect.right - 0), ZoneY );
 //	dc.MoveTo( (graphRect.left + (int)(XScale * (XCenter+HALF_ROBOT_BODY_WIDTH_TENTH_INCHES)) + 2), ZoneY );		
@@ -303,7 +303,7 @@ void CLaserDisplayWnd::OnPaint()
 	ZoneRect.bottom = (graphRect.bottom) - (int)(YScale * (Y_NEGATIVE_TENTH_INCHES-2));
 	dc.FrameRect( ZoneRect, &m_ZoneOutlineBrush );
 	// Draw current Value as a bar
-	ZoneY = graphRect.bottom - (int)( YScale * (g_pSensorSummary->nLeftArmZone + Y_NEGATIVE_TENTH_INCHES) );
+	ZoneY = graphRect.bottom - (int)( YScale * (g_pNavSensorSummary->nLeftArmZone + Y_NEGATIVE_TENTH_INCHES) );
 	dc.MoveTo( (ZoneRect.left - 0),  ZoneY );		
 	dc.LineTo( (ZoneRect.right + 0), ZoneY );
 //	dc.MoveTo( (graphRect.left + (int)(XScale * (XCenter-HALF_ROBOT_BODY_WITH_ARMS_WIDTH_TENTH_INCHES)) + 1), ZoneY );		
@@ -317,7 +317,7 @@ void CLaserDisplayWnd::OnPaint()
 	ZoneRect.bottom = (graphRect.bottom) - (int)(YScale * (Y_NEGATIVE_TENTH_INCHES-2));
 	dc.FrameRect( ZoneRect, &m_ZoneOutlineBrush );
 	// Draw current Value as a bar
-	ZoneY = graphRect.bottom - (int)( YScale * (g_pSensorSummary->nRightFrontSideZone + Y_NEGATIVE_TENTH_INCHES) );
+	ZoneY = graphRect.bottom - (int)( YScale * (g_pNavSensorSummary->nRightFrontSideZone + Y_NEGATIVE_TENTH_INCHES) );
 	dc.MoveTo( (ZoneRect.left + 0),  ZoneY );		
 	dc.LineTo( (ZoneRect.right - 0), ZoneY );
 
@@ -329,7 +329,7 @@ void CLaserDisplayWnd::OnPaint()
 	ZoneRect.bottom = (graphRect.bottom) - (int)(YScale * (Y_NEGATIVE_TENTH_INCHES-2));
 	dc.FrameRect( ZoneRect, &m_ZoneOutlineBrush );
 	// Draw current Value as a bar
-	ZoneY = graphRect.bottom - (int)( YScale * (g_pSensorSummary->nLeftFrontSideZone + Y_NEGATIVE_TENTH_INCHES) );
+	ZoneY = graphRect.bottom - (int)( YScale * (g_pNavSensorSummary->nLeftFrontSideZone + Y_NEGATIVE_TENTH_INCHES) );
 	dc.MoveTo( (ZoneRect.left - 0),  ZoneY );		
 	dc.LineTo( (ZoneRect.right + 0), ZoneY );
 
@@ -341,7 +341,7 @@ void CLaserDisplayWnd::OnPaint()
 	ZoneRect.bottom = graphRect.bottom;
 	dc.FrameRect( ZoneRect, &m_ZoneOutlineBrush );
 	// Draw current Value as a bar
-	ZoneX = graphRect.left +   (int)(XScale * (XCenter+HALF_ROBOT_BODY_WIDTH_TENTH_INCHES+g_pSensorSummary->nRightSideZone)) - 1;
+	ZoneX = graphRect.left +   (int)(XScale * (XCenter+HALF_ROBOT_BODY_WIDTH_TENTH_INCHES+g_pNavSensorSummary->nRightSideZone)) - 1;
 	dc.MoveTo( ZoneX, (graphRect.bottom - (int)(YScale * (Y_NEGATIVE_TENTH_INCHES-10))) );		
 	dc.LineTo( ZoneX, (graphRect.bottom - (int)(YScale * 10)) );
 
@@ -352,7 +352,7 @@ void CLaserDisplayWnd::OnPaint()
 	ZoneRect.bottom = graphRect.bottom;
 	dc.FrameRect( ZoneRect, &m_ZoneOutlineBrush );
 	// Draw current Value as a bar
-	ZoneX = graphRect.left +   (int)(XScale * (XCenter-(HALF_ROBOT_BODY_WIDTH_TENTH_INCHES+g_pSensorSummary->nLeftSideZone))) - 1;
+	ZoneX = graphRect.left +   (int)(XScale * (XCenter-(HALF_ROBOT_BODY_WIDTH_TENTH_INCHES+g_pNavSensorSummary->nLeftSideZone))) - 1;
 	dc.MoveTo( ZoneX, (graphRect.bottom - (int)(YScale * (Y_NEGATIVE_TENTH_INCHES-10))) );
 	dc.LineTo( ZoneX, (graphRect.bottom - (int)(YScale * 10)) );
 
@@ -360,7 +360,7 @@ void CLaserDisplayWnd::OnPaint()
 /*
 
 	// bRightCliff
-//	if( g_pSensorSummary->bRightCliff )
+//	if( g_pNavSensorSummary->bRightCliff )
 	{
 		objRect.left =   graphRect.left +   (int)(XScale * (XCenter+HALF_ROBOT_BODY_WITH_ARMS_WIDTH_TENTH_INCHES)) - 1;		
 		objRect.right =  graphRect.left +   (int)(XScale * (XCenter+HALF_ROBOT_BODY_WITH_ARMS_WIDTH_TENTH_INCHES + 30)) - 1;
@@ -369,7 +369,7 @@ void CLaserDisplayWnd::OnPaint()
 		dc.FillSolidRect( clientRect, PALETTERGB( 255, 90, 90 ) );	}
 
 	// bLeftCliff
-//	if( g_pSensorSummary->bLeftCliff )
+//	if( g_pNavSensorSummary->bLeftCliff )
 	{
 		objRect.left =   graphRect.left +   (int)(XScale * ((XCenter-HALF_ROBOT_BODY_WITH_ARMS_WIDTH_TENTH_INCHES) - 30)) - 1;		
 		objRect.right =  graphRect.left +   (int)(XScale * (XCenter-HALF_ROBOT_BODY_WITH_ARMS_WIDTH_TENTH_INCHES)) - 1;
@@ -498,7 +498,7 @@ void CLaserDisplayWnd::OnPaint()
 		int LastX = 0;
 		int LastY = 0;
 
-		int TargetClearDistance = (__max(g_pSensorSummary->nRightFrontSideZone, g_pSensorSummary->nLeftFrontSideZone) + DOORWAY_MIN_CLEAR_AREA_DEPTH_TENTH_INCHES) ; // tenth inches
+		int TargetClearDistance = (__max(g_pNavSensorSummary->nRightFrontSideZone, g_pNavSensorSummary->nLeftFrontSideZone) + DOORWAY_MIN_CLEAR_AREA_DEPTH_TENTH_INCHES) ; // tenth inches
 		
 		for( i = 0; i < (int)NumberOfSamples; i++ ) 
 		{
