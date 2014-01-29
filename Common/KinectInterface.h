@@ -2,10 +2,12 @@
 //////////////////////////////////////////////////////////////////////
 #pragma once	// Only include this header once
 
+#ifdef SHOULD_I_REMOVE_THIS
+
+
+
 #include "RobotType.h"
 
-//#define KINECT_INTERFACE_SHARED_FILE_NAME	"Global\\MyKinectMappingObject"
-#define KINECT_INTERFACE_SHARED_FILE_NAME	"MyKinectMappingObject"
 #define MAX_DEPTH_DATA_SIZE	(640*480)
 
 
@@ -61,3 +63,4 @@ private:
 
 };
 
+#endif SHOULD_I_REMOVE_THIS

@@ -3722,11 +3722,16 @@ void CBehaviorModule::ActionTellJokes( BOOL TellMultipleJokes )
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CBehaviorModule::DoHeadNod( )
 {
-#define NOD_TIME 2
-#define NOD_AMOUNT 15
-#define HEAD_TILT_DOWN_MAX_TENTHDEGREES (-15*10) // TenthDegrees
-static int  PriorTiltPosition = 0; 
-static int  PriorTiltSpeed = 0; 
+
+#if (ROBOT_TYPE == LOKI)	
+	// only nod for Loki or other human type robots
+	// in particular, don't nod with a telepresence robot!
+
+	#define NOD_TIME 2
+	#define NOD_AMOUNT 15
+	#define HEAD_TILT_DOWN_MAX_TENTHDEGREES (-15*10) // TenthDegrees
+	static int  PriorTiltPosition = 0; 
+	static int  PriorTiltSpeed = 0; 
 
 
 	if( 0 != gHeadNodTimer)
@@ -3817,7 +3822,7 @@ static int  PriorTiltSpeed = 0;
 			ROBOT_ASSERT(0);
 		}
 	}
-
+#endif  // ROBOT_TYPE == LOKI
 }
 
 

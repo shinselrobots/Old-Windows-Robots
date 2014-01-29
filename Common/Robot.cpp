@@ -265,22 +265,19 @@ BOOL CRobotApp::InitInstance()
 
 	////////////////////////////////////////////////////////////////////////////
 	// Launch the KobukiControl Application here for Kobuki robots
+	// Launch the C# Kinect Capture Application here for Kobuki robots
 	////////////////////////////////////////////////////////////////////////////
 	#if (MOTOR_CONTROL_TYPE == KOBUKI_MOTOR_CONTROL) 
 		LaunchKobukiApp(); // Will only launch if enabled in globals.cpp
-	#endif
-
-	////////////////////////////////////////////////////////////////////////////
-	// Launch the C# Kinect Capture Application here for Loki
-	////////////////////////////////////////////////////////////////////////////
-	#if (ROBOT_TYPE == LOKI) 
 		LaunchKinectApp(); // Will only launch if enabled in globals.cpp.  
 	#endif
 
 	////////////////////////////////////////////////////////////////////////////
+	// Launch the C# Kinect Capture Application here for Loki
 	// Launch the OpenCV Camera Capture Application here for Loki
 	////////////////////////////////////////////////////////////////////////////
 	#if (ROBOT_TYPE == LOKI) 
+		LaunchKinectApp(); // Will only launch if enabled in globals.cpp.  
 		LaunchCameraApp(); // Will only launch if enabled in globals.cpp
 	#endif
 

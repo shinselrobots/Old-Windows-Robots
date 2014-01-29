@@ -1,9 +1,10 @@
 // KinectInterface.cpp: Kinect Remote Control class
 //
 //////////////////////////////////////////////////////////////////////
-
-
 #include "stdafx.h"
+
+#ifdef SHOULD_I_REMOVE_THIS
+
 #include "ClientOrServer.h"
 #if ( ROBOT_SERVER == 1 ) 	// This module used for Robot Server only
 
@@ -142,3 +143,5 @@ void KinectInterface::Update()
 }
 
 #endif // ROBOT_SERVER - This module used for Robot Server only
+
+#endif SHOULD_I_REMOVE_THIS

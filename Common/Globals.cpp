@@ -46,7 +46,7 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 // Auto launch KobukiControl Application
-#if SENSOR_CONFIG_TYPE != SENSOR_CONFIG_LOKI
+#if (MOTOR_CONTROL_TYPE == KOBUKI_MOTOR_CONTROL)
 	#define ENABLE_KOBUKI_APP			1	// set value to 1 to allow app communication
 	#define AUTO_LAUNCH_KOBUKI_APP		1	// if 0, start this process first, then start Kobuki
 	#if (ENABLE_KOBUKI_APP == 1)

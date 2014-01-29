@@ -533,7 +533,7 @@ void Setup::OnInitialUpdate()
 	}
 	***/
 
-	if( ROBOT_TYPE == TURTLE )
+	if( MOTOR_CONTROL_TYPE == IROBOT_MOTOR_CONTROL )
 	{
 		// Power for Kinect and Servos enabled by the iRobot Base, so power up the base first
 		ROBOT_LOG( TRUE,  "Opening iRobot base MOTOR PORT\n" )
@@ -638,8 +638,10 @@ void Setup::OnInitialUpdate()
 			OpenArduinoPort();
 		}
 
-		if( ROBOT_TYPE != TURTLE )
+		if( MOTOR_CONTROL_TYPE != IROBOT_MOTOR_CONTROL )
 		{
+			// port opened earlier for iRobot (in order to enable the Kinect power sooner)
+			// for all other motor control types, open the port (if any) and start control threads now
 			ROBOT_LOG( TRUE,  "     MOTOR PORT\n" )
 			OpenMotorPort();
 		}
@@ -655,7 +657,7 @@ void Setup::OnInitialUpdate()
 
 		// WARNING - FOLLOWING PORTS DISABLED!
 
-		//ROBOT_LOG( TRUE,  "     Servo PORT\n" )
+		//ROBOT_LOG( TRUE,  "     Servo PORT\n" ) // Analog servos
 		//OpenServoPort();
 
 		//ROBOT_LOG( TRUE,  "     Sony Camera COM PORT\n" )
@@ -1051,20 +1053,19 @@ void Setup::OpenMotorPort()
 		return;
 
 	#elif( MOTOR_CONTROL_TYPE == KOBUKI_MOTOR_CONTROL )
-		// Kobuki uses external control program
-		/***
-		ROBOT_DISPLAY( TRUE, "Motor COM Port not needed for KOBUKI_MOTOR_CONTROL" )
+		// Kobuki uses external control program.  
+		// Don't open COM port, but do start the thread that talks to the external process
+		ROBOT_DISPLAY( TRUE, "Motor COM Port not needed for KOBUKI_MOTOR_CONTROL, but starting thread for Inter Process Communication (IPC)" )
 		// Create the thread that will be writing to the Kobuki App
 		HANDLE g_hMotorWriteThread = CreateThread(NULL, 0, MotorCommThreadFunc, (LPVOID)0, 0, &g_dwMotorCommThreadId);
 		if(g_hMotorWriteThread == NULL)	
 		{
-			ROBOT_LOG( TRUE, "Error Creating Motor Comm Write Thread for Kobuki." )
+			ROBOT_LOG( TRUE, "Error Creating Motor Write Thread for Kobuki." )
 		}
 		else
 		{
-			ROBOT_LOG( TRUE,  "Created Motor Comm Write Thread for Kobuki. ID = (0x%x)", g_dwMotorCommThreadId )
+			ROBOT_LOG( TRUE,  "Created Motor Comm Thread for Kobuki. ID = (0x%x)", g_dwMotorCommThreadId )
 		}
-		***/
 
 	#else
 

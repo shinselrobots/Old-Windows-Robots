@@ -189,6 +189,7 @@ CRobotCmdView::~CRobotCmdView()
 	// Shut down the Kinect C# process, and OpenCV Camera capture process
 	TerminateKinectApp();
 	TerminateCameraApp();
+	TerminateKobukiApp();	// if started
 
 	// delete allocated stuff
 	//delete m_pArmControlDlg;

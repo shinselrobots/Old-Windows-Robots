@@ -1154,8 +1154,72 @@ DWORD WINAPI iRobotCommReadThreadFunc(LPVOID lpParameter) // g_hMotorCommPort
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 #elif MOTOR_CONTROL_TYPE == KOBUKI_MOTOR_CONTROL
-	// Do nothing, handled by separate Kobuki control application ( see KobukiAppSharedMemoryIPCThreadProc() )
+	__itt_string_handle* pshMotorThreadLoop = __itt_string_handle_create("Motor Loop");
 
+	// For Kobuki motor controller
+	DWORD WINAPI MotorCommThreadFunc(LPVOID lpParameter)	// g_hMotorCommPort, g_dwMotorCommThreadId
+	{
+		///TAL_SetThreadName("Motor Thread");
+		// Writes a command to the Kobuki base controller
+		// Status message are read by a separate thread
+		// Messages are sent to this thread by SendHardwareCmd calls
+		IGNORE_UNUSED_PARAM(lpParameter);
+		__itt_thread_set_name( "Wheel Motor Thread" );
+
+		MSG		msg;
+		UINT	Request;
+		UINT	Index;
+		UINT	Value;
+		CString strStatus;
+		//int		DbgDotCount = 0;
+		//BYTE	MotorNumber = 0;
+		//BYTE	Position = 0;
+
+		CKobukiControl KobukiControl;	// Kobuki Command handler Class
+		//Sleep(100);					// Allow other initialization to complete
+		ROBOT_LOG( TRUE,"\n\n************* INIT KOBUKI *****************\n\n")
+		KobukiControl.Init();			// Send Initialization commands - starts the status read stream
+
+		// Process message loop for this thread
+		while( 0 != GetMessage( &msg, NULL, WM_ROBOT_MESSAGE_BASE, (WM_ROBOT_MESSAGE_BASE+HW_MAX_MESSAGE) ) )
+			// OK to filter out Windows messages, since we don't use WM_QUIT
+		{
+			//TAL_Event("Sending Cmd");
+			///TAL_SCOPED_TASK_NAMED("Motor CMD Loop");
+			__itt_task_begin(pDomainMotorThread, __itt_null, __itt_null, pshMotorThreadLoop);
+
+
+			if( WM_ROBOT_THREAD_EXIT_CMD == msg.message ) 
+			{
+				break; // Quit command received!
+			}
+
+			if( (msg.message < WM_ROBOT_MESSAGE_BASE) || ((msg.message > (WM_ROBOT_MESSAGE_BASE+HW_MAX_MESSAGE) ) ) )
+			{
+				// Ignore any messages not intended for user (where do these come from?)
+				ROBOT_LOG( TRUE, "MotorCommThreadFunc: message out of Range, WM_ROBOT_MESSAGE_BASE = 0x%08X, Msg = 0x%08lX, wParam = 0x%08lX, lParam = 0x%08lX\n", 
+					WM_ROBOT_MESSAGE_BASE, msg.message, msg.wParam, msg.lParam )
+				__itt_task_end(pDomainMotorThread);  // pshMotorThreadLoop
+				continue;
+			}
+
+			Request = msg.message - WM_ROBOT_MESSAGE_BASE;
+			Index = (UINT)(msg.wParam);
+			Value = (UINT)(msg.lParam);
+
+			{
+				///TAL_SCOPED_TASK_NAMED("Trex HandleCmd");
+				//TAL_Event("Handle Motor Command");
+				KobukiControl.HandleCommand( Request, Index, Value );
+			}
+
+			__itt_task_end(pDomainMotorThread);  // pshMotorThreadLoop
+			Sleep(0);
+		}
+
+		ROBOT_LOG( TRUE, "TREX MOTOR COMM THREAD: Received WM_ROBOT_THREAD_EXIT_CMD\n")
+		return 0;
+	}
 
 #elif( MOTOR_CONTROL_TYPE == ARDUINO_MOTOR_CONTROL )
 	// Do nothing, handled by the Arduino Thread

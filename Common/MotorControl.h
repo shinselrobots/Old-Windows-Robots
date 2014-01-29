@@ -424,7 +424,6 @@ public:
 
 };
 
-#if THIS_WILL_NEVER_HAPPEN
 /************************************************************************
                   Kobuki Base control
 ************************************************************************/
@@ -445,7 +444,7 @@ public:
 		__int16  MotorSpeedR;
 		__int16  MotorSpeedL;
 	} KOBUKI_MOTOR_CMD_T;
-	#pragma pack( 4 )
+//	#pragma pack( 4 )
 
 	/***
 typedef struct KobukiCmd_struct {
@@ -509,6 +508,7 @@ protected:
 
 };
 
+/**
 /////////////////////////////////////////////////////////////////////////////
 class CKobukiParser
 {
@@ -522,4 +522,4 @@ public:
 //protected:
 
 };
-#endif // THIS_WILL_NEVER_HAPPEN
+**/

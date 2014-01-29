@@ -9,9 +9,6 @@
 #if ( ROBOT_SERVER == 1 )	// This module used for Robot Server only
 
 
-#if THIS_WILL_NEVER_HAPPEN // MOVED TO EXTERNAL PROGRAM!!!!
-
-
 
 #include "Globals.h"
 #include "MotorControl.h"
@@ -97,15 +94,17 @@ void CKobukiControl::Init()
 	// Init at robot startup
 	ROBOT_LOG( TRUE, "==============================>>>>>>> INIT CALLED <<<<<<<<<<<==========================" )
 
-	// TODO-MUST SetPort(); // Initialize power for Kinect and Dynamixel Servos
+	/* NOT use for Kobuki!!  Kinect power is on by default!
+		SetPort(); // Initialize power for Kinect and Dynamixel Servos
 
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Launch the C# Kinect Capture Application here for iRobot or Kobuki bases, after turning on power to the sensor
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	#if (ROBOT_TYPE == TURTLE) 
-		RobotSleep(2000, pDomainMotorThread); // allow kinect to power up
-		LaunchKinectApp(); // defined in globals.cpp
-	#endif
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// Launch the C# Kinect Capture Application here for iRobot or Kobuki bases, after turning on power to the sensor
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		#if (ROBOT_TYPE == TURTLE) 
+			RobotSleep(2000, pDomainMotorThread); // allow kinect to power up
+			LaunchKinectApp(); // defined in globals.cpp
+		#endif
+	*/
 
 	///g_MotorControlInitialized = TRUE;
 	ROBOT_LOG( TRUE, "MotorControlKobuki: Init Complete\n" )
@@ -657,6 +656,7 @@ void CKobukiControl::HandleCommand( int  Request, int  Param1, int  Param2 )
 
 }
 
+/*
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Kobuki Status Parser Class
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -694,7 +694,6 @@ BOOL CKobukiParser::ParseBuffer( unsigned char* KobukiSIOBuf, int dwSIOBytesRece
 	return TRUE; // assume communicaton established
 
 }
-
-#endif // THIS_WILL_NEVER_HAPPEN
+*/
 
 #endif // ROBOT_SERVER  // Nothing in this file used for client!

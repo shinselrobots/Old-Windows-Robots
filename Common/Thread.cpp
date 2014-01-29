@@ -34,7 +34,7 @@ static char THIS_FILE[] = __FILE__;
 //const wchar_t taskOpsCounterName[] = L"Task ops";
 
 #define DEBUG_KOBUKI_SHARED_MEMORY 0
-
+#define DEBUG_KINECT_SHARED_MEMORY 0
 //-----------------------------------------------------------------------------
 //	Name: ControlThreadProc
 //	This thread is the heart of the robot control system.
@@ -745,10 +745,8 @@ DWORD WINAPI SpeakThreadProc( LPVOID NotUsed ) // g_dwSpeakThreadId
 // Name: KinectAppSharedMemoryIPCThreadProc
 // This thread reads data from the Kinect C# application via shared memory, and sends it to handler threads 
 //-----------------------------------------------------------------------------
-#define DEBUG_IPC_SHARED_MEMORY 1
+#define DEBUG_KINECT_IPC_SHARED_MEMORY 1
 
-// WARNING!  THIS MUST MATCH C# CODE!  - TODO - put this in the .cs file?
-#define IPC_INTERFACE_SHARED_FILE_NAME		"RobotIPCMappingFile"
 #define MESSAGE_QUEUE_MAX_MESSAGES			4
 //#define SPEECH_INPUT_PHRASE_MAX_LENGTH	   128
 //#define SPEECH_INPUT_QUEUE_MAX_MESSAGES		16
@@ -771,14 +769,14 @@ typedef struct
 	int	Param4;
 	float	SpeechRecoConfidence;
 	float	AudioBeamDirection;
-} IPC_MESSAGE_QUEUE_ITEM_T; // Must match struct in Managed code!
+} KINECT_IPC_MESSAGE_QUEUE_ITEM_T; // Must match struct in Managed code!
 
 typedef struct
 {
 	int	  TrackPlayerDisableRequestFlag; // OUT:  Tell C# code to disable display of players
 	int	  SpeechRecoDisableRequestFlag; // OUT: Tell C# code to disable speech recognition
-	IPC_MESSAGE_QUEUE_ITEM_T MessageQueueFromApp[MESSAGE_QUEUE_MAX_MESSAGES];	// IN - From Managed App
-} IPC_MAPPED_DATA_T; // Must match struct in Managed code!
+	KINECT_IPC_MESSAGE_QUEUE_ITEM_T MessageQueueFromApp[MESSAGE_QUEUE_MAX_MESSAGES];	// IN - From Managed App
+} KINECT_IPC_MAPPED_DATA_T; // Must match struct in Managed code!
 
 
 DWORD WINAPI KinectAppSharedMemoryIPCThreadProc( LPVOID NotUsed )
@@ -823,14 +821,14 @@ DWORD WINAPI KinectAppSharedMemoryIPCThreadProc( LPVOID NotUsed )
 
 
 	// Open Memory Mapped File
-	TCHAR szKinectInterfaceSharedFileName[]=TEXT(IPC_INTERFACE_SHARED_FILE_NAME);
+	TCHAR szKinectSpeechInterfaceSharedFileName[]=TEXT(KINECT_SPEECH_INTERFACE_SHARED_FILE_NAME);
 	char *pBuf;
 //	int NextQueuedMessageFromApp = 0;	// Keep track of queue position
 
 	HANDLE hMapFile = OpenFileMapping(
 		FILE_MAP_ALL_ACCESS,		// read/write access
 		FALSE,						// do not inherit the name
-		szKinectInterfaceSharedFileName);	// name of mapping object 
+		szKinectSpeechInterfaceSharedFileName);	// name of mapping object 
 
 	if ( (INVALID_HANDLE_VALUE == hMapFile) || (NULL == hMapFile)  )
 	{ 
@@ -848,7 +846,7 @@ DWORD WINAPI KinectAppSharedMemoryIPCThreadProc( LPVOID NotUsed )
 			FILE_MAP_ALL_ACCESS,  // read/write permission
 			0,                    
 			0,                    
-			(sizeof(IPC_MAPPED_DATA_T)) );                   
+			(sizeof(KINECT_IPC_MAPPED_DATA_T)) );                   
 
 		if (pBuf == NULL) 
 		{ 
@@ -858,7 +856,7 @@ DWORD WINAPI KinectAppSharedMemoryIPCThreadProc( LPVOID NotUsed )
 		}
 		else
 		{
-			ROBOT_DISPLAY( TRUE, "IPC Shared Memory File Opened Sucessfully!" )
+			ROBOT_DISPLAY( TRUE, "Kinect Speech Shared Memory File Opened Sucessfully!" )
 		} 
 	}
 
@@ -872,10 +870,10 @@ DWORD WINAPI KinectAppSharedMemoryIPCThreadProc( LPVOID NotUsed )
 	ROBOT_LOG( TRUE,"Thread Loop starting.\n")
 	while( g_bRunThread && (WAIT_OBJECT_0 == WaitForSingleObject(g_hSpeechRecoEvent, INFINITE)) )
 	{
-		ROBOT_LOG( DEBUG_IPC_SHARED_MEMORY,  "---------------------- g_hSpeechRecoEvent Signaled ---------------------\n");
+		ROBOT_LOG( DEBUG_KINECT_SHARED_MEMORY,  "---------------------- g_hSpeechRecoEvent Signaled ---------------------\n");
 
 		// Read from Shared Memory
-		IPC_MAPPED_DATA_T *pIpcData = (IPC_MAPPED_DATA_T*)pBuf;
+		KINECT_IPC_MAPPED_DATA_T *pIpcData = (KINECT_IPC_MAPPED_DATA_T*)pBuf;
 
 		for( int NextQueuedMessageFromApp = 0; NextQueuedMessageFromApp <MESSAGE_QUEUE_MAX_MESSAGES; NextQueuedMessageFromApp++ )
 		{
@@ -890,7 +888,7 @@ DWORD WINAPI KinectAppSharedMemoryIPCThreadProc( LPVOID NotUsed )
 				g_LastHumanAudioBeamDirection = pIpcData->MessageQueueFromApp[NextQueuedMessageFromApp].AudioBeamDirection;
 
 				// DEBUG
-				ROBOT_LOG( DEBUG_IPC_SHARED_MEMORY, " MESSAGE_QUEUE_MESSAGE_READY in Slot %d: RecoType=%4d, Param1=%4d, SpRecoConf=%3.2f, AudioBeamDir=%3.2f\n", 
+				ROBOT_LOG( DEBUG_KINECT_SHARED_MEMORY, " MESSAGE_QUEUE_MESSAGE_READY in Slot %d: RecoType=%4d, Param1=%4d, SpRecoConf=%3.2f, AudioBeamDir=%3.2f\n", 
 						NextQueuedMessageFromApp, (int)RecoType, Param1, SpeechRecoConfidence, g_LastHumanAudioBeamDirection );
 
 				// Message ready for processing
@@ -1007,7 +1005,7 @@ DWORD WINAPI CameraAppSharedMemoryIPCThreadProc( LPVOID NotUsed )
 			FILE_MAP_ALL_ACCESS,  // read/write permission
 			0,                    
 			0,                    
-			(sizeof(IPC_MAPPED_DATA_T)) );                   
+			(sizeof(CAMERA_UPDATE_T)) );                   
 
 		if (pBuf == NULL) 
 		{ 

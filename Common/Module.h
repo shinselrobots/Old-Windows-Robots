@@ -903,7 +903,6 @@ protected:
 /////////////////////////////////////////////////////////////////////////////
 // class CKinectModule
 
-#define KINECT_INTERFACE_SHARED_FILE_NAME	"MyKinectMappingObject"
 #define MAX_DEPTH_DATA_SIZE	((640*480)+4)	// 4 bytes per 32 bit value
 
 const int ControlFlag_None = 0;

@@ -211,6 +211,7 @@
     <ClCompile Include="..\Common\micropather.cpp" />
     <ClCompile Include="..\Common\Module.cpp" />
     <ClCompile Include="..\Common\MotorControliRobot.cpp" />
+    <ClCompile Include="..\Common\MotorControlKobuki.cpp" />
     <ClCompile Include="..\Common\MotorControlPilot.cpp" />
     <ClCompile Include="..\Common\MotorControlTrex.cpp" />
     <ClCompile Include="..\Common\NavModule.cpp" />

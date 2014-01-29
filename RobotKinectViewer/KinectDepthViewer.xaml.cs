@@ -67,7 +67,7 @@ namespace KinectWpfViewers
         private bool SharedDataFileInitialized = true;
         private int FrameLoopCount = 1;
         private int CopiedFrameNumber = 0; // number of frames copied to shared memory
-        private string smName = "MyKinectMappingObject";
+        private string smName = "RobotKinectDepthMappingFile";
         private Mutex smLock;
         private long smSize = MAX_SHARED_DATA_SIZE;
         private long offset = 0;

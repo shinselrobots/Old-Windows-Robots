@@ -392,6 +392,9 @@
     <ClCompile Include="..\Common\SensorModuleTurtle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Common\MotorControlKobuki.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Turtle.rc">

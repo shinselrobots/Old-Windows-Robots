@@ -166,6 +166,11 @@ enum COMPASS_ROSE {
 		NORTH_WEST,			
 };
 
+// WARNING!  THIS MUST MATCH C# CODE!  - TODO - put this in the .cs file?
+#define KINECT_SPEECH_INTERFACE_SHARED_FILE_NAME	"RobotKinectSpeechMappingFile"
+#define KINECT_DEPTH_INTERFACE_SHARED_FILE_NAME		"RobotKinectDepthMappingFile"
+//#define KINECT_INTERFACE_SHARED_FILE_NAME	"Global\\MyKinectMappingObject"
+
 
 #define DEGREES_TO_RADIANS	0.017452778	// Used in Sin and Cos calculations
 //  or use this if it's easier (such as in the Arduino?):

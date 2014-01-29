@@ -489,16 +489,16 @@ BOOL CKinectModule::OpenMemoryMappedFile()
 	}
 	ROBOT_LOG( TRUE,  "C# App start Success!\n" )
 
-	TCHAR szKinectInterfaceSharedFileName[]=TEXT(KINECT_INTERFACE_SHARED_FILE_NAME);
+	TCHAR szKinectDepthInterfaceSharedFileName[]=TEXT(KINECT_DEPTH_INTERFACE_SHARED_FILE_NAME);
 
 	m_hMapFile = OpenFileMapping(
 		FILE_MAP_ALL_ACCESS,		// read/write access
 		FALSE,						// do not inherit the name
-		szKinectInterfaceSharedFileName);	// name of mapping object 
+		szKinectDepthInterfaceSharedFileName);	// name of mapping object 
 
 	if ( (INVALID_HANDLE_VALUE == m_hMapFile) || (NULL == m_hMapFile)  )
 	{ 
-		ROBOT_LOG( TRUE,  "Could not open file mapping object (%d).\n", GetLastError())
+		ROBOT_LOG( TRUE,  "Could not open Kinect Depth file mapping object (%d).\n", GetLastError())
 		return FALSE;
 	}
 
@@ -516,7 +516,7 @@ BOOL CKinectModule::OpenMemoryMappedFile()
 	}
 
 	m_bKinectSharedMemoryOpened = TRUE;
-	ROBOT_DISPLAY( TRUE, "Shared Memory File Opened Sucessfully!" )
+	ROBOT_DISPLAY( TRUE, "Kinect Depth Shared Memory File Opened Sucessfully!" )
 	return TRUE; // Success!
 
 }

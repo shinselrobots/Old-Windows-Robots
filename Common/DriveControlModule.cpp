@@ -899,11 +899,11 @@ void CDriveControlModule::ExecuteCommand()
 
 		// new command is pending, and needs to be sent
 		if( m_LastMotorCommand != m_Command )
-			ROBOT_LOG( MOTOR_DBG, "Execute: New Cmd = %02X, Ack Cmd = %02X\n", m_Command, m_LastMotorCommand )
+			ROBOT_LOG( MOTOR_DBG, "Execute: New Kobuki Cmd = %02X, Ack Cmd = %02X\n", m_Command, m_LastMotorCommand )
 		if( m_LastMotorSpeed != m_Speed )
-			ROBOT_LOG( MOTOR_DBG, "Execute: New Speed = %d, Ack Speed = %d\n", m_Speed, m_LastMotorSpeed )
+			ROBOT_LOG( MOTOR_DBG, "Execute: New Kobuki Speed = %d, Ack Speed = %d\n", m_Speed, m_LastMotorSpeed )
 		if( m_LastMotorTurn != m_Turn )
-			ROBOT_LOG( MOTOR_DBG, "Execute: New Turn = %d, Ack Turn = %d\n", m_Turn, m_LastMotorTurn )
+			ROBOT_LOG( MOTOR_DBG, "Execute: New Kobuki Turn = %d, Ack Turn = %d\n", m_Turn, m_LastMotorTurn )
 
 		if( HW_SET_MOTOR_BRAKE == m_Command )
 		{

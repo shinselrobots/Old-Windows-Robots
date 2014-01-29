@@ -116,7 +116,7 @@ DWORD WINAPI KobukiAppSharedMemoryIPCThreadProc( LPVOID NotUsed )
 		}
 		else
 		{
-			ROBOT_DISPLAY( TRUE, "IPC Shared Memory File Opened Sucessfully!" )
+			ROBOT_DISPLAY( TRUE, "Kobuki Shared Memory File Opened Sucessfully!" )
 		} 
 	}
 
