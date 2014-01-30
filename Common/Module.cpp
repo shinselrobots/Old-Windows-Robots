@@ -240,7 +240,7 @@ void CRobotModule::SendHardwareCmd(WORD Request, DWORD wParam, DWORD lParam)
 
 		///////////////////////////////////////////////////////////////////////////////
 		#elif MOTOR_CONTROL_TYPE == KOBUKI_MOTOR_CONTROL
-
+			ROBOT_LOG( DEBUG_MOTOR_COMMANDS, "KOBUKI_MOTOR_CONTROL: PostThreadMessage %02X ",  Request)
 			PostThreadMessage( g_dwMotorCommThreadId, (WM_ROBOT_MESSAGE_BASE+Request), wParam, lParam );
 			return;
 
@@ -825,6 +825,7 @@ void CUserCmdModule::ProcessMessage(
 			int NewSpeed = wParam;
 			int NewTurn = lParam;
 
+			ROBOT_LOG( DEBUG_MOTOR_COMMANDS, "Received WM_ROBOT_JOYSTICK_DRIVE_CMD: Speed=%d, Turn=%d  ",  NewSpeed, NewTurn )
 
 			// Speed and Turn commands from GUI are +/- 127, with zero = Center/Stop 
 			// Convert to HW command values, for reverse, we add a negative number

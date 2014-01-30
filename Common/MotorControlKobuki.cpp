@@ -561,6 +561,8 @@ BYTE TestBuf[32];
 void CKobukiControl::HandleCommand( int  Request, int  Param1, int  Param2 )
 {
 
+	ROBOT_LOG( DEBUG_MOTOR_COMMANDS, "Got Command Message %02X ",  Request)
+
 	switch( Request )
 	{		
 		case HW_GET_STATUS:

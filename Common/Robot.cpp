@@ -300,7 +300,7 @@ BOOL CRobotApp::InitInstance()
 	g_hSoundThread = ::CreateThread( NULL, 0, SoundThreadProc, (LPVOID)0, 0, &g_dwSoundThreadId );
 	ROBOT_LOG( TRUE,  "Created Robot Sound Thread. ID = (0x%x)", g_dwSoundThreadId )
 
-	// Create AI thread
+	// Create Speech thread
 	g_hSpeakThread = ::CreateThread( NULL, 0, SpeakThreadProc, (LPVOID)0, 0, &g_dwSpeakThreadId );
 	ROBOT_LOG( TRUE,  "Created Robot Speak Thread. ID = (0x%x)", g_dwSpeakThreadId )
 
@@ -309,18 +309,23 @@ BOOL CRobotApp::InitInstance()
 	ROBOT_LOG( TRUE,  "Created Robot Control Thread. ID = (0x%x) (ControlThreadProc)", g_dwControlThreadId )
 
 	// Create C# managed shared memory thread
+	/* MOVED TO LaunchKinectApp
 	g_hKinectAppSharedMemoryIPCThread = ::CreateThread( NULL, 0, KinectAppSharedMemoryIPCThreadProc, (LPVOID)0, 0, &g_dwKinectAppSharedMemoryIPCThreadId );
 	ROBOT_LOG( TRUE,  "Created Kinect App IPC Thread. ID = (0x%x) (KinectAppSharedMemoryIPCThreadProc)", g_dwKinectAppSharedMemoryIPCThreadId )
-
+	*/
 	// Create Camera App shared memory thread
+	/* MOVED TO LaunchCameraApp
 	g_hCameraAppSharedMemoryIPCThread = ::CreateThread( NULL, 0, CameraAppSharedMemoryIPCThreadProc, (LPVOID)0, 0, &g_dwCameraAppSharedMemoryIPCThreadId );
 	ROBOT_LOG( TRUE,  "Created Camera App IPC Thread. ID = (0x%x) (CameraAppSharedMemoryIPCThreadProc)", g_dwCameraAppSharedMemoryIPCThreadId )
+	*/
 
 	// Create Kobuki App shared memory thread
+	/* MOVED to LaunchKobukiApp
 	#if( MOTOR_CONTROL_TYPE == KOBUKI_MOTOR_CONTROL )
 		g_hKobukiAppSharedMemoryIPCThread = ::CreateThread( NULL, 0, KobukiAppSharedMemoryIPCThreadProc, (LPVOID)0, 0, &g_dwKobukiAppSharedMemoryIPCThreadId );
 		ROBOT_LOG( TRUE,  "Created Kobuki App IPC Thread. ID = (0x%x) (KobukiAppSharedMemoryIPCThreadProc)", g_dwKobukiAppSharedMemoryIPCThreadId )
 	#endif
+	*/
 
 	// Create the video capture thread - MOVED TO CAMERA MODULE CLASS
 //	g_bRunVidCapThread = TRUE; // When FALSE, tells Vidcap thread to exit

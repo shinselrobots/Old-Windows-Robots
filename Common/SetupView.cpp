@@ -681,38 +681,41 @@ void Setup::OnInitialUpdate()
 
 	// Initialize settings for the external camera app
 	// OLD: Camera Processing is reset by OnGetCameraSettings() due to lag in thread startup
-	ROBOT_LOG( TRUE,  "Initializing Camera App Config" )
-	if( (NULL != g_pCameraRequestSharedMemory) && (NULL != g_hCameraRequestEvent) )
+	if ( NULL != g_pCameraRequestSharedMemory )
 	{
-		bEnable = GetDocument()->m_bEnableCamera1;
-		CheckDlgButton( IDC_ENABLE_CAMERA_1, bEnable );
-		m_CameraRequest.RequestData.EnableFeatures.VideoEnable = bEnable;
-		ROBOT_LOG( TRUE, "    Camera1 Video Enable = %d",  bEnable )
+		ROBOT_LOG( TRUE,  "Initializing Camera App Config" )
+		if( (NULL != g_pCameraRequestSharedMemory) && (NULL != g_hCameraRequestEvent) )
+		{
+			bEnable = GetDocument()->m_bEnableCamera1;
+			CheckDlgButton( IDC_ENABLE_CAMERA_1, bEnable );
+			m_CameraRequest.RequestData.EnableFeatures.VideoEnable = bEnable;
+			ROBOT_LOG( TRUE, "    Camera1 Video Enable = %d",  bEnable )
 
-		bEnable = GetDocument()->m_EnableFaceIdentification;
-		CheckDlgButton( IDC_CAMERA_ENABLE_FACE_IDENTIFY, bEnable );
-		m_CameraRequest.RequestData.EnableFeatures.FaceRecognition = bEnable;
-		ROBOT_LOG( TRUE, "    Face ID Enable = %d",  bEnable )
+			bEnable = GetDocument()->m_EnableFaceIdentification;
+			CheckDlgButton( IDC_CAMERA_ENABLE_FACE_IDENTIFY, bEnable );
+			m_CameraRequest.RequestData.EnableFeatures.FaceRecognition = bEnable;
+			ROBOT_LOG( TRUE, "    Face ID Enable = %d",  bEnable )
 
-		bEnable = GetDocument()->m_bEnableTrackingFace;
-		CheckDlgButton( IDC_CAMERA_ENABLE_TRACKING_FACE, bEnable );
-		m_CameraRequest.RequestData.EnableFeatures.FaceTracking = bEnable;
-		ROBOT_LOG( TRUE, "    Face Tracking Enable = %d",  bEnable )
+			bEnable = GetDocument()->m_bEnableTrackingFace;
+			CheckDlgButton( IDC_CAMERA_ENABLE_TRACKING_FACE, bEnable );
+			m_CameraRequest.RequestData.EnableFeatures.FaceTracking = bEnable;
+			ROBOT_LOG( TRUE, "    Face Tracking Enable = %d",  bEnable )
 
-		bEnable = GetDocument()->m_bEnableMatchingObjects;
-		CheckDlgButton( IDC_CAMERA_ENABLE_MATCH_OBJECTS, bEnable );
-		m_CameraRequest.RequestData.EnableFeatures.ObjectMatch = bEnable;
-		ROBOT_LOG( TRUE, "    Object Matching Enable = %d",  bEnable )
+			bEnable = GetDocument()->m_bEnableMatchingObjects;
+			CheckDlgButton( IDC_CAMERA_ENABLE_MATCH_OBJECTS, bEnable );
+			m_CameraRequest.RequestData.EnableFeatures.ObjectMatch = bEnable;
+			ROBOT_LOG( TRUE, "    Object Matching Enable = %d",  bEnable )
 
-		ROBOT_LOG( TRUE, "... Done\n" )
+			ROBOT_LOG( TRUE, "... Done\n" )
 
-		// Notify the Camera App of our new settings
-		CopyMemory((PVOID)g_pCameraRequestSharedMemory, &m_CameraRequest, (sizeof(CAMERA_REQUEST_T)));
-		SetEvent( g_hCameraRequestEvent );  // Send request
-	}
-	else
-	{
-		ROBOT_LOG( TRUE, "ERROR: Can't request video!  Did you have AUTO_LAUNCH_CAMERA_APP enabled?\n" )
+			// Notify the Camera App of our new settings
+			CopyMemory((PVOID)g_pCameraRequestSharedMemory, &m_CameraRequest, (sizeof(CAMERA_REQUEST_T)));
+			SetEvent( g_hCameraRequestEvent );  // Send request
+		}
+		else
+		{
+			ROBOT_LOG( TRUE, "ERROR: Can't request video!  Did you have AUTO_LAUNCH_CAMERA_APP enabled?\n" )
+		}
 	}
 
 	

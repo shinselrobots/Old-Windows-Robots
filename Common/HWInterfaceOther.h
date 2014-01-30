@@ -985,7 +985,7 @@ OLD -----------------
 	//////////////////////////////////////////////////////////////
 	// ARM SERVOS - Includes Shoulder Joint (even though it's not a Dyna Servo)
 
-	#define ROBOT_HAS_RIGHT_ARM			 			FALSE
+	#define ROBOT_HAS_RIGHT_ARM			 			   0
 
 	#define DYNA_RIGHT_ARM_ELBOW_ROTATE_SERVO_ID	   5
 	#define DYNA_RIGHT_ARM_ELBOW_BEND_SERVO_ID		   6
@@ -995,7 +995,7 @@ OLD -----------------
 	#define DYNA_RIGHT_ARM_WRIST_SERVO_ID			   8
 	#define DYNA_RIGHT_ARM_CLAW_SERVO_ID			   9
 
-	#define ROBOT_HAS_LEFT_ARM			 			FALSE
+	#define ROBOT_HAS_LEFT_ARM			 			   0
 
 	#define DYNA_LEFT_ARM_ELBOW_ROTATE_SERVO_ID		  10
 	#define DYNA_LEFT_ARM_ELBOW_BEND_SERVO_ID		  11

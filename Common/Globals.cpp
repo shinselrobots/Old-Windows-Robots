@@ -4,6 +4,7 @@
 ///#include "Joystick.h"
 #include "ClientOrServer.h"
 #include "Globals.h"
+#include "thread.h"
 #include <math.h>
 
 //#include "cv.h"
@@ -640,6 +641,8 @@ DWORD WINAPI TimerThreadProc( LPVOID NotUsed )
 					// GUI or WII/joystick has requested change.  Send it to the motor control
 					nLastSpeedCmd = g_MotorCurrentSpeedCmd;
 					nLastTurnCmd = g_MotorCurrentTurnCmd;
+					ROBOT_LOG( DEBUG_MOTOR_COMMANDS, "Send User Command Joystick: Speed=%d, Turn=%d  ",  nLastSpeedCmd, nLastTurnCmd )
+
 					SendCommand( WM_ROBOT_JOYSTICK_DRIVE_CMD, (DWORD)g_MotorCurrentSpeedCmd, (DWORD)g_MotorCurrentTurnCmd );
 				}
 
@@ -2173,6 +2176,12 @@ void LaunchKinectApp()
 	// Allow the C# process to get started a bit.  this is not critical...
 	Sleep(100); 
 
+	// Now, Create Thread for talking to the C# app
+	g_hKinectAppSharedMemoryIPCThread = ::CreateThread( NULL, 0, KinectAppSharedMemoryIPCThreadProc, (LPVOID)0, 0, &g_dwKinectAppSharedMemoryIPCThreadId );
+	ROBOT_LOG( TRUE,  "Created Kinect App IPC Thread. ID = (0x%x) (KinectAppSharedMemoryIPCThreadProc)", g_dwKinectAppSharedMemoryIPCThreadId )
+
+
+
 /*
 	// Wait until child process has created a window
 	ROBOT_LOG( TRUE,  "WAITING FOR PROCESS WINDOW...\n" )
@@ -2308,7 +2317,11 @@ void LaunchCameraApp()
 	#endif // (AUTO_LAUNCH_CAMERA_APP == 1)
 
 	// Allow the camera process to get started a bit.  this is not critical...
-	//Sleep(20); 
+	Sleep(20);
+
+	// Create Camera App shared memory thread
+	g_hCameraAppSharedMemoryIPCThread = ::CreateThread( NULL, 0, CameraAppSharedMemoryIPCThreadProc, (LPVOID)0, 0, &g_dwCameraAppSharedMemoryIPCThreadId );
+	ROBOT_LOG( TRUE,  "Created Camera App IPC Thread. ID = (0x%x) (CameraAppSharedMemoryIPCThreadProc)", g_dwCameraAppSharedMemoryIPCThreadId )
 
 
 /*
@@ -2362,7 +2375,8 @@ void TerminateKobukiApp()
 
 void LaunchKobukiApp()
 {
-#if ( (ENABLE_KOBUKI_APP == 1) && ( ROBOT_SERVER == 1 ) )
+#if ( (ENABLE_KOBUKI_APP == 1) && ( ROBOT_SERVER == 1 )  && (MOTOR_CONTROL_TYPE == KOBUKI_MOTOR_CONTROL) )
+
 	int SecondsToWait = 240;
     //size_t iMyCounter = 0, iReturnVal = 0, iPos = 0; 
     DWORD dwExitCode = 0; 
@@ -2443,7 +2457,10 @@ void LaunchKobukiApp()
 	#endif // (AUTO_LAUNCH_KOBUKI_APP == 1)
 
 	// Allow the KobukiControl process to get started a bit.  this is not critical...
-	//Sleep(20); 
+	Sleep(20); 
+
+	g_hKobukiAppSharedMemoryIPCThread = ::CreateThread( NULL, 0, KobukiAppSharedMemoryIPCThreadProc, (LPVOID)0, 0, &g_dwKobukiAppSharedMemoryIPCThreadId );
+	ROBOT_LOG( TRUE,  "Created Kobuki App IPC Thread. ID = (0x%x) (KobukiAppSharedMemoryIPCThreadProc)", g_dwKobukiAppSharedMemoryIPCThreadId )
 
 
 /*

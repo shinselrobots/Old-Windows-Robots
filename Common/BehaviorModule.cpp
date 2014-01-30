@@ -162,6 +162,7 @@ __itt_string_handle* pshHeadCenter = __itt_string_handle_create("HeadCenter");
 void CBehaviorModule::RightArmHome()
 {
 	// Move all right arm seros to home position, and reset to default speed
+#if ( 1 == ROBOT_HAS_RIGHT_ARM  )
 	__itt_marker(pDomainControlThread, __itt_null, pshRightArmHome, __itt_marker_scope_task);
 	__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, pshRightArmHome);
 	m_pArmControlRight->MoveArmHome( m_ArmSpeedRight );
@@ -171,11 +172,13 @@ void CBehaviorModule::RightArmHome()
 	m_ArmMovementStateRight = 0;	// back to Idle state
 	m_ArmMovementRight = ARM_MOVEMENT_NONE; // back to Idle state
 	__itt_task_end(pDomainControlThread);
+#endif
 }
 ///////////////////////////////////////////////////////////////////////////////
 void CBehaviorModule::LeftArmHome()
 {
 	// Move all arm seros to home position, and reset to default speed
+#if ( 1 == ROBOT_HAS_LEFT_ARM  )
 	__itt_marker(pDomainControlThread, __itt_null, pshLeftArmHome, __itt_marker_scope_task);
 	__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, pshLeftArmHome);
 	m_pArmControlLeft->MoveArmHome( m_ArmSpeedLeft );
@@ -185,6 +188,7 @@ void CBehaviorModule::LeftArmHome()
 	m_ArmMovementStateLeft = 0;	// back to Idle state
 	m_ArmMovementLeft = ARM_MOVEMENT_NONE; // back to Idle state
 	__itt_task_end(pDomainControlThread);
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////

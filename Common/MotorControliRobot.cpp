@@ -170,13 +170,17 @@ void CiRobotControl::Init()
 	// Init at robot startup
 	ROBOT_LOG( TRUE, "==============================>>>>>>> INIT CALLED <<<<<<<<<<<==========================" )
 
+	#if MOTOR_CONTROL_TYPE != IROBOT_MOTOR_CONTROL
+		ROBOT_ASSERT(0);
+	#endif
+
 	StartSensorStreamCmd();
 	SetPort(); // Initialize power for Kinect and Dynamixel Servos
 
 	////////////////////////////////////////////////////////////////////////////
 	// Launch the C# Kinect Capture Application here for Turtle
 	////////////////////////////////////////////////////////////////////////////
-	#if (ROBOT_TYPE == TURTLE) 
+	#if (MOTOR_CONTROL_TYPE == IROBOT_MOTOR_CONTROL) 
 		RobotSleep(2000, pDomainMotorThread); // allow kinect to power up
 		LaunchKinectApp(); // defined in globals.cpp
 	#endif

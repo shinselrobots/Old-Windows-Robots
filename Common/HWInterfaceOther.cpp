@@ -1197,15 +1197,17 @@ DWORD WINAPI iRobotCommReadThreadFunc(LPVOID lpParameter) // g_hMotorCommPort
 			if( (msg.message < WM_ROBOT_MESSAGE_BASE) || ((msg.message > (WM_ROBOT_MESSAGE_BASE+HW_MAX_MESSAGE) ) ) )
 			{
 				// Ignore any messages not intended for user (where do these come from?)
-				ROBOT_LOG( TRUE, "MotorCommThreadFunc: message out of Range, WM_ROBOT_MESSAGE_BASE = 0x%08X, Msg = 0x%08lX, wParam = 0x%08lX, lParam = 0x%08lX\n", 
+				ROBOT_LOG( TRUE, "Message out of Range, WM_ROBOT_MESSAGE_BASE = 0x%08X, Msg = 0x%08lX, wParam = 0x%08lX, lParam = 0x%08lX\n", 
 					WM_ROBOT_MESSAGE_BASE, msg.message, msg.wParam, msg.lParam )
 				__itt_task_end(pDomainMotorThread);  // pshMotorThreadLoop
 				continue;
 			}
 
+
 			Request = msg.message - WM_ROBOT_MESSAGE_BASE;
 			Index = (UINT)(msg.wParam);
 			Value = (UINT)(msg.lParam);
+			ROBOT_LOG( DEBUG_MOTOR_COMMANDS, "Got Command Message %02X ",  Request)
 
 			{
 				///TAL_SCOPED_TASK_NAMED("Trex HandleCmd");

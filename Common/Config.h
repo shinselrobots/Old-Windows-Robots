@@ -33,6 +33,7 @@
 #define DEBUG_IR					0
 #define DEBUG_ULTRASONIC			0
 #define DEBUG_PIR					0
+#define DEBUG_MOTOR_COMMANDS		1
 
 #define REPORT_CLOSE_OBJECTS		0
 

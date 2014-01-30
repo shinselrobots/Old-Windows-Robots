@@ -277,6 +277,8 @@ void ArmControl::SetArmPosition(int Shoulder, int ElbowRotate, int ElbowBend, in
 //	ROBOT_LOG( TRUE,"SetArmPosition:  Shoulder = %d, ElbowRotate = %d, ElbowBend = %d, Wrist = %d, Claw = %d  degrees (MAX=NOP)\n",
 //		 Shoulder, ElbowRotate, ElbowBend, Wrist, Claw )
 
+	ROBOT_ASSERT(0);
+
 	__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, psh_csServoLock);
 	EnterCriticalSection(&g_csServoLock);
 
