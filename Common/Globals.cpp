@@ -33,10 +33,13 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-// Auto launch Kinect C# Application
-#define AUTO_LAUNCH_KINECT_APP		1	// set value to 1 to auto launch
-#if (AUTO_LAUNCH_KINECT_APP == 1)
-	FIND_WINDOW_HANDLE_STRUCT_T KinectFWHS; // global to this file
+// Auto launch KobukiControl Application
+#if (MOTOR_CONTROL_TYPE == KOBUKI_MOTOR_CONTROL)
+	#define ENABLE_KOBUKI_APP			1	// set value to 1 to allow app communication
+	#define AUTO_LAUNCH_KOBUKI_APP		1	// if 0, start this process first, then start Kobuki
+	#if (ENABLE_KOBUKI_APP == 1)
+		FIND_WINDOW_HANDLE_STRUCT_T KobukiFWHS; // global to this file
+	#endif
 #endif
 
 // Auto launch Camera OpenCV Application
@@ -46,14 +49,6 @@ static char THIS_FILE[] = __FILE__;
 	FIND_WINDOW_HANDLE_STRUCT_T CameraFWHS; // global to this file
 #endif
 
-// Auto launch KobukiControl Application
-#if (MOTOR_CONTROL_TYPE == KOBUKI_MOTOR_CONTROL)
-	#define ENABLE_KOBUKI_APP			1	// set value to 1 to allow app communication
-	#define AUTO_LAUNCH_KOBUKI_APP		1	// if 0, start this process first, then start Kobuki
-	#if (ENABLE_KOBUKI_APP == 1)
-		FIND_WINDOW_HANDLE_STRUCT_T KobukiFWHS; // global to this file
-	#endif
-#endif
 
 //#include <windows.h>
 //#include <stdio.h>
@@ -2118,101 +2113,6 @@ void SpeakText( const char *TextToSpeak )
 }
 
 
-//-----------------------------------------------------------------------------
-// Name: LaunchKinectApp
-// Desc: If enabled, auto-launch the C# applicaiton that handles the 
-// Kinect audio and video+depth cameras
-// Note: started at different times for Loki or Turtle, since iRobot base enables power only on startup
-//-----------------------------------------------------------------------------
-
-// Shut down the Kinect C# process
-void TerminateKinectApp()
-{
-	#if (AUTO_LAUNCH_KINECT_APP == 1)
-		TerminateProcess( KinectFWHS.ProcessInfo.hProcess, 0 );
-		CloseHandle( KinectFWHS.ProcessInfo.hProcess ); 
-		CloseHandle( KinectFWHS.ProcessInfo.hThread ); 
-	#endif
-}
-
-void LaunchKinectApp()
-{
-#if (AUTO_LAUNCH_KINECT_APP == 1)
-	int SecondsToWait = 240;
-    //size_t iMyCounter = 0, iReturnVal = 0, iPos = 0; 
-    DWORD dwExitCode = 0; 
-    //std::wstring sTempStr = L""; 
-	// If need to pass parameters, see example at: http://www.goffconcepts.com/techarticles/development/cpp/createprocess.html
-	// http://msdn.microsoft.com/en-us/library/ms682425(VS.85).aspx
-
-    /* CreateProcess API initialization */ 
-    STARTUPINFO StartupInfo; 
-    PROCESS_INFORMATION ProcessInfo; 
-    memset(&StartupInfo, 0, sizeof(StartupInfo)); 
-    memset(&ProcessInfo, 0, sizeof(ProcessInfo)); 
-    StartupInfo.cb = sizeof(StartupInfo); 
-    memset(&KinectFWHS, 0, sizeof(KinectFWHS)); 
-
-
-	if( !CreateProcess(
-		//"C:\\Dev\\Robots\\RobotKinectViewer\\bin\\Debug\\RobotKinectViewer.exe",	//  __in_opt     LPCTSTR lpApplicationName,
-		"C:\\Dev\\Robots\\RobotKinectViewer\\bin\\Release\\RobotKinectViewer.exe",	//  __in_opt     LPCTSTR lpApplicationName,
-		"",											//  __inout_opt  LPTSTR lpCommandLine,
-		0,											//  __in_opt     LPSECURITY_ATTRIBUTES lpProcessAttributes,
-		0,											//  __in_opt     LPSECURITY_ATTRIBUTES lpThreadAttributes,
-		false,										//  __in         BOOL bInheritHandles,
-		CREATE_DEFAULT_ERROR_MODE,					//  __in         DWORD dwCreationFlags,
-		0,											//  __in_opt     LPVOID lpEnvironment,
-		//"C:\\Dev\\Robots\\RobotKinectViewer\\bin\\Debug",	 //  __in_opt     LPCTSTR lpCurrentDirectory,
-		"C:\\Dev\\Robots\\RobotKinectViewer\\bin\\Release",	 //  __in_opt     LPCTSTR lpCurrentDirectory,
-		&StartupInfo,								// __in         LPSTARTUPINFO lpStartupInfo,
-		&(KinectFWHS.ProcessInfo) )		//  __out        LPPROCESS_INFORMATION lpProcessInformation
-	)
-    { 
-        /* CreateProcess failed */ 
-		ROBOT_DISPLAY( TRUE, "ERROR: KINECT PROCESS LAUNCH FAILED!  Return Code = %04X", GetLastError() )
-    } 
-
-	// Allow the C# process to get started a bit.  this is not critical...
-	Sleep(100); 
-
-	// Now, Create Thread for talking to the C# app
-	g_hKinectAppSharedMemoryIPCThread = ::CreateThread( NULL, 0, KinectAppSharedMemoryIPCThreadProc, (LPVOID)0, 0, &g_dwKinectAppSharedMemoryIPCThreadId );
-	ROBOT_LOG( TRUE,  "Created Kinect App IPC Thread. ID = (0x%x) (KinectAppSharedMemoryIPCThreadProc)", g_dwKinectAppSharedMemoryIPCThreadId )
-
-
-
-/*
-	// Wait until child process has created a window
-	ROBOT_LOG( TRUE,  "WAITING FOR PROCESS WINDOW...\n" )
-	DWORD Result = WaitForInputIdle(
-		ProcessInfo.hProcess,	// __in  HANDLE hProcess,
-		(DWORD)30000 );					// __in  DWORD dwMilliseconds
-
-	if( 0 == Result )
-	{
-		ROBOT_LOG( TRUE,  "DONE\n" )
-	}
-	else
-	{
-		ROBOT_LOG( TRUE,  "TIMED OUT!\n" )
-	}
-
-	// Try PostThreadMessage or PostMessage
-	KinectFWHS.hWndFound  = NULL;
-
-	// Enumerate all top level windows on the desktop, and find the itunes one
-	EnumWindows ( EnumWindowCallBack, (LPARAM)&KinectFWHS ) ;
-	*/
-
-//	SendMessage ( KinectFWHS.hWndFound, Msg, wParam, lParam );
-
-#else
-	g_KinectSubSystemStatus = SUBSYSTEM_DISABLED;
-#endif  // #if (AUTO_LAUNCH_KINECT_APP == 1)
-
-
-}
 
 //-----------------------------------------------------------------------------
 // Name: LaunchCameraApp
@@ -2295,6 +2195,7 @@ void LaunchCameraApp()
 		StartupInfo.cb = sizeof(StartupInfo); 
 		memset(&CameraFWHS, 0, sizeof(CameraFWHS)); 
 
+		ROBOT_LOG( TRUE, "\n ==================== Starting Camera App ====================\n" )
 
 		if( !CreateProcess(
 			//"C:\\Dev\\Robots\\RobotCamera\\Release\\RobotCamera.exe",	//  __in_opt     LPCTSTR lpApplicationName,
@@ -2437,6 +2338,7 @@ void LaunchKobukiApp()
 		StartupInfo.cb = sizeof(StartupInfo); 
 		memset(&KobukiFWHS, 0, sizeof(KobukiFWHS)); 
 
+		ROBOT_LOG( TRUE, "\n ==================== Starting Kobuki Control App ====================\n" )
 
 		if( !CreateProcess(
 			"C:\\Dev\\Robots\\KobukiControl\\Release\\KobukiControl.exe",	//  __in_opt     LPCTSTR lpApplicationName,

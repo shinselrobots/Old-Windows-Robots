@@ -20,7 +20,7 @@ xmlns="http://www.w3.org/2001/06/grammar">
 
       <item>
         my name is <tag> $.Param1="MY_NAME"; </tag>
-        <ruleref uri="C:/Dev/Robots/Speech/Names.grxml#ListOfNames"/> 
+        <ruleref uri="C:/Dev/_Robot/Speech/Names.grxml#ListOfNames"/> 
           <tag> $.Param2=$$.Param; </tag>  <!-- Amber, Heather, Lin, Bob, Fred...  -->
       </item>
 
@@ -28,12 +28,12 @@ xmlns="http://www.w3.org/2001/06/grammar">
         i live in <tag> $.Param1="MY_HOME_LOCATION"; </tag>
         <one-of>
            <item>
-            <ruleref uri="C:/Dev/Robots/Speech/Cities.grxml#OregonCities"/> 
+            <ruleref uri="C:/Dev/_Robot/Speech/Cities.grxml#OregonCities"/> 
               <tag> $.Param2=$$.Param; </tag> <tag> $.Param3="OREGON"; </tag> <!-- Portland, Hillsboro, ...  -->
           </item>
           
           <item>
-            <ruleref uri="C:/Dev/Robots/Speech/Cities.grxml#OtherCities"/>  
+            <ruleref uri="C:/Dev/_Robot/Speech/Cities.grxml#OtherCities"/>  
               <tag> $.Param2=$$.Param1; </tag> <tag> $.Param3=$$.Param2; </tag> <!-- Seattle, LA, ...  -->
           </item>
         </one-of>

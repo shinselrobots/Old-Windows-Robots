@@ -194,7 +194,7 @@ void CCollisionModule::ProcessMessage(
 
 					CString MsgString, SensorString;
 					if( g_pNavSensorSummary->nFrontObjectDistance <= OBJECT_COLLISION )
-					{
+					{ 
 						// Collision was in front
 						m_CollisionDirection = g_pNavSensorSummary->nFrontObjectDirection; // Save so later we know where the threat came from.
 						if( g_pNavSensorSummary->BumperHitFront() )
@@ -667,6 +667,7 @@ CAvoidObjectModule::CAvoidObjectModule( CDriveControlModule *pDriveControlModule
 #if ( ROBOT_SERVER == 1 ) //////////////// SERVER ONLY //////////////////
 	m_ArmsInSafePosition = FALSE;
 	m_pKinectServoControl = NULL;
+	m_KinectInObjectSpottingPosition = FALSE;
 	m_pKinectServoControl = new KinectServoControl;
 
 	#if( ROBOT_HAS_RIGHT_ARM )
@@ -720,18 +721,22 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 				// module enabled
 				m_AvoidanceState = IDLE;
 				ROBOT_DISPLAY( TRUE, "Avoidance Module Enabled" )
-	#if ( ROBOT_SERVER == 1 ) //////////////// SERVER ONLY //////////////////
-				m_pKinectServoControl->SetTiltPosition( KINECT_TILT_OWNER_COLLISION_AVOIDANCE, KINECT_OBJECT_AVOIDANCE_POSITION );
-#endif
+				#if ( ROBOT_SERVER == 1 ) //////////////// SERVER ONLY //////////////////
+					m_pKinectServoControl->SetTiltPosition( KINECT_TILT_OWNER_COLLISION_AVOIDANCE, KINECT_OBJECT_AVOIDANCE_POSITION );
+					m_KinectInObjectSpottingPosition = TRUE;
+				#endif
 			}
 			else
 			{
 				m_AvoidanceState = DISABLED;
 				m_pDriveCtrl->ReleaseOwner( AVOID_OBJECT_MODULE );
-	#if ( ROBOT_SERVER == 1 ) //////////////// SERVER ONLY //////////////////
-				m_pKinectServoControl->SetTiltPosition( KINECT_TILT_OWNER_COLLISION_AVOIDANCE, KINECT_HUMAN_DETECT_START_POSITION );	// By default, leave Kinect in a position where it can find humans
-				m_pKinectServoControl->ReleaseOwner(KINECT_TILT_OWNER_COLLISION_AVOIDANCE);
-#endif
+				#if ( ROBOT_SERVER == 1 ) //////////////// SERVER ONLY //////////////////
+					if( m_KinectInObjectSpottingPosition )
+					{
+						m_pKinectServoControl->SetTiltPosition( KINECT_TILT_OWNER_COLLISION_AVOIDANCE, KINECT_HUMAN_DETECT_START_POSITION );	// By default, leave Kinect in a position where it can find humans
+						m_pKinectServoControl->ReleaseOwner(KINECT_TILT_OWNER_COLLISION_AVOIDANCE);
+					}
+				#endif
 				ROBOT_DISPLAY( TRUE, "Avoidance Module Disabled" )
 			}
 			return;
@@ -773,11 +778,13 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 				// Ignore sensors so we don't suddenly start moving if someone obscures a sensor!
 				// Also, leave Kinect in default position until robot starts moving
 
-				// Move Kinect into position to detect people, if no higher owner has control
-				if( gAvoidanceTimer == 0 ) 
+				// Not moving, so move Kinect back into position to detect people, 
+				if( (gAvoidanceTimer == 0) && m_KinectInObjectSpottingPosition ) 
 				{
 					#if ( ROBOT_SERVER == 1 ) //////////////// SERVER ONLY //////////////////
-						m_pKinectServoControl->SetTiltPosition( KINECT_TILT_OWNER_COLLISION_AVOIDANCE, KINECT_HUMAN_DETECT_START_POSITION );
+
+						//m_pKinectServoControl->SetTiltPosition( KINECT_TILT_OWNER_COLLISION_AVOIDANCE, KINECT_HUMAN_DETECT_START_POSITION );
+						//m_KinectInObjectSpottingPosition = FALSE;
 					#endif
 				}
 
@@ -788,9 +795,13 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 			//int DbgTurn = m_pDriveCtrl->GetCurrentTurn();
 			//ROBOT_LOG( TRUE, "speed = %d, Turn = %d\n", DbgSpeed, DbgTurn )
 
-			// Move Kinect into position to detect objects
+			// Moving, so move Kinect into position to detect objects
 			#if ( ROBOT_SERVER == 1 ) //////////////// SERVER ONLY //////////////////
-				m_pKinectServoControl->SetTiltPosition( KINECT_TILT_OWNER_COLLISION_AVOIDANCE, KINECT_OBJECT_AVOIDANCE_POSITION );
+				if( !m_KinectInObjectSpottingPosition )
+				{
+					m_pKinectServoControl->SetTiltPosition( KINECT_TILT_OWNER_COLLISION_AVOIDANCE, KINECT_OBJECT_AVOIDANCE_POSITION );
+					m_KinectInObjectSpottingPosition = TRUE;
+				}
 			#endif
 
 			if( IDLE == m_AvoidanceState )

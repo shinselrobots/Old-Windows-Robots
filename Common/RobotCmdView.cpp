@@ -187,7 +187,7 @@ CRobotCmdView::~CRobotCmdView()
 	RobotSleep(100, pDomainGUIThread); // Get Servo commands started
 
 	// Shut down the Kinect C# process, and OpenCV Camera capture process
-	TerminateKinectApp();
+	//TerminateKinectApp(); - shuts down with threads
 	TerminateCameraApp();
 	TerminateKobukiApp();	// if started
 

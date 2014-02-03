@@ -54,6 +54,7 @@ using namespace std;
 // Global to both KobukiManager and main - todo fix this
 	LPCTSTR			 pStatusSharedMemory = NULL;
 	HANDLE			 hStatusEvent = NULL;
+	ofstream		 logFile;
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -81,6 +82,7 @@ public:
 		kobuki.enable();
 		slot_stream_data.connect("/kobuki/stream_data");
 		cout << "KobukiManager initialized " << endl;
+		logFile << "KobukiManager initialized " << endl;
 	}
 
 	~CKobukiManager() {
@@ -306,12 +308,13 @@ public:
 		{
 			digital_output.mask[i] = true;
 		}
-		digital_output.values[0] = (bool)(ExternPower & 0x01); // 3.3v
-		digital_output.values[1] = (bool)(ExternPower & 0x02); // 5v
-		digital_output.values[2] = (bool)(ExternPower & 0x04); // 12v, 5A - Servos
-		digital_output.values[3] = (bool)(ExternPower & 0x08); // 12v, 1.5A - Kinect
+		digital_output.values[0] = (ExternPower & 0x01) != 0; // 3.3v
+		digital_output.values[1] = (ExternPower & 0x02) != 0; // 5v
+		digital_output.values[2] = (ExternPower & 0x04) != 0; // 12v, 5A - Servos and CPU?!?
+		digital_output.values[3] = (ExternPower & 0x08) != 0; // 12v, 1.5A - Kinect
 
 		std::cout << "Setting External Power to  " << std::hex << std::uppercase << ExternPower << std::endl;
+		logFile << "Setting External Power to  " << std::hex << std::uppercase << ExternPower << std::endl;
 
 		kobuki.setExternalPower( digital_output );
 	}
@@ -329,12 +332,13 @@ public:
 		{
 			digital_output.mask[i] = true;
 		}
-		digital_output.values[0] = (bool)(PinState & 0x01);
-		digital_output.values[1] = (bool)(PinState & 0x02);
-		digital_output.values[2] = (bool)(PinState & 0x04);
-		digital_output.values[3] = (bool)(PinState & 0x08);
+		digital_output.values[0] = (PinState & 0x01) != 0;
+		digital_output.values[1] = (PinState & 0x02) != 0;
+		digital_output.values[2] = (PinState & 0x04) != 0;
+		digital_output.values[3] = (PinState & 0x08) != 0;
 
 		std::cout << "Setting IO Pins to  " << std::hex << std::uppercase << PinState << std::endl;
+		logFile << "Setting IO Pins to  " << std::hex << std::uppercase << PinState << std::endl;
 		kobuki.setDigitalOutput( digital_output );
 	}
 
@@ -445,6 +449,7 @@ public:
 bool shutdown_req = false;
 void signalHandler(int signum) {
   shutdown_req = true;
+  logFile.flush();
 }
 
 
@@ -467,6 +472,11 @@ int _tmain(int argc, _TCHAR* argv[])
 	// Global Variables
 	LPCTSTR pCommandSharedMemory = NULL;
 	HANDLE hCommandEvent = NULL;
+	//ofstream logFile("KobukiLog.txt");
+	std::cout << "Starting Kobuki, open log file..." << std::endl;
+
+	logFile.open("KobukiLog.txt",std::ios::out|std::ios::trunc); // overwrite prior log
+	logFile << "Log file opened." << std::endl;
 
 	KOBUKI_COMMAND_T *LastCommand = new KOBUKI_COMMAND_T;
 	memset( LastCommand, 0, sizeof(KOBUKI_COMMAND_T) );
@@ -483,8 +493,19 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	signal(SIGINT, signalHandler);
 	std::cout << "Starting Kobuki Base Control..." << std::endl;
+	logFile << "Starting Kobuki Base Control..." << std::endl;
+
+	std::cout << "Starting Kobuki Driver Manager..." << std::endl;
+	logFile << "Starting Kobuki Driver Manager..." << std::endl;
+	CKobukiManager KobukiManager;
+
+	//ecl::Sleep sleep(100);
+
+	Sleep(100); // allow base to start communicating
+
 
 	std::cout << "Initializing shared memory..." << std::endl;
+	logFile << "Initializing shared memory..." << std::endl;
 
 	// Initialize shared memory and events for communicating with the Robot control application
 	int InitIPCResult = InitIPC( hCommandEvent, pCommandSharedMemory, hStatusEvent, pStatusSharedMemory  );
@@ -492,16 +513,12 @@ int _tmain(int argc, _TCHAR* argv[])
 	if ( FAILED == InitIPCResult )
 	{
 		cerr << "InitIPC failed.  Exiting" << endl;
+		logFile << "InitIPC failed.  Exiting" << endl;
+		logFile.flush();
+		logFile.close();
 		return -1;
 	}
 
-	signal(SIGINT, signalHandler);
-
-	std::cout << "Starting Kobuki Driver Manager..." << std::endl;
-
-	CKobukiManager KobukiManager;
-
-	ecl::Sleep sleep(1);
 
 /***
 	// Open log file
@@ -522,20 +539,24 @@ int _tmain(int argc, _TCHAR* argv[])
 ***/
 
 	cout << "Robot Kobuki Base Control Starting..." << endl << endl;
-
-	Sleep(100); // let robot code start up first
+	logFile << "Robot Kobuki Base Control Starting..." << endl << endl;
 
 	cout << "Turning on external power by default..." << endl << endl;
+	logFile << "Turning on external power by default..." << endl << endl;
 	KobukiManager.SetPower( 0xFF );
+
+	Sleep(100); // let robot code start up
 
 	///////////////////////////////////////////////////////////////////////////////////
 	// Command and Status Processing Loop.  
 	std::cout << "Beginning Control Loop..." << std::endl;
+	logFile << "Beginning Control Loop..." << std::endl;
+	int KeyCode = 0;
 	try 
 	{
 		int bRunLoop = 1;
 		while( bRunLoop )
-		{	
+		{
 			const DWORD msTimeOut = 10;  // Sleep time.  
 			if( STAND_ALONE_MODE != InitIPCResult )
 			{
@@ -544,6 +565,7 @@ int _tmain(int argc, _TCHAR* argv[])
 				{
 					// Event did not time out.  That means the Robot has posted a command to shared memory
 					cout << "Command Received: " << endl;
+					logFile << "Command Received: " << endl;
 					// Read from Shared Memory
 					KOBUKI_COMMAND_T *Command = (KOBUKI_COMMAND_T*)pCommandSharedMemory;
 
@@ -553,6 +575,7 @@ int _tmain(int argc, _TCHAR* argv[])
 					{
 						// Exit application.  Kobuki destructor automatically stops motors
 						cout << "KOBUKI_COMMAND_SHUT_DOWN received" << endl;
+						logFile << "KOBUKI_COMMAND_SHUT_DOWN received" << endl;
 						bRunLoop = 0;
 						continue;
 					}
@@ -561,6 +584,7 @@ int _tmain(int argc, _TCHAR* argv[])
 					{
 						// Move command received
 						cout << "KOBUKI COMMAND MOVE: Speed = " << Command->Speed << " Turn = " << Command->Turn << " Acc = " << Command->Acceleration << endl;
+						logFile << "KOBUKI COMMAND MOVE: Speed = " << Command->Speed << " Turn = " << Command->Turn << " Acc = " << Command->Acceleration << endl;
 						TargetSpeed = (double)Command->Speed / 100; // scale from centermeters / sec --> meters/sec
 						TargetTurn = (double)Command->Turn / 100; // scale from 1/100 rad / sec --> rad/sec
 
@@ -589,8 +613,9 @@ int _tmain(int argc, _TCHAR* argv[])
 					if( Command->ExternPower != LastCommand->ExternPower )
 					{
 						cout << "KOBUKI COMMAND EXTERNAL POWER = " << Command->ExternPower << endl;
-						cout << "   Kinect Power = " << (bool)(Command->ExternPower & 0x04)  << endl;
-						cout << "   Servo Power =  " << (bool)(Command->ExternPower & 0x08)  << endl;
+						logFile << "KOBUKI COMMAND EXTERNAL POWER = " << Command->ExternPower << endl;
+						cout << "   Kinect Power = " << (Command->ExternPower & 0x04)  << endl;
+						cout << "   Servo Power =  " << (Command->ExternPower & 0x08)  << endl;
 						KobukiManager.SetPower( Command->ExternPower );
 						LastCommand->ExternPower = Command->ExternPower;
 					}
@@ -612,7 +637,30 @@ int _tmain(int argc, _TCHAR* argv[])
 			}
 			else
 			{
-				// Stand Alone mode - just show status for debug testing?
+				// Stand Alone mode - process Keys?
+	/*
+				KeyCode = getchar();
+				std::cout << "Key = " << KeyCode << std::endl;
+				if( 0x78 == KeyCode ) //"x" Exit
+				{				
+					bRunLoop = 0;  // NOT GREAT, BUT EXITS IF RETURN PRESSED
+					cout << "Exit" << endl;
+					logFile << "Exit requested" << endl << endl;
+					logFile.flush();
+					continue;
+				}
+				else if( 0x2D == KeyCode ) //"=" for "+" key --> Kinect power on
+				{				
+					cout << "Power Off" << endl;
+					KobukiManager.SetPower( 0xF7 ); // Turn off Kinect Only, not the CPU!
+				}
+				else if( 0x3D == KeyCode ) //"-" key --> Kinect power off
+				{				
+					cout << "Power On" << endl;
+					KobukiManager.SetPower( 0xFF );
+				}
+
+	*/			
 			}
 
 			// Do Acceleration Ramp as needed
@@ -672,15 +720,25 @@ int _tmain(int argc, _TCHAR* argv[])
 	catch ( ecl::StandardException &e ) 
 	{
 		std::cout << e.what();
+		logFile << e.what();
+		logFile << "(From exception Handler)"  << endl;	
+		logFile.flush();
 	}
 
 
-  std::cout << "Exiting..." << std::endl;
+	KobukiManager.SetPower( 0xF7 ); // Turn off Kinect Only, not the CPU!
+	std::cout << "Exiting..." << std::endl;
+	logFile << "Exiting..." << std::endl;
+	logFile.flush();
+	logFile.close();
+	Sleep(10);
+
   // TODO  - DISABLED FOR NOW.  Turns off the display, and it does not turn back on!
-  //  KobukiManager.SetPower( 0 ); // Turn off all external power (Kinect, Servos, etc.)
+  //KobukiManager.SetPower( 0 ); // Turn off all external power (Kinect, Servos, etc.)
+  //Sleep(10);
   SAFE_DELETE(LastCommand);
 
-  Sleep(1000); // for debugging
+  Sleep(10); // for debugging
   return 0;
 
 }

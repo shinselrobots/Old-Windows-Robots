@@ -927,13 +927,13 @@ void SpeakText( CString &TextToSpeak );
 void SpeakText( const char *TextToSpeak );
 
 //-----------------------------------------------------------------------------
-// Name: LaunchKinectApp
+// Name: LaunchKinectApp - MOVED TO THREAD.CPP
 // Desc: If enabled, auto-launch the C# applicaiton that handles the 
 // Kinect audio and video+depth cameras
 // Note: started at different times for Loki or Turtle, since iRobot base enables power only on startup
 //-----------------------------------------------------------------------------
-void LaunchKinectApp();
-void TerminateKinectApp();
+//void LaunchKinectApp();
+//void TerminateKinectApp();
 
 //-----------------------------------------------------------------------------
 // Name: LaunchCameraApp

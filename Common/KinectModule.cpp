@@ -193,13 +193,13 @@ void OnDepthWindowMouseEvent( int event, int x, int y, int flags, void* param )
 
 //************************************************************************************************************************
 //************************************************************************************************************************
-// Name: KinectThreadProc   MAIN LOOP FOR KINECT FRAME PROCESSING
-// Desc: dedicated thread for grabbing Kinect frames from shared memory
+// Name: KinectDepthThreadProc   MAIN LOOP FOR KINECT FRAME PROCESSING
+// Desc: dedicated thread for grabbing Kinect Depth frames from shared memory
 // This thread created by the CKinectModule class
 //************************************************************************************************************************
 //************************************************************************************************************************
 
-DWORD WINAPI KinectThreadProc( LPVOID lpParameter )
+DWORD WINAPI KinectDepthThreadProc( LPVOID lpParameter )
 {
 	CKinectModule* pKinectModule = (CKinectModule*)lpParameter;
 	ROBOT_ASSERT( pKinectModule );
@@ -417,7 +417,7 @@ DWORD WINAPI KinectThreadProc( LPVOID lpParameter )
 	// Create the Kinect video capture thread
 	g_bRunKinectThread = TRUE; // When FALSE, tells thread to exit
 	DWORD dwTempThreadId;
-	g_hKinectThread = ::CreateThread( NULL, 0, KinectThreadProc, (LPVOID)this, 0, &dwTempThreadId );
+	g_hKinectThread = ::CreateThread( NULL, 0, KinectDepthThreadProc, (LPVOID)this, 0, &dwTempThreadId );
 	ROBOT_LOG( TRUE, "Created Kinect Thread. ID = (0x%x)", dwTempThreadId )
 
 	ROBOT_LOG( TRUE, "Kinect construstor complete" )

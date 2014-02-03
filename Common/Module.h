@@ -207,7 +207,7 @@ void	VideoCallBack(IplImage* image);
 int		InitCameraVidCap(HWND hwnd, int width, int height, double framerate);
 DWORD WINAPI VidCapThreadProc( LPVOID lpParameter );
 #endif
-DWORD WINAPI KinectThreadProc( LPVOID lpParameter );
+DWORD WINAPI KinectDepthThreadProc( LPVOID lpParameter );
 
 
 
@@ -886,6 +886,7 @@ protected:
 	int			m_SideAvoidDistanceTenthInches;
 	int			m_LastObjectDirection;
 	BOOL		m_ArmsInSafePosition;
+	BOOL		m_KinectInObjectSpottingPosition;
 
 #if ( ROBOT_SERVER == 1 )
 

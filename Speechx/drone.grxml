@@ -33,7 +33,7 @@ xmlns="http://www.w3.org/2001/06/grammar">
         <item>
           <!-- Robot name optional with command -->
           <item repeat="0-1"> <token>drone</token> <tag> $.RobotNameSaid="TRUE"; </tag> </item>
-          <ruleref uri="C:/Dev/Robots/Speech/Commands.grxml#command" />
+          <ruleref uri="C:/Dev/_Robot/Speech/Commands.grxml#command" />
           <tag> $.RecoType="COMMAND"; </tag>
           <tag> $.Param1=$$.Param1; </tag>
           <tag> $.Param2=$$.Param2; </tag>
@@ -46,7 +46,7 @@ xmlns="http://www.w3.org/2001/06/grammar">
       <item>
         <!-- Robot name optional with question -->
         <item repeat="0-1"> <token>drone</token> <tag> $.RobotNameSaid="TRUE"; </tag> </item>
-        <ruleref uri="C:/Dev/Robots/Speech/Questions_TP.grxml#question" />
+        <ruleref uri="C:/Dev/_Robot/Speech/Questions_TP.grxml#question" />
         <tag> $.RecoType="QUESTION"; </tag>
         <tag> $.Param1=$$.Param1; </tag>
         <tag> $.Param2=$$.Param2; </tag>
@@ -59,7 +59,7 @@ xmlns="http://www.w3.org/2001/06/grammar">
       <item>
         <!-- Robot name optional with statement -->
         <item repeat="0-1"> <token>drone</token> <tag> $.RobotNameSaid="TRUE"; </tag> </item>
-        <ruleref uri="C:/Dev/Robots/Speech/Statements.grxml#statement" />
+        <ruleref uri="C:/Dev/_Robot/Speech/Statements.grxml#statement" />
         <tag> $.RecoType="STATEMENT"; </tag>
         <tag> $.Param1=$$.Param1; </tag>
         <tag> $.Param2=$$.Param2; </tag>

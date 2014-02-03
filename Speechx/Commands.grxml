@@ -133,7 +133,7 @@ xmlns="http://www.w3.org/2001/06/grammar">
            <item> id like to introduce </item>
         </one-of>
         <tag> $.Param1="MEET_NAME"; </tag>
-        <ruleref uri="C:/Dev/Robots/Speech/Names.grxml#ListOfNames"/>
+        <ruleref uri="C:/Dev/_Robot/Speech/Names.grxml#ListOfNames"/>
         <tag> $.Param2=$$.Param; </tag>
         <!-- Amber, Heather, Lin, Bob, Fred...  -->
       </item>
@@ -464,17 +464,17 @@ xmlns="http://www.w3.org/2001/06/grammar">
   <!-- EXTERNAL ENUMERATIONS  -->
   
   <rule id="RightLeft" >
-    <ruleref uri="C:/Dev/Robots/Speech/Enums.grxml#RightLeft" />
+    <ruleref uri="C:/Dev/_Robot/Speech/Enums.grxml#RightLeft" />
     <tag> $.Param=$$.Param; </tag>
   </rule>
 
   <rule id="FwdRev" >
-    <ruleref uri="C:/Dev/Robots/Speech/Enums.grxml#FwdRev" />
+    <ruleref uri="C:/Dev/_Robot/Speech/Enums.grxml#FwdRev" />
     <tag> $.Param=$$.Param; </tag>
   </rule>
 
   <rule id="CompassDir" >
-    <ruleref uri="C:/Dev/Robots/Speech/Enums.grxml#CompassDir" />
+    <ruleref uri="C:/Dev/_Robot/Speech/Enums.grxml#CompassDir" />
     <tag> $.Param=$$.Param; </tag>
   </rule>
 

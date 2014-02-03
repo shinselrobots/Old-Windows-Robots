@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<grammar xml:lang="en-US"
+tag-format="semantics-ms/1.0" version="1.0"
+xmlns="http://www.w3.org/2001/06/grammar">
+
+
+  <rule id="RightLeft" scope="public">
+    <one-of>
+      <item> right <tag> $.Param="RIGHT"; </tag></item>
+      <item> left  <tag> $.Param="LEFT"; </tag></item>
+    </one-of>
+  </rule>
+
+  <rule id="FwdRev" scope="public">
+    <one-of>
+      <item> forward  <tag> $.Param="FORWARD"; </tag></item>
+      <item> straight  <tag> $.Param="FORWARD"; </tag></item> <!-- "go straight" -->
+      <item> reverse  <tag> $.Param="REVERSE"; </tag></item>
+      <item> back     <tag> $.Param="REVERSE"; </tag></item>
+    </one-of>
+  </rule>
+
+  <rule id="CompassDir" scope="public">
+    <one-of>
+      <item> north   <tag> $.Param="NORTH"; </tag></item>
+      <item> east    <tag> $.Param="EAST"; </tag></item>
+      <item> south   <tag> $.Param="SOUTH"; </tag></item>
+      <item> west    <tag> $.Param="WEST"; </tag></item>
+    </one-of>
+  </rule>
+  
+  
+ 
+  
+  
+</grammar>
+

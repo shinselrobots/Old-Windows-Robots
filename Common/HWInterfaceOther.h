@@ -1156,7 +1156,7 @@ OLD -----------------
 	#define CAMERA_HUMAN_DETECT_START_POSITION				(  15 * 10)	// +25 degrees - normal position for tracking humans
 	#define KINECT_TILT_CENTER									0		// TenthDegrees from center See LASER_TILT_TENTH_DEGREES_ZERO
 	#define KINECT_HUMAN_DETECT_START_POSITION				( 15 * 10)	// +25 degrees - normal position for tracking humans
-	#define KINECT_OBJECT_AVOIDANCE_POSITION				(-60 * 10)	// degrees - normal position for avoiding objects - for TeleOp!
+	#define KINECT_OBJECT_AVOIDANCE_POSITION				(-57 * 10)	// degrees - normal position for avoiding objects - for TeleOp!
 	#define KINECT_SLEEP_POSITION							(0 * 10)	// degrees - Just leave neutral for Teleop
 
 	#define KINECT_TILT_TENTHDEGREES_MAX_UP					(  65 * 10)	//  +65 degrees

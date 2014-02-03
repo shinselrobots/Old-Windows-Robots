@@ -268,8 +268,9 @@ BOOL CRobotApp::InitInstance()
 	// Launch the C# Kinect Capture Application here for Kobuki robots
 	////////////////////////////////////////////////////////////////////////////
 	#if (MOTOR_CONTROL_TYPE == KOBUKI_MOTOR_CONTROL) 
-		LaunchKobukiApp(); // Will only launch if enabled in globals.cpp
-		LaunchKinectApp(); // Will only launch if enabled in globals.cpp.  
+		LaunchKobukiApp();	// Will only launch if enabled in globals.cpp
+		//Sleep(1000);		// Allow Kobuki to power up Kinect!
+		// DELAY THIS TO ALLOW KINECT TO POWER UP FROM KOBUKI : LaunchKinectApp();	// Will only launch if enabled in globals.cpp.  
 	#endif
 
 	////////////////////////////////////////////////////////////////////////////
@@ -277,7 +278,7 @@ BOOL CRobotApp::InitInstance()
 	// Launch the OpenCV Camera Capture Application here for Loki
 	////////////////////////////////////////////////////////////////////////////
 	#if (ROBOT_TYPE == LOKI) 
-		LaunchKinectApp(); // Will only launch if enabled in globals.cpp.  
+		//LaunchKinectApp(); // Will only launch if enabled in globals.cpp.  - MOVED TO auto start with thread
 		LaunchCameraApp(); // Will only launch if enabled in globals.cpp
 	#endif
 
@@ -309,10 +310,10 @@ BOOL CRobotApp::InitInstance()
 	ROBOT_LOG( TRUE,  "Created Robot Control Thread. ID = (0x%x) (ControlThreadProc)", g_dwControlThreadId )
 
 	// Create C# managed shared memory thread
-	/* MOVED TO LaunchKinectApp
-	g_hKinectAppSharedMemoryIPCThread = ::CreateThread( NULL, 0, KinectAppSharedMemoryIPCThreadProc, (LPVOID)0, 0, &g_dwKinectAppSharedMemoryIPCThreadId );
-	ROBOT_LOG( TRUE,  "Created Kinect App IPC Thread. ID = (0x%x) (KinectAppSharedMemoryIPCThreadProc)", g_dwKinectAppSharedMemoryIPCThreadId )
-	*/
+	g_hKinectAppSharedMemoryIPCThread = ::CreateThread( NULL, 0, KinectSpeechThreadProc, (LPVOID)0, 0, &g_dwKinectAppSharedMemoryIPCThreadId );
+	ROBOT_LOG( TRUE,  "Created Kinect App IPC Thread. ID = (0x%x) (KinectSpeechThreadProc)", g_dwKinectAppSharedMemoryIPCThreadId )
+
+
 	// Create Camera App shared memory thread
 	/* MOVED TO LaunchCameraApp
 	g_hCameraAppSharedMemoryIPCThread = ::CreateThread( NULL, 0, CameraAppSharedMemoryIPCThreadProc, (LPVOID)0, 0, &g_dwCameraAppSharedMemoryIPCThreadId );
@@ -334,7 +335,7 @@ BOOL CRobotApp::InitInstance()
 
 	// Create the Kinect video capture thread - MOVED TO KINECT CLASS
 //	g_bRunKinectThread = TRUE; // When FALSE, tells Vidcap thread to exit
-//	g_hKinectThread = ::CreateThread( NULL, 0, KinectThreadProc, (LPVOID)0, 0, &dwTempThreadId );
+//	g_hKinectThread = ::CreateThread( NULL, 0, KinectDepthThreadProc, (LPVOID)0, 0, &dwTempThreadId );
 //	ROBOT_LOG( TRUE,  "Created Kinect Thread. ID = (0x%x)", dwTempThreadId )
 
 
