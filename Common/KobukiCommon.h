@@ -169,6 +169,7 @@ typedef struct
 	unsigned int	CenterCliffA2D;			//
 	unsigned int	LeftCliffA2D;			//
 
+	unsigned int	AnalogPort[4];			// Analog values from 0 to 4095
 
 /* EACH SENSOR'S DOCK Flags will be set when signal is detected
 0x01 for NEAR_LEFT state

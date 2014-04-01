@@ -303,6 +303,7 @@ enum CAMERA_STATE {
 enum MODULE_OWNER_TEST_RESULT_T {
 		MODULE_SUPPRESSED = 0,				// Module Suppressed.  No action
 		MODULE_HIGHER_PRIORITY_HAS_CONTROL,	// Possible to negotiate speed and turn	
+		MODULE_ALREADY_IS_OWNER,		 
 		MODULE_OWNERSHIP_REQUEST_SUCCESS,		 
 };
 // SUPPRESSED - do nothing
@@ -387,6 +388,8 @@ typedef struct
 	BYTE Param3;
 	BYTE Param4;
 } SIMULATED_HW_CMD_T;
+
+
 
 /////////////////////////////////////////////////////////////////////////////
 // FullSensorStatus
@@ -497,6 +500,16 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 // NavSensorSummary
 // Processed and summarized sensor data
+
+typedef struct
+{
+	int			CenterX;
+	int			Width;
+	POINT2D_T	LeftEdge;
+	POINT2D_T	RightEdge;
+} DOORWAY_T;
+#define MAX_DOORWAYS	5	// max number of doorways to detect
+
 class NavSensorSummary
 {
 public:
@@ -528,21 +541,25 @@ public:
 	// zones
 	int 		nLeftRearZone;
 	int 		nObjectClawLeft;
-	int 		nObjectArmLeft;		// compensated for distance in front of robot - REMOVE
+	int 		nObjectArmLeft;			// compensated for distance in front of robot - REMOVE
 	int 		nLeftSideZone;	
 	int 		nLeftFrontSideZone;	
 	int 		nLeftArmZone;
 	int 		nLeftFrontZone;		
 
-	int 		MotionDetectedDirection; ////// Robot Center
+	int 		MotionDetectedDirection;	////// Robot Center
 
 	int 		nRightFrontZone;
 	int 		nRightArmZone;	
 	int 		nRightFrontSideZone;	
 	int 		nRightSideZone;	
-	int 		nObjectArmRight;	// compensated for distance in front of robot - REMOVE
+	int 		nObjectArmRight;		// compensated for distance in front of robot - REMOVE
 	int 		nObjectClawRight;
 	int 		nRightRearZone;
+
+	int 		nDoorWaysFound;			// number of doorways spotted somewhere in front of robot
+	int			nBestCenterIndex;		// doorway in the array that is closest to front of robot
+	DOORWAY_T	DoorWaysFound[MAX_DOORWAYS];	// info about doorways detected in front of robot, to aid navigation
 
 };
 
@@ -626,6 +643,7 @@ typedef struct
 	unsigned int	RightCliffA2D;			//
 	unsigned int	CenterCliffA2D;			//
 	unsigned int	LeftCliffA2D;			//
+	unsigned int	AnalogPort[4];
 
 } KOBUKI_STATUS_T;
 
@@ -915,9 +933,15 @@ BOOL IsDynaServoMoving();
 // Desc: See if one of the Kerr servos (shoulder motors) are moving
 // Used to set the frequency of servo updates dynamically
 //-----------------------------------------------------------------------------
-
 BOOL IsKerrServoMoving();
 
+//-----------------------------------------------------------------------------
+// Name: FindDoors
+// Desc: Using data from depth finder (Kinect, LaserScanner or other),
+// Find doorways in front of me, so I can shoot for the center of the doorway
+// RETURNS: Number of doorways found, and array of doorway locations
+//-----------------------------------------------------------------------------
+int FindDoors( int nSamples, int nMaxDoorways, POINT2D_T *pPointArray, DOORWAY_T *pDoorWaysFound );
 
 //-----------------------------------------------------------------------------
 // Name: SpeakText
@@ -1233,12 +1257,16 @@ extern HANDLE				g_hCameraCommThread;
 extern BOOL					g_DownloadingFirmware;
 extern BOOL					g_PicFirstStatusReceived;
 
+extern BOOL					g_GUILocalUser;		// indicate if the GUI is running locally or remote.  Used by Cmd and Map views.
+extern int					g_GUICurrentSpeed;	//  Keep Cmd and Map views in sync
+extern int					g_GUICurrentTurn;
+
 extern int					g_LastKey;				// For manual control in Cmd or Map view
 extern int					g_SpeedSetByKeyboard;
 extern int					g_LastSpeedSetByKeyboard;
 
-extern int					g_MotorCurrentSpeedCmd;
-extern int					g_MotorCurrentTurnCmd;
+//extern int					g_MotorCurrentSpeedCmd;
+//extern int					g_MotorCurrentTurnCmd;
 extern int 					g_GlobalMaxAvoidObjectDetectionFeet;	// Max range of objects to detect for Avoidance behavior
 extern int 					g_SegmentAvoidObjectRangeTenthInches;	// Max range for Avoidance behavior, for CURRENT SEGMENT!
 

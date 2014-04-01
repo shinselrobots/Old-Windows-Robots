@@ -612,7 +612,7 @@ CUserCmdModule::CUserCmdModule( CDriveControlModule *pDriveControlModule )
 	m_FaceTrackingEnabled = FALSE;
 	m_FaceIdentificationEnabled = FALSE;
 	m_ObjectIdentificationEnabled = FALSE;
-	m_UserOwnerRequested = FALSE;
+	//m_UserOwnerRequested = FALSE;
 //	HANDLE m_hCameraRequestEvent = NULL;
 	m_pSharedMemory = NULL;
 	m_CameraRequest.RequestData.FaceRequest.PersonID = 0;
@@ -629,7 +629,7 @@ CUserCmdModule::CUserCmdModule( CDriveControlModule *pDriveControlModule )
 			m_pArmControlLeft = new ArmControl( LEFT_ARM );	// For arm position information
 		#endif
 	#endif
-	m_UserOwner = REMOTE_USER_MODULE;	// Normal mode.  Can be switched to LOCAL_USER_MODULE if needed
+//	m_UserOwner = REMOTE_USER_MODULE;	// Normal mode.  Can be switched to LOCAL_USER_MODULE if needed
 
 }
 
@@ -663,11 +663,17 @@ void CUserCmdModule::ProcessMessage(
 			// and accelerometer
 			// These commands come from the Arduino board (which is connected via BT to the Android phone)
 
-			// Handle Bluetooth Phone control
 			if( g_pFullSensorStatus->AndroidConnected )
 			{
+				// Handle Bluetooth Phone control
 				HandleAndroidInput();
 			}	
+			else
+			{
+				// reissue last drive command continuously to keep control of wheels
+				// TODO-MUST_DAVES this seems wrong?
+				//m_pDriveCtrl->SetSpeedAndTurn( REMOTE_USER_MODULE, m_CurrentSpeed, m_CurrentTurn );
+			}
 
 		} // WM_ROBOT_SENSOR_STATUS_READY:
 		break;
@@ -687,6 +693,7 @@ void CUserCmdModule::ProcessMessage(
 		{
 			g_bCmdRecognized = TRUE;
 			// wParam = Distance in TENTH INCHES, lParam = direction
+			// Owner is always assumed to be REMOTE_USER_MODULE
 			
 			// DEBUG
 			int nTempTicks = (int)(wParam * TICKS_PER_TENTH_INCH);
@@ -703,11 +710,11 @@ void CUserCmdModule::ProcessMessage(
 
 			if( FORWARD == lParam )
 			{
-				m_pDriveCtrl->SetMoveDistance( m_UserOwner, SPEED_FWD_MED_SLOW, TURN_CENTER, wParam);
+				m_pDriveCtrl->SetMoveDistance( REMOTE_USER_MODULE, SPEED_FWD_MED_SLOW, TURN_CENTER, wParam);
 			}
 			else
 			{
-				m_pDriveCtrl->SetMoveDistance( m_UserOwner, SPEED_REV_MED_SLOW, TURN_CENTER, wParam);
+				m_pDriveCtrl->SetMoveDistance( REMOTE_USER_MODULE, SPEED_REV_MED_SLOW, TURN_CENTER, wParam);
 			}
 		}
 		break;
@@ -718,6 +725,7 @@ void CUserCmdModule::ProcessMessage(
 			g_bCmdRecognized = TRUE;
 			// wParam = Turn Amount in degrees, 
 			// lParam = direction (Left/Right) and speed
+			// Owner is always assumed to be REMOTE_USER_MODULE
 			
 			CString MsgString;
 			MsgString.Format( "TURN_SET_DISTANCE: %d Degrees", wParam );
@@ -725,11 +733,11 @@ void CUserCmdModule::ProcessMessage(
 
 			if( LEFT == lParam )
 			{
-				m_pDriveCtrl->SetTurnRotation( m_UserOwner, SPEED_STOP, (int)lParam, wParam); // Speed of turn, turn amount
+				m_pDriveCtrl->SetTurnRotation( REMOTE_USER_MODULE, SPEED_STOP, (int)lParam, wParam); // Speed of turn, turn amount
 			}
 			else
 			{
-				m_pDriveCtrl->SetTurnRotation( m_UserOwner, SPEED_STOP, (int)lParam, wParam);
+				m_pDriveCtrl->SetTurnRotation( REMOTE_USER_MODULE, SPEED_STOP, (int)lParam, wParam);
 			}
 		}
 		break;
@@ -755,12 +763,30 @@ void CUserCmdModule::ProcessMessage(
 			else
 			{
 				ROBOT_DISPLAY( TRUE, "SENDING BRAKE COMMAND!")
-				m_pDriveCtrl->Brake( m_UserOwner );
+				m_pDriveCtrl->Brake( LOCAL_USER_MODULE );
 				// m_pDriveCtrl->ExecuteCommand();	// Don't wait for next status update
 			}
 		}
 		break;
 
+		case WM_ROBOT_STOP_CMD:
+		{
+			// Take control from all other modules and Stop (User already higher priority then Nav modules, so no need to supress them)
+			ROBOT_LOG( TRUE, " WM_ROBOT_STOP_CMD: Stop\n" )
+			// ?? this will force the other modules to abort and go back to IDLE state:
+
+//			m_UserOwner = LOCAL_USER_MODULE;	// Super user mode
+			//m_pDriveCtrl->SuppressModule( COLLISION_MODULE );
+			//m_pDriveCtrl->SuppressModule( AVOID_OBJECT_MODULE );
+			//m_pDriveCtrl->SuppressModule( WAY_POINT_NAV_MODULE );
+			//m_pDriveCtrl->SuppressModule( GRID_NAV_MODULE );
+			m_CurrentSpeed = SPEED_STOP;
+			m_CurrentTurn = TURN_CENTER;
+			m_pDriveCtrl->SetSpeedAndTurn( LOCAL_USER_MODULE, m_CurrentSpeed, m_CurrentTurn );
+		}
+		break;
+
+/*
 		case WM_ROBOT_SET_USER_PRIORITY:
 		{
 			g_bCmdRecognized = TRUE;
@@ -815,15 +841,82 @@ void CUserCmdModule::ProcessMessage(
 			}
 		}
 		break;
+*/
 
-		case WM_ROBOT_JOYSTICK_DRIVE_CMD:
+		case WM_ROBOT_DRIVE_LOCAL_CMD:
+		case WM_ROBOT_DRIVE_REMOTE_CMD:
 		{
+			// lParam is Speed, wParam is Turn
+			g_bCmdRecognized = TRUE;
+			int NewSpeed = wParam;
+			int NewTurn = lParam;
+			int Owner = REMOTE_USER_MODULE;
+
+			if( WM_ROBOT_DRIVE_LOCAL_CMD == uMsg )
+			{
+				Owner = LOCAL_USER_MODULE;
+				ROBOT_LOG( DEBUG_MOTOR_COMMANDS, "Received WM_ROBOT_DRIVE_LOCAL_CMD: Speed=%d, Turn=%d  ",  NewSpeed, NewTurn )
+			}
+			else if( WM_ROBOT_DRIVE_REMOTE_CMD == uMsg )
+			{
+				Owner = REMOTE_USER_MODULE;
+				ROBOT_LOG( DEBUG_MOTOR_COMMANDS, "Received WM_ROBOT_DRIVE_REMOTE_CMD: Speed=%d, Turn=%d  ",  NewSpeed, NewTurn )
+			}
+			else
+			{
+				ROBOT_ASSERT(0); // logic error
+			}
+
+			// Speed and Turn commands from GUI are +/- 127, with zero = Center/Stop 
+			// Convert to HW command values, for reverse, we add a negative number
+
+			//-------------------------------------------------------------------------------
+			#if( MOTOR_CONTROL_TYPE == SERVO_MOTOR_CONTROL )
+				// RC Car with external servo control: Servo max values are 0-255
+
+				m_CurrentSpeed = SPEED_STOP + (NewSpeed);	 // convert to servo range
+				if( m_CurrentSpeed > SPEED_FULL_FWD )			// Limit to valid range
+				{
+					m_CurrentSpeed = SPEED_FULL_FWD;	
+				}
+				else if( m_CurrentSpeed < SPEED_FULL_REV )
+				{
+					m_CurrentSpeed = SPEED_FULL_REV;	
+				}
+
+				m_CurrentTurn = (NewTurn);	// convert to servo range
+				if( m_CurrentTurn < TURN_LEFT_MAX )			// Limit to valid range
+				{
+					m_CurrentTurn = TURN_LEFT_MAX;	
+				}
+				else if( m_CurrentTurn > TURN_RIGHT_MAX )
+				{
+					m_CurrentTurn = TURN_RIGHT_MAX;	
+				}
+
+				//int test = (TURN_CENTER - m_CurrentTurn);
+				m_pDriveCtrl->SetSpeedAndTurn( Owner, m_CurrentSpeed, m_CurrentTurn );
+
+			#else
+				m_CurrentSpeed = NewSpeed;
+				m_CurrentTurn = NewTurn;
+				m_pDriveCtrl->SetSpeedAndTurn( Owner, m_CurrentSpeed, m_CurrentTurn );
+			#endif
+
+			return;
+		}
+
+/*		case WM_ROBOT_JOYSTICK_DRIVE_CMD:
+		{
+
 			// This command only comes from a user doing manual control.
 			// lParam is Speed, wParam is Turn
 			// ROBOT_DISPLAY( TRUE, "Server ACK: JOYSTICK DRIVE CMD" )
 			g_bCmdRecognized = TRUE;
 			int NewSpeed = wParam;
 			int NewTurn = lParam;
+
+
 
 			ROBOT_LOG( DEBUG_MOTOR_COMMANDS, "Received WM_ROBOT_JOYSTICK_DRIVE_CMD: Speed=%d, Turn=%d  ",  NewSpeed, NewTurn )
 
@@ -855,17 +948,17 @@ void CUserCmdModule::ProcessMessage(
 				}
 
 				//int test = (TURN_CENTER - m_CurrentTurn);
-				m_pDriveCtrl->SetSpeedAndTurn( m_UserOwner, m_CurrentSpeed, m_CurrentTurn );
+				m_pDriveCtrl->SetSpeedAndTurn( Owner, m_CurrentSpeed, m_CurrentTurn );
 
 			#else
 				m_CurrentSpeed = NewSpeed;
 				m_CurrentTurn = NewTurn;
-				m_pDriveCtrl->SetSpeedAndTurn( m_UserOwner, m_CurrentSpeed, m_CurrentTurn );
+				m_pDriveCtrl->SetSpeedAndTurn( Owner, m_CurrentSpeed, m_CurrentTurn );
 			#endif
 
 			return;
 		}
-
+*/
 		case WM_ROBOT_RESET_WATCHDOG_CMD:
 		{
 			g_bCmdRecognized = TRUE;
@@ -1427,7 +1520,7 @@ void CUserCmdModule::HandleAndroidInput( )
 			m_pDriveCtrl->SetSpeedAndTurn( LOCAL_USER_MODULE, SPEED_STOP, TURN_CENTER );
 			m_AndroidHasMotorControl = TRUE;
 			ROBOT_LOG( TRUE,  "Got Android command: STOP\n")
-			SendCommand( WM_ROBOT_SET_USER_PRIORITY, SET_USER_LOCAL_AND_STOP, 0 ); // Tell all modules to reset (cancel current behavior)
+			SendCommand( WM_ROBOT_STOP_CMD, 0, 0 ); // Forces stops and tells all modules to reset (cancel current behavior)
 			break;
 		}
 		case 14: // What Time

@@ -87,6 +87,8 @@ CRobotSpeechReco::CRobotSpeechReco()
 	m_bPlaySimonSays = FALSE;
 	m_bSimonSays = FALSE;
 	m_PhraseNumber = 0;
+	m_CurrentSpeed = 0;
+	m_CurrentTurn = 0;
 
 	m_pArmControlRight = new ArmControl( RIGHT_ARM );
 	m_pArmControlLeft = new ArmControl( LEFT_ARM );
@@ -419,9 +421,10 @@ if( m_bPlaySimonSays && !m_bSimonSays )
 			{
 				ROBOT_DISPLAY( TRUE, "SpeechReco Command Recognized: Disable Movement")
 				m_bEnableMotorsForSpeechCommands = FALSE;
-				g_MotorCurrentSpeedCmd = SPEED_STOP;
-				g_MotorCurrentTurnCmd = 0;	// Center
-				SpeechSendCommand( WM_ROBOT_SET_USER_PRIORITY, SET_USER_LOCAL_AND_STOP, 0 ); // FORCE STOP, no matter what!
+				m_CurrentSpeed = SPEED_STOP;
+				m_CurrentTurn = 0;	// Center
+				SpeechSendCommand( WM_ROBOT_STOP_CMD, 0, 0 ); // FORCE STOP, no matter what!
+
 				RobotSleep(5, pDomainSpeakThread); // Let the command run first
 				Speak( "Ok, I have disabled my wheel motors" );	
 			}
@@ -431,11 +434,11 @@ if( m_bPlaySimonSays && !m_bSimonSays )
 		case SpeechCmd_Stop:
 		{
 			ROBOT_DISPLAY( TRUE, "SpeechReco Command Recognized: Stop")
-			BOOL bCurrentlyMoving = (SPEED_STOP != g_MotorCurrentSpeedCmd) || (0 != g_MotorCurrentTurnCmd);
+			BOOL bCurrentlyMoving = (SPEED_STOP != m_CurrentSpeed) || (0 != m_CurrentTurn);
 			// Note that since this is the STOP command, we don't care about m_bEnableMotorsForSpeechCommands
-			g_MotorCurrentSpeedCmd = SPEED_STOP;
-			g_MotorCurrentTurnCmd = 0;	// Center
-			SpeechSendCommand( WM_ROBOT_SET_USER_PRIORITY, SET_USER_LOCAL_AND_STOP, 0 ); // FORCE STOP, no matter what!
+			m_CurrentSpeed = SPEED_STOP;
+			m_CurrentTurn = 0;	// Center
+			SpeechSendCommand( WM_ROBOT_STOP_CMD, 0, 0 ); // FORCE STOP, no matter what!
 			SpeechSendCommand( WM_ROBOT_SET_ACTION_CMD, ACTION_MODE_NONE, (DWORD)0 );	// Right/Left arm, Movement to execute, TODO-MUST This is not what Behavior code says!!
 			RobotSleep(5, pDomainSpeakThread); // Let the command run first
 
@@ -455,7 +458,7 @@ if( m_bPlaySimonSays && !m_bSimonSays )
 			SpeechSendCommand( WM_ROBOT_SET_ARM_MOVEMENT, (DWORD)BOTH_ARMS, (DWORD)ARM_MOVEMENT_HOME1 );	// Right/Left arm, Movement to execute, 
 
 
-			SpeechSendCommand( WM_ROBOT_SET_USER_PRIORITY, SET_USER_REMOTE, 0 ); // Rest owner back
+			//SpeechSendCommand( WM_ROBOT_SET_USER_PRIORITY, SET_USER_REMOTE, 0 ); // Rest owner back
 			break;
 		}
 
@@ -498,14 +501,16 @@ if( m_bPlaySimonSays && !m_bSimonSays )
 			if( MovementEnabled() )
 			{
 				BOOL CurrentlyMoving = FALSE;
-				if( (TURN_CENTER != g_MotorCurrentTurnCmd) || (SPEED_STOP != g_MotorCurrentSpeedCmd) )
+				if( (TURN_CENTER != m_CurrentTurn) || (SPEED_STOP != m_CurrentSpeed) )
 				{
 					CurrentlyMoving = TRUE;
 				}
 
 				// Tell robot to go straight forward
-				g_MotorCurrentSpeedCmd = g_SpeedSetByKeyboard;
-				g_MotorCurrentTurnCmd = 0;	// Center
+				m_CurrentSpeed = g_SpeedSetByKeyboard;
+				m_CurrentTurn = 0;	// Center
+				SendDriveCommand( g_GUICurrentSpeed, g_GUICurrentTurn ); // NEW WAY!
+				RobotSleep(200, pDomainSpeakThread);
 
 				if( CurrentlyMoving )
 				{
@@ -544,6 +549,7 @@ if( m_bPlaySimonSays && !m_bSimonSays )
 					ROBOT_DISPLAY( TRUE, "SpeechReco Command Recognized: Move Forward")
 					// Respond to the command with action, then talk
 					const DWORD DistTenthInches = 120; // move set distance forward
+					// Owner is always assumed to be REMOTE_USER_MODULE for this command:
 					SpeechSendCommand( WM_ROBOT_MOVE_SET_DISTANCE_CMD, DistTenthInches, FORWARD );	// wParam = distance in TENTH INCHES, lParam = direction
 					//RobotSleep(500, pDomainSpeakThread);
 					// Respond with random phrases
@@ -562,6 +568,7 @@ if( m_bPlaySimonSays && !m_bSimonSays )
 					ROBOT_DISPLAY( TRUE, "SpeechReco Command Recognized: Move Back")
 					// Respond to the command with action, then talk
 					const DWORD DistTenthInches = 90;
+					// Owner is always assumed to be REMOTE_USER_MODULE for this command:
 					SpeechSendCommand( WM_ROBOT_MOVE_SET_DISTANCE_CMD, DistTenthInches, REVERSE );	// wParam = distance in TENTH INCHES, lParam = direction
 					RobotSleep(1000, pDomainSpeakThread); // Allow action to start before talking
 
@@ -696,7 +703,7 @@ if( m_bPlaySimonSays && !m_bSimonSays )
 				if( SpeechParam_Left == Param2 )
 				{
 					// Respond to the command with action, then talk
-					if( SPEED_STOP == g_MotorCurrentSpeedCmd )
+					if( SPEED_STOP == m_CurrentSpeed )
 					{
 						// Not currently moving, so assume user wants to turn in place
 						SpeechSendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, 90, TURN_LEFT_MED );	// wParam = distance in degrees, lParam = direction and speed
@@ -714,12 +721,13 @@ if( m_bPlaySimonSays && !m_bSimonSays )
 					else
 					{
 						// Currently moving, so assume use wants to curve turn.
-						g_MotorCurrentSpeedCmd = g_SpeedSetByKeyboard;
-						g_MotorCurrentTurnCmd = -(g_SpeedSetByKeyboard/2);
-						if( g_MotorCurrentTurnCmd < TURN_LEFT_MAX )	
+						m_CurrentSpeed = g_SpeedSetByKeyboard;
+						m_CurrentTurn = -(g_SpeedSetByKeyboard/2);
+						if( m_CurrentTurn < TURN_LEFT_MAX )	
 						{
-							g_MotorCurrentTurnCmd = TURN_LEFT_MAX;
+							m_CurrentTurn = TURN_LEFT_MAX;
 						}
+						SendDriveCommand( g_GUICurrentSpeed, g_GUICurrentTurn ); // NEW WAY!
 						RobotSleep(200, pDomainSpeakThread);
 						Speak( "Turn Left" );
 					}
@@ -727,7 +735,7 @@ if( m_bPlaySimonSays && !m_bSimonSays )
 				else if( SpeechParam_Right == Param2 )
 				{
 					// Respond to the command with action, then talk
-					if( SPEED_STOP == g_MotorCurrentSpeedCmd )
+					if( SPEED_STOP == m_CurrentSpeed )
 					{
 						// Not currently moving, so assume user wants to turn in place
 						SpeechSendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, 90, TURN_RIGHT_MED );	// wParam = distance in degrees, lParam = direction and speed
@@ -745,12 +753,13 @@ if( m_bPlaySimonSays && !m_bSimonSays )
 					else
 					{
 						// Currently moving, so assume use wants to curve turn.
-						g_MotorCurrentSpeedCmd = g_SpeedSetByKeyboard;
-						g_MotorCurrentTurnCmd = (g_SpeedSetByKeyboard/2);
-						if( g_MotorCurrentTurnCmd > TURN_RIGHT_MAX )	
+						m_CurrentSpeed = g_SpeedSetByKeyboard;
+						m_CurrentTurn = (g_SpeedSetByKeyboard/2);
+						if( m_CurrentTurn > TURN_RIGHT_MAX )	
 						{
-							g_MotorCurrentTurnCmd = TURN_RIGHT_MAX;
+							m_CurrentTurn = TURN_RIGHT_MAX;
 						}
+						SendDriveCommand( g_GUICurrentSpeed, g_GUICurrentTurn ); // NEW WAY!
 						RobotSleep(200, pDomainSpeakThread);
 						Speak( "Turn Right" );
 					}
@@ -773,7 +782,7 @@ if( m_bPlaySimonSays && !m_bSimonSays )
 				if( SpeechParam_Left == Param2 )
 				{
 					// Respond to the command with action, then talk
-					if( SPEED_STOP == g_MotorCurrentSpeedCmd )
+					if( SPEED_STOP == m_CurrentSpeed )
 					{
 						// Not currently moving, so assume user wants to turn in place
 						SpeechSendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, 45, TURN_LEFT_MED );	// wParam = distance in degrees, lParam = direction and speed
@@ -791,12 +800,13 @@ if( m_bPlaySimonSays && !m_bSimonSays )
 					else
 					{
 						// Currently moving, so assume use wants to curve turn.
-						g_MotorCurrentSpeedCmd = g_SpeedSetByKeyboard;
-						g_MotorCurrentTurnCmd = -(g_SpeedSetByKeyboard/4);
-						if( g_MotorCurrentTurnCmd < TURN_LEFT_MAX )	
+						m_CurrentSpeed = g_SpeedSetByKeyboard;
+						m_CurrentTurn = -(g_SpeedSetByKeyboard/4);
+						if( m_CurrentTurn < TURN_LEFT_MAX )	
 						{
-							g_MotorCurrentTurnCmd = TURN_LEFT_MAX;
+							m_CurrentTurn = TURN_LEFT_MAX;
 						}
+						SendDriveCommand( g_GUICurrentSpeed, g_GUICurrentTurn ); // NEW WAY!
 						RobotSleep(200, pDomainSpeakThread);
 						Speak( "Bear Left" );
 					}
@@ -804,7 +814,7 @@ if( m_bPlaySimonSays && !m_bSimonSays )
 				else if( SpeechParam_Right == Param2 )
 				{
 					// Respond to the command with action, then talk
-					if( SPEED_STOP == g_MotorCurrentSpeedCmd )
+					if( SPEED_STOP == m_CurrentSpeed )
 					{
 						// Not currently moving, so assume user wants to turn in place
 						SpeechSendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, 45, TURN_RIGHT_MED );	// wParam = distance in degrees, lParam = direction and speed
@@ -822,13 +832,14 @@ if( m_bPlaySimonSays && !m_bSimonSays )
 					else
 					{
 						// Currently moving, so assume use wants to curve turn.
-						g_MotorCurrentSpeedCmd = g_SpeedSetByKeyboard;
-						g_MotorCurrentTurnCmd = (g_SpeedSetByKeyboard/4);
-						if( g_MotorCurrentTurnCmd > TURN_RIGHT_MAX )	
+						m_CurrentSpeed = g_SpeedSetByKeyboard;
+						m_CurrentTurn = (g_SpeedSetByKeyboard/4);
+						if( m_CurrentTurn > TURN_RIGHT_MAX )	
 						{
-							g_MotorCurrentTurnCmd = TURN_RIGHT_MAX;
+							m_CurrentTurn = TURN_RIGHT_MAX;
 						}
 						RobotSleep(200, pDomainSpeakThread);
+						SendDriveCommand( g_GUICurrentSpeed, g_GUICurrentTurn ); // NEW WAY!
 						Speak( "Bear Right" );
 					}
 				}
@@ -1867,7 +1878,12 @@ void CRobotSpeechReco::SendRecoToAI( BOOL bEnable )
 	__itt_marker(pDomainSpeechRecoThread, __itt_null, pshSendToAI, __itt_marker_scope_task);
 }
 
-
+void CRobotSpeechReco::SendDriveCommand( int Speed, int Turn )
+{
+	// Speech commands are always considered "Remote" commands, in that the user does not have direct control of the robot
+	SendCommand( WM_ROBOT_DRIVE_REMOTE_CMD, (DWORD)Speed, (DWORD)Turn );
+	ROBOT_LOG( TRUE,  "SPEECH RECO: Speed set to %d, Turn set to %d\n", Speed, Turn )
+}
 
 #endif	// ROBOT_SERVER
 

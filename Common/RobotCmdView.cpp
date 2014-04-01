@@ -112,7 +112,9 @@ CRobotCmdView::CRobotCmdView()
 	m_BlueBrush = new CBrush(BACKGROUND_COLOR_BLUE); // Blue background
 
 	m_BatteryStatus = UNKNOWN;
-	m_LocalUser = FALSE; // default to remote user level for control priority
+	g_GUILocalUser = FALSE; // default to remote user level for control priority
+	g_GUICurrentSpeed = 0;
+	g_GUICurrentTurn = 0;
 }
 
 CRobotCmdView::~CRobotCmdView()
@@ -589,23 +591,22 @@ void CRobotCmdView::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 	// Handle Horizontal Sliders
 	CString strText;
 	CSliderCtrl* pSlider =	(CSliderCtrl*) pScrollBar;
-	int nTemp;
 
 	if( pScrollBar != NULL )	// The window scroll bars pass in NULL to this
 	{
-		switch( pScrollBar->GetDlgCtrlID() ) {
-
+		switch( pScrollBar->GetDlgCtrlID() ) 
+		{
 			case IDC_TURN_SLIDER:
 			//ROBOT_LOG( TRUE,  "updating TURN slider control\n" )
 			//ROBOT_DISPLAY( TRUE, "updating TURN slider control")
 			// Turn range: -64 <--> +64
-			nTemp = (pSlider->GetPos() - SLIDER_CENTER) / 2;	// divide to make turn less sensitive then speed
-			strText.Format("%d", nTemp);
+			g_GUICurrentTurn = (pSlider->GetPos() - SLIDER_CENTER) / 2;	// divide to make turn less sensitive then speed
+			strText.Format("%d", g_GUICurrentTurn);
 			SetDlgItemText(IDC_MOTOR_TURN_STATIC, strText);
-			// Send the command to the motor control.  Loop in globals.cpp filters multiple small 
-			g_MotorCurrentTurnCmd = nTemp;	// Center
-			ROBOT_LOG( TRUE,  "Turn = %d\n", g_MotorCurrentTurnCmd )
+			ROBOT_LOG( TRUE,  "Turn = %d\n", g_GUICurrentTurn )
 
+			// NEW WAY!
+			SendDriveCommand( g_GUICurrentSpeed, g_GUICurrentTurn );
 		}
 	}
 
@@ -615,7 +616,6 @@ void CRobotCmdView::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 void CRobotCmdView::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar) 
 {
 	// Handle Vertical Sliders
-	int nTemp;
 	CString strText;
 	CSliderCtrl* pSlider =	(CSliderCtrl*) pScrollBar;
 	CSpinButtonCtrl* pAvoidObjRangeSpin = (CSpinButtonCtrl*) pScrollBar;
@@ -629,13 +629,15 @@ void CRobotCmdView::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 			//ROBOT_DISPLAY( TRUE, "updating SPEED slider control")
 
 			// Speed Range: -127 <--> +127
-			nTemp = SLIDER_CENTER - pSlider->GetPos();
+			g_GUICurrentSpeed = SLIDER_CENTER - pSlider->GetPos();
 
-			strText.Format("%d", nTemp);
+			strText.Format("%d", g_GUICurrentSpeed);
 			SetDlgItemText(IDC_MOTOR_SPEED_STATIC, strText);
-			// Send the command to the motor control.  Loop in globals.cpp filters multiple small 
-			g_MotorCurrentSpeedCmd = nTemp;
-			ROBOT_LOG( TRUE,  "Speed = %d\n", g_MotorCurrentSpeedCmd )
+
+			// NEW WAY!
+			SendDriveCommand( g_GUICurrentSpeed, g_GUICurrentTurn );
+
+
 			break;
 
 	
@@ -652,7 +654,7 @@ void CRobotCmdView::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 	
 			case IDC_TEST_SERVO_SPIN:
 			// Servo Spin Control
-			nTemp = pSlider->GetPos();
+			int nTemp = pSlider->GetPos();
 			strText.Format(_T("%d"), nTemp);
 			SetDlgItemText(IDC_SERVO_VALUE, strText);
 			char strServoNum[8];
@@ -676,8 +678,13 @@ void CRobotCmdView::OnCenterButton()
 	pSlider->SetPos(m_nTurnSlider);
 	strText.Format("0");
 	SetDlgItemText(IDC_MOTOR_TURN_STATIC, strText);
+
 	// Send the command to the motor control.  Loop in globals.cpp filters multiple small changes
-	g_MotorCurrentTurnCmd = 0;	// Center
+	///g_MotorCurrentTurnCmd = 0;	// Center
+
+	// NEW WAY!
+	SendDriveCommand( g_GUICurrentSpeed, g_GUICurrentTurn );
+
 
 }
 
@@ -693,14 +700,11 @@ void CRobotCmdView::OnStopButton()
 	SetDlgItemText(IDC_MOTOR_SPEED_STATIC, strText);
 	OnCenterButton();	// Center the wheels on Stop command
 
-	// Set the motor control state
-	g_MotorCurrentSpeedCmd = 0;	// Stop
-	g_MotorCurrentTurnCmd = 0;	// Center
 
 	// Manual Stop button will override collision and avoidance behaviors, causing an immediate stop
-	SendCommand( WM_ROBOT_SET_USER_PRIORITY, SET_USER_LOCAL_AND_STOP, 0 );
-	//SendCommand( WM_ROBOT_JOYSTICK_DRIVE_CMD, 0, 0 );
-
+	/// OLD: SendCommand( WM_ROBOT_SET_USER_PRIORITY, SET_USER_LOCAL_AND_STOP, 0 );
+	SendCommand( WM_ROBOT_STOP_CMD, 0, 0 );
+	ROBOT_LOG( TRUE,  "Sending WM_ROBOT_STOP_CMD\n" )
 	// Cancel any current behavior
 	SendCommand( WM_ROBOT_SET_ACTION_CMD, ACTION_MODE_NONE, 0 );
 
@@ -925,7 +929,7 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Handle Global sub-system Status updates if any changes
 
-#if( ROBOT_TYPE == TURTLE )
+#if( MOTOR_CONTROL_TYPE == IROBOT_MOTOR_CONTROL )
 
 	// Note, Left and Right wheel drops not use; wheels bolted in place for stability
 	if( g_pIRobotStatus->WheelDropCaster != LastWheelDropCaster )
@@ -950,9 +954,32 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 	}
 
 
+#elif( MOTOR_CONTROL_TYPE == KOBUKI_MOTOR_CONTROL )
+/** TODO
+	// Note, Left and Right wheel drops not use; wheels bolted in place for stability
+	if( g_pIRobotStatus->WheelDropCaster != LastWheelDropCaster )
+	{
+		strText = ( (g_pIRobotStatus->WheelDropCaster == 0) ? _T("Caster OK") : _T("Caster Drop") );
+		SetDlgItemText( IDC_CASTER_DROP, (LPCTSTR)strText );
+		LastWheelDropCaster = g_pIRobotStatus->WheelDropCaster;
+	}
+
+	if( g_pIRobotStatus->BumperLeft != LastBumperLeft )
+	{
+		strText = ( (g_pIRobotStatus->BumperLeft == 0) ? _T("Left Bumper") : _T("Left Hit") );
+		SetDlgItemText( IDC_STAT_BMPR_LEFT, (LPCTSTR)strText );
+		LastBumperLeft = g_pIRobotStatus->BumperLeft;
+	}
+
+	if( g_pIRobotStatus->BumperRight != LastBumperRight )
+	{
+		strText = ( (g_pIRobotStatus->BumperRight == 0) ? _T("Right Bumper") : _T("Right Hit") );
+		SetDlgItemText( IDC_STAT_BMPR_RIGHT, (LPCTSTR)strText );
+		LastBumperRight = g_pIRobotStatus->BumperRight;
+	}
+**/
+
 #endif
-
-
 
 	if( g_DynaSubSystemStatus != LastConnectedToDyna )
 	{
@@ -999,90 +1026,99 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 	///////// Only on Loki Robot //////////////
 	#if (ROBOT_TYPE == LOKI) 
 
-	if( g_CameraSubSystemStatus != LastCameraReady )
-	{
-		if( SUBSYSTEM_CONNECTED == g_CameraSubSystemStatus )
-			strText.Format( _T("Ready") );
-		else if( SUBSYSTEM_DISABLED == g_CameraSubSystemStatus )
-			strText.Format( _T("Disabled") );
-		else if( SUBSYSTEM_WAITING == g_CameraSubSystemStatus )
-			strText.Format( _T("Initializing") );
-		else
-			strText.Format( _T("ERROR") );
-		SetDlgItemText( IDC_CAMERA_STATUS, (LPCTSTR)strText );
-		LastCameraReady = g_CameraSubSystemStatus;
-	}
+		if( g_CameraSubSystemStatus != LastCameraReady )
+		{
+			if( SUBSYSTEM_CONNECTED == g_CameraSubSystemStatus )
+				strText.Format( _T("Ready") );
+			else if( SUBSYSTEM_DISABLED == g_CameraSubSystemStatus )
+				strText.Format( _T("Disabled") );
+			else if( SUBSYSTEM_WAITING == g_CameraSubSystemStatus )
+				strText.Format( _T("Initializing") );
+			else
+				strText.Format( _T("ERROR") );
+			SetDlgItemText( IDC_CAMERA_STATUS, (LPCTSTR)strText );
+			LastCameraReady = g_CameraSubSystemStatus;
+		}
 
-	if( g_RX64SubSystemStatus != LastConnectedToRX64 )
-	{
-		if( SUBSYSTEM_CONNECTED == g_RX64SubSystemStatus )
-			strText.Format( _T("Ready") );
-		else if( SUBSYSTEM_DISABLED == g_RX64SubSystemStatus )
-			strText.Format( _T("Disabled") );
-		else if( SUBSYSTEM_WAITING == g_RX64SubSystemStatus )
-			strText.Format( _T("Initializing") );
-		else
-			strText.Format( _T("ERROR") );
-		SetDlgItemText( IDC_RX64_STATUS, (LPCTSTR)strText );
-		LastConnectedToRX64 = g_RX64SubSystemStatus;
-	}
+		if( g_RX64SubSystemStatus != LastConnectedToRX64 )
+		{
+			if( SUBSYSTEM_CONNECTED == g_RX64SubSystemStatus )
+				strText.Format( _T("Ready") );
+			else if( SUBSYSTEM_DISABLED == g_RX64SubSystemStatus )
+				strText.Format( _T("Disabled") );
+			else if( SUBSYSTEM_WAITING == g_RX64SubSystemStatus )
+				strText.Format( _T("Initializing") );
+			else
+				strText.Format( _T("ERROR") );
+			SetDlgItemText( IDC_RX64_STATUS, (LPCTSTR)strText );
+			LastConnectedToRX64 = g_RX64SubSystemStatus;
+		}
 
-	if( g_KerrSubSystemStatus != LastConnectedToKerr )
-	{
-		if( SUBSYSTEM_CONNECTED == g_KerrSubSystemStatus )
-			strText.Format( _T("Ready") );
-		else if( SUBSYSTEM_DISABLED == g_KerrSubSystemStatus )
-			strText.Format( _T("Disabled") );
-		else if( SUBSYSTEM_WAITING == g_KerrSubSystemStatus )
-			strText.Format( _T("Initializing") );
-		else
-			strText.Format( _T("ERROR") );
-		SetDlgItemText( IDC_KERR_STATUS, (LPCTSTR)strText );
-		LastConnectedToKerr = g_KerrSubSystemStatus;
-	}
+		if( g_KerrSubSystemStatus != LastConnectedToKerr )
+		{
+			if( SUBSYSTEM_CONNECTED == g_KerrSubSystemStatus )
+				strText.Format( _T("Ready") );
+			else if( SUBSYSTEM_DISABLED == g_KerrSubSystemStatus )
+				strText.Format( _T("Disabled") );
+			else if( SUBSYSTEM_WAITING == g_KerrSubSystemStatus )
+				strText.Format( _T("Initializing") );
+			else
+				strText.Format( _T("ERROR") );
+			SetDlgItemText( IDC_KERR_STATUS, (LPCTSTR)strText );
+			LastConnectedToKerr = g_KerrSubSystemStatus;
+		}
 	
-	if( g_LaserSubSystemStatus != LastLaserReady )
-	{
-		if( SUBSYSTEM_CONNECTED == g_LaserSubSystemStatus )
-			strText.Format( _T("Ready") );
-		else if( SUBSYSTEM_DISABLED == g_LaserSubSystemStatus )
-			strText.Format( _T("Disabled") );
-		else if( SUBSYSTEM_WAITING == g_LaserSubSystemStatus )
-			strText.Format( _T("Initializing") );
-		else
-			strText.Format( _T("ERROR") );
-		SetDlgItemText( IDC_LASER_STATUS, (LPCTSTR)strText );
-		LastLaserReady = g_LaserSubSystemStatus;
-	}
+		if( g_LaserSubSystemStatus != LastLaserReady )
+		{
+			if( SUBSYSTEM_CONNECTED == g_LaserSubSystemStatus )
+				strText.Format( _T("Ready") );
+			else if( SUBSYSTEM_DISABLED == g_LaserSubSystemStatus )
+				strText.Format( _T("Disabled") );
+			else if( SUBSYSTEM_WAITING == g_LaserSubSystemStatus )
+				strText.Format( _T("Initializing") );
+			else
+				strText.Format( _T("ERROR") );
+			SetDlgItemText( IDC_LASER_STATUS, (LPCTSTR)strText );
+			LastLaserReady = g_LaserSubSystemStatus;
+		}
 
-	if( g_LeftArmSubSystemStatus != LastArmReady_L )
-	{
-		if( SUBSYSTEM_CONNECTED == g_LeftArmSubSystemStatus )
-			strText.Format( _T("Ready") );
-		else if( SUBSYSTEM_DISABLED == g_LeftArmSubSystemStatus )
-			strText.Format( _T("Disabled") );
-		else if( SUBSYSTEM_WAITING == g_LeftArmSubSystemStatus )
-			strText.Format( _T("Initializing") );
-		else
-			strText.Format( _T("ERROR") );
-		SetDlgItemText( IDC_ARM_L_STATUS, (LPCTSTR)strText );
-		LastArmReady_L = g_LeftArmSubSystemStatus;
-	}
+		if( g_LeftArmSubSystemStatus != LastArmReady_L )
+		{
+			if( SUBSYSTEM_CONNECTED == g_LeftArmSubSystemStatus )
+				strText.Format( _T("Ready") );
+			else if( SUBSYSTEM_DISABLED == g_LeftArmSubSystemStatus )
+				strText.Format( _T("Disabled") );
+			else if( SUBSYSTEM_WAITING == g_LeftArmSubSystemStatus )
+				strText.Format( _T("Initializing") );
+			else
+				strText.Format( _T("ERROR") );
+			SetDlgItemText( IDC_ARM_L_STATUS, (LPCTSTR)strText );
+			LastArmReady_L = g_LeftArmSubSystemStatus;
+		}
 
-	if( g_RightArmSubSystemStatus != LastArmReady_R )
-	{
-		if( SUBSYSTEM_CONNECTED == g_RightArmSubSystemStatus )
-			strText.Format( _T("Ready") );
-		else if( SUBSYSTEM_DISABLED == g_RightArmSubSystemStatus )
+		if( g_RightArmSubSystemStatus != LastArmReady_R )
+		{
+			if( SUBSYSTEM_CONNECTED == g_RightArmSubSystemStatus )
+				strText.Format( _T("Ready") );
+			else if( SUBSYSTEM_DISABLED == g_RightArmSubSystemStatus )
+				strText.Format( _T("Disabled") );
+			else if( SUBSYSTEM_WAITING == g_RightArmSubSystemStatus )
+				strText.Format( _T("Initializing") );
+			else
+				strText.Format( _T("ERROR") );
+			SetDlgItemText( IDC_ARM_R_STATUS, (LPCTSTR)strText );
+			LastArmReady_R = g_RightArmSubSystemStatus;
+		}
+
+	#else
+		if( g_ArduinoSubSystemStatus != SUBSYSTEM_DISABLED )
+		{
+			g_ArduinoSubSystemStatus = SUBSYSTEM_DISABLED;
 			strText.Format( _T("Disabled") );
-		else if( SUBSYSTEM_WAITING == g_RightArmSubSystemStatus )
-			strText.Format( _T("Initializing") );
-		else
-			strText.Format( _T("ERROR") );
-		SetDlgItemText( IDC_ARM_R_STATUS, (LPCTSTR)strText );
-		LastArmReady_R = g_RightArmSubSystemStatus;
-	}
-	#endif
+			SetDlgItemText( IDC_PIC_STATUS, (LPCTSTR)strText );
+			LastConnectedToPIC = g_ArduinoSubSystemStatus;
+		}
+	#endif // LOKI
 
 
 	// Report Initial Status
@@ -2287,7 +2323,9 @@ void CRobotCmdView::OnMoveDistanceForward()
 		ROBOT_LOG( TRUE,  "ERROR - UNKNOWN DISTANCE!\n" )
 		return;
 	}
+	// Owner is always assumed to be REMOTE_USER_MODULE for this command:
 	SendCommand( WM_ROBOT_MOVE_SET_DISTANCE_CMD, nTenthInches, FORWARD );	// wParam = distance in TenthInches, lParam = direction
+
 	
 }
 
@@ -2309,6 +2347,7 @@ void CRobotCmdView::OnMoveDistanceReverse()
 		ROBOT_LOG( TRUE,   "ERROR - UNKNOWN DISTANCE!\n" )
 		return;
 	}
+	// Owner is always assumed to be REMOTE_USER_MODULE for this command:
 	SendCommand( WM_ROBOT_MOVE_SET_DISTANCE_CMD, nTenthInches, REVERSE );	// wParam = distance in TENTH INCHES, lParam = direction
 }
 void CRobotCmdView::OnTurnDistanceLeft() 
@@ -2329,6 +2368,7 @@ void CRobotCmdView::OnTurnDistanceLeft()
 		ROBOT_LOG( TRUE,   "ERROR - UNKNOWN DISTANCE!\n" )
 		return;
 	}
+	// Owner is always assumed to be REMOTE_USER_MODULE for this command:
 	SendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, nDegrees, TURN_LEFT_MED );	// wParam = distance in degrees, lParam = direction and speed
 
  }
@@ -2352,6 +2392,7 @@ void CRobotCmdView::OnTurnDistanceRight()
 		ROBOT_LOG( TRUE,   "ERROR - UNKNOWN DISTANCE!\n" )
 		return;
 	}
+	// Owner is always assumed to be REMOTE_USER_MODULE for this command:
 	SendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, nDegrees, TURN_RIGHT_MED );	// wParam = distance in degrees, lParam = direction and speed
 }
 
@@ -2548,8 +2589,6 @@ void CRobotCmdView::OnSelchangeHeadTilt()
 //	strText.Format("0");
 //	SetDlgItemText(IDC_MOTOR_SPEED_STATIC, strText);
 //	// Send the command to the motor control
-//	g_MotorCurrentSpeedCmd = 0;	// Stop
-//	g_MotorCurrentTurnCmd = 0;	// Center
 //	// Special Case the BRAKE. don't wait for nothing!
 //	SendCommand( WM_ROBOT_BRAKE_CMD, 0, 0 );
 //	OnPausePath();	// Pause current path that is running!
@@ -2613,8 +2652,8 @@ void CRobotCmdView::OnTestBrake()
 	strText.Format("0");
 	SetDlgItemText(IDC_MOTOR_SPEED_STATIC, strText);
 	// Send the command to the motor control
-	g_MotorCurrentSpeedCmd = 0;	// Stop
-	g_MotorCurrentTurnCmd = 0;	// Center
+	//g_MotorCurrentSpeedCmd = 0;	// Stop
+	//g_MotorCurrentTurnCmd = 0;	// Center
 	// Special Case the BRAKE. don't wait for nothing!
 	SendCommand( WM_ROBOT_BRAKE_CMD, 0, 1 );				// /DEBUG Test Mode!!!!!
 	OnPausePath();	// Pause current path that is running!
@@ -3007,12 +3046,17 @@ void CRobotCmdView::OnQ_Key()
 	g_LastKey = 'Q';
 
 	ROBOT_LOG( TRUE,  "KEY Curve Left\n" )
-	g_MotorCurrentSpeedCmd = g_SpeedSetByKeyboard;
-	g_MotorCurrentTurnCmd = -(g_SpeedSetByKeyboard/3);
-	if( g_MotorCurrentTurnCmd < TURN_LEFT_MAX )	
+	g_GUICurrentSpeed = g_SpeedSetByKeyboard;
+	g_GUICurrentTurn = -(g_SpeedSetByKeyboard/3);
+	if( g_GUICurrentTurn < TURN_LEFT_MAX )	
 	{
-		g_MotorCurrentTurnCmd = TURN_LEFT_MAX;
+		g_GUICurrentTurn = TURN_LEFT_MAX;
 	}	
+
+	// NEW WAY!
+	SendDriveCommand( g_GUICurrentSpeed, g_GUICurrentTurn );
+
+
 }
 
 void CRobotCmdView::OnKey_E() 
@@ -3024,12 +3068,16 @@ void CRobotCmdView::OnKey_E()
 	g_LastKey = 'E';
 
 	ROBOT_LOG( TRUE,  "KEY Curve Right\n" )
-	g_MotorCurrentSpeedCmd = g_SpeedSetByKeyboard;
-	g_MotorCurrentTurnCmd = (g_SpeedSetByKeyboard/3);
-	if( g_MotorCurrentTurnCmd > TURN_RIGHT_MAX )	
+	g_GUICurrentSpeed = g_SpeedSetByKeyboard;
+	g_GUICurrentTurn = (g_SpeedSetByKeyboard/3);
+	if( g_GUICurrentTurn > TURN_RIGHT_MAX )	
 	{
-		g_MotorCurrentTurnCmd = TURN_RIGHT_MAX;
+		g_GUICurrentTurn = TURN_RIGHT_MAX;
 	}
+
+	// NEW WAY!
+	SendDriveCommand( g_GUICurrentSpeed, g_GUICurrentTurn );
+
 }
 
 void CRobotCmdView::OnKEY_A() 
@@ -3041,12 +3089,16 @@ void CRobotCmdView::OnKEY_A()
 	g_LastKey = 'A';
 
 	ROBOT_LOG( TRUE,  "KEY Spin Left\n" )
-	g_MotorCurrentSpeedCmd = 0;
-	g_MotorCurrentTurnCmd = (g_SpeedSetByKeyboard * -70) / 100; // n%.  note negative value
-	if( g_MotorCurrentTurnCmd < TURN_LEFT_MAX )	
+	g_GUICurrentSpeed = 0;
+	g_GUICurrentTurn = (g_SpeedSetByKeyboard * -70) / 100; // n%.  note negative value
+	if( g_GUICurrentTurn < TURN_LEFT_MAX )	
 	{
-		g_MotorCurrentTurnCmd = TURN_LEFT_MAX;
+		g_GUICurrentTurn = TURN_LEFT_MAX;
 	}
+
+	// NEW WAY!
+	SendDriveCommand( g_GUICurrentSpeed, g_GUICurrentTurn );
+
 }
 
 void CRobotCmdView::OnKey_D() 
@@ -3058,15 +3110,17 @@ void CRobotCmdView::OnKey_D()
 	g_LastKey = 'D';
 
 	ROBOT_LOG( TRUE,  "KEY Spin Right\n" )
-	g_MotorCurrentSpeedCmd = 0;
-	g_MotorCurrentTurnCmd = (g_SpeedSetByKeyboard * 70) / 100;	// n%
-	if( g_MotorCurrentTurnCmd > TURN_RIGHT_MAX )	
+	g_GUICurrentSpeed = 0;
+	g_GUICurrentTurn = (g_SpeedSetByKeyboard * 70) / 100;	// n%
+	if( g_GUICurrentTurn > TURN_RIGHT_MAX )	
 	{
-		g_MotorCurrentTurnCmd = TURN_RIGHT_MAX;
+		g_GUICurrentTurn = TURN_RIGHT_MAX;
 	}
+
+	// NEW WAY!
+	SendDriveCommand( g_GUICurrentSpeed, g_GUICurrentTurn );
+
 }
-
-
 
 void CRobotCmdView::OnKey_S() 
 {
@@ -3078,18 +3132,17 @@ if( 'S' == g_LastKey )
 	g_LastKey = 'S';
 */
 	ROBOT_LOG( TRUE,  "KEY Stop\n" )
-	g_MotorCurrentSpeedCmd = SPEED_STOP;
-	g_MotorCurrentTurnCmd = 0;	// Center
+	g_GUICurrentSpeed = SPEED_STOP;
+	g_GUICurrentTurn = 0;	// Center
 
 	// When user presses Stop, supress other modules, so they don't keep robot moving!
-//	SendCommand( WM_ROBOT_SUPPRESS_MODULE, 
-//		AVOID_OBJECT_MODULE, SUPPRESS ); // Modules, Suppress/UnSupress
-	SendCommand( WM_ROBOT_SET_USER_PRIORITY, SET_USER_LOCAL_AND_STOP, 0 );
+	SendCommand( WM_ROBOT_STOP_CMD, 0, 0 );
 	SendCommand( WM_ROBOT_EXECUTE_PATH, PATH_EXECUTE_PAUSE,	1 ); // lParam: 1 = Wait for bumper to start, 0 = Don't wait
+
 
 }
 
-void CRobotCmdView::OnKey_W() 
+void CRobotCmdView::OnKey_W() // W = Forward
 {
 	if( 'W' == g_LastKey )
 	{
@@ -3097,10 +3150,16 @@ void CRobotCmdView::OnKey_W()
 	}
 	g_LastKey = 'W';
 	ROBOT_LOG( TRUE,  "KEY Forward\n" )
-	g_MotorCurrentSpeedCmd = g_SpeedSetByKeyboard;
-	g_MotorCurrentTurnCmd = 0;	// Center
+	g_GUICurrentSpeed = g_SpeedSetByKeyboard;
+	g_GUICurrentTurn = 0;	// Center
 	
+
+	// NEW WAY!
+	SendDriveCommand( g_GUICurrentSpeed, g_GUICurrentTurn );
+
+
 }
+
 
 void CRobotCmdView::OnKey_X() 
 {
@@ -3111,7 +3170,11 @@ void CRobotCmdView::OnKey_X()
 	g_LastKey = 'X';
 
 	ROBOT_LOG( TRUE,  "KEY Backup\n" )
-	g_MotorCurrentSpeedCmd = SPEED_REV_MED_SLOW;	// Keyboard Speed ignored by backup
+	g_GUICurrentSpeed = SPEED_REV_MED_SLOW;	// Keyboard Speed ignored by backup
+
+
+	// NEW WAY!
+	SendDriveCommand( g_GUICurrentSpeed, g_GUICurrentTurn );
 
 }
 
@@ -3121,9 +3184,15 @@ void CRobotCmdView::OnKey_Plus()
 	// + = Increase Speed
 	g_SpeedSetByKeyboard += 5;
 	if( g_SpeedSetByKeyboard > SPEED_FULL_FWD ) g_SpeedSetByKeyboard = SPEED_FULL_FWD;
-	CString MsgString;
-	MsgString.Format("Speed Increased to %d\n", g_SpeedSetByKeyboard);
-	ROBOT_DISPLAY( TRUE, (MsgString))
+	ROBOT_DISPLAY( TRUE, "Speed Increased to %d\n", g_SpeedSetByKeyboard )
+	if( g_GUICurrentSpeed > 0 )
+	{
+		// Already moving forward, apply the speed change
+		g_GUICurrentSpeed = g_SpeedSetByKeyboard;
+
+		// NEW WAY!
+		SendDriveCommand( g_GUICurrentSpeed, g_GUICurrentTurn );
+	}
 }
 
 void CRobotCmdView::OnKey_Minus() 
@@ -3131,9 +3200,15 @@ void CRobotCmdView::OnKey_Minus()
 	// - = Decrease Speed
 	g_SpeedSetByKeyboard -= 5;
 	if( g_SpeedSetByKeyboard < 0 ) g_SpeedSetByKeyboard = 0;
-	CString MsgString;
-	MsgString.Format("Speed Decreased to %d\n", g_SpeedSetByKeyboard);
-	ROBOT_DISPLAY( TRUE, (MsgString))
+	ROBOT_DISPLAY( TRUE, "Speed Decreased to %d\n", g_SpeedSetByKeyboard )
+	if( g_GUICurrentSpeed > 0 )
+	{
+		// Already moving forward, apply the speed change
+		g_GUICurrentSpeed = g_SpeedSetByKeyboard;
+
+		// NEW WAY!
+		SendDriveCommand( g_GUICurrentSpeed, g_GUICurrentTurn );
+	}
 }
 
 void CRobotCmdView::OnKey_Zero() 
@@ -3143,6 +3218,7 @@ void CRobotCmdView::OnKey_Zero()
 	CString MsgString;
 	MsgString.Format("Speed set to Default (%d)\n", SPEED_FWD_MED_SLOW);
 	ROBOT_DISPLAY( TRUE, (MsgString))
+
 }
 
 
@@ -3155,14 +3231,17 @@ void CRobotCmdView::OnKey_C()
 	g_LastKey = 'C';
 
 	ROBOT_LOG( TRUE,  "KEY Continue path\n" )
+/*
 	g_MotorCurrentSpeedCmd = 0;
 	g_MotorCurrentTurnCmd = g_SpeedSetByKeyboard;
 	if( g_MotorCurrentTurnCmd > TURN_RIGHT_MAX )	
 	{
 		g_MotorCurrentTurnCmd = TURN_RIGHT_MAX;
 	}
-	//SendCommand( WM_ROBOT_SET_USER_PRIORITY, SET_USER_LOCAL_AND_STOP, 0 );
+*/
 	SendCommand( WM_ROBOT_EXECUTE_PATH, PATH_EXECUTE_RESUME,	0 );
+
+
 
 }
 
@@ -3257,8 +3336,8 @@ void CRobotCmdView::OnBnClickedLocalUser()
 {
 	// True = all commands issued as LOCAL user, otherwise as Remote user.  
 	// Allow testing Local/Remote behavior over Remote Desktop
-	m_LocalUser = IsDlgButtonChecked(IDC_LOCAL_USER_CB);
-	if( m_LocalUser )
+	g_GUILocalUser = IsDlgButtonChecked(IDC_LOCAL_USER_CB);
+/*	if( g_GUILocalUser )
 	{
 		SendCommand( WM_ROBOT_SET_USER_PRIORITY, SET_USER_LOCAL, 0 );
 	}
@@ -3266,7 +3345,7 @@ void CRobotCmdView::OnBnClickedLocalUser()
 	{
 		SendCommand( WM_ROBOT_SET_USER_PRIORITY, SET_USER_REMOTE, 0 );
 	}
-
+	*/
 }
 
 void CRobotCmdView::OnBnClickedKinectPwrEnable()
@@ -3474,3 +3553,21 @@ void CRobotCmdView::OnStnClickedIrBumperArmLFingerR()
 	// TODO: Add your control notification handler code here
 }
 
+void CRobotCmdView::SendDriveCommand( int Speed, int Turn )
+{
+
+//	SendCommand( WM_ROBOT_JOYSTICK_DRIVE_CMD, (DWORD)m_LocalUser, (DWORD)MAKELONG(g_MotorCurrentSpeedCmd, g_MotorCurrentTurnCmd) ); //LOWORD, HIWORD
+
+
+	if( g_GUILocalUser )
+	{
+		// True = all commands issued as LOCAL user, otherwise as Remote user.  Allow testing Local/Remote behavior over Remote Desktop
+		SendCommand( WM_ROBOT_DRIVE_LOCAL_CMD, (DWORD)Speed, (DWORD)Turn );
+		ROBOT_LOG( TRUE,  "LOCAL USER: Speed set to %d, Turn set to %d\n", Speed, Turn )
+	}
+	else
+	{
+		SendCommand( WM_ROBOT_DRIVE_REMOTE_CMD, (DWORD)Speed, (DWORD)Turn );
+		ROBOT_LOG( TRUE,  "REMOTE USER: Speed set to %d, Turn set to %d\n", Speed, Turn )
+	}
+}

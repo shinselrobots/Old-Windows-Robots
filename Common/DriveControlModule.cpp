@@ -542,8 +542,10 @@ void CDriveControlModule::SetSpeedAndTurn( int  Module, int Speed, int Turn, int
 {
 	CString MsgString, ModuleName;
 	int Result = CheckAndSetOwner(Module);
-	if( MODULE_OWNERSHIP_REQUEST_SUCCESS == Result) 
+
+	if( MODULE_OWNERSHIP_REQUEST_SUCCESS == Result )
 	{
+		// New owner taking control
 		m_DriveOwner = Module;	
 		m_Command = HW_SET_SPEED_AND_TURN;
 		m_Speed = Speed;
@@ -554,10 +556,31 @@ void CDriveControlModule::SetSpeedAndTurn( int  Module, int Speed, int Turn, int
 		m_TurnRotationRemaining = 0;
 		CString MsgString, ModuleName;
 		ModuleNumberToName( Module, ModuleName );
-		MsgString.Format( "%s: New Speed: %d and Turn %d Requested",
+		MsgString.Format( "New Owner %s: New Speed: %d and Turn %d Requested",
 			ModuleName, Speed, Turn );
 		ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
 		ExecuteCommand();
+
+	}
+	else if( MODULE_ALREADY_IS_OWNER == Result  )
+	{
+		if( (m_Speed != Speed) || (m_Turn != Turn) || (m_Acceleration != Acceleration) )
+		{
+			m_DriveOwner = Module;	
+			m_Command = HW_SET_SPEED_AND_TURN;
+			m_Speed = Speed;
+			m_Acceleration = Acceleration;
+			m_Turn = Turn;
+			m_MoveDistanceRemaining = 0;
+			m_TrackCompassHeading = 0;
+			m_TurnRotationRemaining = 0;
+			CString MsgString, ModuleName;
+			ModuleNumberToName( Module, ModuleName );
+			MsgString.Format( "%s: New Speed: %d and Turn %d Requested",
+				ModuleName, Speed, Turn );
+			ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
+			ExecuteCommand();
+		}
 
 	}
 	else if( MODULE_HIGHER_PRIORITY_HAS_CONTROL == Result )  
@@ -618,7 +641,7 @@ BOOL CDriveControlModule::CheckAndSetOwner( int  NewOwner )
 		// Owner reasking for control
 		// Silently reset timer for how long to maintain control
 		gDriveControlOwnerTimer = 20;	// 1/10 seconds
-		return MODULE_OWNERSHIP_REQUEST_SUCCESS;
+		return MODULE_ALREADY_IS_OWNER;
 	}
 
 	CString MsgString, NewOwnerName, CurrentOwnerName;

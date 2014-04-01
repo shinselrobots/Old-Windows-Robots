@@ -34,6 +34,11 @@ public:
 	//-------------------------------------------------------------------------------------
 	BOOL WiiControl::ButtonDownEvent( UINT ButtonBit, BOOL &PriorButtonDownState );
 
+	// ------------------------------------------------------------------------------------
+	// Name: SendDriveCommand
+	// Desc: Sends drive commands from Wii to robot motor control
+	//-------------------------------------------------------------------------------------
+	void SendDriveCommand( int Speed, int Turn );
 
 private:
 
@@ -67,6 +72,9 @@ private:
 	BOOL			m_ButtonDownWiiMote_RIGHT;
 	BOOL			m_ButtonDownWiiMote_LEFT;
 	BOOL			m_ButtonDownWiiMote_HOME;
+
+	int				m_CurrentSpeed;
+	int				m_CurrentTurn;
 
 	ArmControl	   *m_pArmControlRight;
 	ArmControl	   *m_pArmControlLeft;

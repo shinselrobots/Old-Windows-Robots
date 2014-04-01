@@ -2797,66 +2797,77 @@ FORCE_SPEED_CHANGE:
 		case KEY_ARROW_UP:	// Up Arrow
 		{
 			ROBOT_LOG( TRUE,  "KEY Forward\n" );
-			g_MotorCurrentSpeedCmd = g_SpeedSetByKeyboard;
-			g_MotorCurrentTurnCmd = 0;	// Center
+			g_GUICurrentSpeed = g_SpeedSetByKeyboard;
+			g_GUICurrentTurn = 0;	// Center
+			// NEW WAY!
+			SendDriveCommand( g_GUICurrentSpeed, g_GUICurrentTurn );
 			break;
 		}
 		case KEY_A:				// A = Spin Left
 		case KEY_ARROW_LEFT:	// Left Arrow
 		{
 			ROBOT_LOG( TRUE,  "KEY Spin Left\n" );
-			g_MotorCurrentSpeedCmd = 0;
-			g_MotorCurrentTurnCmd = -g_SpeedSetByKeyboard; // note negative value
-			if( g_MotorCurrentTurnCmd < TURN_LEFT_MAX )	
+			g_GUICurrentSpeed = 0;
+			g_GUICurrentTurn = -g_SpeedSetByKeyboard; // note negative value
+			if( g_GUICurrentTurn < TURN_LEFT_MAX )	
 			{
-				g_MotorCurrentTurnCmd = TURN_LEFT_MAX;
+				g_GUICurrentTurn = TURN_LEFT_MAX;
 			}
+			// NEW WAY!
+			SendDriveCommand( g_GUICurrentSpeed, g_GUICurrentTurn );
 			break;
 		}
 		case KEY_D:				// D = Spin Right
 		case KEY_ARROW_RIGHT:	// Right Arrow
 		{
 			ROBOT_LOG( TRUE,  "KEY Spin Right\n" );
-			g_MotorCurrentSpeedCmd = 0;
-			g_MotorCurrentTurnCmd = g_SpeedSetByKeyboard;
-			if( g_MotorCurrentTurnCmd > TURN_RIGHT_MAX )	
+			g_GUICurrentSpeed = 0;
+			g_GUICurrentTurn = g_SpeedSetByKeyboard;
+			if( g_GUICurrentTurn > TURN_RIGHT_MAX )	
 			{
-				g_MotorCurrentTurnCmd = TURN_RIGHT_MAX;
+				g_GUICurrentTurn = TURN_RIGHT_MAX;
 			}
+			// NEW WAY!
+			SendDriveCommand( g_GUICurrentSpeed, g_GUICurrentTurn );
 			break;
 		}
 		case KEY_Q:		// Q = Curve Left
 		// case 166:	// Page Left does not work
 		{
 			ROBOT_LOG( TRUE,  "KEY Curve Left\n" );
-			g_MotorCurrentSpeedCmd = g_SpeedSetByKeyboard;
-			g_MotorCurrentTurnCmd = -(g_SpeedSetByKeyboard/2);
-			if( g_MotorCurrentTurnCmd < TURN_LEFT_MAX )	
+			g_GUICurrentSpeed = g_SpeedSetByKeyboard;
+			g_GUICurrentTurn = -(g_SpeedSetByKeyboard/2);
+			if( g_GUICurrentTurn < TURN_LEFT_MAX )	
 			{
-				g_MotorCurrentTurnCmd = TURN_LEFT_MAX;
+				g_GUICurrentTurn = TURN_LEFT_MAX;
 			}
+			// NEW WAY!
+			SendDriveCommand( g_GUICurrentSpeed, g_GUICurrentTurn );
 			break;
 		}
 		case KEY_E:		// E = Curve Right
 		// case 167:	// Page Right does not work
 		{
 			ROBOT_LOG( TRUE,  "KEY Curve Right\n" );
-			g_MotorCurrentSpeedCmd = g_SpeedSetByKeyboard;
-			g_MotorCurrentTurnCmd = (g_SpeedSetByKeyboard/2);
-			if( g_MotorCurrentTurnCmd > TURN_RIGHT_MAX )	
+			g_GUICurrentSpeed = g_SpeedSetByKeyboard;
+			g_GUICurrentTurn = (g_SpeedSetByKeyboard/2);
+			if( g_GUICurrentTurn > TURN_RIGHT_MAX )	
 			{
-				g_MotorCurrentTurnCmd = TURN_RIGHT_MAX;
+				g_GUICurrentTurn = TURN_RIGHT_MAX;
 			}
+			// NEW WAY!
+			SendDriveCommand( g_GUICurrentSpeed, g_GUICurrentTurn );
 			break;
 		}
 		case KEY_S:	// S = Stop
 		case 35:	// "End" = Stop
 		{
 			ROBOT_LOG( TRUE,  "KEY Stop\n" );
-			g_MotorCurrentSpeedCmd = SPEED_STOP;
-			g_MotorCurrentTurnCmd = 0;	// Center
+			g_GUICurrentSpeed = SPEED_STOP;
+			g_GUICurrentTurn = 0;	// Center
 			// Manual Stop button will override collision and avoidance behaviors, causing an immediate stop
-			SendCommand( WM_ROBOT_SET_USER_PRIORITY, SET_USER_LOCAL_AND_STOP, 0 );
+			SendCommand( WM_ROBOT_STOP_CMD, 0, 0 );
+			//SendCommand( WM_ROBOT_SET_USER_PRIORITY, SET_USER_LOCAL_AND_STOP, 0 );
 			//SendCommand( WM_ROBOT_EXECUTE_PATH, PATH_EXECUTE_PAUSE,	1 ); // lParam: 1 = Wait for bumper to start, 0 = Don't wait
 			//m_LastOverrideState = SET_USER_OVERRIDE_AND_STOP;
 			break;
@@ -2865,8 +2876,10 @@ FORCE_SPEED_CHANGE:
 		case KEY_ARROW_DOWN:	// Down Arrow
 		{
 			ROBOT_LOG( TRUE,  "KEY Backup\n" );
-			g_MotorCurrentSpeedCmd = SPEED_REV_MED_SLOW; // Keyboard Speed ignored by backup
+			g_GUICurrentSpeed = SPEED_REV_MED_SLOW; // Keyboard Speed ignored by backup
 			//g_SpeedSetByKeyboard = SPEED_FWD_MED_SLOW;	
+			// NEW WAY!
+			SendDriveCommand( g_GUICurrentSpeed, g_GUICurrentTurn );
 			break;
 		}
 		case KEY_PLUS:	// + = Increase Speed
@@ -2922,7 +2935,7 @@ void CMapView::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 		// Last key was curve left or right, so now continue going forward center
 		ROBOT_LOG( TRUE,  "KeyUp - continue forward center\n" );
 		g_LastKey = 0;
-		g_MotorCurrentTurnCmd = 0;	// Center
+		g_GUICurrentTurn = 0;	// Center
 	}
 
 	CScrollView::OnKeyUp(nChar, nRepCnt, nFlags);
@@ -2979,3 +2992,18 @@ void CMapView::OnUpdateSetCurrentLocation(CCmdUI* pCmdUI)
 	pCmdUI->SetCheck( (DRAW_MODE_SET_LOCATION == GetDocument()->GetStrokeType()) );
 }
 
+void CMapView::SendDriveCommand( int Speed, int Turn )
+{
+
+	if( g_GUILocalUser ) // Set in RobotCmd
+	{
+		// True = all commands issued as LOCAL user, otherwise as Remote user.  Allow testing Local/Remote behavior over Remote Desktop
+		SendCommand( WM_ROBOT_DRIVE_LOCAL_CMD, (DWORD)Speed, (DWORD)Turn );
+		ROBOT_LOG( TRUE,  "LOCAL USER: Speed set to %d, Turn set to %d\n", Speed, Turn )
+	}
+	else
+	{
+		SendCommand( WM_ROBOT_DRIVE_REMOTE_CMD, (DWORD)Speed, (DWORD)Turn );
+		ROBOT_LOG( TRUE,  "REMOTE USER: Speed set to %d, Turn set to %d\n", Speed, Turn )
+	}
+}

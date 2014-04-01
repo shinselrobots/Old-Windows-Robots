@@ -392,6 +392,9 @@
     <ClCompile Include="..\Common\SensorModuleLoki.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Common\DriveAvoidanceModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Loki.rc">

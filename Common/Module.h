@@ -167,13 +167,12 @@ const int  IRDistanceTable[] =
 
 const int  DistanceTable_IRWideAngle[] = 
 //  0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  19  20  21  22  23  24    // Inches
-{ 156,156,128,108, 89, 76, 69, 61, 55, 52, 47, 44, 41, 38, 35, 34, 32, 31, 29, 28, 27, 26, 25, 24, 23}; // Reading
+{ 156,156,128,108, 89, 76, 69, 61, 55, 52, 47, 44, 41, 38, 35, 34, 32, 31, 29, 28, 27, 26, 25, 24, 23 }; // Reading
 
 // Less then 31 not reliable - may go up when farther away!
 // if value read between 18 and 30, something there just not sure how far away it is
 // however, relative values seem to be ok, so should still work for finding way down hallway
 // need to test this!
-
 
 // LD 160,137, 96, 82, 74, 68, 60, 56, 51, 48, 45, 43, 41, 39, 37, 35, 		// Reading
 // 16  17  18  19  20  21  22  23  24 		// Inches
@@ -402,6 +401,8 @@ public:
 
 	int 	ScaleIR( int  nReading );
 	int 	ScaleWideIR( int  nReading );
+	int 	ScaleWideIRKobuki( int  nReading );
+	int 	ScaleLongRangeIRKobuki( int  nReading, int Compensation = 0 );	
 	int 	ScaleLongRangeIR( int  nReading, int Compensation = 0 );
 	int 	ScaleSRF04UltraSonic( int  nReading );
 	int 	ScaleMaxEZ1UltraSonic( int  nReading );
@@ -414,6 +415,7 @@ public:
 	int 	ReadElbowSensorsLeft();
 	int 	ReadElbowSensorsRight();
 	void	DoSensorFusion();
+	void	FuseLaserAndKinectData();
 	void	UpdateOdometer();
 
 	#if SENSOR_CONFIG_TYPE == SENSOR_CONFIG_LOKI
@@ -511,7 +513,7 @@ protected:
 	CDriveControlModule	   *m_pDriveCtrl;
 	int						m_CurrentSpeed;
 	int						m_CurrentTurn;
-	BOOL					m_UserOwnerRequested;
+	//BOOL					m_UserOwnerRequested;
 	BOOL					m_AndroidHasMotorControl; // for Android phone contol of motors
 	BOOL					m_VidCapProcessingEnabled;
 	BOOL					m_IRTrackingEnabled;
@@ -523,7 +525,7 @@ protected:
 	LPCTSTR				 m_pSharedMemory;		// Shared memory for communicating with the Camera App
 	HANDLE				 m_hCameraRequestEvent;	// Event for communicating with the Camera App
 	CAMERA_REQUEST_T	 m_CameraRequest;
-	UINT				 m_UserOwner;			// switches between LOCAL_USER_MODULE or REMOTE_USER_MODULE if needed.
+	//UINT				 m_UserOwner;			// switches between LOCAL_USER_MODULE or REMOTE_USER_MODULE if needed.
 
 
 
@@ -863,6 +865,9 @@ protected:
 
 
 /////////////////////////////////////////////////////////////////////////////
+#define OCCUPANCY_GRID_RESOLUTION		60 // tenth inches
+#define OCCUPANCY_GRID_SIZE			LASER_RANGEFINDER_TENTH_INCHES_MAX / OCCUPANCY_GRID_RESOLUTION
+
 class CAvoidObjectModule : public CRobotModule
 {
 
@@ -874,6 +879,11 @@ public:
 	BOOL					 DetectAndHandleCliff( int &Turn, int &Speed );
 	void					 CheckArmSafePosition();
 	BOOL					 DetectAndHandleDoorway( int &DoorwayWidth, int &DoorwayCenter);
+	int						 FindDoors( int nSamples, int nMaxDoorways, POINT2D_T *pPointArray, DOORWAY_T *pDoorWaysFound );
+	void					 HandleKinectPosition();
+	BOOL					 BuildWeightedOccupancyGrid();
+	int						 RecommendClearestDirection();
+
 #if ( ROBOT_SERVER == 1 )	// This module used for Robot Server only
 	KinectServoControl		*m_pKinectServoControl;
 #endif
@@ -887,6 +897,9 @@ protected:
 	int			m_LastObjectDirection;
 	BOOL		m_ArmsInSafePosition;
 	BOOL		m_KinectInObjectSpottingPosition;
+	BOOL		m_WaitingToMoveKinect;
+	int			m_OccupancyGrid[OCCUPANCY_GRID_SIZE][OCCUPANCY_GRID_SIZE];
+
 
 #if ( ROBOT_SERVER == 1 )
 

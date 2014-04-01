@@ -36,6 +36,10 @@ protected:
 //	int			m_SpeedSetByKeyboard;
 //	int			m_LastSpeedSetByKeyboard;
 
+//	BOOL		 m_LocalUser;		
+	int			 m_nCurrentSpeed;	// keep track of speed and turn for commands
+	int			 m_nCurrentTurn;
+
 
 
 // Operations
@@ -55,6 +59,7 @@ public:
 	virtual void OnUpdate(CView* pSender, LPARAM lHint, CObject* pHint);
 	virtual void OnPrint(CDC* pDC, CPrintInfo* pInfo);
 	//}}AFX_VIRTUAL
+
 
 // Implementation
 public:
@@ -80,6 +85,7 @@ public:
 
 	bool	AddPage( int Direction );
 	CSize	GetMCZoomedMapSize();
+	void	SendDriveCommand( int Speed, int Turn );
 
 	virtual ~CMapView();
 #ifdef _DEBUG

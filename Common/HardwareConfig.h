@@ -318,43 +318,42 @@
 	#define FOREARM_IR_TO_FINGER_TIP_TENTH_INCHES_R				102.5	// Tenth_Inches
 #endif
 
-	#define GRID_MAP_AVOID_OBJECT_DISTANCE						  60	// Tenth_Inches - Avoid objects closer then this distance to the robot
+	const int GRID_MAP_AVOID_OBJECT_DISTANCE =					  60;	// Tenth_Inches - Avoid objects closer then this distance to the robot
 
 
-	#define DISTANCE_BETWEEN_WHEELS_TENTH_INCHES 142.0	// 14.0 inches -Used for calculating amount of turn based upon difference in wheel odometers
+	const int DISTANCE_BETWEEN_WHEELS_TENTH_INCHES =			142;	// 14.0 inches -Used for calculating amount of turn based upon difference in wheel odometers
 
-	#define ROBOT_BODY_SENSOR_RADIUS_TENTH_INCHES		75.0	// Sensor is 7.5 inches from center of robot body
-	#define ROBOT_BODY_DRAW_RADIUS_TENTH_INCHES			75.0	// Size of robot to draw on the map
-	#define ROBOT_BODY_WIDTH_TENTH_INCHES				140		// Width of robot main body - Kobuki
-	#define ROBOT_BODY_LENGTH_TENTH_INCHES				140		// Length of robot main body
-	#define ROBOT_ARM_WIDTH_TENTH_INCHES				0.5		// Amount that each Arm sticks out from the sides of the robot main body
-	#define ROBOT_BODY_WITH_ARMS_WIDTH_TENTH_INCHES		(ROBOT_BODY_WIDTH_TENTH_INCHES + (ROBOT_ARM_WIDTH_TENTH_INCHES * 2))	// Size of robot, for calculating if it can fit between objects!
+	const int ROBOT_BODY_SENSOR_RADIUS_TENTH_INCHES	=			 75;	// Sensor is 7.5 inches from center of robot body
+	const int ROBOT_BODY_DRAW_RADIUS_TENTH_INCHES =				 75;	// Size of robot to draw on the map
+	const int ROBOT_BODY_WIDTH_TENTH_INCHES	=					140;	// Width of robot main body - Kobuki
+	const int ROBOT_BODY_LENGTH_TENTH_INCHES =					140;	// Length of robot main body
+	const int ROBOT_ARM_WIDTH_TENTH_INCHES =					10;		// Amount that each Arm sticks out from the sides of the robot main body
+	const int ROBOT_BODY_WITH_ARMS_WIDTH_TENTH_INCHES =			(ROBOT_BODY_WIDTH_TENTH_INCHES + (ROBOT_ARM_WIDTH_TENTH_INCHES * 2));	// Size of robot, for calculating if it can fit between objects!
 
-	#define HALF_ROBOT_BODY_WIDTH_TENTH_INCHES				(ROBOT_BODY_WIDTH_TENTH_INCHES/2)
-	#define HALF_ROBOT_BODY_LENGTH_TENTH_INCHES				(ROBOT_BODY_LENGTH_TENTH_INCHES/2)
-	#define HALF_ROBOT_BODY_WITH_ARMS_WIDTH_TENTH_INCHES	(HALF_ROBOT_BODY_WIDTH_TENTH_INCHES + ROBOT_ARM_WIDTH_TENTH_INCHES)
-	#define HALF_ROBOT_CLAW_WIDTH_TENTH_INCHES				20
+	const int HALF_ROBOT_BODY_WIDTH_TENTH_INCHES =				(ROBOT_BODY_WIDTH_TENTH_INCHES/2);
+	const int HALF_ROBOT_BODY_LENGTH_TENTH_INCHES =				(ROBOT_BODY_LENGTH_TENTH_INCHES/2);
+	const int HALF_ROBOT_BODY_WITH_ARMS_WIDTH_TENTH_INCHES =	(HALF_ROBOT_BODY_WIDTH_TENTH_INCHES + ROBOT_ARM_WIDTH_TENTH_INCHES);
+	const int HALF_ROBOT_CLAW_WIDTH_TENTH_INCHES =				20;
 
 	// Sensor Zones for object avoidance
-	#define FRONT_ZONE_THREAT_MIN_THRESHOLD		 120	// Tenth_Inches - Always avoid objects closer then this on the front
-	#define ARM_ZONE_THREAT_MIN_THRESHOLD		  30	// Tenth_Inches - Always avoid objects closer then this on the front
-	#define SIDE_THREAT_MIN_THRESHOLD			  40	// Tenth_Inches - avoid objects closer then this on the side
-	#define SIDE_THREAT_NORM_THRESHOLD			 100	// Tenth_Inches - avoid objects closer then this on the side
-	#define THREAT_PERSISTANCE_TIME				 50	// (1/10 sec) - how long to persist until allowing wider side avoidance behavior
+	const int FRONT_ZONE_THREAT_MIN_THRESHOLD =					120;	// Tenth_Inches - Always avoid objects closer then this on the front
+	const int ARM_ZONE_THREAT_MIN_THRESHOLD	=					 30;	// Tenth_Inches - Always avoid objects closer then this on the front
+	const int SIDE_THREAT_MIN_THRESHOLD	=						 40;	// Tenth_Inches - avoid objects closer then this on the side
+	const int SIDE_THREAT_NORM_THRESHOLD =						100;	// Tenth_Inches - avoid objects closer then this on the side
+	const int THREAT_PERSISTANCE_TIME =							 50;	// (1/10 sec) - how long to persist until allowing wider side avoidance behavior
 
-	#define THREAT_PERSISTANCE_TIME				    50		// (1/10 sec) - how long to persist until allowing wider side avoidance behavior
-	#define REAR_THREAT_THRESHOLD				    50		// Tenth_Inches - avoid objects closer then this behind the robot
+	const int REAR_THREAT_THRESHOLD =						     50;	// Tenth_Inches - avoid objects closer then this behind the robot
 
-	#define PROTECT_ARMS_FRONT_THREAT_THRESHOLD	   360		// Tenth_Inches - if object closer than this, raise the robot's arms into a safe position
-	#define PROTECT_ARMS_SIDE_THREAT_THRESHOLD		80		// Tenth_Inches - if object closer than this, raise the robot's arms into a safe position
+	const int PROTECT_ARMS_FRONT_THREAT_THRESHOLD =				360;	// Tenth_Inches - if object closer than this, raise the robot's arms into a safe position
+	const int PROTECT_ARMS_SIDE_THREAT_THRESHOLD =				 80;	// Tenth_Inches - if object closer than this, raise the robot's arms into a safe position
 
 
-	#define FRONT_CENTER_ZONE_EDGE_TENTH_INCHES				HALF_ROBOT_BODY_WIDTH_TENTH_INCHES // 2 zones in front center of robot
-	#define FRONT_ARM_ZONE_EDGE_TENTH_INCHES				(FRONT_CENTER_ZONE_EDGE_TENTH_INCHES+ROBOT_ARM_WIDTH_TENTH_INCHES) // zone in front of each arm
-	#define FRONT_SIDE_ZONE_WIDTH_TENTH_INCHES				90 // look for objects to avoid this far to either side of the robot
-	#define FRONT_SIDE_ZONE_EDGE_TENTH_INCHES				(FRONT_ARM_ZONE_EDGE_TENTH_INCHES+FRONT_SIDE_ZONE_WIDTH_TENTH_INCHES)
+	const int FRONT_CENTER_ZONE_EDGE_TENTH_INCHES =				HALF_ROBOT_BODY_WIDTH_TENTH_INCHES; // 2 zones in front center of robot
+	const int FRONT_ARM_ZONE_EDGE_TENTH_INCHES =				(FRONT_CENTER_ZONE_EDGE_TENTH_INCHES+ROBOT_ARM_WIDTH_TENTH_INCHES); // zone in front of each arm
+	const int FRONT_SIDE_ZONE_WIDTH_TENTH_INCHES =				90; // look for objects to avoid this far to either side of the robot
+	const int FRONT_SIDE_ZONE_EDGE_TENTH_INCHES	=				(FRONT_ARM_ZONE_EDGE_TENTH_INCHES+FRONT_SIDE_ZONE_WIDTH_TENTH_INCHES);
 
-	#define AVOIDANCE_SHARP_TURN_RANGE			  40 // Tenth_Inches - if front object closer then this, turn sharply
+	const int AVOIDANCE_SHARP_TURN_RANGE =					   40; // Tenth_Inches - if front object closer then this, turn sharply
 
 	// Head measurements (for Camera positioning)
 	#define HEAD_IR_OFFSET_FROM_FRONT_TENTH_INCHES	 70	// Distance from Head IR sensors to front of robot

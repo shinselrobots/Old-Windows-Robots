@@ -190,6 +190,7 @@
     <ClCompile Include="..\Common\ChildFrm.cpp" />
     <ClCompile Include="..\Common\ClientSock.cpp" />
     <ClCompile Include="..\Common\DrawDevice.cpp" />
+    <ClCompile Include="..\Common\DriveAvoidanceModule.cpp" />
     <ClCompile Include="..\Common\DriveBehaviorModule.cpp" />
     <ClCompile Include="..\Common\DriveControlModule.cpp" />
     <ClCompile Include="..\Common\DynamixelControl.cpp" />

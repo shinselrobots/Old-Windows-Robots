@@ -14,6 +14,7 @@
 
 #if ( ROBOT_SERVER == 1 )	// These modules used for Robot Server only
 
+#include "HardwareConfig.h"
 #include "headcontrol.h"
 #include "armcontrol.h"
 #include "..\Common\WiiMoteCommon.h"
@@ -133,7 +134,6 @@ __itt_string_handle* psh_Sleep = __itt_string_handle_create("Sleep");
 #endif
 
 
-
 //-----------------------------------------------------------------------------
 
 HWND				g_RobotMainFrameHWND   = NULL;		// Handle to main frame (joystick only)
@@ -152,7 +152,7 @@ BOOL				g_bRunKinectThread = FALSE;			// When FALSE, tells Vidcap thread to exit
 // Global Pause and Power Control - Allows pausing or powering on/off subsystems instantly
 BOOL				g_SleepMode = FALSE;				// Power on by default, unless in lowpower "sleep mode"
 BOOL				g_DynaPowerEnabled = FALSE;
-BOOL				g_KinectPowerEnabled = FALSE;
+BOOL				g_KinectPowerEnabled = TRUE;
 BOOL				g_GlobalPause = FALSE;				// freeze all servos and motors until unpaused
 
 //maker
@@ -391,11 +391,15 @@ HANDLE				g_hCameraCommThread = INVALID_HANDLE_VALUE;
 BOOL				g_DownloadingFirmware = FALSE;
 BOOL				g_PicFirstStatusReceived = FALSE;
 
+BOOL				g_GUILocalUser = FALSE;	// indicate if the GUI is running locally or remote.  Used by Cmd and Map views.
+int					g_GUICurrentSpeed = 0;	//  Keep Cmd and Map views in sync
+int					g_GUICurrentTurn = 0;
+
 int					g_LastKey = 0;		// For manual control in Cmd or Map view
 int					g_SpeedSetByKeyboard = SPEED_FWD_MED_SLOW;
 int					g_LastSpeedSetByKeyboard = SPEED_FWD_MED_SLOW;
-int					g_MotorCurrentSpeedCmd = 0;
-int					g_MotorCurrentTurnCmd = 0;
+//int					g_MotorCurrentSpeedCmd = 0;
+//int					g_MotorCurrentTurnCmd = 0;
 int 				g_GlobalMaxAvoidObjectDetectionFeet = OBJECT_AVOID_DEFAULT_FEET;	// Max range of objects to detect for Avoidance behavior
 int 				g_SegmentAvoidObjectRangeTenthInches = 0xFFFFF;	// Max range for Avoidance behavior, for CURRENT SEGMENT!
 
@@ -595,18 +599,6 @@ DWORD WINAPI TimerThreadProc( LPVOID NotUsed )
 				Delta, minutes, seconds, miliseconds )
 	#endif
 
-			// Get update from the Wii Controller
-			// check every time through the loop (LOOP_TIMES_PER_SECOND) currently 10 times per second
-			{
-				///TAL_SCOPED_TASK_NAMED("WII Ctrl");
-   				// Handle joystick input here, if desired
-				// Replaced by Wii controller instead
-				
-				#if ( ROBOT_SERVER == 1 )
-					//pWiiControl->Update();
-				#endif
-			}
-
 			// One Second Timer
 			if( nOneSecondTimer++ >= (LOOP_TIMES_PER_SECOND) ) // 1 time per second
 			{
@@ -619,6 +611,7 @@ DWORD WINAPI TimerThreadProc( LPVOID NotUsed )
 			}
 
 			// Limit number of motor command messages per second that can be sent from the GUI
+/*** 
 			if( nMotorCmdTimer++ >= (LOOP_TIMES_PER_SECOND/5) ) // Send 5 per second
 			{
 				///TAL_SCOPED_TASK_NAMED("WII Ctrl");
@@ -630,6 +623,7 @@ DWORD WINAPI TimerThreadProc( LPVOID NotUsed )
 				//pWiiControl->Update();
 #endif
 				// Now send update to the Robot Control module
+
 				if( (g_MotorCurrentSpeedCmd != nLastSpeedCmd) ||
 					(g_MotorCurrentTurnCmd != nLastTurnCmd) )
 				{
@@ -640,9 +634,9 @@ DWORD WINAPI TimerThreadProc( LPVOID NotUsed )
 
 					SendCommand( WM_ROBOT_JOYSTICK_DRIVE_CMD, (DWORD)g_MotorCurrentSpeedCmd, (DWORD)g_MotorCurrentTurnCmd );
 				}
-
 				nMotorCmdTimer = 0;
 			}
+***/
 
 	#if ( ROBOT_SERVER == 1 )  ///////////////////////////////////////////////////////////////////
 
@@ -2082,6 +2076,149 @@ BOOL IsKerrServoMoving()
 
 
 //-----------------------------------------------------------------------------
+// Name: FindDoors
+// Desc: Using data from depth finder (Kinect, LaserScanner or other),
+// Find doorways in front of me, so I can shoot for the center of the doorway
+// RETURNS: Number of doorways found, and array of doorway locations
+//-----------------------------------------------------------------------------
+
+// TODO-MUST KLUDGE! remove from Module.cpp!!!!
+const int DOOR_SPOTTING_DISTANCE_TENTH_INCHES	=		480; //360;	// Start looking for doors if object closer than this
+const int DOORWAY_MIN_CLEAR_AREA_DEPTH_TENTH_INCHES	=	250;	// Minimum clear distance beyond the door
+const int DOORWAY_MIN_CLEAR_AREA_WIDTH_TENTH_INCHES	=	(ROBOT_BODY_WITH_ARMS_WIDTH_TENTH_INCHES + 20); // Width of robot plus clearance
+
+int FindDoors( int nSamples, int nMaxDoorways, POINT2D_T *pPointArray, DOORWAY_T *pDoorWaysFound )
+{
+	// just in case another thread happens to check while the function is running (acts as a non-blocking semiphore)
+	g_pNavSensorSummary->nDoorWaysFound = 0; 
+
+	int nDoorwaysFound = 0;
+	if( nSamples <= 0 )
+	{
+		return 0; // No doorways found
+	}
+
+	int X, Y;
+	POINT2D_T RightEdge = {0,0};
+	POINT2D_T LeftEdge = {0,0};
+	int LastX = 0;
+	int LastY = 0;
+	bool DebugFindDoors = false;  // enable this for debug
+
+	//int TargetClearDistance = DOOR_SPOTTING_DISTANCE_TENTH_INCHES + DOORWAY_MIN_CLEAR_AREA_DEPTH_TENTH_INCHES;
+	// int TargetClearDistance = (__max(g_pNavSensorSummary->nRightFrontSideZone, g_pNavSensorSummary->nLeftFrontSideZone) + DOORWAY_MIN_CLEAR_AREA_DEPTH_TENTH_INCHES) ; // tenth inches
+
+	//DOORWAY_T DoorwayFound[MAX_DOORWAYS];	// array of potential multiple doors 
+	for( int i=0; i<nMaxDoorways; i++ )
+	{
+		pDoorWaysFound[i].CenterX = 0;
+		pDoorWaysFound[i].Width = 0;
+		pDoorWaysFound[i].RightEdge.X = 0;
+		pDoorWaysFound[i].RightEdge.Y = 0;
+		pDoorWaysFound[i].LeftEdge.X = 0;
+		pDoorWaysFound[i].LeftEdge.Y = 0;
+	}
+
+	// Track last door edge found (default to first sample, in case door extends off sensor range to the right)
+	// Look for the open path/door from right to left
+	bool FirstValidSampleFound = FALSE;
+	for( int i = 0; i < nSamples; i++ ) 
+	{
+		X = pPointArray[i].X; // tenth inches  // see WallPoints  MapPoints2D
+		Y = pPointArray[i].Y ;
+
+		// Skip any bad values
+		if( (X >= LASER_RANGEFINDER_TENTH_INCHES_ERROR) ||
+			(Y >= LASER_RANGEFINDER_TENTH_INCHES_ERROR) )
+		{
+			continue;
+		}
+
+		// DEBUG ONLY!!!
+		ROBOT_LOG( DebugFindDoors, "DOOR SCAN: x = %d:  y = %d, ", X,Y )
+
+		if( !FirstValidSampleFound )
+		{
+			if( X < LASER_RANGEFINDER_TENTH_INCHES_MAX )
+			{
+				LastX = X;
+				LastY = Y;
+				FirstValidSampleFound = true;
+			}
+			continue;
+		}
+
+		if( 0 == RightEdge.X )
+		{ 
+			// looking for right edge
+			if( LastY < DOOR_SPOTTING_DISTANCE_TENTH_INCHES ) 	// something was in range
+			{
+				if( (Y > LastY+DOORWAY_MIN_CLEAR_AREA_DEPTH_TENTH_INCHES) || // Sudden change in Y distance, at least big enough for robot		
+					( (LastX - X) > 120 )  )  // TenthInches - Sudden change in X, indicates that there is a gap that extends beyond sensor range
+				{	
+					// Found inside of potential door edge! (or may be that the door extends off sensor range to the left)
+					RightEdge.X = LastX;	// Use the last valid data
+					RightEdge.Y = __min(LastY, DOOR_SPOTTING_DISTANCE_TENTH_INCHES); // Use the last valid data
+					ROBOT_LOG( DebugFindDoors, "DOOR SCAN: RIGHT Edge at: x = %d:  y = %d, ", LastX, LastY )
+				}
+			}
+		}
+		else
+		{
+			// Right edge found, looking for Left edge
+			if( Y < RightEdge.Y + DOORWAY_MIN_CLEAR_AREA_DEPTH_TENTH_INCHES )
+			{
+				int DoorwayWidth = RightEdge.X - X;
+				if( (DoorwayWidth >= DOORWAY_MIN_CLEAR_AREA_WIDTH_TENTH_INCHES) &&
+					(DoorwayWidth <= 420) )
+				{
+					// Found it!
+					LeftEdge.X = X;
+					LeftEdge.Y = Y;
+					ROBOT_LOG( DebugFindDoors, "DOOR SCAN: LEFT Edge at: x = %d:  y = %d, ", X, Y )
+
+					// Found a Doorway, so save the results
+					pDoorWaysFound[nDoorwaysFound].Width = RightEdge.X - LeftEdge.X;
+					pDoorWaysFound[nDoorwaysFound].CenterX = RightEdge.X - (DoorwayWidth/2);
+					pDoorWaysFound[nDoorwaysFound].LeftEdge.X = LeftEdge.X;
+					pDoorWaysFound[nDoorwaysFound].LeftEdge.Y = LeftEdge.Y;
+					pDoorWaysFound[nDoorwaysFound].RightEdge.X = RightEdge.X;
+					pDoorWaysFound[nDoorwaysFound].RightEdge.Y = RightEdge.Y;
+
+					ROBOT_LOG( TRUE, "FOUND DOOR: Left = %d, %d  Right = %d, %d  Width = %d  Center = %d", 
+						LeftEdge.X, LeftEdge.Y, RightEdge.X, RightEdge.Y, 
+						pDoorWaysFound[nDoorwaysFound].Width, pDoorWaysFound[nDoorwaysFound].CenterX )
+
+					// clear values to search for next doorway
+					RightEdge.X = 0; LeftEdge.X = 0;
+					RightEdge.Y = 0; LeftEdge.Y = 0;
+
+					if( ++nDoorwaysFound >= nMaxDoorways)
+					{
+						ROBOT_LOG( TRUE, "ERROR!  Too Many Doorways Found!" )
+						break;
+					}
+				}
+				else
+				{
+					// Doorway too narrow, restart search
+					RightEdge.X = 0;
+				}
+			}
+		}
+		LastX = X;
+		LastY = Y;
+
+	}	// for loop
+
+	g_pNavSensorSummary->nDoorWaysFound = nDoorwaysFound; // update for other threads 
+	return nDoorwaysFound;
+}
+
+
+
+
+//-----------------------------------------------------------------------------
 // Name: SpeakText
 // Desc: queues text to speak and signals text to speech thread
 //-----------------------------------------------------------------------------
@@ -2518,6 +2655,18 @@ void NavSensorSummary::InitializeDefaults()
 	nObjectArmRight =				NO_OBJECT_IN_RANGE;	// compensated for distance in front of robot - REMOVE
 	nObjectClawRight =				NO_OBJECT_IN_RANGE;
 	nRightRearZone =				NO_OBJECT_IN_RANGE;
+
+	nDoorWaysFound = 0;			// number of doorways spotted somewhere in front of robot
+	nBestCenterIndex = 0;		// doorway in the array that is closest to front of robot
+	for( int i=0; i<MAX_DOORWAYS; i++ )
+	{
+		DoorWaysFound[i].CenterX = 0;
+		DoorWaysFound[i].Width = 0;
+		DoorWaysFound[i].RightEdge.X = 0;
+		DoorWaysFound[i].RightEdge.Y = 0;
+		DoorWaysFound[i].LeftEdge.X = 0;
+		DoorWaysFound[i].LeftEdge.Y = 0;
+	}
 
 }
 

@@ -830,7 +830,7 @@ int  CSensorModule::ScaleIR(int  nReading )
 // Value returned is TENTH INCHES
 int  CSensorModule::ScaleWideIR(int  nReading )
 {
-	// NOTE!  Larger values are closer objects!  
+	// NOTE!  Larger values are closer objects!
 	// Therefore, PIC_NO_OBJECT_IN_RANGE seems VERY CLOSE!  Trap here! 
 	if( nReading >= PIC_NO_OBJECT_IN_RANGE )
 		return NO_OBJECT_IN_RANGE;
@@ -851,6 +851,7 @@ int  CSensorModule::ScaleWideIR(int  nReading )
 		}
 	}
 	return NO_OBJECT_IN_RANGE;	// No object in sensor range
+
 }
 
 // Sharp GP2Y0A02YK Long Range IR sensor - 5 foot range

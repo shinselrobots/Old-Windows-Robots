@@ -135,7 +135,10 @@ DWORD WINAPI KobukiAppSharedMemoryIPCThreadProc( LPVOID NotUsed )
 		if( KobukiBaseStatus.TimeStamp != LastTimeStamp )
 		{
 			LastTimeStamp = KobukiBaseStatus.TimeStamp;
-
+			if( SUBSYSTEM_CONNECTED != g_MotorSubSystemStatus )
+			{
+				g_MotorSubSystemStatus = SUBSYSTEM_CONNECTED; // on first message from Kobuki, update status dashboard
+			}
 
 			// Now, throw the data 
 
@@ -164,6 +167,15 @@ DWORD WINAPI KobukiAppSharedMemoryIPCThreadProc( LPVOID NotUsed )
 			g_pKobukiStatus->RightCliffA2D =		   KobukiBaseStatus.RightCliffA2D;
 			g_pKobukiStatus->TimeStamp = 			   KobukiBaseStatus.TimeStamp;
 			g_pKobukiStatus->TurnRate =				   KobukiBaseStatus.TurnRate;
+
+
+//			TRACE("\n KOBUKI IR:  ");
+			for( int i=0; i<4; i++ )
+			{
+				g_pKobukiStatus->AnalogPort[i] =		KobukiBaseStatus.AnalogPort[i];
+//				TRACE( "%d=%4d  ", i, g_pKobukiStatus->AnalogPort[i]  );
+			}
+//			TRACE("\n");
 
 			//////////////////////////////////////////////////////////////////////////
 			// Process bit fields

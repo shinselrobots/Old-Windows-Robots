@@ -86,6 +86,9 @@ WiiControl::WiiControl()
 	m_ButtonDownWiiMote_LEFT = FALSE;
 	m_ButtonDownWiiMote_HOME = FALSE;
 
+	m_CurrentSpeed = 0;
+	m_CurrentTurn = 0;
+
 
 	ROBOT_LOG( TRUE,  "Wii Control constructor complete" )
 }
@@ -237,14 +240,17 @@ void WiiControl::Update()
 			}
 
 			ROBOT_LOG( TRUE,  "WiiSpeed = %d, WiiTurn = %d\n", WiiSpeed, WiiTurn)
+			/* No longer needed
 			if( !m_bWiiHasMotorControl )
 			{
 				// Wii does not currently have control, force override
-				SendCommand( WM_ROBOT_SET_USER_PRIORITY, SET_USER_LOCAL, 0 );
+				//SendCommand( WM_ROBOT_SET_USER_PRIORITY, SET_USER_LOCAL, 0 );
 			}
-			g_MotorCurrentSpeedCmd = WiiSpeed;
-			g_MotorCurrentTurnCmd = WiiTurn;
+			*/
+			m_CurrentSpeed = WiiSpeed;
+			m_CurrentTurn = WiiTurn;
 			m_bWiiHasMotorControl = TRUE;
+			SendDriveCommand( m_CurrentSpeed, m_CurrentTurn );
 
 		}	// WiiMote "B"
 		else
@@ -253,9 +259,9 @@ void WiiControl::Update()
 			if( m_bWiiHasMotorControl )
 			{
 				// WiiMote Had control, but now button released. Force a stop
-				g_MotorCurrentSpeedCmd = 0;
-				g_MotorCurrentTurnCmd = 0;
-				SendCommand( WM_ROBOT_SET_USER_PRIORITY, SET_USER_LOCAL_AND_STOP, 0 );
+				m_CurrentSpeed = 0;
+				m_CurrentTurn = 0;
+				SendCommand( WM_ROBOT_STOP_CMD, 0, 0 ); // FORCE STOP, no matter what!
 				m_bWiiHasMotorControl = FALSE;
 			}
 		} // B pressed
@@ -792,6 +798,13 @@ void WiiControl::Update()
 	m_LastButtonState = m_WiiMoteStatus.Buttons;
 	__itt_task_end(pDomainGlobalThread);
 
+}
+
+void WiiControl::SendDriveCommand( int Speed, int Turn )
+{
+	// Wii Control commands are always considered "local" commands, in that the user always has direct control of the robot
+	SendCommand( WM_ROBOT_DRIVE_LOCAL_CMD, (DWORD)Speed, (DWORD)Turn );
+	ROBOT_LOG( TRUE,  "WII CONTROL: Speed set to %d, Turn set to %d\n", Speed, Turn )
 }
 
 #endif // ROBOT_SERVER - This module used for Robot Server only

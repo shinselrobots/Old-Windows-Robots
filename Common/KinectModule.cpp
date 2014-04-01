@@ -393,8 +393,8 @@ DWORD WINAPI KinectDepthThreadProc( LPVOID lpParameter )
 	}
 	for( int i=0; i < KINECT_CAPTURE_SIZE_MAX_X; i++ )
 	{
-		g_KinectPointCloud->WallPoints[i].X = LASER_RANGEFINDER_TENTH_INCHES_MAX;
-		g_KinectPointCloud->WallPoints[i].Y = LASER_RANGEFINDER_TENTH_INCHES_MAX;
+		g_KinectPointCloud->WallPoints[i].X = LASER_RANGEFINDER_TENTH_INCHES_ERROR;
+		g_KinectPointCloud->WallPoints[i].Y = LASER_RANGEFINDER_TENTH_INCHES_ERROR;
 	}
 
 	//LeaveCriticalSection(&g_csKinectPointCloudLock);
@@ -767,9 +767,9 @@ void CKinectModule::GetDepthImage()
 				//ROBOT_LOG( TRUE,"Kinect Read Zero: EnterCriticalSection g_csKinectPointCloudLock\n")
 				//__itt_task_begin(pDomainKinectThread, __itt_null, __itt_null, psh_csKinectPointCloudLock);
 				EnterCriticalSection(&g_csKinectPointCloudLock);
-					g_KinectPointCloud->Point3dArray[y][x].X = KINECT_RANGE_TENTH_INCHES_MAX;
-					g_KinectPointCloud->Point3dArray[y][x].Y = KINECT_RANGE_TENTH_INCHES_MAX;
-					g_KinectPointCloud->Point3dArray[y][x].Z = KINECT_RANGE_TENTH_INCHES_MAX;
+					g_KinectPointCloud->Point3dArray[y][x].X = LASER_RANGEFINDER_TENTH_INCHES_ERROR;
+					g_KinectPointCloud->Point3dArray[y][x].Y = LASER_RANGEFINDER_TENTH_INCHES_ERROR;
+					g_KinectPointCloud->Point3dArray[y][x].Z = LASER_RANGEFINDER_TENTH_INCHES_ERROR;
 				LeaveCriticalSection(&g_csKinectPointCloudLock);
 				//__itt_task_end(pDomainKinectThread);
 				//ROBOT_LOG( TRUE,"Kinect Read Zero: LeaveCriticalSection g_csKinectPointCloudLock\n")
@@ -1578,8 +1578,8 @@ void CKinectModule::FindWallsAnd2dMaps()
 
 	for( int HScan = 0; HScan < m_FrameInfo->Width; HScan++)
 	{
-		g_KinectPointCloud->WallPoints[HScan].X = g_KinectPointCloud->WallPoints[HScan].Y = LASER_RANGEFINDER_TENTH_INCHES_MAX; // infinate range
-		g_KinectPointCloud->MapPoints2D[HScan].X = g_KinectPointCloud->MapPoints2D[HScan].Y = LASER_RANGEFINDER_TENTH_INCHES_MAX;
+		g_KinectPointCloud->WallPoints[HScan].X = g_KinectPointCloud->WallPoints[HScan].Y = LASER_RANGEFINDER_TENTH_INCHES_ERROR; // infinate range
+		g_KinectPointCloud->MapPoints2D[HScan].X = g_KinectPointCloud->MapPoints2D[HScan].Y = LASER_RANGEFINDER_TENTH_INCHES_ERROR;
 
 //		ROBOT_LOG( TRUE,"FindWallsAnd2dMaps: HScan = %d\n", HScan)
 //		if( HScan > 162 )
@@ -1683,12 +1683,15 @@ void CKinectModule::FindWallsAnd2dMaps()
 		if( LeadingEdgeFound )
 		{
 			// MapPoints contains any blocking object 
-			g_KinectPointCloud->MapPoints2D[HScan].X = g_KinectPointCloud->Point3dArray[LeadPos][HScan].X;
-			g_KinectPointCloud->MapPoints2D[HScan].Y = LeadingEdgeY;
-			//g_KinectPointCloud->MapPoints2D[HScan].Z = ObjPeakHeight - FloorValue;
-			//if( (g_KinectPointCloud->MapPoints2D[HScan].X > -60) && (g_KinectPointCloud->MapPoints2D[HScan].X < 60) )
-			//	TRACE(" Y=%d, X=%d, PeakHeight=%d\n",  g_KinectPointCloud->MapPoints2D[HScan].X, g_KinectPointCloud->MapPoints2D[HScan].Y, ObjPeakHeight );
-
+			int detectHeight = 20;
+			if( LeadingEdgeY >  detectHeight ) // cut out some noise MAP_OBJECT_DETECT_HEIGHT_TENTH_INCHES
+			{
+				g_KinectPointCloud->MapPoints2D[HScan].X = g_KinectPointCloud->Point3dArray[LeadPos][HScan].X;
+				g_KinectPointCloud->MapPoints2D[HScan].Y = LeadingEdgeY;
+				//g_KinectPointCloud->MapPoints2D[HScan].Z = ObjPeakHeight - FloorValue;
+				//if( (g_KinectPointCloud->MapPoints2D[HScan].X > -60) && (g_KinectPointCloud->MapPoints2D[HScan].X < 60) )
+				//	TRACE(" Y=%d, X=%d, PeakHeight=%d\n",  g_KinectPointCloud->MapPoints2D[HScan].X, g_KinectPointCloud->MapPoints2D[HScan].Y, ObjPeakHeight );
+			}
 
 			if( FloorValue < KINECT_TRIGGER_WALL_OBJECT_HEIGHT_TENTH_INCHES )
 			{
@@ -1712,13 +1715,21 @@ void CKinectModule::FindWallsAnd2dMaps()
 	//__itt_task_end(pDomainKinectThread);
 	//ROBOT_LOG( TRUE,"FindWallsAnd2dMaps: Kinect LeaveCriticalSection g_csKinectPointCloudLock\n")
 
+	// Now, look for Doorways -used by Avoidance Module, and displayed in the GUI
+	// (Avoidance module does not alway run, but useful to see this in the GUI anyway)
 
-		// Now throw message in the queue, to indicate that the Kinect 2D Map data has been updated
-		//TODO!	PostThreadMessage( g_dwControlThreadId, (WM_ROBOT_GPS_DATA_READY), 0, 0 );
-		// Post message to the GUI display (local or remote)
-		SendResponse( WM_ROBOT_DISPLAY_SINGLE_ITEM,	// command
-			ROBOT_RESPONSE_KINECT_DATA,				// Param1 = Bulk data command
-			0 );									// Param2 = not used
+	int NumberOfKinectSamples = g_KinectPointCloud->FrameSizeX; 
+	//int nMaxDoorways = MAX_DOORWAYS;
+//	DOORWAY_T  *DoorWaysFound[MAX_DOORWAYS];	
+//	POINT2D_T *pPointArray = g_KinectPointCloud->WallPoints;
+	FindDoors( NumberOfKinectSamples, MAX_DOORWAYS, g_KinectPointCloud->MapPoints2D, g_pNavSensorSummary->DoorWaysFound );
+
+	// Now throw message in the queue, to indicate that the Kinect 2D Map data has been updated
+	//TODO!	PostThreadMessage( g_dwControlThreadId, (WM_ROBOT_GPS_DATA_READY), 0, 0 );
+	// Post message to the GUI display (local or remote)
+	SendResponse( WM_ROBOT_DISPLAY_SINGLE_ITEM,	// command
+		ROBOT_RESPONSE_KINECT_DATA,				// Param1 = Bulk data command
+		0 );									// Param2 = not used
 
 //	LeaveCriticalSection(&g_csKinectPointCloudLock);
 //	__itt_task_end(pDomainKinectThread);
@@ -1853,8 +1864,9 @@ void CKinectModule::FindObjectsInSingleScanLine( int  ScanLine, int NumberOfSamp
 #define RIGHT_SAMPLES_TO_AVE					   2
 //#define GAP_SIZE								   5	// Pixels!  For Kinect 320 / ~16" = 20 pixels/inch
 #define GAP_SIZE								  10	// Pixels!  For Kinect this is 640 / ~16" = 40 pixels/inch
-#define OBJECT_DETECT_HEIGHT_TENTH_INCHES		   9
-#define OBJECT_DETECT_WIDTH_TENTH_INCHES		   5	// min width to capture an object in the scan line
+#define OBJECT_DETECT_HEIGHT_TENTH_INCHES		   9	// (TenthInches)
+#define OBJECT_DETECT_WIDTH_TENTH_INCHES		   5	// min width to capture an object in the scan line(TenthInches)
+#define MAP_OBJECT_DETECT_HEIGHT_TENTH_INCHES	  20	// objects taller than this show up on the map (TenthInches)
 
 //ROBOT_LOG( TRUE,"ScanLine %d - FindObjectsInSingleScanLine() \n", ScanLine )
 

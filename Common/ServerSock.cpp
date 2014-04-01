@@ -432,7 +432,7 @@ DWORD WINAPI ServerSockReceiveThreadProc( LPVOID lpParameter )
 			// TODO?: closesocket(sockListen);
 
 			// Send stop command to the Arduino.
-			PostThreadMessage( g_dwControlThreadId, WM_ROBOT_JOYSTICK_DRIVE_CMD, 0, 0 );	// Stop
+			PostThreadMessage( g_dwControlThreadId, WM_ROBOT_STOP_CMD, 0, 0 );	// Stop
 		}
 		g_bConnectedToClient = FALSE;
 	}

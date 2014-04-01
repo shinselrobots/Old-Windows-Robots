@@ -37,9 +37,9 @@
 #define UNSUPPRESS							0x01
 
 // Parameter for WM_ROBOT_SET_USER_PRIORITY
-#define SET_USER_REMOTE					0x01
-#define SET_USER_LOCAL					0x02
-#define SET_USER_LOCAL_AND_STOP			0x03
+//#define SET_USER_REMOTE					0x01
+//#define SET_USER_LOCAL					0x02
+//#define SET_USER_LOCAL_AND_STOP			0x03
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -50,10 +50,11 @@ enum WM_ROBOT_MESSAGES {
 		WM_ROBOT_MESSAGE_BASE = WM_APP,				// Start at App Base message
 		WM_ROBOT_REQUEST_STATUS_CMD,				// WM_ROBOT_MESSAGE_BASE + 0x01	// Usually Sent directly to HW thread, except simulation
 		WM_ROBOT_REQUEST_VERSION_CMD,				// Request version from Arduino
-		WM_ROBOT_JOYSTICK_DRIVE_CMD,
+		//WM_ROBOT_JOYSTICK_DRIVE_CMD,				// wParam = Owner, lParam: HiWord, LowWord = speed, turn
+		WM_ROBOT_STOP_CMD,							// Will force a stop. Use WM_ROBOT_JOYSTICK_DRIVE_CMD with speed zero unless strong stop needed?
 		WM_ROBOT_DRIVE_LOCAL_CMD,					// FUTURE: User has local, direct control of the robot, 
 		WM_ROBOT_DRIVE_REMOTE_CMD,					// FUTURE: or is remote (can't see robot directly)
-		WM_ROBOT_SET_USER_PRIORITY,					// Override command for User control of the robot (PANIC stop)
+		//WM_ROBOT_SET_USER_PRIORITY,					// Override command for User control of the robot (PANIC stop)
 		WM_ROBOT_GET_SERVO_STATUS,				
 
 		// HW Responses
@@ -63,8 +64,8 @@ enum WM_ROBOT_MESSAGES {
 		WM_ROBOT_ER1_ODOMETER_READY,				
 		WM_ROBOT_SERVO_STATUS_READY,				
 
-		WM_ROBOT_MOVE_SET_DISTANCE_CMD,				// wParam = distance in tenth inches, lParam = direction
-		WM_ROBOT_TURN_SET_DISTANCE_CMD,				// wParam = distance in degrees, lParam = Direction and speed
+		WM_ROBOT_MOVE_SET_DISTANCE_CMD,				// REMOTE_USER_MODULE is always used as owner! wParam = distance in tenth inches, lParam = direction
+		WM_ROBOT_TURN_SET_DISTANCE_CMD,				// REMOTE_USER_MODULE is always used as owner! wParam = distance in degrees, lParam = Direction and speed
 		WM_ROBOT_RESET_WATCHDOG_CMD,			
 		WM_ROBOT_SERVO_POWER_CMD,				
 		WM_ROBOT_CLIENT_KEEP_ALIVE_CMD,		

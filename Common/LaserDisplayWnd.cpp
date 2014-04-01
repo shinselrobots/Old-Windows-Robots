@@ -15,11 +15,6 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 
-// KLUDGE! copied from Module.cpp!!!!
-#define DOOR_SPOTTING_DISTANCE_TENTH_INCHES				480
-#define DOORWAY_MIN_CLEAR_AREA_DEPTH_TENTH_INCHES		300
-#define DOORWAY_MIN_CLEAR_AREA_WIDTH_TENTH_INCHES		230	// 23 inches.  Robot is 22 inches wide, including arms!
-
 
 /////////////////////////////////////////////////////////////////////////////
 // CLaserDisplayWnd
@@ -335,7 +330,7 @@ void CLaserDisplayWnd::OnPaint()
 
 
 	// nRightSideZone
-	ZoneRect.left =    graphRect.left +   (int)(XScale * (XCenter+HALF_ROBOT_BODY_WIDTH_TENTH_INCHES));		
+	ZoneRect.left =    graphRect.left +   (int)(XScale * (XCenter+HALF_ROBOT_BODY_WIDTH_TENTH_INCHES+ROBOT_ARM_WIDTH_TENTH_INCHES));		
 	ZoneRect.right =   ZoneRect.left +   (int)(XScale * (FRONT_SIDE_ZONE_WIDTH_TENTH_INCHES)); // TODO!!!
 	ZoneRect.top =    (graphRect.bottom) - (int)(YScale * (Y_NEGATIVE_TENTH_INCHES-2));	
 	ZoneRect.bottom = graphRect.bottom;
@@ -346,8 +341,8 @@ void CLaserDisplayWnd::OnPaint()
 	dc.LineTo( ZoneX, (graphRect.bottom - (int)(YScale * 10)) );
 
 	// nLeftSideZone
-	ZoneRect.right =   graphRect.left +   (int)(XScale * (XCenter - HALF_ROBOT_BODY_WIDTH_TENTH_INCHES));		
-	ZoneRect.left =    ZoneRect.right -   (int)(XScale * (FRONT_SIDE_ZONE_WIDTH_TENTH_INCHES)); // TODO!!!
+	ZoneRect.right =   graphRect.left +   (int)(XScale * (XCenter - (HALF_ROBOT_BODY_WIDTH_TENTH_INCHES+ROBOT_ARM_WIDTH_TENTH_INCHES)));		
+	ZoneRect.left =    ZoneRect.right -   (int)(XScale * (FRONT_SIDE_ZONE_WIDTH_TENTH_INCHES));
 	ZoneRect.top =    (graphRect.bottom) - (int)(YScale * (Y_NEGATIVE_TENTH_INCHES-2));	
 	ZoneRect.bottom = graphRect.bottom;
 	dc.FrameRect( ZoneRect, &m_ZoneOutlineBrush );
@@ -384,16 +379,16 @@ void CLaserDisplayWnd::OnPaint()
 	// LASER
 	////////////////////////////////////////////////////////////////////
 	CPen *pOldPen = dc.SelectObject( &m_graphPen );
-	int  NumberOfSamples = 0;
+	int  NumberOfLaserSamples = 0;
 
-	NumberOfSamples = g_pLaserScannerData->NumberOfSamples;
+	NumberOfLaserSamples = g_pLaserScannerData->NumberOfSamples;
 /**
 	// Show Phantom lines, connecting all known objects
-	if( 0 != NumberOfSamples )
+	if( 0 != NumberOfLaserSamples )
 	{
 		double XData, YData;
 
-		for( i = 0; i < (int)NumberOfSamples; i++ ) 
+		for( i = 0; i < (int)NumberOfLaserSamples; i++ ) 
 		{
 			XData = g_pLaserScannerData->ScanPoints[i].X ; // tenth inches
 			YData = g_pLaserScannerData->ScanPoints[i].Y ;
@@ -414,7 +409,7 @@ void CLaserDisplayWnd::OnPaint()
 			}
 		}
 
-	} // if( 0 != NumberOfSamples )
+	} // if( 0 != NumberOfLaserSamples )
 **/
 
 	////////////////////////////////////////////////////////////////////
@@ -422,10 +417,10 @@ void CLaserDisplayWnd::OnPaint()
 	////////////////////////////////////////////////////////////////////
 	dc.SelectObject( &m_XYPen );
 
-	if( 0 != NumberOfSamples )
+	if( 0 != NumberOfLaserSamples )
 	{
 		double XData, YData;
-		for( i = 0; i < (int)NumberOfSamples; i++ ) 
+		for( i = 0; i < (int)NumberOfLaserSamples; i++ ) 
 		{
 			XData = g_pLaserScannerData->ScanPoints[i].X ; // tenth inches
 			YData = g_pLaserScannerData->ScanPoints[i].Y ;
@@ -440,11 +435,11 @@ void CLaserDisplayWnd::OnPaint()
 			dc.LineTo( graphRect.left + (int)(XScale * XData) + 1, (graphRect.bottom) - (int)(YScale * (YData+Y_NEGATIVE_TENTH_INCHES)) );
 		}
 
-	} // if( 0 != NumberOfSamples )
+	} // if( 0 != NumberOfLaserSamples )
 
 
 	////////////////////////////////////////////////////////////////////
-	// KINECT 2D Values
+	// Draw KINECT 2D X,Y values
 	////////////////////////////////////////////////////////////////////
 	dc.SelectObject( &m_KinectXYPen );
 
@@ -476,31 +471,27 @@ void CLaserDisplayWnd::OnPaint()
 	// Draw Doorways
 	////////////////////////////////////////////////////////////////////
 
+//	const int MAX_DOORWAYS = 5;
+
+
 	dc.SelectObject( &m_DoorwayPen );
 
-	if( 0 != NumberOfSamples )
+/***
+	if( 0 != NumberOfLaserSamples )
 	{
-		// Laser Range Finder
+		//////////////////// LASER //////////////////////
+		// Laser Scanner installed and working, so use it!
 
 		// for laser finder, highest granular increment should be: .36 degrees?360°/1024?
 		// ASSUMES 180 degrees!  Need to change to 240 degree?
-//		double DegreeIncrement = (double)180 / (double)NumberOfSamples;	// step angle of each sample
-//		double Degree;
-		//double Distance;
 		int XData, YData;
-//		double Radians;
-//		int ValueX;
-//		int ValueY;
-		int RightEdgeX = 0;
-		int LeftEdgeX = 0;
-		int RightEdgeY = 0;
-		int LeftEdgeY = 0;
+		POINT2D_T RightEdge = {0,0};
+		POINT2D_T LeftEdge = {0,0};
 		int LastX = 0;
 		int LastY = 0;
-
 		int TargetClearDistance = (__max(g_pNavSensorSummary->nRightFrontSideZone, g_pNavSensorSummary->nLeftFrontSideZone) + DOORWAY_MIN_CLEAR_AREA_DEPTH_TENTH_INCHES) ; // tenth inches
 		
-		for( i = 0; i < (int)NumberOfSamples; i++ ) 
+		for( i = 0; i < (int)NumberOfLaserSamples; i++ ) 
 		{
 			XData = g_pLaserScannerData->ScanPoints[i].X ; // tenth inches
 			YData = g_pLaserScannerData->ScanPoints[i].Y ;
@@ -509,14 +500,14 @@ void CLaserDisplayWnd::OnPaint()
 				(XData >= -(HALF_ROBOT_BODY_WITH_ARMS_WIDTH_TENTH_INCHES+FRONT_SIDE_ZONE_WIDTH_TENTH_INCHES)) )
 			{
 				// point is inside RightFrontSideZone to LeftFrontSideZone
-				if( 0 == RightEdgeX )
+				if( 0 == RightEdge.X )
 				{ 
 					// looking for right edge
 					if( YData >= TargetClearDistance )
 					{
 						// Found inside of door edge!
-						RightEdgeX = LastX;	// Use the last valid data
-						RightEdgeY = LastY;
+						RightEdge.X = LastX;	// Use the last valid data
+						RightEdge.Y = LastY;
 					}
 				}
 				else
@@ -524,32 +515,33 @@ void CLaserDisplayWnd::OnPaint()
 					// Right edge found, looking for left edge
 					if( YData < TargetClearDistance )
 					{
-						if( (RightEdgeX - XData) >= (DOORWAY_MIN_CLEAR_AREA_WIDTH_TENTH_INCHES) )
+						if( (RightEdge.X - XData) >= DOORWAY_MIN_CLEAR_AREA_WIDTH_TENTH_INCHES )
 						{
 							// Found it!
-							LeftEdgeX = XData;
-							LeftEdgeY = YData;
+							LeftEdge.X = XData;
+							LeftEdge.Y = YData;
 
 							// Draw where we think the door is!
 
 							// Draw Left Door Frame
-							dc.MoveTo( graphRect.left + (int)(XScale * (XCenter + LeftEdgeX)) + 1, (graphRect.bottom) - (int)(YScale * (LeftEdgeY + Y_NEGATIVE_TENTH_INCHES)) - 5 ); 
-							dc.LineTo( graphRect.left + (int)(XScale * (XCenter + LeftEdgeX)) + 1, (graphRect.bottom) - (int)(YScale * (LeftEdgeY + Y_NEGATIVE_TENTH_INCHES)) + 5 );
+							dc.MoveTo( graphRect.left + (int)(XScale * (XCenter + LeftEdge.X)) + 1, (graphRect.bottom) - (int)(YScale * (LeftEdge.Y + Y_NEGATIVE_TENTH_INCHES)) - 5 ); 
+							dc.LineTo( graphRect.left + (int)(XScale * (XCenter + LeftEdge.X)) + 1, (graphRect.bottom) - (int)(YScale * (LeftEdge.Y + Y_NEGATIVE_TENTH_INCHES)) + 5 );
 
 							// Draw line connecting the two door frames
-							dc.MoveTo( graphRect.left + (int)(XScale * (XCenter + LeftEdgeX)) + 1, (graphRect.bottom) -  (int)(YScale * (LeftEdgeY  + Y_NEGATIVE_TENTH_INCHES))  ); 
-							dc.LineTo( graphRect.left + (int)(XScale * (XCenter + RightEdgeX)) + 1, (graphRect.bottom) - (int)(YScale * (RightEdgeY + Y_NEGATIVE_TENTH_INCHES)) );	// Connect to Right Door Frame
+							dc.MoveTo( graphRect.left + (int)(XScale * (XCenter + LeftEdge.X)) + 1, (graphRect.bottom) -  (int)(YScale * (LeftEdge.Y  + Y_NEGATIVE_TENTH_INCHES))  ); 
+							dc.LineTo( graphRect.left + (int)(XScale * (XCenter + RightEdge.X)) + 1, (graphRect.bottom) - (int)(YScale * (RightEdge.Y + Y_NEGATIVE_TENTH_INCHES)) );	// Connect to Right Door Frame
 
 							// Draw Right Door Frame
-							dc.MoveTo( graphRect.left + (int)(XScale * (XCenter + RightEdgeX)) + 1, (graphRect.bottom) - (int)(YScale * (RightEdgeY + Y_NEGATIVE_TENTH_INCHES)) - 5 ); // Draw Right Door Frame
-							dc.LineTo( graphRect.left + (int)(XScale * (XCenter + RightEdgeX)) + 1, (graphRect.bottom) - (int)(YScale * (RightEdgeY + Y_NEGATIVE_TENTH_INCHES)) + 5 );
+							dc.MoveTo( graphRect.left + (int)(XScale * (XCenter + RightEdge.X)) + 1, (graphRect.bottom) - (int)(YScale * (RightEdge.Y + Y_NEGATIVE_TENTH_INCHES)) - 5 ); // Draw Right Door Frame
+							dc.LineTo( graphRect.left + (int)(XScale * (XCenter + RightEdge.X)) + 1, (graphRect.bottom) - (int)(YScale * (RightEdge.Y + Y_NEGATIVE_TENTH_INCHES)) + 5 );
+
 
 							break;
 						}
 						else
 						{
 							// too narrow, restart search
-							RightEdgeX = 0;
+							RightEdge.X = 0;
 						}
 					}
 					else
@@ -562,7 +554,191 @@ void CLaserDisplayWnd::OnPaint()
 				LastY = YData;
 			}
 		}
-	} // if( 0 != NumberOfSamples )
+	} // if( 0 != NumberOfLaserSamples )
+	else
+	{
+
+****/
+
+		//////////////////// KINECT //////////////////////
+		// No Laser, draw Kinect door detection
+
+		// DEBUG ONLY!
+		//ROBOT_LOG( TRUE, "\n\nKINECT DOOR SCAN: ========================================================== \n\n" )
+
+		//int NumberOfKinectSamples = g_KinectPointCloud->FrameSizeX;
+		//int nMaxDoorways = MAX_DOORWAYS;
+		//DOORWAY_T  DoorWaysFound[MAX_DOORWAYS];	// array of potential multiple doors
+		//POINT2D_T *pPointArray = g_KinectPointCloud->WallPoints;
+
+		//int nDoorwaysFound = FindDoors( NumberOfKinectSamples, nMaxDoorways, pPointArray, DoorWaysFound );
+
+
+		for( int i=0; i < g_pNavSensorSummary->nDoorWaysFound; i++ )
+		{
+			// Draw where we think the door is
+			ROBOT_LOG( TRUE, "Doorway %d:  Center = %d, Width = %d", 
+				i, g_pNavSensorSummary->DoorWaysFound[i].CenterX, g_pNavSensorSummary->DoorWaysFound[i].Width )
+
+			// Draw Left Door Frame
+			dc.MoveTo( graphRect.left + (int)(XScale * (XCenter +  g_pNavSensorSummary->DoorWaysFound[i].LeftEdge.X )) + 1, 
+					(graphRect.bottom) - (int)(YScale * (g_pNavSensorSummary->DoorWaysFound[i].LeftEdge.Y + Y_NEGATIVE_TENTH_INCHES)) - 5 ); 
+
+			dc.LineTo( graphRect.left + (int)(XScale * (XCenter + g_pNavSensorSummary->DoorWaysFound[i].LeftEdge.X)) + 1,
+				(graphRect.bottom) - (int)(YScale * (g_pNavSensorSummary->DoorWaysFound[i].LeftEdge.Y + Y_NEGATIVE_TENTH_INCHES)) + 5 );
+
+			// Draw line connecting the two door frames
+			dc.MoveTo( graphRect.left + (int)(XScale * (XCenter + g_pNavSensorSummary->DoorWaysFound[i].LeftEdge.X)) + 1, 
+				(graphRect.bottom) -  (int)(YScale * (g_pNavSensorSummary->DoorWaysFound[i].LeftEdge.Y  + Y_NEGATIVE_TENTH_INCHES))  );
+
+			dc.LineTo( graphRect.left + (int)(XScale * (XCenter + g_pNavSensorSummary->DoorWaysFound[i].RightEdge.X)) + 1, 
+				(graphRect.bottom) - (int)(YScale * (g_pNavSensorSummary->DoorWaysFound[i].RightEdge.Y + Y_NEGATIVE_TENTH_INCHES)) );	// Connect to Right Door Frame
+
+			// Draw Right Door Frame
+			dc.MoveTo( graphRect.left + (int)(XScale * (XCenter + g_pNavSensorSummary->DoorWaysFound[i].RightEdge.X)) + 1, 
+				(graphRect.bottom) - (int)(YScale * (g_pNavSensorSummary->DoorWaysFound[i].RightEdge.Y + Y_NEGATIVE_TENTH_INCHES)) - 5 ); // Draw Right Door Frame
+
+			dc.LineTo( graphRect.left + (int)(XScale * (XCenter + g_pNavSensorSummary->DoorWaysFound[i].RightEdge.X)) + 1, 
+				(graphRect.bottom) - (int)(YScale * (g_pNavSensorSummary->DoorWaysFound[i].RightEdge.Y + Y_NEGATIVE_TENTH_INCHES)) + 5 );
+		}
+
+/************
+		if( NumberOfKinectSamples > 0 )
+		{
+			int X, Y;
+			POINT2D_T RightEdge = {0,0};
+			POINT2D_T LeftEdge = {0,0};
+			int LastX = 0;
+			int LastY = 0;
+			//int LeftOpenAreaX = 0;
+			//int RightOpenAreaX = 0;
+			//int TargetDistance = 0;
+			//int TargetClearDistance = DOOR_SPOTTING_DISTANCE_TENTH_INCHES + DOORWAY_MIN_CLEAR_AREA_DEPTH_TENTH_INCHES;
+			// int TargetClearDistance = (__max(g_pNavSensorSummary->nRightFrontSideZone, g_pNavSensorSummary->nLeftFrontSideZone) + DOORWAY_MIN_CLEAR_AREA_DEPTH_TENTH_INCHES) ; // tenth inches
+
+			int nDoorwaysFound = 0;
+			DOORWAY_T DoorwayFound[MAX_DOORWAYS];	// array of potential multiple doors 
+			for( int i=0; i<MAX_DOORWAYS; i++ )
+			{
+				DoorwayFound[i].CenterX = 0;
+				DoorwayFound[i].Width = 0;
+				DoorwayFound[i].RightEdge.X = 0;
+				DoorwayFound[i].RightEdge.Y = 0;
+				DoorwayFound[i].LeftEdge.X = 0;
+				DoorwayFound[i].LeftEdge.Y = 0;
+			}
+
+			// Track last door edge found (default to first sample, in case door extends off sensor range to the right)
+			// Look for the open path/door from right to left
+			bool FirstValidSampleFound = FALSE;
+			for( int i = 0; i < NumberOfKinectSamples; i++ ) 
+			{
+				X = g_KinectPointCloud->WallPoints[i].X; // tenth inches  WallPoints  MapPoints2D
+				Y = g_KinectPointCloud->WallPoints[i].Y ;
+
+
+				// Skip any bad values
+				if( (X >= LASER_RANGEFINDER_TENTH_INCHES_ERROR) ||
+					(Y >= LASER_RANGEFINDER_TENTH_INCHES_ERROR) )
+				{
+					continue;
+				}
+
+				// DEBUG ONLY!!!
+				//ROBOT_LOG( TRUE, "KINECT DOOR SCAN: x = %d:  y = %d, ", X,Y )
+
+				if( !FirstValidSampleFound )
+				{
+					if( X < LASER_RANGEFINDER_TENTH_INCHES_MAX )
+					{
+						LastX = X;
+						LastY = Y;
+						FirstValidSampleFound = true;
+					}
+					continue;
+				}
+
+				if( 0 == RightEdge.X )
+				{ 
+					// looking for right edge
+					int TargetDistance = __min(LastY, DOOR_SPOTTING_DISTANCE_TENTH_INCHES) + DOORWAY_MIN_CLEAR_AREA_DEPTH_TENTH_INCHES;
+					if( Y >= TargetDistance )
+					{	// Found inside of door edge! (or may be that the door extends off sensor range to the left)
+						RightEdge.X = LastX;	// Use the last valid data
+						RightEdge.Y = __min(LastY, DOOR_SPOTTING_DISTANCE_TENTH_INCHES); // Use the last valid data
+					}
+				}
+				else
+				{
+					// Right edge found, looking for Left edge
+					if( Y < RightEdge.Y + DOORWAY_MIN_CLEAR_AREA_DEPTH_TENTH_INCHES )
+					{
+						int DoorwayWidth = RightEdge.X - X;
+						if( (DoorwayWidth >= DOORWAY_MIN_CLEAR_AREA_WIDTH_TENTH_INCHES) &&
+							(DoorwayWidth <= 420) )
+						{
+							// Found it!
+							LeftEdge.X = X;
+							LeftEdge.Y = Y;
+
+							// Found a Doorway
+
+								// Draw where we think the door is!
+
+								// Draw Left Door Frame
+								dc.MoveTo( graphRect.left + (int)(XScale * (XCenter + LeftEdge.X)) + 1, (graphRect.bottom) - (int)(YScale * (LeftEdge.Y + Y_NEGATIVE_TENTH_INCHES)) - 5 ); 
+								dc.LineTo( graphRect.left + (int)(XScale * (XCenter + LeftEdge.X)) + 1, (graphRect.bottom) - (int)(YScale * (LeftEdge.Y + Y_NEGATIVE_TENTH_INCHES)) + 5 );
+
+								// Draw line connecting the two door frames
+								dc.MoveTo( graphRect.left + (int)(XScale * (XCenter + LeftEdge.X)) + 1, (graphRect.bottom) -  (int)(YScale * (LeftEdge.Y  + Y_NEGATIVE_TENTH_INCHES))  ); 
+								dc.LineTo( graphRect.left + (int)(XScale * (XCenter + RightEdge.X)) + 1, (graphRect.bottom) - (int)(YScale * (RightEdge.Y + Y_NEGATIVE_TENTH_INCHES)) );	// Connect to Right Door Frame
+
+								// Draw Right Door Frame
+								dc.MoveTo( graphRect.left + (int)(XScale * (XCenter + RightEdge.X)) + 1, (graphRect.bottom) - (int)(YScale * (RightEdge.Y + Y_NEGATIVE_TENTH_INCHES)) - 5 ); // Draw Right Door Frame
+								dc.LineTo( graphRect.left + (int)(XScale * (XCenter + RightEdge.X)) + 1, (graphRect.bottom) - (int)(YScale * (RightEdge.Y + Y_NEGATIVE_TENTH_INCHES)) + 5 );
+
+							// Save the results
+							DoorwayFound[nDoorwaysFound].Width = RightEdge.X - LeftEdge.X;
+							DoorwayFound[nDoorwaysFound].CenterX = RightEdge.X - (DoorwayWidth/2);
+							RightEdge.X = 0; // clear values to search for next doorway
+							LeftEdge.X = 0;
+							RightEdge.Y = 0;
+							LeftEdge.Y = 0;
+
+							if( ++nDoorwaysFound >= MAX_DOORWAYS)
+							{
+								ROBOT_LOG( TRUE, "ERROR!  Too Many Doorways Found!" )
+								break;
+							}
+						}
+						else
+						{
+							// Doorway too narrow, restart search
+							RightEdge.X = 0;
+						}
+					}
+				}
+				LastX = X;
+				LastY = Y;
+
+			}	// for loop
+
+			if( nDoorwaysFound > 0 )
+			{
+				ROBOT_LOG( TRUE, "At lest one Doorway / Path Found" )
+				for(int i=0; i<nDoorwaysFound; i++)
+				{
+					ROBOT_LOG( TRUE, "Doorway %d:  Center = %d, Width = %d", i, DoorwayFound[i].CenterX, DoorwayFound[i].Width )
+
+					// TODO-MUST-DAVES - Find door nearest center!
+				}
+			}
+
+		}	// Number of Kinect Samples > 0
+
+	} // if( 0 == NumberOfLaserSamples )
+
+*******/
 
 
 	////////////////////////////////

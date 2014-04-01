@@ -88,6 +88,8 @@ protected:
 	virtual void Dump(CDumpContext& dc) const;
 #endif
 
+void SendDriveCommand( int Speed, int Turn );
+
 protected:
 // Used for both Client and Server
 
@@ -111,7 +113,9 @@ protected:
 	CBrush				*m_GreenBrush;	// Green background
 	CBrush				*m_BlueBrush;	// Blue background
 	BATTERY_STATUS		 m_BatteryStatus;
-	BOOL				 m_LocalUser;	// True = all commands issued as LOCAL user, otherwise as Remote user.  Allow testing Local/Remote behavior over Remote Desktop
+	//BOOL				 m_LocalUser;		// True = all commands issued as LOCAL user, otherwise as Remote user.  Allow testing Local/Remote behavior over Remote Desktop
+	//int					 m_nCurrentSpeed;	// keep track of speed and turn for commands
+	//int					 m_nCurrentTurn;
 
 
 //	HANDLE				 m_hSocketThread;

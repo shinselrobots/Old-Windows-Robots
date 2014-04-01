@@ -167,6 +167,7 @@ public:
 	void		PIDToString( UINT nPID, CString &String );
 	void		CmdToString( UINT Command, CString &CmdString );
 	void		Speak( const char* TextToSay ); // send to other thread to speak text
+	void		SendDriveCommand( int Speed, int Turn );
 
 	
 protected:
@@ -183,6 +184,8 @@ protected:
 	UINT						m_PhraseNumber;	// rotate through various phrases to speak, avoid the same one twice
 	ArmControl					*m_pArmControlRight;
 	ArmControl					*m_pArmControlLeft;
+	int							m_CurrentSpeed;	// keep track of speed and turn for commands
+	int							m_CurrentTurn;
 
 };
 

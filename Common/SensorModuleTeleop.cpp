@@ -21,6 +21,27 @@ static char THIS_FILE[] = __FILE__;
 //#define BUMPER_DEBUG_ENABLED
 #define ENABLE_BUMPERS 1 // Enable or disable reacting to bumper hits.  Disable if debugging or hardware problem
 
+// Scale for A/D converter on Kobuki
+const int  DistanceTable_IRWideAngleKobuki[] = 
+//   0    1    2    3    4    5    6    7    8    9   10   11   12   13   14   15   16   17   18   19   20   21   22   23   24     // Inches
+{ 3000,3000,2500,1720,1340,1140, 950, 840, 740, 660, 600, 550, 500, 470, 430, 405, 375, 350, 320, 290, 275, 265, 250, 235, 220 };  // Reading
+
+
+const int  DistanceTable_IRLongRangeKobuki[] =	
+//feet 0		                                                   1		                                                   2
+//in   0    1    2    3    4    5    6    7    8    9   10   11   12   13   14   15   16   17   18   19   20   21   22	 23   24
+  { 3500,3500,3500,3500,3440,3300,3320,3180,2933,2722,2540,2350,2180,2040,1900,1785,1680,1590,1445,1370,1310,1245,1195,1150,1100,
+//feet 		                                                       3		                                                   4
+//in       25   26   27   28   29   30   31   32   33   34   35   36   37   38   39   40   41   42   43   44   45   46   47   48
+         1060,1055,1020, 975, 945, 920, 885, 860, 830, 815, 800, 765, 750, 740, 720, 705, 690, 680, 660, 650, 640, 625, 615, 600,
+//feet 		                                                       5		                                                   6
+//in       49   50   51   52   53   54   55   56   67   58   59   60   61   62   63   64   65   66   67   68   69   70   71   72
+          580, 575, 570, 550, 545,  535, 530, 525, 515, 505, 500, 490, 480, 470, 460, 450, 440, 435, 425, 420, 415, 410, 405, 400 };
+
+
+
+
+
 
 ///////////////////////////////////////////////////////////////////////////////
 #if SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TELEOP
@@ -31,6 +52,8 @@ static char THIS_FILE[] = __FILE__;
 	// There are different implementations of this function for each robot type.  See "SensorModuleXXX" for each robot type.
 	void CSensorModule::ProcessSensorStatus()
 	{
+
+		static int LastRawIR = 0;
 
 		// First thing is to initialize the processed Sensor Status block
 		// Don't memset the structure, it corrupts current position!
@@ -96,14 +119,41 @@ static char THIS_FILE[] = __FILE__;
 		//g_pFullSensorStatus->TiltAccelX =	0;			// Typically From Arduino.  zero = level
 		//g_pFullSensorStatus->TiltAccelY =	0;	 		// Typically From Arduino.  zero = level
 
-		// Analog Sensors - none installed
+		// Analog Sensors
+		for( int i=0; i<4; i++ )
+		{
+			g_pFullSensorStatus->IR[i] = g_pKobukiStatus->AnalogPort[i];
+		}
+
+		/// TODO-MUST-DAVES - figure out where to factor in offset from front of robot!!!
 		// HandleAnalogSensors();
+		g_pFullSensorStatus->IR[0] = ScaleLongRangeIRKobuki( g_pKobukiStatus->AnalogPort[0], -10 );	// Left Side Long Range, Compesation
+		g_pFullSensorStatus->IR[1] = ScaleLongRangeIRKobuki( g_pKobukiStatus->AnalogPort[1], +10 );	// Right Side Long Range, Compensation
+//		g_pFullSensorStatus->IR[2] = ScaleWideIRKobuki( g_pKobukiStatus->AnalogPort[2] );			// Left Side Wide angle Short range
+//		g_pFullSensorStatus->IR[3] = ScaleWideIRKobuki( g_pKobukiStatus->AnalogPort[3] );			// Left Side Wide angle Short range
 
 
-		// Add line break in log if debugging IR or Ultrasonic sensors
-		#if ( (DEBUG_IR == 1) || (DEBUG_ULTRASONIC == 1) )
-				ROBOT_LOG( TRUE,  "\n" );
-		#endif
+		/* DEBUG
+		int AveIR = (g_pKobukiStatus->AnalogPort[0] + g_pKobukiStatus->AnalogPort[1] + LastRawIR ) / 3;
+		int DeltaIR = g_pKobukiStatus->AnalogPort[1] - g_pKobukiStatus->AnalogPort[0];
+		TRACE("IR In0 = %3d, In1 = %3d,   RAW: IR0 = %4d,  IR1 = %4d,  Average = %4d, Delta = 4%d\n", 
+			g_pFullSensorStatus->IR[0]/10, g_pFullSensorStatus->IR[1]/10, g_pKobukiStatus->AnalogPort[0],  g_pKobukiStatus->AnalogPort[1], AveIR, DeltaIR );
+
+		LastRawIR = AveIR; // FOR DEBUG!!!
+		*/
+
+		/*
+		// For DEBUG, show the values in Inches
+			TRACE( "\nIR: (Raw,Inches) ");
+			for( int nSensorNumber=0; nSensorNumber< 2; nSensorNumber++ ) // NUM_IR_SENSORS
+			{
+				TRACE("  %2u=%3u, %3u Inches",
+					nSensorNumber, g_pKobukiStatus->AnalogPort[nSensorNumber], g_pFullSensorStatus->IR[nSensorNumber]/10 );
+			}
+			TRACE( "\n" );
+			ROBOT_LOG( TRUE,  "\n" );
+		*/
+
 
 		///////////////////////////////////////////////////////////////////////////
 		// Done processing sensor data.
@@ -329,6 +379,71 @@ static char THIS_FILE[] = __FILE__;
 		UpdateLocation();	// Update the internal view of where we are in the world!
 
 
+	}
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Sharp GP2Y0A21YK Wide Angle IR sensor
+	// Value returned is TENTH INCHES
+	// Kobuki has a different A/D converter, so the values are different
+	#define KOBUKI_IR_SR_MAX_RANGE_RAW 3000
+
+	int  CSensorModule::ScaleWideIRKobuki(int  nReading )
+	{
+		// NOTE!  Larger values are closer objects!
+		// Therefore, PIC_NO_OBJECT_IN_RANGE seems VERY CLOSE!  Trap here! 
+		if( nReading >= KOBUKI_IR_SR_MAX_RANGE_RAW )
+			return NO_OBJECT_IN_RANGE;
+
+		int MaxInches = (IR_MAX_TENTH_INCHES / 10);
+		for( int inches=0; inches <= MaxInches; inches++ )
+		{
+			if( nReading > DistanceTable_IRWideAngleKobuki[inches]  )
+			{
+				if( (inches*10) > IR_SR_MAX_RANGE_TENTH_INCHES )
+				{
+					return NO_OBJECT_IN_RANGE;	// No object in reliable sensor range
+				}
+				else
+				{
+					return (inches*10);
+				}
+			}
+		}
+		return NO_OBJECT_IN_RANGE;	// No object in sensor range
+
+	}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	// Sharp GP2Y0A02YK Long Range IR sensor - 5 foot range
+	// Value returned is TENTH INCHES
+	// Kobuki has a different A/D converter, so the values are different
+	#define KOBUKI_IR_LR_MAX_RANGE_VALUE_RAW 3500	// minimum distance
+	#define KOBUKI_IR_LR_MIN_RANGE_VALUE_RAW 450	// maximum distance
+
+	int  CSensorModule::ScaleLongRangeIRKobuki(int  nReading, int Compensation )
+	{
+		// Scale from raw value to inches.  Compensation may be passed in to correct known sensor differences
+		// NOTE!  Larger values are closer objects!  
+		if( nReading >= KOBUKI_IR_LR_MAX_RANGE_VALUE_RAW )
+			return NO_OBJECT_IN_RANGE;
+
+		if( nReading < KOBUKI_IR_LR_MIN_RANGE_VALUE_RAW )	// Outside  readable range value
+			return NO_OBJECT_IN_RANGE;
+
+		int RangeTenthInches = NO_OBJECT_IN_RANGE;
+
+		int MaxInches = 72;	// Inches!
+		for( int index=0; index <= MaxInches; index++ )	// Table goes to 72" Max - 6 feet (but only really accurate to ~5 feet)
+		{
+			if( nReading >= DistanceTable_IRLongRangeKobuki[index]  )
+			{
+				RangeTenthInches = (index*10) + Compensation;
+				if( RangeTenthInches < 0 ) RangeTenthInches = 0;
+				return (RangeTenthInches);	// CONVERTED TO TENTH INCHES!!
+			}
+		}
+		return NO_OBJECT_IN_RANGE;	// No object in sensor range
 	}
 
 #endif // SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TELEOP

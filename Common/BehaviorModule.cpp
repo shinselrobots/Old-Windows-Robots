@@ -241,6 +241,20 @@ void CBehaviorModule::ProcessMessage(
 		// Behavior modes - what to do while standing around
 		// Some of these are mutually exclusive!
 
+		case WM_ROBOT_STOP_CMD:
+		{
+			g_bCmdRecognized = TRUE;
+			// Other modules will handle the stop.  For Behavior module, this means cancel current behavior and go back to idle
+			// Example: SpeechSendCommand( WM_ROBOT_SET_USER_PRIORITY, SET_USER_LOCAL_AND_STOP, 0 ); // FORCE STOP, no matter what!
+			m_CurrentActionMode = ACTION_MODE_NONE;
+			m_CurrentTask = TASK_NONE;
+			m_TaskState = 0;
+			RightArmHome();
+			LeftArmHome();
+		}
+		break;
+
+/*
 		case WM_ROBOT_SET_USER_PRIORITY:
 		{
 			g_bCmdRecognized = TRUE;
@@ -261,7 +275,7 @@ void CBehaviorModule::ProcessMessage(
 			}
 		}
 		break;
-
+*/
 		case WM_ROBOT_SET_BEHAVIOR_CMD:
 		{
 			g_bCmdRecognized = TRUE;
@@ -5252,11 +5266,13 @@ void CBehaviorModule::ActionOpenDoor()
 						// Move body so that the claw is approx "N" inches from the door
 						if ( nDistanceToMove > 0 )
 						{
-							SendCommand( WM_ROBOT_MOVE_SET_DISTANCE_CMD, (DWORD)nDistanceToMoveTenthInches, FORWARD );	// wParam = distance in inches, lParam = direction
+							****> use m_pDriveCtrl->SetMoveDistance() instead of this!
+							m_pDriveCtrl->SetMoveDistance( BEHAVIOR_GOAL_MODULE, SPEED_FWD_MED_SLOW, TURN_CENTER, nDistanceToMoveTenthInches );
+							/// SendCommand( WM_ROBOT_MOVE_SET_DISTANCE_CMD, (DWORD)nDistanceToMoveTenthInches, FORWARD );	// wParam = distance in inches, lParam = direction
 						}
 						else
 						{
-							SendCommand( WM_ROBOT_MOVE_SET_DISTANCE_CMD, (DWORD)nDistanceToMoveTenthInches, REVERSE );	// wParam = distance in inches, lParam = direction
+							/// SendCommand( WM_ROBOT_MOVE_SET_DISTANCE_CMD, (DWORD)nDistanceToMoveTenthInches, REVERSE );	// wParam = distance in inches, lParam = direction
 						}
 						*/
 
