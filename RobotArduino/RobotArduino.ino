@@ -1,8 +1,8 @@
 #include <Wire.h> // for I2C
 #include <FreqPeriodCounter.h> // For wheel odometer pulse monitoring
 #include "RobotConstants.h"
-#include "C:\Dev\_Robot\Common\HardwareCmds.h"
-#include "C:\Dev\_Robot\Common\HWInterfaceLokiArduino.h"
+#include "C:\Dev\Robots\Common\HardwareCmds.h"
+#include "C:\Dev\Robots\Common\HWInterfaceLokiArduino.h"
 #include <MeetAndroid.h>
 #include <Adafruit_ADS1015.h>
 
