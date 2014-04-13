@@ -156,9 +156,9 @@ public:
 		for( int i=0; i<4; i++ )
 		{
 			Status.AnalogPort[i] = GpInput.analog_input[i];
-			 cout << dec << "   IR" << i << ": " << setw(4) << Status.AnalogPort[i]; // debug IR sensors
+			 //cout << dec << "   IR" << i << ": " << setw(4) << Status.AnalogPort[i]; // debug IR sensors
 		}
-		 cout << endl; // Debug IR sensors
+		 //cout << endl; // Debug IR sensors
 
 
 		kobuki::DockIR::Data DockIR = kobuki.getDockIRData();

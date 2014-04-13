@@ -484,7 +484,7 @@ namespace RobotKinect.Speech
             YesNoGrammar.Enabled = false; // this grammar disabled by default, until turned on.
             */
 
-            string grammarPath = @"C:/Dev/_Robot/Speech/";
+            string grammarPath = @"C:/Dev/Robots/Speech/";
            // string FileName = @"robot";
             string XMLPath = grammarPath + RobotName + ".grxml";
             string CfgPath = grammarPath + RobotName + ".cfg";

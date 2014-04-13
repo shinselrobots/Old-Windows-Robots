@@ -127,8 +127,8 @@ const int  DistanceTable_IRLongRangeKobuki[] =
 
 		/// TODO-MUST-DAVES - figure out where to factor in offset from front of robot!!!
 		// HandleAnalogSensors();
-		g_pFullSensorStatus->IR[0] = ScaleLongRangeIRKobuki( g_pKobukiStatus->AnalogPort[0], -10 );	// Left Side Long Range, Compesation
-		g_pFullSensorStatus->IR[1] = ScaleLongRangeIRKobuki( g_pKobukiStatus->AnalogPort[1], +10 );	// Right Side Long Range, Compensation
+		g_pFullSensorStatus->IR[0] = ScaleLongRangeIRKobuki( g_pKobukiStatus->AnalogPort[0], (-BASE_IR_OFFSET_FROM_FRONT_TENTH_INCHES + 0) );	// Left Side Long Range, Compesation
+		g_pFullSensorStatus->IR[1] = ScaleLongRangeIRKobuki( g_pKobukiStatus->AnalogPort[1], (-BASE_IR_OFFSET_FROM_FRONT_TENTH_INCHES + 0) );	// Right Side Long Range, Compensation
 //		g_pFullSensorStatus->IR[2] = ScaleWideIRKobuki( g_pKobukiStatus->AnalogPort[2] );			// Left Side Wide angle Short range
 //		g_pFullSensorStatus->IR[3] = ScaleWideIRKobuki( g_pKobukiStatus->AnalogPort[3] );			// Left Side Wide angle Short range
 
@@ -136,7 +136,7 @@ const int  DistanceTable_IRLongRangeKobuki[] =
 		/* DEBUG
 		int AveIR = (g_pKobukiStatus->AnalogPort[0] + g_pKobukiStatus->AnalogPort[1] + LastRawIR ) / 3;
 		int DeltaIR = g_pKobukiStatus->AnalogPort[1] - g_pKobukiStatus->AnalogPort[0];
-		TRACE("IR In0 = %3d, In1 = %3d,   RAW: IR0 = %4d,  IR1 = %4d,  Average = %4d, Delta = 4%d\n", 
+		TRACE("IR Inches 0 = %3d, 1 = %3d,   RAW: IR0 = %4d,  IR1 = %4d,  Average = %4d, Delta = 4%d\n", 
 			g_pFullSensorStatus->IR[0]/10, g_pFullSensorStatus->IR[1]/10, g_pKobukiStatus->AnalogPort[0],  g_pKobukiStatus->AnalogPort[1], AveIR, DeltaIR );
 
 		LastRawIR = AveIR; // FOR DEBUG!!!
@@ -229,6 +229,9 @@ const int  DistanceTable_IRLongRangeKobuki[] =
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Get first level summary data for each sensor.  May be overridden by bumpers later
 
+		// Analog IR sensors
+		g_pNavSensorSummary->nLeftFrontZone =	__min( g_pNavSensorSummary->nLeftFrontZone, g_pFullSensorStatus->IR[IR_SENSOR_FRONT_LEFT] );
+		g_pNavSensorSummary->nRightFrontZone =	__min( g_pNavSensorSummary->nRightFrontZone, g_pFullSensorStatus->IR[IR_SENSOR_FRONT_RIGHT] );
 
 		// Check Bumpers
 		if( g_pFullSensorStatus->HWBumperFront )
@@ -433,7 +436,7 @@ const int  DistanceTable_IRLongRangeKobuki[] =
 
 		int RangeTenthInches = NO_OBJECT_IN_RANGE;
 
-		int MaxInches = 72;	// Inches!
+		int MaxInches = 66;	// 5 ft, 6 Inches
 		for( int index=0; index <= MaxInches; index++ )	// Table goes to 72" Max - 6 feet (but only really accurate to ~5 feet)
 		{
 			if( nReading >= DistanceTable_IRLongRangeKobuki[index]  )

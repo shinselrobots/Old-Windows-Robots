@@ -18,13 +18,16 @@
 	#define NUM_US_SENSORS										  3	// 1 head mounted, 2 front mounted
 
 	// Sensor Positions in arrays
+	#define	IR_SENSOR_FRONT_LEFT								  0
+	#define	IR_SENSOR_FRONT_RIGHT								  1
+/*
 	#define	IR_SENSOR_SIDE_LEFT									  0
 	#define	IR_SENSOR_FRONT_LEFT								  1
 	#define	IR_SENSOR_HEAD_LEFT									  2
 	#define	IR_SENSOR_HEAD_RIGHT								  3
 	#define	IR_SENSOR_FRONT_RIGHT								  4
 	#define	IR_SENSOR_SIDE_RIGHT								  5
-
+*/
 	#define US_SENSOR_CAMERA									  0	// Mounted on Camera
 	#define US_SENSOR_FRONT_LEFT								  1
 	#define US_SENSOR_FRONT_RIGHT								  2

@@ -1163,6 +1163,7 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 		else if( IR_ARRAY1 == lParam )
 		{
 			m_RadarDisplay.SetData( lParam, IR1_SAMPLES, g_ScaledSensorData[lParam] );
+			//m_LaserDisplay.SetData( ); // force display update
 			//strText.Format( "%d", (UINT)g_ScaledSensorData[lParam][IR1_SAMPLES/2] );  // display the middle value
 			//SetDlgItemText( IDC_IR_DISPLAY, strText );
 		}
@@ -1974,12 +1975,10 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 		SetDlgItemText( IDC_RC2_DISPLAY, (LPCTSTR)strText );
 
 
-
 		#endif
 
 
-
-
+		//m_LaserDisplay.SetData( ); // force display update
 
 	}
 	else if( ROBOT_RESPONSE_GPS_DATA  == Item )

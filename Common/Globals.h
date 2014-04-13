@@ -100,11 +100,6 @@ void g_PostStatus();	// forward declaration, so we can use it here
 	g_PostStatus( (LPCTSTR)LogString, __FUNCTION__, TRUE );    } // Does display on GUI
 
 
-// Path to config data
-/// MOVED TO RobotType.h
-//#define ROBOT_DATA_PATH	"C:\\Dev\\_Robot\\RobotData"
-//#define ROBOT_COMMON_PATH L"C:\\Dev\\_Robot\\Common"
-
 ///////////////////////////////////////////////////////////////////
 // Kludge for when OpenCV not linked
 	#ifndef CvPoint

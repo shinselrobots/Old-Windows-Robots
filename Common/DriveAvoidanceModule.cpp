@@ -168,7 +168,7 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 			{
 				// Not moving (may be doing a spin turn, but thats OK)
 				// Don't do Avoidance behavior if we are not moving
-//				return;
+				return;
 			}
 
 			//int DbgSpeed = m_pDriveCtrl->GetCurrentSpeed();

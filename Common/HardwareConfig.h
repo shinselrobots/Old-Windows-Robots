@@ -378,6 +378,11 @@
 	#define KINECT_HEIGHT_ABOVE_GROUND_TENTH_INCHES				 383.0	// Tenth_Inches - distance to Kinect sensor center - adjusted for TeleOp
 	#define KINECT_DISTANCE_FROM_FRONT_TENTH_INCHES				  60.0	// Tenth_Inches - distance to Kinect internal sensor 
 
+	// IR Sensor offsets (Teleop sensors are set back from front of robot)
+	#define BASE_IR_OFFSET_FROM_FRONT_TENTH_INCHES	 70	// Distance from Base IR sensors to front of robot
+
+
+
 	// Degrees from Forward of each sensor
 	// TODO! IR2,IR3 and US0 - Depends upon where the head is facing!  ASSUME forward for now!
 
