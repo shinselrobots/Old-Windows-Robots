@@ -151,21 +151,23 @@ DWORD WINAPI ControlThreadProc( LPVOID NotUsed )
 			__itt_metadata_add(pDomainControlThread, __itt_null, pSH2, __itt_metadata_s32, 1, (void*)&LoopIndex);
 			LoopIndex++;
 
-			// Dispatch the message to each module, highest priority first
-			// Sensor module is called first, so it's sensor data gets scaled
-			// to appropriate units.  Processed data is returned in SensorData.
-			//
+			// Dispatch the message to each module
+			// Sensor modules are called first, so all sensor data gets processed and fused to sensor summary other modues can use.
+
+			////////////////////////////////////////
+			// Sensory Modules
 			{
 				__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, pshSensorModule);
 				pSensorModule->ProcessMessage( UserMessage, msg.wParam, msg.lParam );
 				__itt_task_end(pDomainControlThread);
 			}
-/**			{
+			/**
+			{
 				__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, pshCameraModule);
 				pCameraModule->ProcessMessage( UserMessage, msg.wParam, msg.lParam );
 				__itt_task_end(pDomainControlThread);
 			}
-**/
+			**/
 			{
 				__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, pshKinectModule);
 				pKinectModule->ProcessMessage( UserMessage, msg.wParam, msg.lParam );
@@ -176,24 +178,14 @@ DWORD WINAPI ControlThreadProc( LPVOID NotUsed )
 				pSystemModule->ProcessMessage( UserMessage, msg.wParam, msg.lParam );
 				__itt_task_end(pDomainControlThread);
 			}
+
+			////////////////////////////////////////
+			// Behavioral modules
+			// Lowest to hightest priority, so higher priority modules can get hints from lower priority modules
+
 			{
-				__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, pshCollisionModule);
-				pCollisionModule->ProcessMessage( UserMessage, msg.wParam, msg.lParam );
-				__itt_task_end(pDomainControlThread);
-			}
-			{
-				__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, pshAvoidModule);
-				pAvoidObjectModule->ProcessMessage( UserMessage, msg.wParam, msg.lParam );
-				__itt_task_end(pDomainControlThread);
-			}
-			{
-				__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, pshUserCmdModule);
-				pUserCmdModule->ProcessMessage( UserMessage, msg.wParam, msg.lParam );
-				__itt_task_end(pDomainControlThread);
-			}
-			{
-				__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, pshWayPointModule);
-				pWayPointNavModule->ProcessMessage( UserMessage, msg.wParam, msg.lParam );
+				__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, pshBehaviorModule);
+				pBehaviorModule->ProcessMessage( UserMessage, msg.wParam, msg.lParam );
 				__itt_task_end(pDomainControlThread);
 			}
 			{
@@ -202,10 +194,26 @@ DWORD WINAPI ControlThreadProc( LPVOID NotUsed )
 				__itt_task_end(pDomainControlThread);
 			}
 			{
-				__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, pshBehaviorModule);
-				pBehaviorModule->ProcessMessage( UserMessage, msg.wParam, msg.lParam );
+				__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, pshWayPointModule);
+				pWayPointNavModule->ProcessMessage( UserMessage, msg.wParam, msg.lParam );
 				__itt_task_end(pDomainControlThread);
 			}
+			{
+				__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, pshUserCmdModule);
+				pUserCmdModule->ProcessMessage( UserMessage, msg.wParam, msg.lParam );
+				__itt_task_end(pDomainControlThread);
+			}
+			{
+				__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, pshAvoidModule);
+				pAvoidObjectModule->ProcessMessage( UserMessage, msg.wParam, msg.lParam );
+				__itt_task_end(pDomainControlThread);
+			}
+			{
+				__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, pshCollisionModule);
+				pCollisionModule->ProcessMessage( UserMessage, msg.wParam, msg.lParam );
+				__itt_task_end(pDomainControlThread);
+			}
+
 
 			if( !g_bCmdRecognized )
 			{
@@ -215,7 +223,7 @@ DWORD WINAPI ControlThreadProc( LPVOID NotUsed )
 			else
 			{
 				// DriveControlModule arbitrates requests from other modules and issues
-				// the command to the Arduino.  Send motor commands after each status update
+				// the command to the motor control.  Send motor commands after each status update
 				if( WM_ROBOT_SENSOR_STATUS_READY == (msg.message))
 				{
 					///TAL_SCOPED_TASK_NAMED("Execute Drive Control");
