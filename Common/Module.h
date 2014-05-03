@@ -306,6 +306,11 @@ public:
 	BOOL MoveDistanceCompleted() { return (m_MoveDistanceRemaining == 0); }	// Inline
 	BOOL TurnRotationCompleted() { return (m_TurnRotationRemaining == 0); }	// Inline, used for both compass and odometry turns
 
+	void CDriveControlModule::BeginSensorUpdate();
+	void CDriveControlModule::EndSensorUpdate();
+	BOOL CDriveControlModule::MovementCommandPending();
+	void SetCommandPending() { m_CommandPending = TRUE; }	// Inline
+
 	void Brake( int  Module, int Acceleration = ACCELERATION_MEDIUM );
 	void Stop( int  Module, int Acceleration = ACCELERATION_MEDIUM );
 	void SetSpeed( int  Module, int Speed, int Acceleration = ACCELERATION_MEDIUM );
@@ -317,7 +322,7 @@ public:
 	BOOL SetTurnToCompassDirection( int  Module, int Speed, int Turn, int DesiredCompassHeading, BOOL StopAfterTurn );
 	void UpdateMoveDistance( double OdometerUpdate );
 	void UpdateTurnRotation( double RotationAngleAmount );
-	void SpeedControl();
+	//void SpeedControl();
 	int  SetTachometerTarget( int TargetSpeed );
 	void BrakeControl();
 
@@ -337,6 +342,7 @@ protected:
 //	PilotCmd_T	m_PilotCmd;
 	BOOL	m_MotorsPaused;
 	int 	m_Command;
+	BOOL	m_CommandPending;	// a Command is pending execution
 	int 	m_LastMotorCommand;
 	int		m_LastMotorSpeed;
 	int		m_LastMotorTurn;

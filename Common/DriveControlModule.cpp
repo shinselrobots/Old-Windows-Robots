@@ -39,6 +39,7 @@ CDriveControlModule::CDriveControlModule()
 {
 	m_MotorsPaused		= FALSE;
 	m_Command			= HW_SET_MOTOR_STOP;
+	m_CommandPending	= FALSE;
 	m_LastMotorCommand	= HW_SET_MOTOR_STOP;
 	m_Speed				= SPEED_STOP;
 	m_LastMotorSpeed	= SPEED_STOP;
@@ -161,7 +162,7 @@ void CDriveControlModule::UpdateTurnRotation(double RotationAngleAmount)
 				(m_TurnRotationRemaining < 30.0)  && (abs(m_Turn) > TURN_RIGHT_MED_SLOW) )
 			{
 				m_Turn = (int)( (float)m_Turn * 0.90 ); // percent to reduce speed of turn
-				ExecuteCommand();
+				SetCommandPending();
 			}
 		}
 	}
@@ -186,7 +187,7 @@ void CDriveControlModule::UpdateTurnRotation(double RotationAngleAmount)
 			m_Command = HW_SET_MOTOR_STOP;
 			m_Speed = SPEED_STOP;
 			m_Turn = TURN_CENTER;
-			ExecuteCommand();
+			SetCommandPending();
 		}
 	}
 }
@@ -210,7 +211,7 @@ void CDriveControlModule::UpdateMoveDistance(double OdometerUpdateTenthInches)
 			{
 				m_Command = HW_SET_MOTOR_STOP;
 				m_Speed = SPEED_STOP;
-				ExecuteCommand();
+				SetCommandPending();
 			}
 		}
 	}
@@ -242,6 +243,40 @@ BOOL CDriveControlModule::RobotStopped()
 }
 
 
+void CDriveControlModule::BeginSensorUpdate()
+{
+	// At start of each Sensor Update cycle, clear out last owner unless programmed move or turn in progress
+	if( (0 != m_MoveDistanceRemaining) && (0 != m_TurnRotationRemaining) )
+	{
+		m_DriveOwner = NO_MODULE;	
+	}
+
+}
+
+void CDriveControlModule::EndSensorUpdate()
+{
+	// At start of each Sensor Update cycle, clear out last owner unless programmed move or turn in progress
+	if( m_CommandPending )
+	{
+		// someone asked for drive control
+		ExecuteCommand();
+		m_CommandPending = FALSE;
+	}
+}
+
+BOOL CDriveControlModule::MovementCommandPending()
+{
+	// Indicates if a command to move the robot is pending
+	// Note that no command, or a command to STOP, both return FALSE
+	if( m_CommandPending && (m_Speed != SPEED_STOP) )
+	{
+		return TRUE;
+	}
+	else
+	{
+		return FALSE;
+	}
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -274,7 +309,7 @@ void CDriveControlModule::Stop(int  Module, int Acceleration)
 		ModuleNumberToName( Module, ModuleName );
 		MsgString.Format( "%s: New Stop Command Requested" ,ModuleName );
 		ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
-		ExecuteCommand();
+		SetCommandPending();
 	}
 }
 
@@ -296,7 +331,7 @@ void CDriveControlModule::Brake(int  Module, int Acceleration)
 		ModuleNumberToName( Module, ModuleName );
 		MsgString.Format( "%s: New Brake Command Requested",ModuleName );
 		ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
-		ExecuteCommand();
+		SetCommandPending();
 	}
 }
 
@@ -359,7 +394,7 @@ BOOL CDriveControlModule::SetTurnRotation( int  Module, int Speed, int Turn, int
 	MsgString.Format( "%s: New SetTurnRotation Requested: Speed:%d Turn %d RotationAmountDegrees %d",
 		ModuleName, m_Speed, m_Turn, AbsTurnAmountDegrees );
 	ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
-	ExecuteCommand();
+	SetCommandPending();
 	return TRUE;
 }
 
@@ -403,7 +438,7 @@ BOOL CDriveControlModule::SetTurnToCompassDirection( int  Module, int Speed, int
 	MsgString.Format( "%s: New SetTurnToCompassDirection Requested: Speed:%d Turn %d RotationAmountDegrees %d",
 		ModuleName, m_Speed, m_Turn, TurnDegrees );
 	ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
-	ExecuteCommand();
+	SetCommandPending();
 
 	return TRUE;
 }
@@ -433,7 +468,7 @@ BOOL CDriveControlModule::SetMoveDistance( int  Module, int Speed, int Turn, int
 		ModuleNumberToName( Module, ModuleName );
 		MsgString.Format( "%s: New SetMoveDistance Requested: Speed:%d Turn %d DistanceTenthInches %3.1f",ModuleName, m_Speed, m_Turn, m_MoveDistanceRemaining );
 		ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
-		ExecuteCommand();
+		SetCommandPending();
 	}
 	else
 	{
@@ -460,7 +495,7 @@ void CDriveControlModule::SetSpeed( int  Module, int Speed, int Acceleration )
 		ModuleNumberToName( Module, ModuleName );
 		MsgString.Format( "%s: New Speed Requested: %d", ModuleName, Speed );
 		ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
-		ExecuteCommand();
+		SetCommandPending();
 
 	}
 	else if( MODULE_HIGHER_PRIORITY_HAS_CONTROL == Result )  
@@ -485,7 +520,7 @@ void CDriveControlModule::SetSpeed( int  Module, int Speed, int Acceleration )
 				ModuleNumberToName( Module, ModuleName );
 				MsgString.Format( "%s: New Speed Requested: %d", ModuleName, Speed );
 				ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
-				ExecuteCommand();
+				SetCommandPending();
 			}
 		}
 	}
@@ -509,7 +544,7 @@ void CDriveControlModule::SetTurn( int  Module, int Turn, int Acceleration )
 		ModuleNumberToName( Module, ModuleName );
 		MsgString.Format( "%s: New Turn Requested: %d",ModuleName, Turn );
 		ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
-		ExecuteCommand();
+		SetCommandPending();
 
 	}	
 	else if( MODULE_HIGHER_PRIORITY_HAS_CONTROL == Result )  
@@ -533,7 +568,7 @@ void CDriveControlModule::SetTurn( int  Module, int Turn, int Acceleration )
 				ModuleNumberToName( Module, ModuleName );
 				MsgString.Format( "%s: New Low Priority Turn Requested: %d",ModuleName, Turn );
 				ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
-				ExecuteCommand();
+				SetCommandPending();
 			}
 		}
 	}
@@ -560,7 +595,7 @@ void CDriveControlModule::SetSpeedAndTurn( int  Module, int Speed, int Turn, int
 		MsgString.Format( "New Owner %s: New Speed: %d and Turn %d Requested",
 			ModuleName, Speed, Turn );
 		ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
-		ExecuteCommand();
+		SetCommandPending();
 
 	}
 	else if( MODULE_ALREADY_IS_OWNER == Result  )
@@ -580,7 +615,7 @@ void CDriveControlModule::SetSpeedAndTurn( int  Module, int Speed, int Turn, int
 			MsgString.Format( "%s: New Speed: %d and Turn %d Requested",
 				ModuleName, Speed, Turn );
 			ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
-			ExecuteCommand();
+			SetCommandPending();
 		}
 
 	}
@@ -627,7 +662,7 @@ void CDriveControlModule::SetSpeedAndTurn( int  Module, int Speed, int Turn, int
 				m_MoveDistanceRemaining = 0;
 				m_TrackCompassHeading = 0;
 				m_TurnRotationRemaining = 0;
-				ExecuteCommand();
+				SetCommandPending();
 			}
 		}
 	}
@@ -1191,113 +1226,5 @@ void CDriveControlModule::BrakeControl()
 }
 
 
-void CDriveControlModule::SpeedControl()
-{
-	// This function called from ExecuteCommand(), which is called every time 
-	// a WM_ROBOT_SENSOR_STATUS_READY update is processed.
-	// However, it is NOT called when a new command get issued.
-
-	// Member functtions used: m_Command, m_Speed, m_Turn?
-	//		m_LastMotorCommand = m_Command;
-	//		m_LastMotorSpeed = m_Speed;
-	//		m_LastMotorTurn = m_Turn;
-#if ( MOTOR_CONTROL_TYPE == SERVO_MOTOR_CONTROL )
-	// Used by Seeker Carbot
-	// None of this is used if ER1 Pilot is being used for motor control.
-
-	// #define SPEED_STOP				 	  0		//
-	// #define SPEED_FULL_FWD				125		// WARNING! if you swap these, update m_CurrentSpeed in Module.cpp!!!
-	// #define SPEED_FULL_REV			  (-125)
-
-	///////////////////////////////////////////////////////////////////////////////
-	// Calculate Speed Control feedback for the motors, and adjust speed
-	// (Moved from Arduino code)
-
-	
-
-	#if (ROBOT_TYPE == CARBOT)
-		// Check if Power is enabled with the RC "dead man switch" control
-		// Note: to debug speed control, disable the this test
-		if( !(g_pFullSensorStatus->StatusFlags & HW_STATUS_RC_BUTTON_PWR_ENABLE) )
-		{
-			// RC Power Button not enabled.  Delay and disable speed control.
-			// Otherwise, causes a speed surge when the power is restored again
-			gMotorSpeedTimer = NEW_SPEED_SET_TIME * 2;// give time for motors to respond after power is restored
-			return;
-		}
-
-		// See if we need to wait for brake delay to complete
-		if( gBrakeTimer != 0 ) 
-		{
-			return;
-		}
-
-	#endif
-
-	// See if we need to wait for a delay to complete
-	if( gMotorSpeedTimer != 0 ) 
-	{
-		return;
-	}
-
-
-	if( (0 != m_TachometerTarget) && (0 != m_SpeedRequested)	&& 
-		(HW_SET_MOTOR_STOP != m_Command) &&	(HW_SET_MOTOR_BRAKE != m_Command) )
-	{
-		// Requested speed not zero, and not braking, so perform motor speed control.
-
-		ROBOT_LOG( TRUE,  " Called\n");
-		return; //DEBUG
-
-		if( g_pFullSensorStatus->Tachometer < m_TachometerTarget-1 )
-		{
-			// Going too slow
-			if( m_MotorForward )
-			{
-				if( m_SpeedCurrentSetting < (m_SpeedRequested + MAX_SPEED_CORRECTION) )
-				{
-					m_SpeedCurrentSetting++;	// Speed up forward
-				}
-			}
-			else
-			{
-				if( m_SpeedCurrentSetting > (m_SpeedRequested - MAX_SPEED_CORRECTION) )
-				{
-					m_SpeedCurrentSetting--;	// Speed up backward
-				}
-			}
-			SendHardwareCmd( HW_SET_SPEED, m_SpeedCurrentSetting,0 );	
-			gMotorSpeedTimer = SPEED_CHANGE_TIME;		// give time for motors to respond before checking again
-		}
-		else if( g_pFullSensorStatus->Tachometer > m_TachometerTarget+1 )
-		{
-			// Going too fast
-			if( m_MotorForward )
-			{
-//						if( SpeedServo > HW_SPEED_STOP )	// don't overshoot center!
-				if( ( m_SpeedRequested >= (SPEED_SERVO_CENTER+SPEED_FWD_SLOW) ) &&
-					( m_SpeedCurrentSetting > (SPEED_SERVO_CENTER+SPEED_FWD_SLOW) ) )	// ??don't cycle on and off!
-				{
-					m_SpeedCurrentSetting--;	// Slow down forward
-				}
-			}
-			else
-			{
-//						if( SpeedServo < HW_SPEED_STOP )	// don't overshoot center!
-				if( (m_SpeedRequested <= (SPEED_SERVO_CENTER-SPEED_REV_SLOW)) &&
-					(m_SpeedCurrentSetting < (SPEED_SERVO_CENTER-SPEED_REV_SLOW)) )	// ??don't cycle on and off!
-				{
-					m_SpeedCurrentSetting++;	// Slow down backward
-				}
-			}
-			SendHardwareCmd( HW_SET_SPEED, m_SpeedCurrentSetting,0 );	
-			gMotorSpeedTimer = SPEED_CHANGE_TIME;		// give time for motors to respond before checking again
-		}
-	}
-
-	// Note for Set Move distance, see UpdateMoveDistance()
-
-#endif //  ( (MOTOR_CONTROL_TYPE == SERVO_MOTOR_CONTROL) )
-}
 
 

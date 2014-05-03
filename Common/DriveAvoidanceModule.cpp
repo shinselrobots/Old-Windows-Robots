@@ -140,7 +140,7 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 		}
 		break;
 
-		case WM_ROBOT_SERVO_STATUS_READY:
+		//case WM_ROBOT_SERVO_STATUS_READY:
 		case WM_ROBOT_SENSOR_STATUS_READY:
 		{
 			g_bCmdRecognized = TRUE;
@@ -164,7 +164,8 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 			// If needed, make sure Kinect is in postion to provide obstacle data
 			HandleKinectPosition();
 
-			if( 0 != m_pDriveCtrl->GetCurrentSpeed() )
+			//if( 0 != m_pDriveCtrl->GetCurrentSpeed() )
+			if( !m_pDriveCtrl->MovementCommandPending() )
 			{
 				// Not moving (may be doing a spin turn, but thats OK)
 				// Don't do Avoidance behavior if we are not moving
