@@ -259,15 +259,19 @@ DWORD WINAPI KinectDepthThreadProc( LPVOID lpParameter )
 			// Not in position to spot a human, so disable human tracking
 			pKinectModule->m_FrameInfo->ControlFlags |= ControlFlag_HidePlayers; // flag for controlling the C# app
 
-			// only enable if in position to see ahead
+			// only enable if in position to see ahead, and tilt servo is not moving
+			BOOL Success = FALSE;
 			__itt_task_begin(pDomainKinectThread, __itt_null, __itt_null, psh_csFindWallsAnd2dMaps);
-				pKinectModule->FindWallsAnd2dMaps();
+				Success = pKinectModule->FindWallsAnd2dMaps();
 			__itt_task_end(pDomainKinectThread); // psh_csFindWallsAnd2dMaps
 
 			// Update global summary of objects seen for object avoidance
-			__itt_task_begin(pDomainKinectThread, __itt_null, __itt_null, psh_csUpdateKinectObjectSummary);
-				pKinectModule->UpdateKinectObjectSummary();
-			__itt_task_end(pDomainKinectThread); // psh_csUpdateKinectObjectSummary
+			if( Success )
+			{
+				__itt_task_begin(pDomainKinectThread, __itt_null, __itt_null, psh_csUpdateKinectObjectSummary);
+						pKinectModule->UpdateKinectObjectSummary();
+				__itt_task_end(pDomainKinectThread); // psh_csUpdateKinectObjectSummary
+			}
 		}
 		else
 		{
@@ -1567,12 +1571,20 @@ void CKinectModule::ProcessMessage(
 #define KINECT_TRIGGER_WALL_OBJECT_HEIGHT_TENTH_INCHES	120 // if greater than this, slope not needed, it's an object to avoid
 #define KINECT_WALL_DETECT_GAP_SIZE					30 // number of pixels between front and back slope detector
  
-void CKinectModule::FindWallsAnd2dMaps()
+BOOL CKinectModule::FindWallsAnd2dMaps()
 {
 	// Horizontal Scan lines:  0=Right to Left
 	//ROBOT_LOG( TRUE,"FindWallsAnd2dMaps: Kinect EnterCriticalSection g_csKinectPointCloudLock\n")
 	// __itt_task_begin(pDomainKinectThread, __itt_null, __itt_null, psh_csKinectPointCloudLock);
 	// EnterCriticalSection(&g_csKinectPointCloudLock);
+
+	if ( m_pKinectServoControl->IsMoving() )
+	{
+		// Kinect servo is moving, which makes the data suspect
+		// wait until it stops moving to look for objects
+		return FALSE;
+	}
+
 
 //	TRACE("FindWallsAnd2dMaps: Edges at:");
 
@@ -1749,6 +1761,8 @@ void CKinectModule::FindWallsAnd2dMaps()
 	else
 		ROBOT_LOG( TRUE,"No Walls Found\n")
 */
+
+	return TRUE;  // Success
 
 }
 
@@ -2493,6 +2507,21 @@ int KinectServoControl::GetTiltPosition(  )
 {
 	return g_BulkServoStatus[DYNA_KINECT_SCANNER_SERVO_ID].PositionTenthDegrees;
 }
+
+//-----------------------------------------------------------------------------
+// Name: IsMoving
+// Desc: Tells if Kinect sensor servo is in motion (Kinect readings not reliable when it is)
+//-----------------------------------------------------------------------------
+bool KinectServoControl::IsMoving(  )
+{
+	int ServoSpeed = g_BulkServoStatus[DYNA_KINECT_SCANNER_SERVO_ID].Speed;
+	if( 0 != ServoSpeed )
+	{
+		return true;
+	}
+	return false;
+}
+
 
 //-----------------------------------------------------------------------------
 // Name: SetTiltPosition

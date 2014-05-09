@@ -70,6 +70,9 @@ CDriveControlModule::CDriveControlModule()
 	m_TrackCompassHeading = FALSE;
 	m_TargetCompassHeading = 0;
 
+	memset( m_ModuleCommandRequest, 0x00, (sizeof(int) * NUMBER_OF_MOTOR_OWNERS) );
+	memset( m_ModuleSpeedRequest, 0x00, (sizeof(int) * NUMBER_OF_MOTOR_OWNERS) );
+	memset( m_ModuleTurnRequest, 0x00, (sizeof(int) * NUMBER_OF_MOTOR_OWNERS) );
 
 }
 
@@ -183,6 +186,12 @@ void CDriveControlModule::UpdateTurnRotation(double RotationAngleAmount)
 
 		if( m_StopAfterTurnRotation )
 		{
+
+			// keep track of last setting each module requested, as hints for other modules
+			m_ModuleCommandRequest[m_DriveOwner] = HW_SET_MOTOR_STOP;
+			m_ModuleSpeedRequest[m_DriveOwner] = SPEED_STOP;
+			m_ModuleTurnRequest[m_DriveOwner] = TURN_CENTER;
+
 			m_Command = HW_SET_MOTOR_STOP;
 			m_Speed = SPEED_STOP;
 			m_Turn = TURN_CENTER;
@@ -208,8 +217,14 @@ void CDriveControlModule::UpdateMoveDistance(double OdometerUpdateTenthInches)
 			ROBOT_DISPLAY( TRUE, "SetMoveDistance Completed" )
 			if( m_StopAfterMoveDistance )
 			{
+				// keep track of last setting each module requested, as hints for other modules
+				m_ModuleCommandRequest[m_DriveOwner] = HW_SET_MOTOR_STOP;
+				m_ModuleSpeedRequest[m_DriveOwner] = SPEED_STOP;
+				m_ModuleTurnRequest[m_DriveOwner] = TURN_CENTER;
+
 				m_Command = HW_SET_MOTOR_STOP;
 				m_Speed = SPEED_STOP;
+				m_Turn = TURN_CENTER;
 				ExecuteCommand();
 			}
 		}
@@ -257,6 +272,12 @@ BOOL CDriveControlModule::RobotStopped()
 
 void CDriveControlModule::Stop(int  Module, int Acceleration)
 {
+	// keep track of last setting each module requested, as hints for other modules
+	m_ModuleCommandRequest[Module] = HW_SET_MOTOR_STOP;
+	m_ModuleSpeedRequest[Module] = SPEED_STOP;
+	//m_ModuleTurnRequest[Module] = ;
+
+
 	int Result = CheckAndSetOwner(Module);
 	if( (MODULE_OWNERSHIP_REQUEST_SUCCESS == Result)   ||
 		(MODULE_HIGHER_PRIORITY_HAS_CONTROL == Result) )  // allow lower priority modules to still call stop
@@ -280,6 +301,11 @@ void CDriveControlModule::Stop(int  Module, int Acceleration)
 
 void CDriveControlModule::Brake(int  Module, int Acceleration)
 {
+	// keep track of last setting each module requested, as hints for other modules
+	m_ModuleCommandRequest[Module] = HW_SET_MOTOR_BRAKE;
+	m_ModuleSpeedRequest[Module] = SPEED_STOP;
+	//m_ModuleTurnRequest[Module] = TURN_CENTER;
+
 	// Used only for Seeker CarBot.  Note: Once a Brake operation starts, the Pic won't abort until done.
 	int Result = CheckAndSetOwner(Module);
 	if( (MODULE_OWNERSHIP_REQUEST_SUCCESS == Result)   ||
@@ -311,7 +337,12 @@ BOOL CDriveControlModule::SetTurnRotation( int  Module, int Speed, int Turn, int
 	m_LastCompassHeading = g_pFullSensorStatus->CompassHeading;  // Track changes at each update
 	m_MoveDistanceRemaining = 0;
 	m_TurnRotationRemaining = 0;
-	
+
+	// keep track of last setting each module requested, as hints for other modules
+	m_ModuleCommandRequest[Module] = HW_SET_SPEED_AND_TURN;
+	m_ModuleSpeedRequest[Module] = SPEED_STOP;
+	m_ModuleTurnRequest[Module] = Turn;
+
 	if( MODULE_OWNERSHIP_REQUEST_SUCCESS != CheckAndSetOwner(Module) )
 	{
 		return FALSE; // Failed to set turn
@@ -368,6 +399,11 @@ BOOL CDriveControlModule::SetTurnToCompassDirection( int  Module, int Speed, int
 	// Note: A SetTurnRotation can be over ridden by another command, which will abort the turn.
 	// Lower priority modules will NOT override.  They can't do a setturn if higher priory has control
 
+	// keep track of last setting each module requested, as hints for other modules
+	m_ModuleCommandRequest[Module] = HW_SET_SPEED_AND_TURN;
+	m_ModuleSpeedRequest[Module] = SPEED_STOP;
+	m_ModuleTurnRequest[Module] = Turn;
+
 	if( MODULE_OWNERSHIP_REQUEST_SUCCESS != CheckAndSetOwner(Module) )
 	{
 		return FALSE; // Failed to set mode
@@ -413,6 +449,12 @@ BOOL CDriveControlModule::SetMoveDistance( int  Module, int Speed, int Turn, int
 {
 	// Note: A SetMoveDistance can be over ridden by another command, which will abort the move dist.
 	// Lower priority modules will NOT override.  They can't do a SetMove if higher priory has control
+
+	// keep track of last setting each module requested, as hints for other modules
+	m_ModuleCommandRequest[Module] = HW_SET_SPEED_AND_TURN;
+	m_ModuleSpeedRequest[Module] = Speed;
+	m_ModuleTurnRequest[Module] = Turn;
+
 	if( MODULE_OWNERSHIP_REQUEST_SUCCESS != CheckAndSetOwner(Module) )
 	{
 		return FALSE; // failed to set move
@@ -444,7 +486,12 @@ BOOL CDriveControlModule::SetMoveDistance( int  Module, int Speed, int Turn, int
 
 void CDriveControlModule::SetSpeed( int  Module, int Speed, int Acceleration )
 {
-	// Lower priority modules can reduce speed, but not increase it.
+
+	// keep track of last setting each module requested, as hints for other modules
+	m_ModuleCommandRequest[Module] = HW_SET_SPEED_AND_TURN;
+	m_ModuleSpeedRequest[Module] = Speed;
+	//m_ModuleTurnRequest[Module] = Turn;
+
 	int Result = CheckAndSetOwner(Module);
 	if( MODULE_OWNERSHIP_REQUEST_SUCCESS == Result )
 	{
@@ -493,6 +540,13 @@ void CDriveControlModule::SetSpeed( int  Module, int Speed, int Acceleration )
 
 void CDriveControlModule::SetTurn( int  Module, int Turn, int Acceleration )
 {
+
+	// keep track of last setting each module requested, as hints for other modules
+	m_ModuleCommandRequest[Module] = HW_SET_SPEED_AND_TURN;
+	//m_ModuleSpeedRequest[Module] = Speed;
+	m_ModuleTurnRequest[Module] = Turn;
+
+
 	CString MsgString, ModuleName;
 	int Result = CheckAndSetOwner(Module);
 
@@ -542,6 +596,12 @@ void CDriveControlModule::SetTurn( int  Module, int Turn, int Acceleration )
 void CDriveControlModule::SetSpeedAndTurn( int  Module, int Speed, int Turn, int Acceleration )
 {
 	CString MsgString, ModuleName;
+
+	// keep track of last setting each module requested, as hints for other modules
+	m_ModuleCommandRequest[Module] = HW_SET_SPEED_AND_TURN;
+	m_ModuleSpeedRequest[Module] = Speed;
+	m_ModuleTurnRequest[Module] = Turn;
+
 	int Result = CheckAndSetOwner(Module);
 
 	if( MODULE_OWNERSHIP_REQUEST_SUCCESS == Result )
@@ -636,7 +696,6 @@ void CDriveControlModule::SetSpeedAndTurn( int  Module, int Speed, int Turn, int
 
 BOOL CDriveControlModule::CheckAndSetOwner( int  NewOwner )
 {
-
 	if( NewOwner == m_DriveOwner )
 	{
 		// Owner reasking for control
@@ -654,6 +713,11 @@ BOOL CDriveControlModule::CheckAndSetOwner( int  NewOwner )
 		// ownership timed out
 		MsgString.Format( "Motor Control: Owner %s has timed out", CurrentOwnerName );
 		ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
+
+		m_ModuleCommandRequest[m_DriveOwner] = HW_SET_MOTOR_STOP;
+		m_ModuleSpeedRequest[m_DriveOwner] = SPEED_STOP;
+		m_ModuleTurnRequest[m_DriveOwner] = TURN_CENTER;
+
 		m_DriveOwner = NO_MODULE;
 	}
 

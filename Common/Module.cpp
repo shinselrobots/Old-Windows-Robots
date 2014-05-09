@@ -672,7 +672,7 @@ void CUserCmdModule::ProcessMessage(
 			{
 				// reissue last drive command continuously to keep control of wheels
 				// TODO-MUST_DAVES this seems wrong?
-				//m_pDriveCtrl->SetSpeedAndTurn( REMOTE_USER_MODULE, m_CurrentSpeed, m_CurrentTurn );
+				m_pDriveCtrl->SetSpeedAndTurn( REMOTE_USER_MODULE, m_CurrentSpeed, m_CurrentTurn );
 			}
 
 		} // WM_ROBOT_SENSOR_STATUS_READY:

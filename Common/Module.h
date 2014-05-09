@@ -222,6 +222,7 @@ class KinectServoControl
 
 public:
 	int		GetTiltPosition();
+	bool	IsMoving();
 	void	SetTiltPosition(  int  NewOwner, int TiltTenthDegrees, int Speed = 0 ); // Speed optional.  0 = don't set
 	int		CheckServoPosition( BOOL verbose );
 	BOOL	CheckAndSetOwner( int  NewOwner );
@@ -329,6 +330,10 @@ public:
 	void ExecuteCommand();
 	void SetPicAck( int  Command, int  Speed, int  Turn );
 	BOOL RobotStopped();
+	int  GetModuleCommandRequest(int Module) { return (m_ModuleCommandRequest[Module]); }	// Inline
+	int  GetModuleSpeedRequest(int Module) { return (m_ModuleSpeedRequest[Module]); }	// Inline
+	int  GetModuleTurnRequest(int Module) { return (m_ModuleTurnRequest[Module]); }	// Inline
+
 
 //public:
 	//int		m_AutoNavigateMode;
@@ -361,6 +366,9 @@ protected:
 	int		m_UserOverrideMode;
 	BOOL	m_TrackCompassHeading;
 	int		m_TargetCompassHeading;
+	int		m_ModuleCommandRequest[NUMBER_OF_MOTOR_OWNERS];
+	int		m_ModuleSpeedRequest[NUMBER_OF_MOTOR_OWNERS];		// these are arrays, with index being the module ID
+	int		m_ModuleTurnRequest[NUMBER_OF_MOTOR_OWNERS];		// keep track of what modules want, as a hint to other modules
 
 };
 
@@ -956,7 +964,7 @@ public:
 	void	FindObjectsOnFloorRequest( int NumberOfTries );		// Queue up requests to find objects on the floor
 	void	FindObjectsOnFloor();							// finds 3D objects.  Assumes Kinect pointing down at the floor
 	void	FindObjectsInSingleScanLine( int  ScanLine, int NumberOfSamples, OBJECT_2D_ARRAY_T* pKinectObjects2D );
-	void	FindWallsAnd2dMaps();
+	BOOL	FindWallsAnd2dMaps();
 	void	UpdateKinectObjectSummary();
 	BOOL	OpenMemoryMappedFile();
 

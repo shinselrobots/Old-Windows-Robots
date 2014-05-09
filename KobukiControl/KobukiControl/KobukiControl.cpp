@@ -77,8 +77,11 @@ public:
 		parameters.angular_deceleration_limit = (-3.5*1.2);	// (-3.5*1.2);
 		*/
 
+		cout << "Calling Kobuki.init " << endl;
 		kobuki.init(parameters);
+		cout << "Calling Kobuki.enable " << endl;
 		kobuki.enable();
+		cout << "Connecting stream data " << endl;
 		slot_stream_data.connect("/kobuki/stream_data");
 		cout << "KobukiManager initialized " << endl;
 	}
@@ -510,6 +513,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	std::cout << "Starting Kobuki Driver Manager..." << std::endl;
 
 	CKobukiManager KobukiManager;
+	std::cout << "KobukiManager initialized..." << std::endl;
 
 	ecl::Sleep sleep(1);
 

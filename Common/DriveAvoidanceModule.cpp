@@ -164,12 +164,42 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 			// If needed, make sure Kinect is in postion to provide obstacle data
 			HandleKinectPosition();
 
-			if( 0 != m_pDriveCtrl->GetCurrentSpeed() )
+
+			// See if any behavior module is making the robot move
+			// Can't just use current speed, because this module may have made the robot move,
+			// but origional request cancelled or timed out
+			bool RobotMoveRequested = false;
+			for( int ModuleId = 1; ModuleId < AVOID_OBJECT_MODULE; ModuleId++ )
+			{
+				if( 0 != m_pDriveCtrl->GetModuleSpeedRequest(ModuleId) )
+				{
+					RobotMoveRequested = true; // some behavior is driving the robot to move
+					break;
+				}
+			}
+
+			if( 0 == m_pDriveCtrl->GetCurrentSpeed() )
+			{
+				return;
+			}
+
+/*
+			if( !RobotMoveRequested || (0 == m_pDriveCtrl->GetCurrentSpeed()) )
 			{
 				// Not moving (may be doing a spin turn, but thats OK)
 				// Don't do Avoidance behavior if we are not moving
+
+				if( m_pDriveCtrl->IsOwner(AVOID_OBJECT_MODULE) )
+				{
+					// No objects to avoid, but this module has control from last time.  Release control now
+					ROBOT_DISPLAY( TRUE, "Avoidance State: Done Avoiding Object" )
+					m_pDriveCtrl->SetSpeedAndTurn( AVOID_OBJECT_MODULE, SPEED_STOP, TURN_CENTER );
+					m_AvoidanceState = IDLE;
+					m_pDriveCtrl->ReleaseOwner( AVOID_OBJECT_MODULE );
+				}
 				return;
 			}
+*/
 
 			//int DbgSpeed = m_pDriveCtrl->GetCurrentSpeed();
 			//int DbgTurn = m_pDriveCtrl->GetCurrentTurn();
@@ -481,6 +511,7 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 				{
 					// No objects to avoid, but this module has control from last time.  Release control now
 					ROBOT_DISPLAY( TRUE, "Avoidance State: Done Avoiding Object" )
+					//m_pDriveCtrl->SetSpeedAndTurn( AVOID_OBJECT_MODULE, SPEED_STOP, TURN_CENTER );
 					m_AvoidanceState = IDLE;
 					m_pDriveCtrl->ReleaseOwner( AVOID_OBJECT_MODULE );
 				}
