@@ -77,7 +77,7 @@ CDriveControlModule::CDriveControlModule()
 void CDriveControlModule::BeginSensorUpdate()
 {
 	// At start of each Sensor Update cycle, clear out last owner unless programmed move or turn in progress
-	if( (0 != m_MoveDistanceRemaining) && (0 != m_TurnRotationRemaining) )
+	if( (0.0 == m_MoveDistanceRemaining) && (0.0 == m_TurnRotationRemaining) )
 	{
 		m_DriveOwner = NO_MODULE;	
 		m_Command			= HW_SET_MOTOR_STOP;
@@ -90,6 +90,9 @@ void CDriveControlModule::BeginSensorUpdate()
 
 void CDriveControlModule::EndSensorUpdate()
 {
+	ExecuteCommand();  // Alway execute, so lack of command means stop?
+
+	/*
 	// At start of each Sensor Update cycle, clear out last owner unless programmed move or turn in progress
 	if( m_CommandPending )
 	{
@@ -97,6 +100,7 @@ void CDriveControlModule::EndSensorUpdate()
 		ExecuteCommand();
 		m_CommandPending = FALSE;
 	}
+	*/
 }
 
 BOOL CDriveControlModule::MovementCommandPending()

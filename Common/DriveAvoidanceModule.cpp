@@ -164,11 +164,19 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 			// If needed, make sure Kinect is in postion to provide obstacle data
 			HandleKinectPosition();
 
-			//if( 0 != m_pDriveCtrl->GetCurrentSpeed() )
-			if( !m_pDriveCtrl->MovementCommandPending() )
+			if( 0 == m_pDriveCtrl->GetCurrentSpeed()  )
+			//if( !m_pDriveCtrl->MovementCommandPending() )
 			{
-				// Not moving (may be doing a spin turn, but thats OK)
-				// Don't do Avoidance behavior if we are not moving
+				// Not moving. Don't do Avoidance behavior if we are not moving
+
+				if( m_pDriveCtrl->IsOwner(AVOID_OBJECT_MODULE) )
+				{
+					// this module has control from last time.  Release control now
+					//ROBOT_DISPLAY( TRUE, "Avoidance State: Done Avoiding Object" )
+					//m_pDriveCtrl->SetSpeedAndTurn( AVOID_OBJECT_MODULE, SPEED_STOP, TURN_CENTER );
+					m_AvoidanceState = IDLE;
+					m_pDriveCtrl->ReleaseOwner( AVOID_OBJECT_MODULE );
+				}
 				return;
 			}
 
@@ -366,43 +374,41 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 					else
 					{
 						// Object Dead Ahead. Check side sensors for a hint
-						if( 0 != g_pNavSensorSummary->nSideObjectDirection )
+						if( g_pNavSensorSummary->nSideObjectDirection > 0 )
 						{
-							// In range of one of the side sensors ( and both not reading identical)
-							if( g_pNavSensorSummary->nSideObjectDirection > 0 )
+							// Object to the Right, Turn Left
+							ROBOT_LOG( TRUE, "AVOID_OBJECT_MODULE: Object Dead Ahead, turning Left (other object on right side)\n" )
+							Turn = TURN_LEFT_MED_SLOW;
+						}
+						if( g_pNavSensorSummary->nSideObjectDirection < 0 )
+						{
+							// Object to the Left, Turn Right
+							ROBOT_LOG( TRUE, "AVOID_OBJECT_MODULE: Object Dead Ahead, turning Right (other object on left side)\n" )
+							Turn = TURN_RIGHT_MED_SLOW;
+						}
+						else
+						{
+							// No idea which way to turn, so do a random turn
+							int RandomNumber = ((3 * rand()) / RAND_MAX);
+							if( RandomNumber >= 2 )
 							{
-								// Object to the Right, Turn Left
-								ROBOT_LOG( TRUE, "AVOID_OBJECT_MODULE: Object Dead Ahead, turning Left (other object on right side)\n" )
 								Turn = TURN_LEFT_MED_SLOW;
-							}
-							if( g_pNavSensorSummary->nSideObjectDirection < 0 )
-							{
-								// Object to the Left, Turn Right
-								ROBOT_LOG( TRUE, "AVOID_OBJECT_MODULE: Object Dead Ahead, turning Right (other object on left side)\n" )
-								Turn = TURN_RIGHT_MED_SLOW;
+								ROBOT_LOG( TRUE, "AVOID_OBJECT_MODULE: Object Dead Ahead!  Random Turn Left!\n" )
 							}
 							else
 							{
-								int RandomNumber = ((3 * rand()) / RAND_MAX);
-								if( RandomNumber >= 2 )
-								{
-									Turn = TURN_LEFT_MED_SLOW;
-									ROBOT_LOG( TRUE, "AVOID_OBJECT_MODULE: Object Dead Ahead!  Random Turn Left!\n" )
-								}
-								else
-								{
-									Turn = TURN_RIGHT_MED_SLOW;
-									ROBOT_LOG( TRUE, "AVOID_OBJECT_MODULE: Object Dead Ahead!  Random Turn Right!\n" )
-								}
+								Turn = TURN_RIGHT_MED_SLOW;
+								ROBOT_LOG( TRUE, "AVOID_OBJECT_MODULE: Object Dead Ahead!  Random Turn Right!\n" )
+							}
 
 								Speed = SPEED_FWD_MED_SLOW;
 								//Turn = TURN_RIGHT_MED_SLOW; // when in doubt, turn right
 							}
-						}
+
 					}	// End of object dead ahead
 
-					// If object is very close, stop and force a turn on axis
-					if( g_pNavSensorSummary->nFrontObjectDistance <= FRONT_ZONE_THREAT_MIN_THRESHOLD )
+					// If object is very close, stop and force a turn on axis (But make sure we are turning, so we don't just stall)
+					if( (g_pNavSensorSummary->nFrontObjectDistance <= FRONT_ZONE_THREAT_MIN_THRESHOLD) && (0 != Turn) )
 					{
 						Speed = SPEED_STOP;
 					}
@@ -809,7 +815,7 @@ void CAvoidObjectModule::HandleKinectPosition( )
 					// expired
 					// Move Kinect back into position to detect people, 
 					#if ( ROBOT_SERVER == 1 ) //////////////// SERVER ONLY //////////////////
-						m_pKinectServoControl->SetTiltPosition( KINECT_TILT_OWNER_COLLISION_AVOIDANCE, KINECT_HUMAN_DETECT_START_POSITION );
+///TODO-MUST_REMOVED FOR DEBUG_ONLY!						m_pKinectServoControl->SetTiltPosition( KINECT_TILT_OWNER_COLLISION_AVOIDANCE, KINECT_HUMAN_DETECT_START_POSITION );
 					#endif
 					m_WaitingToMoveKinect = FALSE;
 				}
