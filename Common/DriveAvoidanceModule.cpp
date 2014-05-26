@@ -140,7 +140,7 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 		}
 		break;
 
-		case WM_ROBOT_SERVO_STATUS_READY:
+		//case WM_ROBOT_SERVO_STATUS_READY:
 		case WM_ROBOT_SENSOR_STATUS_READY:
 		{
 			g_bCmdRecognized = TRUE;
@@ -164,42 +164,21 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 			// If needed, make sure Kinect is in postion to provide obstacle data
 			HandleKinectPosition();
 
-
-			// See if any behavior module is making the robot move
-			// Can't just use current speed, because this module may have made the robot move,
-			// but origional request cancelled or timed out
-			bool RobotMoveRequested = false;
-			for( int ModuleId = 1; ModuleId < AVOID_OBJECT_MODULE; ModuleId++ )
+			if( 0 == m_pDriveCtrl->GetCurrentSpeed()  )
+			//if( !m_pDriveCtrl->MovementCommandPending() )
 			{
-				if( 0 != m_pDriveCtrl->GetModuleSpeedRequest(ModuleId) )
-				{
-					RobotMoveRequested = true; // some behavior is driving the robot to move
-					break;
-				}
-			}
-
-			if( 0 == m_pDriveCtrl->GetCurrentSpeed() )
-			{
-				return;
-			}
-
-/*
-			if( !RobotMoveRequested || (0 == m_pDriveCtrl->GetCurrentSpeed()) )
-			{
-				// Not moving (may be doing a spin turn, but thats OK)
-				// Don't do Avoidance behavior if we are not moving
+				// Not moving. Don't do Avoidance behavior if we are not moving
 
 				if( m_pDriveCtrl->IsOwner(AVOID_OBJECT_MODULE) )
 				{
-					// No objects to avoid, but this module has control from last time.  Release control now
-					ROBOT_DISPLAY( TRUE, "Avoidance State: Done Avoiding Object" )
-					m_pDriveCtrl->SetSpeedAndTurn( AVOID_OBJECT_MODULE, SPEED_STOP, TURN_CENTER );
+					// this module has control from last time.  Release control now
+					//ROBOT_DISPLAY( TRUE, "Avoidance State: Done Avoiding Object" )
+					//m_pDriveCtrl->SetSpeedAndTurn( AVOID_OBJECT_MODULE, SPEED_STOP, TURN_CENTER );
 					m_AvoidanceState = IDLE;
 					m_pDriveCtrl->ReleaseOwner( AVOID_OBJECT_MODULE );
 				}
 				return;
 			}
-*/
 
 			//int DbgSpeed = m_pDriveCtrl->GetCurrentSpeed();
 			//int DbgTurn = m_pDriveCtrl->GetCurrentTurn();
@@ -224,7 +203,7 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 
 			// Avoid objects.  Turn while looking for a clear path
 
-			int  AvoidObjectDistanceTenthInches = __min( (g_GlobalMaxAvoidObjectDetectionFeet * 120), g_SegmentAvoidObjectRangeTenthInches );
+			// NOT USED: int  AvoidObjectDistanceTenthInches = __min( (g_GlobalMaxAvoidObjectDetectionFeet * 120), g_SegmentAvoidObjectRangeTenthInches );
 
 			///////////////////////////////////////////////////////////////////////////////////////////////////////////
 			#if SENSOR_CONFIG_TYPE == SENSOR_CONFIG_CARBOT
@@ -299,25 +278,6 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 				// See if we should move arms out of harms way
 				CheckArmSafePosition();
 
-				if(	(g_pNavSensorSummary->nFrontObjectDistance <= AvoidObjectDistanceTenthInches) ||
-					(g_pNavSensorSummary->nSideObjectDistance < m_SideAvoidDistanceTenthInches) )
-				{
-					// Something to avoid
-
-					// Tighen up the side distance; focus on avoiding current obstacle
-					gAvoidanceTimer = THREAT_PERSISTANCE_TIME;
-					// Slow down while manuvering
-/**
-					Speed = Speed - SPEED_FWD_SLOW;	// subtract one "speed level" from current speed
-					if( Speed < SPEED_FWD_SLOW ) Speed = SPEED_FWD_SLOW;
-					if( g_pNavSensorSummary->nFrontObjectDistance <= AVOIDANCE_SHARP_TURN_RANGE )
-					{
-						// Object is close!  A sharp turn is needed!
-						ROBOT_LOG( TRUE, "AVOID_OBJECT_MODULE: Forcing sharp turn to avoid close object\n" )
-						Speed = SPEED_FWD_SLOW;	// force almost a pivot turn
-					}
-**/
-				}
 
 				// Start Avoidance Behavior
 				Turn = 0;
@@ -327,38 +287,17 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 				if( DetectAndHandleCliff(Turn, Speed) )
 				{
 					ROBOT_LOG( TRUE, "AVOID_OBJECT_MODULE: Avoiding Cliff\n" )
+
 				}
 				else if( DetectAndHandleDoorway(Turn, Speed) )
 				{
 					ROBOT_LOG( TRUE, "AVOID_OBJECT_MODULE: Heading for Doorway\n" )
+
 				}
-#ifdef THISSTUFFEVERWORKS
-				else 
-				{
-					RecommendedDirectionVector = 0; ///RecommendClearestDirection();
-					ROBOT_LOG( TRUE, "AVOID_OBJECT_MODULE: RecommendClearestDirection = %d\n", RecommendedDirectionVector )
-						//TODO - TUNE THIS
-					if( RecommendedDirectionVector > 0 )
-					{
-							//Turn = TURN_RIGHT_MED;	// hard turn
-					}
-					else if( RecommendedDirectionVector < 0 )
-					{
-							//Turn = TURN_LEFT_MED;	// hard turn
-					}
-					else
-					{
-						ROBOT_LOG( TRUE, "AVOID_OBJECT_MODULE: RecommendClearestDirection HAS NO DIRECTION!\n" )
-					}
-					break; // debug
-				}				
-#endif // THISSTUFFEVERWORKS
-
-
-				// Avoid very close objects in key zones
 				else if( (g_pNavSensorSummary->nRightArmZone <= ARM_ZONE_THREAT_MIN_THRESHOLD) ||
 						 (g_pNavSensorSummary->nLeftArmZone <= ARM_ZONE_THREAT_MIN_THRESHOLD) )
 				{
+					// Avoid very close objects in key zones
 					// close object about to hit an arm
 					if( g_pNavSensorSummary->nRightArmZone < g_pNavSensorSummary->nLeftArmZone )
 					{
@@ -374,7 +313,7 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 					Speed = SPEED_FWD_SLOW;	// force a pivot turn
  
 				}
-				else if( g_pNavSensorSummary->nFrontObjectDistance <= AvoidObjectDistanceTenthInches )
+				else if( g_pNavSensorSummary->nFrontObjectDistance <= FRONT_ZONE_THREAT_NORM_THRESHOLD )
 				{
 					// There is an object somewhere in front of us. 
 					ROBOT_LOG( TRUE, "AVOID_OBJECT_MODULE: FrontObjectDistance = %d, direction = %d\n",
@@ -395,43 +334,41 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 					else
 					{
 						// Object Dead Ahead. Check side sensors for a hint
-						if( 0 != g_pNavSensorSummary->nSideObjectDirection )
+						if( g_pNavSensorSummary->nSideObjectDirection > 0 )
 						{
-							// In range of one of the side sensors ( and both not reading identical)
-							if( g_pNavSensorSummary->nSideObjectDirection > 0 )
+							// Object to the Right, Turn Left
+							ROBOT_LOG( TRUE, "AVOID_OBJECT_MODULE: Object Dead Ahead, turning Left (other object on right side)\n" )
+							Turn = TURN_LEFT_MED_SLOW;
+						}
+						if( g_pNavSensorSummary->nSideObjectDirection < 0 )
+						{
+							// Object to the Left, Turn Right
+							ROBOT_LOG( TRUE, "AVOID_OBJECT_MODULE: Object Dead Ahead, turning Right (other object on left side)\n" )
+							Turn = TURN_RIGHT_MED_SLOW;
+						}
+						else
+						{
+							// No idea which way to turn, so do a random turn
+							int RandomNumber = ((3 * rand()) / RAND_MAX);
+							if( RandomNumber >= 2 )
 							{
-								// Object to the Right, Turn Left
-								ROBOT_LOG( TRUE, "AVOID_OBJECT_MODULE: Object Dead Ahead, turning Left (other object on right side)\n" )
 								Turn = TURN_LEFT_MED_SLOW;
-							}
-							if( g_pNavSensorSummary->nSideObjectDirection < 0 )
-							{
-								// Object to the Left, Turn Right
-								ROBOT_LOG( TRUE, "AVOID_OBJECT_MODULE: Object Dead Ahead, turning Right (other object on left side)\n" )
-								Turn = TURN_RIGHT_MED_SLOW;
+								ROBOT_LOG( TRUE, "AVOID_OBJECT_MODULE: Object Dead Ahead!  Random Turn Left!\n" )
 							}
 							else
 							{
-								int RandomNumber = ((3 * rand()) / RAND_MAX);
-								if( RandomNumber >= 2 )
-								{
-									Turn = TURN_LEFT_MED_SLOW;
-									ROBOT_LOG( TRUE, "AVOID_OBJECT_MODULE: Object Dead Ahead!  Random Turn Left!\n" )
-								}
-								else
-								{
-									Turn = TURN_RIGHT_MED_SLOW;
-									ROBOT_LOG( TRUE, "AVOID_OBJECT_MODULE: Object Dead Ahead!  Random Turn Right!\n" )
-								}
+								Turn = TURN_RIGHT_MED_SLOW;
+								ROBOT_LOG( TRUE, "AVOID_OBJECT_MODULE: Object Dead Ahead!  Random Turn Right!\n" )
+							}
 
 								Speed = SPEED_FWD_MED_SLOW;
 								//Turn = TURN_RIGHT_MED_SLOW; // when in doubt, turn right
 							}
-						}
+
 					}	// End of object dead ahead
 
-					// If object is very close, stop and force a turn on axis
-					if( g_pNavSensorSummary->nFrontObjectDistance <= FRONT_ZONE_THREAT_MIN_THRESHOLD )
+					// If object is very close, stop and force a turn on axis (But make sure we are turning, so we don't just stall)
+					if( (g_pNavSensorSummary->nFrontObjectDistance <= FRONT_ZONE_THREAT_MIN_THRESHOLD) && (0 != Turn) )
 					{
 						Speed = SPEED_STOP;
 					}
@@ -481,37 +418,10 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 					ROBOT_DISPLAY( TRUE, "Avoidance State: AVOIDING" )
 
 				} 
-/***
-				else if( TURNING1 == m_AvoidanceState )
-				{
-					// We had been turning to avoid an object, and the way is clear now.
-					// Move forward a little before releasing control, so we don't just drive right back into the same object!
-					#ifndef AVOIDANCE_MOVES_DISABLED_FOR_TESTING
-						m_pDriveCtrl->SetMoveDistance( AVOID_OBJECT_MODULE, Speed, 
-							TURN_CENTER, AVOIDANCE_FORWARD_DISTANCE, DONT_STOP_AFTER);	// Don't stop when done, smoothly move to normal speed
-					#endif
-					ROBOT_LOG( TRUE, "Avoidance Module - Avoided, now going Forward Straight for a bit\n" )
-					m_AvoidanceState = FORWARD1;
-					ROBOT_DISPLAY( TRUE, "Avoidance State: FORWARD1" )
-				}
-				else if( FORWARD1 == m_AvoidanceState )
-				{
-					// Wait for drive control to report that we are done moving forward
-					if( m_pDriveCtrl->MoveDistanceCompleted() )
-					{
-						// Done moving forward, 
-						// Done recovering from object Avoidance. Ready to resume where we left off.
-						m_AvoidanceState = IDLE;
-						ROBOT_DISPLAY( TRUE, "Avoidance State: Done --> IDLE" )
-						m_pDriveCtrl->ReleaseOwner( AVOID_OBJECT_MODULE );
-					}
-				}
-***/
 				else if( m_pDriveCtrl->IsOwner(AVOID_OBJECT_MODULE) )
 				{
 					// No objects to avoid, but this module has control from last time.  Release control now
 					ROBOT_DISPLAY( TRUE, "Avoidance State: Done Avoiding Object" )
-					//m_pDriveCtrl->SetSpeedAndTurn( AVOID_OBJECT_MODULE, SPEED_STOP, TURN_CENTER );
 					m_AvoidanceState = IDLE;
 					m_pDriveCtrl->ReleaseOwner( AVOID_OBJECT_MODULE );
 				}
@@ -839,7 +749,7 @@ void CAvoidObjectModule::HandleKinectPosition( )
 					// expired
 					// Move Kinect back into position to detect people, 
 					#if ( ROBOT_SERVER == 1 ) //////////////// SERVER ONLY //////////////////
-						m_pKinectServoControl->SetTiltPosition( KINECT_TILT_OWNER_COLLISION_AVOIDANCE, KINECT_HUMAN_DETECT_START_POSITION );
+///TODO-MUST_REMOVED FOR DEBUG_ONLY!						m_pKinectServoControl->SetTiltPosition( KINECT_TILT_OWNER_COLLISION_AVOIDANCE, KINECT_HUMAN_DETECT_START_POSITION );
 					#endif
 					m_WaitingToMoveKinect = FALSE;
 				}

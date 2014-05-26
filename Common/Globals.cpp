@@ -315,6 +315,9 @@ int					g_nClientKeepAliveCount = 0;
 int					gStartTime = 0;				// Used to determine time since Robot started.  Warning, only good for 45 days! :-)
 int					gCurrentTime = 0;			// Convenient tenth second count-up timer
 int					gPicWatchDogTimer = 0;
+int					gKeyPressTimer = 0;
+int					gLocalUserCmdTimer = 0;
+int					gRemoteUserCmdTimer = 0;
 int					gMotorSpeedTimer = 0;
 int					gBrakeTimer = 0;
 int					gCollisionTimer = 0;
@@ -696,6 +699,18 @@ DWORD WINAPI TimerThreadProc( LPVOID NotUsed )
 
 				// Timers used by Modules:	// Assumes 1/10 second count!
 				
+				if( gKeyPressTimer != 0 ) 
+				{
+					gKeyPressTimer--;
+				}
+				if( gLocalUserCmdTimer != 0 ) 
+				{
+					gLocalUserCmdTimer--;
+				}
+				if( gRemoteUserCmdTimer != 0 ) 
+				{
+					gRemoteUserCmdTimer--;
+				}
 				if( gMotorSpeedTimer != 0 ) 
 				{
 					gMotorSpeedTimer--;

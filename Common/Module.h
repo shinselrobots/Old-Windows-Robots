@@ -222,7 +222,6 @@ class KinectServoControl
 
 public:
 	int		GetTiltPosition();
-	bool	IsMoving();
 	void	SetTiltPosition(  int  NewOwner, int TiltTenthDegrees, int Speed = 0 ); // Speed optional.  0 = don't set
 	int		CheckServoPosition( BOOL verbose );
 	BOOL	CheckAndSetOwner( int  NewOwner );
@@ -307,6 +306,11 @@ public:
 	BOOL MoveDistanceCompleted() { return (m_MoveDistanceRemaining == 0); }	// Inline
 	BOOL TurnRotationCompleted() { return (m_TurnRotationRemaining == 0); }	// Inline, used for both compass and odometry turns
 
+	void CDriveControlModule::BeginSensorUpdate();
+	void CDriveControlModule::EndSensorUpdate();
+	BOOL CDriveControlModule::MovementCommandPending();
+	void SetCommandPending() { m_CommandPending = TRUE; }	// Inline
+
 	void Brake( int  Module, int Acceleration = ACCELERATION_MEDIUM );
 	void Stop( int  Module, int Acceleration = ACCELERATION_MEDIUM );
 	void SetSpeed( int  Module, int Speed, int Acceleration = ACCELERATION_MEDIUM );
@@ -318,7 +322,7 @@ public:
 	BOOL SetTurnToCompassDirection( int  Module, int Speed, int Turn, int DesiredCompassHeading, BOOL StopAfterTurn );
 	void UpdateMoveDistance( double OdometerUpdate );
 	void UpdateTurnRotation( double RotationAngleAmount );
-	void SpeedControl();
+	//void SpeedControl();
 	int  SetTachometerTarget( int TargetSpeed );
 	void BrakeControl();
 
@@ -330,10 +334,6 @@ public:
 	void ExecuteCommand();
 	void SetPicAck( int  Command, int  Speed, int  Turn );
 	BOOL RobotStopped();
-	int  GetModuleCommandRequest(int Module) { return (m_ModuleCommandRequest[Module]); }	// Inline
-	int  GetModuleSpeedRequest(int Module) { return (m_ModuleSpeedRequest[Module]); }	// Inline
-	int  GetModuleTurnRequest(int Module) { return (m_ModuleTurnRequest[Module]); }	// Inline
-
 
 //public:
 	//int		m_AutoNavigateMode;
@@ -342,6 +342,7 @@ protected:
 //	PilotCmd_T	m_PilotCmd;
 	BOOL	m_MotorsPaused;
 	int 	m_Command;
+	BOOL	m_CommandPending;	// a Command is pending execution
 	int 	m_LastMotorCommand;
 	int		m_LastMotorSpeed;
 	int		m_LastMotorTurn;
@@ -366,9 +367,6 @@ protected:
 	int		m_UserOverrideMode;
 	BOOL	m_TrackCompassHeading;
 	int		m_TargetCompassHeading;
-	int		m_ModuleCommandRequest[NUMBER_OF_MOTOR_OWNERS];
-	int		m_ModuleSpeedRequest[NUMBER_OF_MOTOR_OWNERS];		// these are arrays, with index being the module ID
-	int		m_ModuleTurnRequest[NUMBER_OF_MOTOR_OWNERS];		// keep track of what modules want, as a hint to other modules
 
 };
 
@@ -519,8 +517,10 @@ public:
 
 protected:
 	CDriveControlModule	   *m_pDriveCtrl;
-	int						m_CurrentSpeed;
-	int						m_CurrentTurn;
+	int						m_LocalSpeed;
+	int						m_LocalTurn;
+	int						m_RemoteSpeed;
+	int						m_RemoteTurn;
 	//BOOL					m_UserOwnerRequested;
 	BOOL					m_AndroidHasMotorControl; // for Android phone contol of motors
 	BOOL					m_VidCapProcessingEnabled;
@@ -964,7 +964,7 @@ public:
 	void	FindObjectsOnFloorRequest( int NumberOfTries );		// Queue up requests to find objects on the floor
 	void	FindObjectsOnFloor();							// finds 3D objects.  Assumes Kinect pointing down at the floor
 	void	FindObjectsInSingleScanLine( int  ScanLine, int NumberOfSamples, OBJECT_2D_ARRAY_T* pKinectObjects2D );
-	BOOL	FindWallsAnd2dMaps();
+	void	FindWallsAnd2dMaps();
 	void	UpdateKinectObjectSummary();
 	BOOL	OpenMemoryMappedFile();
 

@@ -180,6 +180,7 @@
 #define IDC_BEHAVIOR_MODE_GO            1122
 #define IDC_STAT_IR_BUMPER_LOW_FRONT_LEFT 1122
 #define IDC_ARM_MOTION10                1122
+#define IDC_STAT_IR11                   1122
 #define IDC_STAT_COMPASS_ERROR          1123
 #define IDC_ARM_MOTION11                1123
 #define IDC_STAT_MOTOR_L                1124

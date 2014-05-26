@@ -155,6 +155,10 @@ DWORD WINAPI ControlThreadProc( LPVOID NotUsed )
 
 			// Dispatch the message to each module
 			// Sensor modules are called first, so all sensor data gets processed and fused to sensor summary other modues can use.
+			if( WM_ROBOT_SENSOR_STATUS_READY == (msg.message))
+			{
+				pDriveControlModule->BeginSensorUpdate();
+			}
 
 			////////////////////////////////////////
 			// Sensory Modules
@@ -216,7 +220,6 @@ DWORD WINAPI ControlThreadProc( LPVOID NotUsed )
 				__itt_task_end(pDomainControlThread);
 			}
 
-
 			if( !g_bCmdRecognized )
 			{
 				ROBOT_LOG( TRUE, _T( "Thread.cpp: ERROR unknown message (probably new) Msg = 0x%08lX, wParam = 0x%08lX, lParam = 0x%08lX\n"), 
@@ -231,7 +234,9 @@ DWORD WINAPI ControlThreadProc( LPVOID NotUsed )
 					///TAL_SCOPED_TASK_NAMED("Execute Drive Control");
 	//				ROBOT_LOG( TRUE,  "DBG: Thread Execute Cmd %02X\n",(msg.message) )
 					// 
-					pDriveControlModule->ExecuteCommand();
+					//pDriveControlModule->ExecuteCommand();
+					pDriveControlModule->EndSensorUpdate();
+
 				}
 			}
 			__itt_task_end(pDomainControlThread);  // pshControlThreadLoop

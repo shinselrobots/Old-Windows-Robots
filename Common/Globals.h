@@ -284,26 +284,20 @@ enum CAMERA_STATE {
 // Module Identifiers, in priority order (bigger number = higher priority)
 // But, lower priority modules may suppress higher priority modules (brain planning suppresses reflex)
 //#define	OVERRIDE_MODULE			0x80	// Emergency Override, used to stop robot
-
-enum DRIVE_MOTOR_OWNERS {
-	NO_MODULE = 0,		// Lowest Priority
-	GRID_NAV_MODULE,
-	WAY_POINT_NAV_MODULE,
-	BEHAVIOR_GOAL_MODULE,
-	REMOTE_USER_MODULE,
-	AVOID_OBJECT_MODULE,
-	COLLISION_MODULE,
-	LOCAL_USER_MODULE,	// Local direct control
-	NUMBER_OF_MOTOR_OWNERS	// for allocating memory
-		
-};
+#define	LOCAL_USER_MODULE		0x40	// Local direct control
+#define	COLLISION_MODULE		0x20
+#define	AVOID_OBJECT_MODULE		0x10
+#define	REMOTE_USER_MODULE		0x08
+#define BEHAVIOR_GOAL_MODULE	0x04
+#define	WAY_POINT_NAV_MODULE	0x02
+#define	GRID_NAV_MODULE			0x01
+#define	NO_MODULE				0x00
 
 ////////////////////////////////////////////////////////////////////////////////
 // Results of Owner Priority Check
 enum MODULE_OWNER_TEST_RESULT_T {
 		MODULE_SUPPRESSED = 0,				// Module Suppressed.  No action
-		MODULE_HIGHER_PRIORITY_HAS_CONTROL,	// Possible to negotiate speed and turn	
-		MODULE_ALREADY_IS_OWNER,		 
+		MODULE_HIGHER_PRIORITY_HAS_CONTROL,
 		MODULE_OWNERSHIP_REQUEST_SUCCESS,		 
 };
 // SUPPRESSED - do nothing
@@ -336,6 +330,12 @@ enum KINECT_SERVO_OWNERS {
 		KINECT_TILT_OWNER_USER_CONTROL		// Highest Priority
 };
 
+
+
+
+// All motor modules except for User:
+#define ALL_AUTO_MOTOR_MODULES (COLLISION_MODULE | AVOID_OBJECT_MODULE | WAY_POINT_NAV_MODULE | GRID_NAV_MODULE)
+#define AVOID_AND_COLLISION_MODULES (COLLISION_MODULE | AVOID_OBJECT_MODULE )
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1175,6 +1175,9 @@ extern int					g_nClientKeepAliveCount;
 extern int					gStartTime;				// Time that the robot started executing.  Used as baseline for time numbers
 extern int					gCurrentTime;			// Convenient tenth second count-up timer
 extern int					gPicWatchDogTimer;
+extern int					gKeyPressTimer;			// 
+extern int					gLocalUserCmdTimer;		// 
+extern int					gRemoteUserCmdTimer;	// 
 extern int					gMotorSpeedTimer;
 extern int					gBrakeTimer;
 extern int					gCollisionTimer;

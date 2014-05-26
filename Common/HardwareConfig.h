@@ -104,6 +104,7 @@
 	#define HALF_ROBOT_CLAW_WIDTH_TENTH_INCHES				20
 
 	// Sensor Zones for object avoidance
+	#define FRONT_ZONE_THREAT_NORM_THRESHOLD	   180		// Tenth_Inches - Always avoid objects closer then this on the front
 	#define FRONT_ZONE_THREAT_MIN_THRESHOLD		   120		// Tenth_Inches - Always avoid objects closer then this on the front
 	#define ARM_ZONE_THREAT_MIN_THRESHOLD		    30		// Tenth_Inches - Always avoid objects closer then this on the front
 	#define SIDE_THREAT_MIN_THRESHOLD			    50		// Tenth_Inches - avoid objects closer then this on the side
@@ -216,6 +217,7 @@
 	#define HALF_ROBOT_CLAW_WIDTH_TENTH_INCHES				20
 
 	// Sensor Zones for object avoidance
+	#define FRONT_ZONE_THREAT_NORM_THRESHOLD	   180		// Tenth_Inches - Always avoid objects closer then this on the front
 	#define FRONT_ZONE_THREAT_MIN_THRESHOLD		 120	// Tenth_Inches - Always avoid objects closer then this on the front
 	#define ARM_ZONE_THREAT_MIN_THRESHOLD		  30	// Tenth_Inches - Always avoid objects closer then this on the front
 	#define SIDE_THREAT_MIN_THRESHOLD			  40	// Tenth_Inches - avoid objects closer then this on the side
@@ -336,6 +338,7 @@
 	const int HALF_ROBOT_CLAW_WIDTH_TENTH_INCHES =				20;
 
 	// Sensor Zones for object avoidance
+	const int FRONT_ZONE_THREAT_NORM_THRESHOLD =				180;	// Tenth_Inches - Avoid objects closer then this on the front
 	const int FRONT_ZONE_THREAT_MIN_THRESHOLD =					120;	// Tenth_Inches - Always avoid objects closer then this on the front
 	const int ARM_ZONE_THREAT_MIN_THRESHOLD	=					 30;	// Tenth_Inches - Always avoid objects closer then this on the front
 	const int SIDE_THREAT_MIN_THRESHOLD	=						 40;	// Tenth_Inches - avoid objects closer then this on the side

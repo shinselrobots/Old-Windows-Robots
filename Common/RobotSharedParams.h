@@ -50,11 +50,9 @@ enum WM_ROBOT_MESSAGES {
 		WM_ROBOT_MESSAGE_BASE = WM_APP,				// Start at App Base message
 		WM_ROBOT_REQUEST_STATUS_CMD,				// WM_ROBOT_MESSAGE_BASE + 0x01	// Usually Sent directly to HW thread, except simulation
 		WM_ROBOT_REQUEST_VERSION_CMD,				// Request version from Arduino
-		//WM_ROBOT_JOYSTICK_DRIVE_CMD,				// wParam = Owner, lParam: HiWord, LowWord = speed, turn
-		WM_ROBOT_STOP_CMD,							// Will force a stop. Use WM_ROBOT_JOYSTICK_DRIVE_CMD with speed zero unless strong stop needed?
-		WM_ROBOT_DRIVE_LOCAL_CMD,					// FUTURE: User has local, direct control of the robot, 
-		WM_ROBOT_DRIVE_REMOTE_CMD,					// FUTURE: or is remote (can't see robot directly)
-		//WM_ROBOT_SET_USER_PRIORITY,					// Override command for User control of the robot (PANIC stop)
+		WM_ROBOT_STOP_CMD,							// Will force a stop.
+		WM_ROBOT_DRIVE_LOCAL_CMD,					// User has local, direct control of the robot, wParam = Speed, lParam = Turn 
+		WM_ROBOT_DRIVE_REMOTE_CMD,					// User is remote (can't see robot directly), wParam = Speed, lParam = Turn
 		WM_ROBOT_GET_SERVO_STATUS,				
 
 		// HW Responses
