@@ -517,8 +517,10 @@ public:
 
 protected:
 	CDriveControlModule	   *m_pDriveCtrl;
-	int						m_CurrentSpeed;
-	int						m_CurrentTurn;
+	int						m_LocalSpeed;
+	int						m_LocalTurn;
+	int						m_RemoteSpeed;
+	int						m_RemoteTurn;
 	//BOOL					m_UserOwnerRequested;
 	BOOL					m_AndroidHasMotorControl; // for Android phone contol of motors
 	BOOL					m_VidCapProcessingEnabled;

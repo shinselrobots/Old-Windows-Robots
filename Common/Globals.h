@@ -297,8 +297,7 @@ enum CAMERA_STATE {
 // Results of Owner Priority Check
 enum MODULE_OWNER_TEST_RESULT_T {
 		MODULE_SUPPRESSED = 0,				// Module Suppressed.  No action
-		MODULE_HIGHER_PRIORITY_HAS_CONTROL,	// Possible to negotiate speed and turn	
-		MODULE_ALREADY_IS_OWNER,		 
+		MODULE_HIGHER_PRIORITY_HAS_CONTROL,
 		MODULE_OWNERSHIP_REQUEST_SUCCESS,		 
 };
 // SUPPRESSED - do nothing
@@ -1176,6 +1175,9 @@ extern int					g_nClientKeepAliveCount;
 extern int					gStartTime;				// Time that the robot started executing.  Used as baseline for time numbers
 extern int					gCurrentTime;			// Convenient tenth second count-up timer
 extern int					gPicWatchDogTimer;
+extern int					gKeyPressTimer;			// 
+extern int					gLocalUserCmdTimer;		// 
+extern int					gRemoteUserCmdTimer;	// 
 extern int					gMotorSpeedTimer;
 extern int					gBrakeTimer;
 extern int					gCollisionTimer;
