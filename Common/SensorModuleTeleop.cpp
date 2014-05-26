@@ -436,8 +436,8 @@ const int  DistanceTable_IRLongRangeKobuki[] =
 
 		int RangeTenthInches = NO_OBJECT_IN_RANGE;
 
-		int MaxInches = 66;	// 5 ft, 6 Inches
-		for( int index=0; index <= MaxInches; index++ )	// Table goes to 72" Max - 6 feet (but only really accurate to ~5 feet)
+		int MaxInches = 48;	// 4 ft
+		for( int index=0; index <= MaxInches; index++ )	// Table goes to 72" Max - 6 feet (but noisy after ~4 feet)
 		{
 			if( nReading >= DistanceTable_IRLongRangeKobuki[index]  )
 			{
