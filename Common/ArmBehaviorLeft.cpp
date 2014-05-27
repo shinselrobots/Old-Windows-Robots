@@ -1138,7 +1138,7 @@ void CBehaviorModule::HandleArmServoStatusUpdateLeft( WPARAM wParam, LPARAM lPar
 							{
 								// Camera is disabled, just say something
 								#if ( PUBLIC_DEMO == 1)
-									RandomNumber = 0;
+									//RandomNumber = 0;
 									SpeakText( "This is my ball" );
 								#else
 									int RandomNumber = ((4 * rand()) / RAND_MAX);

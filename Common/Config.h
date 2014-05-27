@@ -37,7 +37,7 @@
 
 #define REPORT_CLOSE_OBJECTS		0
 
-#define PUBLIC_DEMO					0 // enable if doing public demos; modifies some behaviors
+#define PUBLIC_DEMO					1 // enable if doing public demos; modifies some behaviors
 
 //****************************************************************************
 

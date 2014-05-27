@@ -658,44 +658,5 @@ void CKobukiControl::HandleCommand( int  Request, int  Param1, int  Param2 )
 
 }
 
-/*
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Kobuki Status Parser Class
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define START_BYTE				19
-#define ASCII_CARRIAGE_RTN		13
-#define ASCII_LINE_FEED			10
-#define ASCII_SPACE				32
-#define ASCII_Z				   122
-#define FULL_SENSOR_PACKET_SIZE		53 // The only thing we ever ask for is the full sensor packet
-#define CHECKSUM_OFFSET		(FULL_SENSOR_PACKET_SIZE+2)
-
-CKobukiParser::CKobukiParser()
-{
-	//m_pReadBuf[KOBUKI_READ_BUF_SIZE]
-}
-
-CKobukiParser::~CKobukiParser()
-{
-//	SAFE_DELETE(m_pCmdBuf);
-
-}
-
-BOOL CKobukiParser::ParseBuffer( unsigned char* KobukiSIOBuf, int dwSIOBytesReceived )
-{
-
-	// NOT USED - KOBUKI moved to separate process!
-	if( dwSIOBytesReceived > KOBUKI_READ_BUF_SIZE )
-	{
-		TRACE( "CKobukiParser: ERROR - dwSIOBytesReceived too big! %d", dwSIOBytesReceived );
-		return 0;
-	}
-
-
-
-	return TRUE; // assume communicaton established
-
-}
-*/
 
 #endif // ROBOT_SERVER  // Nothing in this file used for client!

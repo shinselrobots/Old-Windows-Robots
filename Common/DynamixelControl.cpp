@@ -3173,8 +3173,10 @@ void CDynaControl::HandleCommand( int  Request, int  Param1, int  Param2, int  O
 			{
 
 					__itt_task_begin(pDomainSmartServoThread, __itt_null, __itt_null, psh_csServoLock);
-					EnterCriticalSection(&g_csServoLock);
-					memcpy( m_BulkServoCmdCopy, g_BulkServoCmd, (sizeof(BULK_SERVO_CMD_T))* NUMBER_OF_SMART_SERVOS+1 );
+						EnterCriticalSection(&g_csServoLock);
+							memcpy( m_BulkServoCmdCopy, g_BulkServoCmd, (sizeof(BULK_SERVO_CMD_T))* NUMBER_OF_SMART_SERVOS+1 );
+						LeaveCriticalSection(&g_csServoLock);
+					__itt_task_end(pDomainSmartServoThread);
 
 					// DEBUG!!!
 					/*	if( m_BulkServoCmdCopy[ServoID].Delay != 0 )
@@ -3203,8 +3205,6 @@ void CDynaControl::HandleCommand( int  Request, int  Param1, int  Param2, int  O
 						return; // if no arms installed
 					}
 
-				LeaveCriticalSection(&g_csServoLock);
-				__itt_task_end(pDomainSmartServoThread);
 			}
 			while( WaitForDelay )
 			{

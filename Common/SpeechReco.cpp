@@ -146,6 +146,7 @@ void CRobotSpeechReco::CmdToString( UINT Command, CString &CmdString )
         case SpeechCmd_Mic:				CmdString = "Mic";				break;
         case SpeechCmd_Lights:			CmdString = "Lights";			break;
         case SpeechCmd_Move:			CmdString = "Move";				break;
+        case SpeechCmd_SmallMove:		CmdString = "SmallMove";		break;
 		case SpeechCmd_Explore:			CmdString = "Explore";			break;
         case SpeechCmd_Spin:			CmdString = "Spin";				break;
         case SpeechCmd_Turn:			CmdString = "Turn";				break;
@@ -540,19 +541,21 @@ if( m_bPlaySimonSays && !m_bSimonSays )
 		}
 
 		case SpeechCmd_Move:
+		case SpeechCmd_SmallMove:
 		{
-			ROBOT_DISPLAY( TRUE, "SpeechReco Command Recognized: Move Forward")
 			if( MovementEnabled() )
 			{
 				if( SpeechParam_Forward == Param2 )
 				{
 					ROBOT_DISPLAY( TRUE, "SpeechReco Command Recognized: Move Forward")
-					// Respond to the command with action, then talk
-					const DWORD DistTenthInches = 120; // move set distance forward
-					// Owner is always assumed to be REMOTE_USER_MODULE for this command:
+					DWORD DistTenthInches = 120; // move SMALL set distance forward
+					if( SpeechCmd_Move == Command )
+					{
+						ROBOT_DISPLAY( TRUE, "   --> Move BIG")
+						DistTenthInches = 360;  // move long distance forward
+					}
 					SpeechSendCommand( WM_ROBOT_MOVE_SET_DISTANCE_CMD, DistTenthInches, FORWARD );	// wParam = distance in TENTH INCHES, lParam = direction
-					//RobotSleep(500, pDomainSpeakThread);
-					// Respond with random phrases
+
 					int RandomNumber = ((4 * rand()) / RAND_MAX);
 					ROBOT_LOG( TRUE, "DEBUG: RAND = %d\n", RandomNumber)
 					switch( RandomNumber )
@@ -566,13 +569,15 @@ if( m_bPlaySimonSays && !m_bSimonSays )
 				else if( SpeechParam_Reverse == Param2 )
 				{
 					ROBOT_DISPLAY( TRUE, "SpeechReco Command Recognized: Move Back")
-					// Respond to the command with action, then talk
-					const DWORD DistTenthInches = 90;
-					// Owner is always assumed to be REMOTE_USER_MODULE for this command:
+					DWORD DistTenthInches = 90;
+					if( SpeechCmd_Move == Command )
+					{
+						ROBOT_DISPLAY( TRUE, "   --> Move BIG")
+						DistTenthInches = 240;  // move long distance forward
+					}
 					SpeechSendCommand( WM_ROBOT_MOVE_SET_DISTANCE_CMD, DistTenthInches, REVERSE );	// wParam = distance in TENTH INCHES, lParam = direction
 					RobotSleep(1000, pDomainSpeakThread); // Allow action to start before talking
 
-					// Respond with random phrases
 					int RandomNumber = ((3 * rand()) / RAND_MAX);
 					ROBOT_LOG( TRUE, "DEBUG: RAND = %d\n", RandomNumber)
 					switch( RandomNumber )
@@ -596,8 +601,36 @@ if( m_bPlaySimonSays && !m_bSimonSays )
 			{
 				if( g_LastHumanCompassDirection < 0 )
 				{
-					ROBOT_DISPLAY( TRUE, "SpeechReco Command: Face Me - ERROR, g_LastHumanCompassDirection < 0") // no human previously found
-					Speak( "I am having a problem detecting your location" );
+
+					// Person not seen by Kinect, so use their voice
+					//Speak( "I am turning to the sound of your voice" ); 
+					//RobotSleep(500, pDomainSpeakThread);
+					ROBOT_DISPLAY( TRUE, "SpeechReco Command: Face Me - Person not found, Turning toward Voice") // no human previously found
+
+					int TurnAmt = abs( (int)(g_LastHumanAudioBeamDirection * (float)1.5) );		//Audio Angle in Degrees
+					if( g_LastHumanAudioBeamDirection < 0 )
+					{
+						SpeechSendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, TurnAmt, TURN_RIGHT_MED );	// wParam = distance in degrees, lParam = direction and speed
+					}
+					if( g_LastHumanAudioBeamDirection > 0 )
+					{
+						SpeechSendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, TurnAmt, TURN_LEFT_MED );	// wParam = distance in degrees, lParam = direction and speed
+					}
+					RobotSleep(500, pDomainSpeakThread);
+					// Respond with random phrases
+					int RandomNumber = ((3 * rand()) / RAND_MAX);
+					ROBOT_LOG( TRUE, "DEBUG: RAND = %d\n", RandomNumber)
+					switch( RandomNumber )
+					{
+						case 0:  Speak( "How is this" );break;
+						default: Speak( "ok" ); // If const is larger number, this gets called more often
+					}
+
+
+					//ROBOT_DISPLAY( TRUE, "SpeechReco Command: Face Me - ERROR, g_LastHumanCompassDirection < 0") // no human previously found
+					//Speak( "I am having a problem detecting your location" );
+
+
 				}
 				else
 				{
@@ -656,7 +689,7 @@ if( m_bPlaySimonSays && !m_bSimonSays )
 				// Spin in place
 				if( SpeechParam_Left == Param2 )
 				{
-					SpeechSendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, 180, TURN_LEFT_MED );	// wParam = distance in degrees, lParam = direction and speed
+					SpeechSendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, TURN_AMOUNT_180_DEGREES, TURN_LEFT_MED );	// wParam = distance in degrees, lParam = direction and speed
 					RobotSleep(500, pDomainSpeakThread);
 					// Respond with random phrases
 					int RandomNumber = ((5 * rand()) / RAND_MAX);
@@ -672,7 +705,7 @@ if( m_bPlaySimonSays && !m_bSimonSays )
 				}
 				else if( SpeechParam_Right == Param2 )
 				{
-					SpeechSendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, 180, TURN_RIGHT_MED );	// wParam = distance in degrees, lParam = direction and speed
+					SpeechSendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, TURN_AMOUNT_180_DEGREES, TURN_RIGHT_MED );	// wParam = distance in degrees, lParam = direction and speed
 					RobotSleep(500, pDomainSpeakThread);
 					// Respond with random phrases
 					int RandomNumber = ((5 * rand()) / RAND_MAX);
@@ -706,7 +739,7 @@ if( m_bPlaySimonSays && !m_bSimonSays )
 					if( SPEED_STOP == m_CurrentSpeed )
 					{
 						// Not currently moving, so assume user wants to turn in place
-						SpeechSendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, 90, TURN_LEFT_MED );	// wParam = distance in degrees, lParam = direction and speed
+						SpeechSendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, TURN_AMOUNT_90_DEGREES, TURN_LEFT_MED );	// wParam = distance in degrees, lParam = direction and speed
 						RobotSleep(500, pDomainSpeakThread);
 						// Respond with random phrases
 						int RandomNumber = ((3 * rand()) / RAND_MAX);
@@ -738,7 +771,7 @@ if( m_bPlaySimonSays && !m_bSimonSays )
 					if( SPEED_STOP == m_CurrentSpeed )
 					{
 						// Not currently moving, so assume user wants to turn in place
-						SpeechSendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, 90, TURN_RIGHT_MED );	// wParam = distance in degrees, lParam = direction and speed
+						SpeechSendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, TURN_AMOUNT_90_DEGREES, TURN_RIGHT_MED );	// wParam = distance in degrees, lParam = direction and speed
 						RobotSleep(500, pDomainSpeakThread);
 						// Respond with random phrases
 						int RandomNumber = ((3 * rand()) / RAND_MAX);
@@ -785,7 +818,7 @@ if( m_bPlaySimonSays && !m_bSimonSays )
 					if( SPEED_STOP == m_CurrentSpeed )
 					{
 						// Not currently moving, so assume user wants to turn in place
-						SpeechSendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, 45, TURN_LEFT_MED );	// wParam = distance in degrees, lParam = direction and speed
+						SpeechSendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, TURN_AMOUNT_45_DEGREES, TURN_LEFT_MED );	// wParam = distance in degrees, lParam = direction and speed
 						RobotSleep(500, pDomainSpeakThread);
 						// Respond with random phrases
 						int RandomNumber = ((3 * rand()) / RAND_MAX);
@@ -817,7 +850,7 @@ if( m_bPlaySimonSays && !m_bSimonSays )
 					if( SPEED_STOP == m_CurrentSpeed )
 					{
 						// Not currently moving, so assume user wants to turn in place
-						SpeechSendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, 45, TURN_RIGHT_MED );	// wParam = distance in degrees, lParam = direction and speed
+						SpeechSendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, TURN_AMOUNT_45_DEGREES, TURN_RIGHT_MED );	// wParam = distance in degrees, lParam = direction and speed
 						RobotSleep(500, pDomainSpeakThread);
 						// Respond with random phrases
 						int RandomNumber = ((3 * rand()) / RAND_MAX);
@@ -1446,7 +1479,7 @@ if( m_bPlaySimonSays && !m_bSimonSays )
 		{
 			// Turn in the direction of the speaker's voice!
 			//g_LastHumanAudioBeamDirection //Audio Angle in TenthDegrees
-			ROBOT_DISPLAY( TRUE, "SpeechReco Command Recognized: Turn Towards Me NOT IMPLEMENTED!")
+			ROBOT_DISPLAY( TRUE, "SpeechReco Command Recognized: Turn Towards Me NOT IMPLEMENTED?") // TODO-MUST Test This
 			if( MovementEnabled() )
 			{
 				// Respond to the command with action, then talk
@@ -1841,12 +1874,10 @@ if( m_bPlaySimonSays && !m_bSimonSays )
 		{
 			ROBOT_DISPLAY( TRUE, "SpeechReco Command Recognized: Introduction")
 			//SendCommand( WM_ROBOT_TEXT_MESSAGE_TO_SERVER, WM_ROBOT_SPEAK_TEXT, SPEAK_INTRO );
-			SpeechSendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, 120, TURN_RIGHT_MED );	// wParam = distance in degrees, lParam = direction and speed
+			SpeechSendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, TURN_AMOUNT_90_DEGREES, TURN_RIGHT_MED );	// wParam = distance in degrees, lParam = direction and speed
 			SpeechSendCommand( WM_ROBOT_USER_CAMERA_PAN_CMD, (DWORD)CAMERA_PAN_ABS_CENTER, 5 ); // face forward
 			RobotSleep(1000, pDomainSpeakThread);
 			SpeechSendCommand( WM_ROBOT_USER_CAMERA_PAN_CMD, (DWORD)CAMERA_PAN_ABS_CENTER, 5 ); // face forward
-			SpeechSendCommand( WM_ROBOT_SET_ARM_MOVEMENT, (DWORD)RIGHT_ARM, (DWORD)ARM_MOVEMENT_WAVE );	// Right/Left arm, Movement to execute, 
-			Sleep(3000);
 			SpeechSendCommand( WM_ROBOT_SET_ARM_MOVEMENT, (DWORD)RIGHT_ARM, (DWORD)ARM_MOVEMENT_WAVE );	// Right/Left arm, Movement to execute, 
 			Sleep(3000);
 			PostThreadMessage( g_dwSpeakThreadId, WM_ROBOT_SPEAK_TEXT, SPEAK_INTRO, 0 );

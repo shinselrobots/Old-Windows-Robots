@@ -75,6 +75,10 @@ xmlns="http://www.w3.org/2001/06/grammar">
         <tag> $.Param1="FOLLOW"; </tag>
       </item>
 
+      <item>  come here
+        <tag> $.Param1="COME_HERE"; </tag>
+      </item>
+
       <item>  what time is it 
         <tag> $.Param1="DO_WHAT_TIME"; </tag>
       </item>
@@ -170,15 +174,25 @@ xmlns="http://www.w3.org/2001/06/grammar">
       
       <item>
         <!-- move short distance fwd/back -->
+        <item> move a little </item>
+        <tag> $.Param1="SMALL_MOVE"; </tag>
+        <ruleref uri="#FwdRev"/>
+        <tag> $.Param2=$$.Param; </tag>
+      </item>
+      
+      <item>  back up
+        <tag> $.Param1="SMALL_MOVE"; </tag>
+        <tag> $.Param2="REVERSE"; </tag>
+      </item>
+
+      <item>
+        <!-- move short distance fwd/back -->
         <item> move </item>
         <tag> $.Param1="MOVE"; </tag>
         <ruleref uri="#FwdRev"/>
         <tag> $.Param2=$$.Param; </tag>
       </item>
-      <item>  back up 
-        <tag> $.Param1="MOVE"; </tag>
-        <tag> $.Param2="REVERSE"; </tag>
-      </item>
+
 
       <item>
         <!-- move continuously fwd -->
@@ -204,7 +218,7 @@ xmlns="http://www.w3.org/2001/06/grammar">
 
       <item>
         <one-of>
-          <item> small turn </item>
+          <item> turn a little </item>
           <item> bear  </item>
         </one-of>
         <tag> $.Param1="SMALL_TURN"; </tag>

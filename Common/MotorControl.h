@@ -508,18 +508,3 @@ protected:
 
 };
 
-/**
-/////////////////////////////////////////////////////////////////////////////
-class CKobukiParser
-{
-
-public:
-	CKobukiParser();
-	~CKobukiParser();
-
-	BOOL ParseBuffer( unsigned char* KobukiSIOBuf, int dwSIOBytesReceived );
-
-//protected:
-
-};
-**/

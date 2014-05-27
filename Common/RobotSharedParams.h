@@ -41,6 +41,11 @@
 //#define SET_USER_LOCAL					0x02
 //#define SET_USER_LOCAL_AND_STOP			0x03
 
+// Fine turn turn amounts here
+#define TURN_AMOUNT_45_DEGREES				  40
+#define TURN_AMOUNT_90_DEGREES				  80
+#define TURN_AMOUNT_180_DEGREES			 	 170
+
 
 /////////////////////////////////////////////////////////////////////////////
 enum WM_ROBOT_MESSAGES { 

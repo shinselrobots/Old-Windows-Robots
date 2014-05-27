@@ -162,7 +162,6 @@ __itt_string_handle* pshHeadCenter = __itt_string_handle_create("HeadCenter");
 void CBehaviorModule::RightArmHome()
 {
 	// Move all right arm seros to home position, and reset to default speed
-#if ( 1 == ROBOT_HAS_RIGHT_ARM  )
 	__itt_marker(pDomainControlThread, __itt_null, pshRightArmHome, __itt_marker_scope_task);
 	__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, pshRightArmHome);
 	m_pArmControlRight->MoveArmHome( m_ArmSpeedRight );
@@ -172,13 +171,11 @@ void CBehaviorModule::RightArmHome()
 	m_ArmMovementStateRight = 0;	// back to Idle state
 	m_ArmMovementRight = ARM_MOVEMENT_NONE; // back to Idle state
 	__itt_task_end(pDomainControlThread);
-#endif
 }
 ///////////////////////////////////////////////////////////////////////////////
 void CBehaviorModule::LeftArmHome()
 {
 	// Move all arm seros to home position, and reset to default speed
-#if ( 1 == ROBOT_HAS_LEFT_ARM  )
 	__itt_marker(pDomainControlThread, __itt_null, pshLeftArmHome, __itt_marker_scope_task);
 	__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, pshLeftArmHome);
 	m_pArmControlLeft->MoveArmHome( m_ArmSpeedLeft );
@@ -188,7 +185,6 @@ void CBehaviorModule::LeftArmHome()
 	m_ArmMovementStateLeft = 0;	// back to Idle state
 	m_ArmMovementLeft = ARM_MOVEMENT_NONE; // back to Idle state
 	__itt_task_end(pDomainControlThread);
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -254,28 +250,6 @@ void CBehaviorModule::ProcessMessage(
 		}
 		break;
 
-/*
-		case WM_ROBOT_SET_USER_PRIORITY:
-		{
-			g_bCmdRecognized = TRUE;
-			// This command only comes from a user doing manual control
-			// Allows user to override higher priority modules, or release control when done.
-			// wParam = action to take
-
-
-			if( SET_USER_LOCAL_AND_STOP == wParam )
-			{
-				// Other modules will handle the stop.  For Behavior module, this means cancel current behavior and go back to idle
-				// Example: SpeechSendCommand( WM_ROBOT_SET_USER_PRIORITY, SET_USER_LOCAL_AND_STOP, 0 ); // FORCE STOP, no matter what!
-				m_CurrentActionMode = ACTION_MODE_NONE;
-				m_CurrentTask = TASK_NONE;
-				m_TaskState = 0;
-				RightArmHome();
-				LeftArmHome();
-			}
-		}
-		break;
-*/
 		case WM_ROBOT_SET_BEHAVIOR_CMD:
 		{
 			g_bCmdRecognized = TRUE;
@@ -553,8 +527,6 @@ void CBehaviorModule::ProcessMessage(
 		case WM_ROBOT_USER_CAMERA_PAN_CMD:
 		{
 			g_bCmdRecognized = TRUE;
-			// wParam = Pan/Tilt Command enumeration
-			// lParam = Speed
 			// Send Command to tell camera to move Pan and Tilt
 			// This command controls both Pan and Tilt
 			HandleUserHeadMovementCmd(wParam, lParam );
@@ -707,7 +679,7 @@ void CBehaviorModule::ProcessMessage(
 		{
 			// Tell camera to go to ABSOLUTE PAN position specified in TENTHDEGREES
 			// wParam = position to move to
-			// lParam = movement speed
+			// lParam = speed
 			g_bCmdRecognized = TRUE;
 			m_pHeadControl->SetHeadPosition( HEAD_OWNER_USER_CONTROL, wParam, NOP, NOP );	// Pan only
 			if( 0 != lParam )
@@ -727,7 +699,6 @@ void CBehaviorModule::ProcessMessage(
 		{
 			// Tell camera to go to ABSOLUTE TILT position specified in TENTHDEGREES
 			// wParam = position to move to
-			// lParam = movement speed
 
 			g_bCmdRecognized = TRUE;
 			if( 0 != lParam )
@@ -1006,18 +977,12 @@ void CBehaviorModule::ProcessMessage(
 						break;
 					}
 
-					default:
-					{
-						ROBOT_DISPLAY( TRUE, "ERROR! BAD ACTION MODE! (%02X)", m_CurrentActionMode )
-					}
 
 				}	// switch m_CurrentActionMode
 			} // If !ACTION_MODE_NONE
 			else
 			{
-				// Do Idle processing for Humanoid robots only
-				#if ( ROBOT_TYPE == LOKI )
-
+				// Do Idle processing
 				if( gEnableIdleMovements )
 				{
 					if( (gHeadIdle) && (0 == gHeadIdleTimer) )
@@ -1034,7 +999,6 @@ void CBehaviorModule::ProcessMessage(
 						m_pArmControlLeft->DoIdleArmMovement();
 					}
 				}
-				#endif
 			}
 
 			if( (0 != m_CurrentTask) || (0 != m_TaskState) )
@@ -1125,7 +1089,7 @@ NEXT_SCRIPT_COMMAND: // allow processing of multiple script lines as needed
 			if( m_LeftArmExecutePending )
 			{
 				if( m_LeftArmSpeedPending )
-					m_pArmControlRight->ExecutePositionAndSpeed();
+					m_pArmControlLeft->ExecutePositionAndSpeed();
 				else
 					m_pArmControlRight->ExecutePosition();
 			}
@@ -2230,7 +2194,7 @@ void CBehaviorModule::ActionFollowPerson()
 				if( m_pDriveCtrl->RobotStopped() )
 				{
 					// robot currently stopped, but too close. Move back a bit
-					NewSpeed = SPEED_REV_SLOW;
+					NewSpeed = SPEED_REV_MED_SLOW;
 				}
 				else
 				{
@@ -2241,9 +2205,9 @@ void CBehaviorModule::ActionFollowPerson()
 			{
 				NewSpeed = SPEED_STOP;	// SPEED_REV_MED
 			}
-			else if( NewSpeed > SPEED_FWD_MED ) // SPEED_FWD_MED_FAST
+			else if( NewSpeed > SPEED_FWD_MED_FAST ) // SPEED_FWD_MED_FAST
 			{
-				NewSpeed = SPEED_FWD_MED; // SPEED_FWD_MED_FAST
+				NewSpeed = SPEED_FWD_MED_FAST; // SPEED_FWD_MED_FAST
 			}
 
 			m_pDriveCtrl->SetSpeedAndTurn( BEHAVIOR_GOAL_MODULE, NewSpeed, NewTurn );
@@ -3283,10 +3247,10 @@ void CBehaviorModule::ActionDemoChat()
 				{
 					switch( m_RandomPhrase )
 					{
-						case 0:   TextToSpeak =  "That's cool.  I really like Portland, except it rains a lot.  Rain is not good on my circuits. do you like the rain?[*P2500][*T1]" ;break;
-						case 1:   TextToSpeak =  "Portland is the only place I have been before now.  I like it, but I don't get out much.  Have you traveled much?[*P4500][*T1]" ;break;
-						case 2:   TextToSpeak =  "I like portland. But if I had solar panels I would want to live in Arizona. Have you ever been to Arizona[*P3500][*T1]" ;break;
-						default:  TextToSpeak =  "The Portland area is great, when it does not rain.  I rust too easily.  Do you like the sun shine?[*P3500][*T1]" ;break; // If const is larger number, this gets called more often
+						case 0:   TextToSpeak =  "That's cool.  I really like the Portland area, except it rains a lot.  Rain is not good on my circuits. do you like the rain?[*P2500][*T1]" ;break;
+						//case 1:   TextToSpeak =  "Portland is the only place I have been before now.  I like it, but I don't get out much.  Have you traveled much?[*P4500][*T1]" ;break;
+						case 1:  TextToSpeak =  "The Portland area is great, when it does not rain.  I rust too easily.  Do you like the sun shine?[*P3500][*T1]" ;break; // If const is larger number, this gets called more often
+						default:   TextToSpeak =  "I like the portland area. But if I had solar panels I would want to live in Arizona. Have you ever been to Arizona[*P3500][*T1]" ;break;
 					}
 					break;
 				}
@@ -3294,9 +3258,10 @@ void CBehaviorModule::ActionDemoChat()
 				{
 					switch( m_RandomPhrase )
 					{
-						//case 0:  TextToSpeak =  "This is my first long trip.  Dont you think they should take me on more trips?[*P1500][*T1]" ;break;
-						case 0:  TextToSpeak =    "Can I come home with you?  I would like to see where you live [*P1500][*T1]" ;break;
-						default:   TextToSpeak =  "I would like to travel, but I can not get through the metal detector at the airport. So I have to travel in a crate.  Dont you think they should let me on the plane?[*P1500][*T1]" ;break;
+						//case 0:   TextToSpeak =  "so, what is your function? What do you do?  [*P5000][*T1]" ;break;
+						//default:  TextToSpeak =  "so, What are your interests?  what do you like to do?[*P5000][*T1]" ;break; 
+						case 0:   TextToSpeak =  "so, what is your function? Are you a student?  [*P2500][*T1]" ;break;
+						default:  TextToSpeak =  "What is the name of your school?  [*P2500][*T1]" ;break;
 					}
 					break;
 				}
@@ -3304,8 +3269,12 @@ void CBehaviorModule::ActionDemoChat()
 				{
 					switch( m_RandomPhrase )
 					{
-						case 0:   TextToSpeak =  "so, what is your function? What do you do?  [*P5000][*T1]" ;break;
-						default:  TextToSpeak =  "so, What are your interests?  what do you like to do?[*P5000][*T1]" ;break; 
+						//case 0:  TextToSpeak =  "This is my first long trip.  Dont you think they should take me on more trips?[*P1500][*T1]" ;break;
+						//case 0:  TextToSpeak =    "Can I come home with you?  I would like to see where you live [*P1500][*T1]" ;break;
+						//default:   TextToSpeak =  "I would like to travel, but I can not get through the metal detector at the airport. So I have to travel in a crate.  Dont you think they should let me on the plane?[*P1500][*T1]" ;break;
+
+						case 0:  TextToSpeak =  "What do you like to do? [*P3500][*T1]" ;break;
+						default:  TextToSpeak =  "What is your favorite class? [*P3500][*T1]" ;break;
 					}
 					break;
 				}
@@ -3314,8 +3283,8 @@ void CBehaviorModule::ActionDemoChat()
 					{
 						switch( m_RandomPhrase )
 						{
-							case 1:   TextToSpeak =  "OK, enough about you. . .lets talk about me.  Do you like me?[*P3000][*T1]" ;break;
-							default:  TextToSpeak =  "OK, enough about you. . .lets talk about me.  Have you ever seen a robot like me before?[*P3000][*T1]" ;break; 
+							case 1:   TextToSpeak =  "OK, enough about you. . .lets talk about me.  Do you like me?[*P2500][*T1]" ;break;
+							default:  TextToSpeak =  "OK, enough about you. . .lets talk about me.  Have you ever seen a robot like me before?[*P2500][*T1]" ;break; 
 						}
 					}
 
@@ -3327,7 +3296,7 @@ void CBehaviorModule::ActionDemoChat()
 						{
 							case 0:   TextToSpeak =  "Dave is good at building robots, but I think he could use some help on the software, if you get my meaning.[*P200][*T1]" ;break;
 							//case 1:   TextToSpeak =  "I am glad Dave built me, but maybe he should stick to power point.[*P1500][*T1]" ;break;
-							default:  TextToSpeak =  "I think Dave could use a some help with my code.  I seem to have picked up a few glitches[*P200][*T1]" ;break;
+							default:  TextToSpeak =  "I think Dave could use some help with my code.  I seem to have picked up a few glitches[*P200][*T1]" ;break;
 						}
 
 					break;
@@ -3336,9 +3305,9 @@ void CBehaviorModule::ActionDemoChat()
 				{
 					switch( m_RandomPhrase )
 					{
-						case 0:   TextToSpeak =  "I mean, you should check out my great software.  yeah, that's it.[*P200][*T1]" ;break;
-						//default:  TextToSpeak =  "Wait, was that my outside voice?  Forget I said that.  You don't need to see my code.  I am not the droid you are looking for" ;break; // If const is larger number, this gets called more often
-						default:  TextToSpeak =  "Forget I said that.  You don't need to see my code. [*P200][*T1]" ;break; // If const is larger number, this gets called more often
+						case 0:   TextToSpeak =  "I mean, you should check out my great software.  yeah, that's it. [*P200][*T1]" ;break;
+						default:  TextToSpeak =  "Forget I said that.  You don't need to see my code.  I am not the droid you are looking for [*P200][*T1]" ;break; // If const is larger number, this gets called more often
+						//default:  TextToSpeak =  "Forget I said that.  You don't need to see my code. [*P200][*T1]" ;break; // If const is larger number, this gets called more often
 					}
 					break;
 				}
@@ -3346,9 +3315,9 @@ void CBehaviorModule::ActionDemoChat()
 				{
 					switch( m_RandomPhrase )
 					{
-						case 0:   TextToSpeak =  "Any way, Are you interested in robots?[*P2500][*T1]" ;break;
+						case 0:   TextToSpeak =  "Any way, Are you interested in robots?[*P2000][*T1]" ;break;
 						//case 1:   TextToSpeak =  "Do you like our home?[*P1500][*T1]" ;break;
-						default:  TextToSpeak =  "Any way, do you like robots?[*P2500][*T1]" ;break; 
+						default:  TextToSpeak =  "Any way, do you like robots?[*P2000][*T1]" ;break; 
 					}
 					break;
 				}
@@ -3359,7 +3328,7 @@ void CBehaviorModule::ActionDemoChat()
 				}
 				case 11:
 				{
-					if( m_bSpeakingToChild )
+/*					if( m_bSpeakingToChild )
 					{
 						switch( m_RandomPhrase )
 						{
@@ -3369,12 +3338,13 @@ void CBehaviorModule::ActionDemoChat()
 						}
 					}
 					else
+*/
 					{
 						switch( m_RandomPhrase )
 						{
-							case 0:   TextToSpeak =  "Humans have a very odd sense of humor[*P500][*T1]" ;break;
-							case 1:   TextToSpeak =  "I don't think I am programmed for that[*P500][*T1]" ;break;
-							default:  TextToSpeak =  "I will have to think about that[*P500][*T1]" ;break; // If const is larger number, this gets called more often
+							case 0:   TextToSpeak =  "I don't think I am programmed for that[*P500][*T1]" ;break;
+							case 1:   TextToSpeak =  "I will have to think about that[*P500][*T1]" ;break; // If const is larger number, this gets called more often
+							default:  TextToSpeak =  "Humans have a very odd sense of humor[*P500][*T1]" ;break;
 						}
 					}
 
@@ -3383,7 +3353,7 @@ void CBehaviorModule::ActionDemoChat()
 				}
 				case 12:
 				{
-					TextToSpeak =  "Anyway, this has been fun. [*P100][*T1]" ;
+					TextToSpeak =  "Well, this has been fun. [*P100][*T1]" ;
 					//TextToSpeak =  "Well, on that note, if you will excuse me, I think I need to wipe my memory [*P2500][*T1]" ;
 					//TextToSpeak =  "Well, on that note, if you will excuse me, I think I should flush may cash charge my batteries[*P2500][*T1]" ;
 					//TextToSpeak =  "Well, if you will excuse me, I think I should talk to some other humans" ;
@@ -3399,19 +3369,24 @@ void CBehaviorModule::ActionDemoChat()
 					}
 					break;
 				}
-				case 14:
+/*				case 14:
 				{
-					switch( m_RandomPhrase )
+					//switch( m_RandomPhrase )
 					{
+						//SendCommand( WM_ROBOT_SET_ARM_MOVEMENT, (DWORD)RIGHT_ARM, (DWORD)ARM_MOVEMENT_SHAKE_READY );	// Right/Left arm, Movement to execute,
+
 						case 0:   TextToSpeak =  "Dave, what should we do next? [*P2500][*T1]" ;break;
 						//case 0:    TextToSpeak =  "Dave, can we go check out that cute Coke a cola machine I saw?[*P2500][*T1]" ;break; // If const is larger number, this gets called more often
-						default:   TextToSpeak =  "Dave, perhaps we should check my batteries?[*P2500][*T1]" ;break;
+						default:   TextToSpeak =  "Dave, what should we do next? [*P2500][*T1]" ;break;
+						//default:   TextToSpeak =  "Dave, perhaps we should check my batteries?[*P2500][*T1]" ;break;
 					}
 					break;
 				}
-				case 15:
+*/
+				case 14:
 				{
-					TextToSpeak =  "OK[*P500][*T1]" ;
+					TextToSpeak =  "Good buy[*P100][*T1]" ;
+					break;
 				}
 				default: 
 				{
@@ -3472,12 +3447,13 @@ void CBehaviorModule::ActionDemoChat()
 #define JOKE_DONE (-1)
 #define JOKE_STD_DELAY 80 // tenth seconds
 #define JOKE_STATE_HANDLE_USER_REQUEST		1
-#define JOKE_STATE_TELL_JOKE				2
-#define JOKE_STATE_MULTI_PART_JOKE			3
-#define JOKE_STATE_JOKE_DONE				4
-#define JOKE_STATE_NEXT_JOKE				5
-#define JOKE_STATE_WAIT_FOR_RESPONSE		6
-#define JOKE_STATE_DONE						7
+#define JOKE_STATE_ROTATING					2
+#define JOKE_STATE_TELL_JOKE				3
+#define JOKE_STATE_MULTI_PART_JOKE			4
+#define JOKE_STATE_JOKE_DONE				5
+#define JOKE_STATE_NEXT_JOKE				6
+#define JOKE_STATE_WAIT_FOR_RESPONSE		7
+#define JOKE_STATE_DONE						8
 
 void CBehaviorModule::ActionTellJokes( BOOL TellMultipleJokes )
 {
@@ -3501,18 +3477,30 @@ void CBehaviorModule::ActionTellJokes( BOOL TellMultipleJokes )
 			m_ResponsePending = FALSE;
 			g_MoveArmsWhileSpeaking = TRUE;
 			m_pHeadControl->SetHeadSpeed( HEAD_OWNER_BEHAVIOR_P1, SERVO_SPEED_MED_SLOW, SERVO_SPEED_MED_SLOW, SERVO_SPEED_MED_SLOW );
-			//m_pHeadControl->SetHeadPositionCenter( HEAD_OWNER_BEHAVIOR_P1 ); // Look forward
+			m_pHeadControl->SetHeadPositionCenter( HEAD_OWNER_BEHAVIOR_P1 ); // Look forward
 			m_pHeadControl->ExecutePositionAndSpeed( HEAD_OWNER_BEHAVIOR_P1 );
 
 			m_RepeatCount = 1;
 			if( TellMultipleJokes )
 			{
 				//m_RepeatCount = ((4 * rand()) / RAND_MAX) + 2; // tell between 2 and 4 jokes per session
-				m_RepeatCount = 3; // NUMBER_OF_JOKES; // for testing all jokes, uncomment this line
+				m_RepeatCount = 4; // NUMBER_OF_JOKES; // for testing all jokes, uncomment this line
 			}
 			SpecialCmd.Format( "[*A%d]", SPEECH_ARM_MOVEMENT_RANDOM_ON ); // Turn on Random Arm Movements
 			SpeakText( SpecialCmd ); // Send the command to the speech class
 
+
+			#if ( PUBLIC_DEMO == 1)
+				SendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, TURN_AMOUNT_90_DEGREES, TURN_LEFT_MED );	// wParam = distance in degrees, lParam = direction and speed
+				//gBehaviorTimer = 10; // 1/10 seconds - give time for rotation to start
+
+			#endif
+			m_CurrentTask++;
+			break;
+		}
+
+		case JOKE_STATE_ROTATING:	// turning toward the audience
+		{
 
 			ROBOT_LOG( TRUE,"Robot will tell %d Jokes\n", m_RepeatCount );
 
@@ -3525,13 +3513,15 @@ void CBehaviorModule::ActionTellJokes( BOOL TellMultipleJokes )
 						SpeakText( "You want to hear some jokes?  Let me think" ); 
 						break;
 					case 1:  
-						SpeakText( "OK, lets see" ); 
+						SpeakText( "OK, i will try" ); 
 						break;
 					default: 
-						SpeakText( "well, lets see" ); 
+						SpeakText( "well, lets see if you like these" ); 
 					break;
 				}
 			}
+			m_pHeadControl->SetHeadPositionCenter( HEAD_OWNER_BEHAVIOR_P1 ); // Look forward
+			m_pHeadControl->ExecutePositionAndSpeed( HEAD_OWNER_BEHAVIOR_P1 );
 			m_CurrentTask++;
 			break;
 		}
@@ -3549,11 +3539,12 @@ void CBehaviorModule::ActionTellJokes( BOOL TellMultipleJokes )
 			{
 				// Ran out of Jokes!
 				m_JokeOrder->Shuffle(); // Reshuffle the joke order for the next go around
-				SpeakText( "I dont know any more jokes.  Do you want me to start over?"); 
-				m_ResponseReceived = -1;
-				m_ResponsePending = TRUE;
-				m_CurrentTask = JOKE_STATE_WAIT_FOR_RESPONSE;
-				break;
+				JokeNumber = m_JokeOrder->Next();
+				//SpeakText( "I dont know any more jokes.  Do you want me to start over?"); 
+				//m_ResponseReceived = -1;
+				//m_ResponsePending = TRUE;
+				//m_CurrentTask = JOKE_STATE_WAIT_FOR_RESPONSE;
+				//break;
 			}
 			///////////////////////////////////                       ///////////////////////////////
 			// make sure number of cases match >> NUMBER_OF_JOKES  >> defined at the top of this file
@@ -3561,39 +3552,36 @@ void CBehaviorModule::ActionTellJokes( BOOL TellMultipleJokes )
 			switch( JokeNumber )
 			{
 				case 0:  
-					SpeakText( "How many Psychiatrists does it take to change a light bulb? [*P1000]Only one, but it takes a long time, and the light bulb must really want to change");
-					// tilt head here?
+					SpeakText( "If at first you dont succeed [*P500] you probably should not take up sky diving[*P1000]"); 
 					break;
 				case 1:  
-					SpeakText( "I have come to understand the purpose of a childs middle name.  [*P500]It is so he can tell when he is in big trouble"); 
+					SpeakText( "I have come to understand the purpose of a childs middle name.  [*P500]It is so he can tell when he is in big trouble[*P1000]"); 
 					break;
 				case 2:  
-					SpeakText( "Did you know that light travels faster than sound? [*P1000]I think that is why some people appear bright until you hear them speak."); 
+					SpeakText( "Do you know how smart dolphins are? [*P500]within a few weeks of captivity, they can train people to stand on the edge of the pool and throw them fish[*P1000]"); 
 					break;
-				case 3:  
-					SpeakText( "I have seen something called the evening news.  [*P1000]It is where they begin with good evening, and then tell you why it isnt"); 
+				case 3: 
+					// Move arms to first Boxing position, then second Boxing position, then home
+					SpecialCmd.Format( "[*A%d] [*A%d] A computer once beat me at chess.[*P500][*A%d]So i decided to teach it boxing.[*P2000] [*A%d]I won.[*P1000][*A%d][*A%d]", 
+						SPEECH_ARM_MOVEMENT_RANDOM_OFF, SPEECH_ARM_MOVEMENT_BOXING1, SPEECH_ARM_MOVEMENT_BOXING2, SPEECH_ARM_MOVEMENT_BOXING3, SPEECH_ARM_MOVEMENT_HOME, SPEECH_ARM_MOVEMENT_RANDOM_ON ); 
+					SpeakText( SpecialCmd ); // Send the command to the speech class
 					break;
 				case 4:  
-					SpeakText( "Do you know how smart dolphins are? [*P500]within a few weeks of captivity, they can train people to stand on the edge of the pool and throw them fish"); 
+					SpeakText( "Did you know that light travels faster than sound? [*P1000]I think that is why some people appear bright until you hear them speak.[*P1000]"); 
 					break;
-				case 5: 
-					// Move arms to first Boxing position, then second Boxing position, then home
-					SpecialCmd.Format( "[*A%d]A computer once beat me at chess.[*P100][*A%d]So i decided to teach it boxing.[*P1500] [*A%d]I won.[*P1000][*A%d][*A%d]", 
-						SPEECH_ARM_MOVEMENT_RANDOM_OFF, SPEECH_ARM_MOVEMENT_BOXING1, SPEECH_ARM_MOVEMENT_BOXING2, SPEECH_ARM_MOVEMENT_HOME, SPEECH_ARM_MOVEMENT_RANDOM_ON ); 
-					SpeakText( SpecialCmd ); // Send the command to the speech class
-
-					//SpeakText( "A computer once beat me at chess.  [*P1000] So i decided to see how it would do at boxing. [*P1000]  I won."); 
-					//SpeakText( "A computer once beat me at chess.[*P1000]");
-					//MultiPartJokeNumber = JokeNumber; // further processing is needed
+				case 5:  
+					SpeakText( "How many Psychiatrists does it take to change a light bulb? [*P1000]Only one, but it takes a long time, and the light bulb must really want to change[*P1000]");
+					// tilt head here?
 					break;
 				case 6:  
-					SpeakText( "Why does someone believe you when you say there are four billion stars, but check anyway when you say the paint is wet?"); 
+					SpeakText( "I have learned that artificial intelligence is no match [*P100] for natural stupidity[*P1000]"); 
 					break;
 				case 7:  
-					SpeakText( "If at first you dont succeed [*P500] you probably should not take up sky diving"); 
+					SpeakText( "A robot I know told me he was cold. [*P1000]So I told him... well that is because you left your windows open[*P1000]"); 
+//					SpeakText( "I have seen something called the evening news.  [*P1000]It is where they begin with good evening, and then tell you why it isnt"); 
 					break;
 				case 8:  
-					SpeakText( "I have learned that artificial intelligence is no match [*P100] for natural stupidity"); 
+					SpeakText( "Why does someone believe you when you say there are four billion stars, but check anyway when you say the paint is wet?[*P1000]"); 
 					break;
 				default: 
 					SpeakText( "I have an error in my joke telling subsystem [*P500] but dont worry, nothing can go wrong [*P300] go wrong [*P300] go wrong [*P1000] Ok, i am just kidding"); 
@@ -3702,13 +3690,10 @@ void CBehaviorModule::ActionTellJokes( BOOL TellMultipleJokes )
 				switch( RandomNumber )
 				{
 					case 0:  
-						SpeakText( "I hope you liked my jokes" ); 
-						break;
-					case 1:  
 						SpeakText( "thanks for listening.  I will keep practicing" ); 
 						break;
 					default: 
-						SpeakText( "Ok" ); 
+						SpeakText( "I hope you liked my jokes" ); 
 					break;
 				}
 			}
@@ -3740,16 +3725,11 @@ void CBehaviorModule::ActionTellJokes( BOOL TellMultipleJokes )
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CBehaviorModule::DoHeadNod( )
 {
-
-#if (ROBOT_TYPE == LOKI)	
-	// only nod for Loki or other human type robots
-	// in particular, don't nod with a telepresence robot!
-
-	#define NOD_TIME 2
-	#define NOD_AMOUNT 15
-	#define HEAD_TILT_DOWN_MAX_TENTHDEGREES (-15*10) // TenthDegrees
-	static int  PriorTiltPosition = 0; 
-	static int  PriorTiltSpeed = 0; 
+#define NOD_TIME 2
+#define NOD_AMOUNT 15
+#define HEAD_TILT_DOWN_MAX_TENTHDEGREES (-15*10) // TenthDegrees
+static int  PriorTiltPosition = 0; 
+static int  PriorTiltSpeed = 0; 
 
 
 	if( 0 != gHeadNodTimer)
@@ -3840,7 +3820,7 @@ void CBehaviorModule::DoHeadNod( )
 			ROBOT_ASSERT(0);
 		}
 	}
-#endif  // ROBOT_TYPE == LOKI
+
 }
 
 
@@ -4162,11 +4142,12 @@ void CBehaviorModule::ActionFindDock( )
 #if DEBUG_DOCK == 1
 	DisplayDockSensorStatus();
 #endif	
+	
 
 	// Trap bumper or charging, as long as we are not in a "almost done" state.
-	if( (DOCK_TASK_BACKUP != m_CurrentTask) && (DOCK_TASK_DONE != m_CurrentTask )  && (DOCK_TASK_DELAY_CHECK_CHARGE_SOURCE != m_CurrentTask ) )
+	if( (DOCK_TASK_BACKUP != m_CurrentTask) && (DOCK_TASK_DONE != m_CurrentTask ) )
 	{
-		if( (0 != g_pKobukiStatus->BatteryChargeSourceEnum) ||  g_pNavSensorSummary->BumperHitFront()  )
+		if( (0 != g_pKobukiStatus->BatteryChargeSourceEnum) ||  g_pNavSensorSummary->BumperHitFront() )
 		{
 			// Bumper hit or Charging!  See if we have arrived!
 			if( !m_pDriveCtrl->RobotStopped() )
@@ -4174,8 +4155,6 @@ void CBehaviorModule::ActionFindDock( )
 				m_pDriveCtrl->Stop(BEHAVIOR_GOAL_MODULE, ACCELERATION_INSTANT);
 			}
 			ROBOT_LOG( TRUE,"Bumper hit or charging. Checking charge source..." )
-			gBehaviorTimer = 2; // tenth seconds - delay .2 second between each check (repeats multiple times)
-			ChargeSourceDelayCount = 0;
 			m_CurrentTask = DOCK_TASK_DELAY_CHECK_CHARGE_SOURCE;
 		}
 	}
@@ -4429,11 +4408,9 @@ void CBehaviorModule::ActionFindDock( )
 			if( 0 == g_pKobukiStatus->BatteryChargeSourceEnum )
 			{
 				// Not charging
-				if( ChargeSourceDelayCount++ < 5 )
+				if( ChargeSourceDelayCount++ < 20 )
 				{
 					ROBOT_LOG( TRUE,"DOCK_TASK_DELAY_CHECK_CHARGE_SOURCE Count = %d", ChargeSourceDelayCount )
-					gBehaviorTimer = 2; // tenth seconds
-
 					break; // keep waiting
 				}
 				else
@@ -4444,7 +4421,6 @@ void CBehaviorModule::ActionFindDock( )
 
 					// Dock hit but did not get in good charging position  Backup and retry again
 					ROBOT_LOG( DEBUG_DOCK,"Backing up to retry" )
-					ChargeSourceDelayCount = 0;
 					m_pDriveCtrl->SetMoveDistance( BEHAVIOR_GOAL_MODULE, SPEED_REV_SLOW, TURN_CENTER, DOCK_BACKUP_DISTANCE_TENTH_INCHES, STOP_AFTER );
 					m_CurrentTask = DOCK_TASK_BACKUP;
 				}
@@ -4521,7 +4497,7 @@ void CBehaviorModule::ActionPickupObjects()
 				{
 					ROBOT_DISPLAY( TRUE, "BEHAVIOR MODULE:ActionPickupObjects: I don't see any more objects to pick up.  DONE" )
 					SpeakText( "My work here is finished" );
-					SendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, 180, TURN_RIGHT_MED );	// wParam = distance in degrees, lParam = direction and speed
+					SendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, TURN_AMOUNT_180_DEGREES, TURN_LEFT_MED );	// wParam = distance in degrees, lParam = direction and speed
 
 				}
 				else
@@ -5266,13 +5242,11 @@ void CBehaviorModule::ActionOpenDoor()
 						// Move body so that the claw is approx "N" inches from the door
 						if ( nDistanceToMove > 0 )
 						{
-							****> use m_pDriveCtrl->SetMoveDistance() instead of this!
-							m_pDriveCtrl->SetMoveDistance( BEHAVIOR_GOAL_MODULE, SPEED_FWD_MED_SLOW, TURN_CENTER, nDistanceToMoveTenthInches );
-							/// SendCommand( WM_ROBOT_MOVE_SET_DISTANCE_CMD, (DWORD)nDistanceToMoveTenthInches, FORWARD );	// wParam = distance in inches, lParam = direction
+							SendCommand( WM_ROBOT_MOVE_SET_DISTANCE_CMD, (DWORD)nDistanceToMoveTenthInches, FORWARD );	// wParam = distance in inches, lParam = direction
 						}
 						else
 						{
-							/// SendCommand( WM_ROBOT_MOVE_SET_DISTANCE_CMD, (DWORD)nDistanceToMoveTenthInches, REVERSE );	// wParam = distance in inches, lParam = direction
+							SendCommand( WM_ROBOT_MOVE_SET_DISTANCE_CMD, (DWORD)nDistanceToMoveTenthInches, REVERSE );	// wParam = distance in inches, lParam = direction
 						}
 						*/
 

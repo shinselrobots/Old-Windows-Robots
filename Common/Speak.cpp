@@ -205,26 +205,37 @@ void CRobotSpeak::SpeakIntro()
 		return;
 	#endif
 
-
+	const int TurnAmount = 30;
 	m_pArmControlLeft->SetClawTorque(GENTLE_TORQUE);	// reset to gentle torque
 	//m_pArmControlLeft->SetArmPosition( RIGHT_ARM_SHOULDER_HOME1, RIGHT_ARM_ELBOW_ROTATE_HOME1, RIGHT_ARM_ELBOW_BEND_HOME1, RIGHT_ARM_WRIST_ROTATE_HOME1, RIGHT_ARM_CLAW_HOME1 ); // in DEGREES
-
 
 	DoRandomArmMovements(); // move arms while speaking
 	Speak( L"My name is Low key, and I am 4 years old" );
 //	Speak( L"I am 4 years old, and I was built by Dave, who builds robots as his hobby");
+
+	SendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, TurnAmount, TURN_LEFT_SLOW );	// wParam = distance in degrees, lParam = direction and speed
 	DoRandomArmMovements(); // move arms while speaking
 	Speak( L"My brain is a laptop computer, which has an Intel core processor with 1.1 billion transistors" );
+
 	DoRandomArmMovements(); // move arms while speaking
 	Speak( L"My actions are controlled by over 25,000 lines of custom C plus plus code" );
+
+	SendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, TurnAmount+10, TURN_RIGHT_SLOW );	// wParam = distance in degrees, lParam = direction and speed
 	DoRandomArmMovements(); // move arms while speaking
 	Speak( L"I have 12 servos, 4 motors, 13 infrared sensors, a compass, two cameras, a laser scanner, and a Kenect sensor" );
+
+	SendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, TurnAmount+10, TURN_RIGHT_SLOW );	// wParam = distance in degrees, lParam = direction and speed
 	DoRandomArmMovements(); // move arms while speaking
 	Speak( L"I am able to understand human commands, navigate my home with a built-in map, and avoid obstacles" );
+
+	SendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, TurnAmount, TURN_LEFT_SLOW );	// wParam = distance in degrees, lParam = direction and speed
 	DoRandomArmMovements(); // move arms while speaking
 	Speak( L"I love humans, other robots, and dogs, but unfortunately dogs dont seem to like me" );
+
 	DoRandomArmMovements(); // move arms while speaking
+	RobotSleep(2000, pDomainSpeakThread);
 	Speak( L"the only thing I dont like is darth vaider.  He scares me." );
+
 	DoRandomArmMovements(); // move arms while speaking
 	
 	m_pArmControlLeft->MoveArmHome( SERVO_SPEED_MED );
@@ -233,11 +244,11 @@ void CRobotSpeak::SpeakIntro()
 	m_pArmControlRight->EnableIdleArmMovement(TRUE);
 	gHeadIdle = TRUE;
 
-	SendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, 120, TURN_LEFT_MED );	// wParam = distance in degrees, lParam = direction and speed
+	SendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, TURN_AMOUNT_90_DEGREES, TURN_RIGHT_MED );	// wParam = distance in degrees, lParam = direction and speed
 	SendCommand( WM_ROBOT_USER_CAMERA_PAN_CMD, (DWORD)CAMERA_PAN_ABS_CENTER, 5 ); // face forward
 	RobotSleep(3000, pDomainSpeakThread);
 	SendCommand( WM_ROBOT_USER_CAMERA_PAN_CMD, (DWORD)CAMERA_PAN_ABS_CENTER, 5 ); // face forward
-	Speak( L"what should we do next?" );
+	//Speak( L"what should we do next?" );
 
 }
 
@@ -427,7 +438,7 @@ void CRobotSpeak::HandleSpecialCommands( char TokenType, int Param )
 			m_pArmControlLeft->SetArmSpeed( SERVO_SPEED_MED, SERVO_SPEED_SLOW, SERVO_SPEED_SLOW, SERVO_SPEED_MED, SERVO_SPEED_MED );
 			m_pArmControlRight->SetArmSpeed( SERVO_SPEED_MED, SERVO_SPEED_SLOW, SERVO_SPEED_SLOW, SERVO_SPEED_MED, SERVO_SPEED_MED );
 			m_pArmControlRight->SetArmPosition( 20,  0, 125, 0, 10 ); // Start talking position
-			m_pArmControlLeft->SetArmPosition( 15,   0, 105, 0, 10 ); // Start talking position
+			m_pArmControlLeft->SetArmPosition( 25,   0, 105, 0, 10 ); // Start talking position
 			m_pArmControlLeft->ExecutePositionAndSpeed();
 			m_pArmControlRight->ExecutePositionAndSpeed();
 		}
@@ -442,15 +453,22 @@ void CRobotSpeak::HandleSpecialCommands( char TokenType, int Param )
 		}
 		else if( SPEECH_ARM_MOVEMENT_BOXING1 == Param )
 		{
-			m_pArmControlRight->SetArmPosition( 50, -30, 130, NOP, 1 ); 
-			m_pArmControlLeft->SetArmPosition(  50,  25, 130, NOP, 10 ); 
+			m_pArmControlRight->SetArmPosition( 40, 0, 130, NOP, 1 );  //int Shoulder, int ElbowRotate, int ElbowBend, int Wrist, int Claw 
+			m_pArmControlLeft->SetArmPosition(  40, 0, 130, NOP, 10 ); 
 			m_pArmControlRight->ExecutePosition();
 			m_pArmControlLeft->ExecutePosition();
 		}
 		else if( SPEECH_ARM_MOVEMENT_BOXING2 == Param )
 		{
+			m_pArmControlRight->SetArmPosition( 50, -30, 130, NOP, 1 ); 
+			m_pArmControlLeft->SetArmPosition(  50,  25, 130, NOP, 10 ); 
+			m_pArmControlRight->ExecutePosition();
+			m_pArmControlLeft->ExecutePosition();
+		}
+		else if( SPEECH_ARM_MOVEMENT_BOXING3 == Param )
+		{
 			m_pArmControlRight->SetArmSpeed( SERVO_SPEED_MED, SERVO_SPEED_MED_FAST, SERVO_SPEED_MED_FAST, SERVO_SPEED_MED, SERVO_SPEED_MED );
-			m_pArmControlRight->SetArmPosition( 60, NOP, 100, NOP, NOP ); 
+			m_pArmControlRight->SetArmPosition( 60, NOP, 90, NOP, NOP ); 
 			//m_pArmControlLeft->SetArmPosition(  50, NOP, 135, NOP, NOP ); 
 			m_pArmControlRight->ExecutePositionAndSpeed();
 			//m_pArmControlLeft->ExecutePositionAndSpeed();
@@ -498,27 +516,29 @@ void CRobotSpeak::DoRandomArmMovements()
 			m_pArmControlLeft->SetArmPosition( 15,   0, 105, 0, 10 ); // Start talking position
 			break;
 		case 1:  
-			m_pArmControlRight->SetArmPosition( 20,  -5, 125, NOP, 10 ); // Start talking position
-			//m_pArmControlLeft->SetArmPosition( 20,   0, 105, NOP, 10 ); // Start talking position
+			m_pArmControlRight->SetArmPosition( 20,  -5, 125, NOP, 10 ); // small in
 			break;
 		case 2:  
-			m_pArmControlRight->SetArmPosition( 20, -10, 115, NOP, 10 ); // Hand in
-			m_pArmControlLeft->SetArmPosition( 10,   10, 115, NOP, 10 ); // Hand in
+			m_pArmControlLeft->SetArmPosition( 10,   10, 115, NOP, 10 ); // large out
 			break;
 		case 3:  
-			m_pArmControlRight->SetArmPosition( 20,  5, 105, NOP, 30 ); // Hand out
-			//m_pArmControlLeft->SetArmPosition( 20,  -5, 105, NOP, 30 ); // Hand out
+			m_pArmControlRight->SetArmPosition( 20,  0, 105, NOP, 30 ); // neutral
+			m_pArmControlLeft->SetArmPosition( 20,  -5, 105, NOP, 30 ); // small in
 			break;
 		case 4:  
-			m_pArmControlRight->SetArmPosition( 25, -5, 125, NOP, 10 ); // Hand in small
+			m_pArmControlRight->SetArmPosition( 25, -5, 125, NOP, 10 ); // small out
 			//m_pArmControlLeft->SetArmPosition( 20,   5, 115, NOP, 10 ); // Hand in small
 			break;
 		case 5:  
-			m_pArmControlRight->SetArmPosition( 20,  10, 125, NOP, 10 ); // Hand out small
-			//m_pArmControlLeft->SetArmPosition( 20,  -10, NOP, NOP, 10 ); // Hand out small
+			//m_pArmControlRight->SetArmPosition( 20,  10, 125, NOP, 10 ); // Hand out small
+			m_pArmControlLeft->SetArmPosition( 20,  5, 115, NOP, 10 ); // small out
+			break;
+		case 6:  
+			m_pArmControlRight->SetArmPosition( 20,  0, 125, NOP, 10 ); // back to neutral
+			//m_pArmControlLeft->SetArmPosition( 20,  5, NOP, NOP, 10 ); // small out
 			m_ArmPosition = 1; // restart
 			break;
-		case 6:
+		case 7:
 			m_ArmPosition = 1; // restart
 			break;
 		default: 

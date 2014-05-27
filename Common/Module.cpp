@@ -50,7 +50,10 @@ CSequenceOrder::CSequenceOrder( const int NumberOfItems )
 	// now randomize it
 	DWORD dwTime = GetTickCount();
 	std::srand(dwTime); // Seed with random number (current time in ticks).  Only call this once
-	Shuffle();
+
+	#if ( PUBLIC_DEMO == 0) // For public demos, play jokes in order every time
+		Shuffle();
+	#endif
 
 	m_NextItem = 0;
 	//ROBOT_LOG( TRUE,"CSequenceOrder initialized\n")
