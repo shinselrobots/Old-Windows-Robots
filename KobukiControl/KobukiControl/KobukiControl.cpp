@@ -77,7 +77,7 @@ public:
 		parameters.angular_deceleration_limit = (-3.5*1.2);	// (-3.5*1.2);
 		*/
 
-		cout << "Calling Kobuki.init " << endl;
+		cout << "Calling Kobuki.init -------------> Port = " << parameters.device_port << endl;
 		kobuki.init(parameters);
 		cout << "Calling Kobuki.enable " << endl;
 		kobuki.enable();

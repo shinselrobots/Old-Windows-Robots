@@ -8,7 +8,7 @@
 // of the KinectAudioSource for speech recognition in a game setting.
 
 // IMPORTANT: This code requires the Speech Platform SDK (v11) to be installed on the developer workstation
-#define ROBOT_TYPE_LOKI
+//#define ROBOT_TYPE_LOKI
 
 namespace RobotKinect.Speech
 {

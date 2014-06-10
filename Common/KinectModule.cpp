@@ -254,6 +254,7 @@ DWORD WINAPI KinectDepthThreadProc( LPVOID lpParameter )
 		__itt_task_end(pDomainKinectThread);
 
 		// Update 2D map with wall and object locations
+		// TODO??? if( ROBOT_HAS_KINECT_SERVO )
 		if( g_BulkServoStatus[DYNA_KINECT_SCANNER_SERVO_ID].PositionTenthDegrees <= KINECT_TILT_CENTER )
 		{
 			// Not in position to spot a human, so disable human tracking
@@ -665,8 +666,11 @@ void CKinectModule::GetDepthImage()
 	double DegreeIncrementY = KINECT_DEPTH_FOV_Y / (double)m_FrameInfo->Height;
 
 	// Get Kinect Tilt angle, and position offset caused by tilt
-	double KinectTiltTenthDegrees =	g_BulkServoStatus[DYNA_KINECT_SCANNER_SERVO_ID].PositionTenthDegrees;
-
+	double KinectTiltTenthDegrees =	0;
+	// TODO?  if( ROBOT_HAS_KINECT_SERVO )
+	{
+		KinectTiltTenthDegrees = g_BulkServoStatus[DYNA_KINECT_SCANNER_SERVO_ID].PositionTenthDegrees;
+	}
 	// for debug on a PC
 	if( 1 == ROBOT_SIMULATION_MODE )
 	{

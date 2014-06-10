@@ -190,7 +190,7 @@ void CRobotSpeak::Speak( WCHAR *TextToSpeak )
 	HRESULT hr = m_pVoice->Speak( TextToSpeak, 0, NULL );
 	if (FAILED(hr))
 	{
-		ROBOT_ASSERT(0);
+		ROBOT_ASSERT(0); // THIS CAN HAPPEN IF NO SPEAKERS ENABLED (for example, Intel NUC requires speaker plugged into audio jack!)
 	}
 	g_CurrentlySpeaking = FALSE;
 	__itt_task_end( pDomainSpeakThread ); // Robot Speaking

@@ -189,7 +189,7 @@ void CDynaControl::Init()
 //	SetAllCameraServosSpeed(		3 * (DYNA_MOVING_SPEED_MAX /16) );
 
 	// Set Compliance of Laser Tilt servo to "med", for accurate laser scanner control
-	SetServoComplianceSlope( DYNA_KINECT_SCANNER_SERVO_ID, DYNA_COMPLIANCE_MED_TIGHT );
+	// SetServoComplianceSlope( DYNA_KINECT_SCANNER_SERVO_ID, DYNA_COMPLIANCE_MED_TIGHT );
 
 	// Put Camera Head and arms "startup" Position, with Torque applied 
 	EnableCameraServosTorque( TRUE );
@@ -296,9 +296,12 @@ void CDynaControl::EnableCameraServosTorque( BOOL bEnable )
 	}
 
 	// Now do Kinect Scanner
-	EnableServoTorque( DYNA_KINECT_SCANNER_SERVO_ID, bEnable );	
-	g_BulkServoCmd[DYNA_KINECT_SCANNER_SERVO_ID].Speed = SERVO_SPEED_SLOW;
-	g_BulkServoCmd[DYNA_KINECT_SCANNER_SERVO_ID].Enable = bEnable;
+	if( ROBOT_HAS_KINECT_SERVO )
+	{
+		EnableServoTorque( DYNA_KINECT_SCANNER_SERVO_ID, bEnable );	
+		g_BulkServoCmd[DYNA_KINECT_SCANNER_SERVO_ID].Speed = SERVO_SPEED_SLOW;
+		g_BulkServoCmd[DYNA_KINECT_SCANNER_SERVO_ID].Enable = bEnable;
+	}
 }
 
 void CDynaControl::EnableRightArmTorque( BOOL bEnable )
@@ -361,7 +364,8 @@ void CDynaControl::SetAllCameraServosSpeed( int  Speed )
 	if( NUMBER_OF_DYNA_SERVOS_IN_HEAD >=1 )
 		SetServoSpeed( DYNA_CAMERA_PAN_SERVO_ID, Speed );
 
-	SetServoSpeed( DYNA_KINECT_SCANNER_SERVO_ID, Speed );	
+	if( 1 == ROBOT_HAS_KINECT_SERVO )
+		SetServoSpeed( DYNA_KINECT_SCANNER_SERVO_ID, Speed );	
 
 }
 
@@ -374,8 +378,8 @@ void CDynaControl::SetAllCameraServosMaxTorque( int  MaxTorque )
 		SetServoMaxTorque( DYNA_CAMERA_TILT_SERVO_ID, MaxTorque );	
 	if( NUMBER_OF_DYNA_SERVOS_IN_HEAD >=1 )
 		SetServoMaxTorque( DYNA_CAMERA_PAN_SERVO_ID, MaxTorque );
-
-	SetServoMaxTorque( DYNA_KINECT_SCANNER_SERVO_ID, MaxTorque );	
+	if( 1 == ROBOT_HAS_KINECT_SERVO )
+		SetServoMaxTorque( DYNA_KINECT_SCANNER_SERVO_ID, MaxTorque );	
 
 }
 
@@ -391,7 +395,8 @@ void CDynaControl::GetAllCameraServosStatus( )
 		GetServoStatus( DYNA_CAMERA_PAN_SERVO_ID );	
 		ROBOT_LOG( TRUE, "\n============= Dumping Status of all Camera Servos =============\n" )
 	}
-	GetServoStatus( DYNA_KINECT_SCANNER_SERVO_ID );	
+	if( 1 == ROBOT_HAS_KINECT_SERVO )
+		GetServoStatus( DYNA_KINECT_SCANNER_SERVO_ID );	
 
 }
 
@@ -486,10 +491,13 @@ void CDynaControl::GotoSleepPosition() // Sleeping Position
 	ROBOT_DISPLAY( TRUE, "Moving Arms to sleep position" )
 	if( ROBOT_TYPE != LOKI )
 	{
-		SetServoSpeed( DYNA_KINECT_SCANNER_SERVO_ID, 100 );	// Max = 0x03FF = 1023
-		//SetAllCameraServosSpeed(DYNA_VELOCITY_MED_SLOW); // Max = 0x03FF = 1023
-		PositionTicks = TenthDegreeToTicks( DYNA_KINECT_SCANNER_SERVO_ID, KINECT_SLEEP_POSITION ); // NOT: KINECT_TILT_CENTER
-		SetServoPosition( DYNA_KINECT_SCANNER_SERVO_ID, PositionTicks );	// ID, position (0-03FF)
+		if( 1 == ROBOT_HAS_KINECT_SERVO )
+		{
+			SetServoSpeed( DYNA_KINECT_SCANNER_SERVO_ID, 100 );	// Max = 0x03FF = 1023
+			//SetAllCameraServosSpeed(DYNA_VELOCITY_MED_SLOW); // Max = 0x03FF = 1023
+			PositionTicks = TenthDegreeToTicks( DYNA_KINECT_SCANNER_SERVO_ID, KINECT_SLEEP_POSITION ); // NOT: KINECT_TILT_CENTER
+			SetServoPosition( DYNA_KINECT_SCANNER_SERVO_ID, PositionTicks );	// ID, position (0-03FF)
+		}
 	}
 	else
 	{
@@ -501,8 +509,11 @@ void CDynaControl::GotoSleepPosition() // Sleeping Position
 		PositionTicks = TenthDegreeToTicks( DYNA_CAMERA_SIDETILT_SERVO_ID, CAMERA_SIDETILT_CENTER );
 		SetServoPosition( DYNA_CAMERA_SIDETILT_SERVO_ID, PositionTicks );	// ID, position (0-03FF)
 
-		PositionTicks = TenthDegreeToTicks( DYNA_KINECT_SCANNER_SERVO_ID, KINECT_SLEEP_POSITION ); // NOT: KINECT_TILT_CENTER
-		SetServoPosition( DYNA_KINECT_SCANNER_SERVO_ID, PositionTicks );	// ID, position (0-03FF)
+		if( 1 == ROBOT_HAS_KINECT_SERVO )
+		{
+			PositionTicks = TenthDegreeToTicks( DYNA_KINECT_SCANNER_SERVO_ID, KINECT_SLEEP_POSITION ); // NOT: KINECT_TILT_CENTER	
+			SetServoPosition( DYNA_KINECT_SCANNER_SERVO_ID, PositionTicks );	// ID, position (0-03FF)
+		}
 
 		/////////////////////////////////////////////////////////////////////////////
 		// Set the arms to sleep position
@@ -618,9 +629,11 @@ void CDynaControl::GotoStartupPosition() // Home Position
 		PositionTicks = TenthDegreeToTicks( DYNA_CAMERA_PAN_SERVO_ID, CAMERA_PAN_CENTER );
 		SetServoPosition( DYNA_CAMERA_PAN_SERVO_ID, PositionTicks );	// ID, position (0-03FF)
 	}
-
-	PositionTicks = TenthDegreeToTicks( DYNA_KINECT_SCANNER_SERVO_ID, KINECT_HUMAN_DETECT_START_POSITION ); // Start in position to detect people
-	SetServoPosition( DYNA_KINECT_SCANNER_SERVO_ID, PositionTicks );	// ID, position (0-03FF)
+	if( 1 == ROBOT_HAS_KINECT_SERVO )
+	{
+		PositionTicks = TenthDegreeToTicks( DYNA_KINECT_SCANNER_SERVO_ID, KINECT_HUMAN_DETECT_START_POSITION ); // Start in position to detect people
+		SetServoPosition( DYNA_KINECT_SCANNER_SERVO_ID, PositionTicks );	// ID, position (0-03FF)
+	}
 
 	if( ROBOT_TYPE == LOKI )
 	{
@@ -1379,11 +1392,14 @@ void CDynaControl::GetStatusOfMovingServos()
 
 	// Laser Scanner
 	
-
-	if( g_BulkServoCmd[DYNA_KINECT_SCANNER_SERVO_ID].Enable && (abs( g_BulkServoCmd[DYNA_KINECT_SCANNER_SERVO_ID].PositionTenthDegrees - 
-			g_BulkServoStatus[DYNA_KINECT_SCANNER_SERVO_ID].PositionTenthDegrees ) > KINECT_SERVO_TOLERANCE_NORMAL_TENTHDEGREES ))
+	if( 1 == ROBOT_HAS_KINECT_SERVO )
 	{
-		GetServoStatus( DYNA_KINECT_SCANNER_SERVO_ID );
+
+		if( g_BulkServoCmd[DYNA_KINECT_SCANNER_SERVO_ID].Enable && (abs( g_BulkServoCmd[DYNA_KINECT_SCANNER_SERVO_ID].PositionTenthDegrees - 
+				g_BulkServoStatus[DYNA_KINECT_SCANNER_SERVO_ID].PositionTenthDegrees ) > KINECT_SERVO_TOLERANCE_NORMAL_TENTHDEGREES ))
+		{
+			GetServoStatus( DYNA_KINECT_SCANNER_SERVO_ID );
+		}
 	}
 
 	// Camera/Head servos
@@ -2365,7 +2381,8 @@ void CDynaControl::HandleCommand( int  Request, int  Param1, int  Param2, int  O
 				GetServoStatus( DYNA_CAMERA_TILT_SERVO_ID );	
 				GetServoStatus( DYNA_CAMERA_SIDETILT_SERVO_ID );	
 			}
-			if( (KINECT_SERVO == ServoToPoll) || (ALL_SERVOS == ServoToPoll) )
+
+			if( ROBOT_HAS_KINECT_SERVO && ( (KINECT_SERVO == ServoToPoll) || (ALL_SERVOS == ServoToPoll) ) )
 			{
 				// Get the status for Kinect servo			
 				GetServoStatus( DYNA_KINECT_SCANNER_SERVO_ID );
@@ -3012,21 +3029,27 @@ void CDynaControl::HandleCommand( int  Request, int  Param1, int  Param2, int  O
 
 			int FirstServo = DYNA_CAMERA_PAN_SERVO_ID;
 			int LastServo = DYNA_CAMERA_SIDETILT_SERVO_ID;
+
 			if( 0 == NUMBER_OF_DYNA_SERVOS_IN_HEAD )
 			{
 				// This robot has no head
 				break;
 			}
-			if( 2 == NUMBER_OF_DYNA_SERVOS_IN_HEAD )
+			else if( 1 == NUMBER_OF_DYNA_SERVOS_IN_HEAD )
+			{
+				// This robot has no tilt
+				LastServo = DYNA_CAMERA_PAN_SERVO_ID;
+			}
+			else if( 2 == NUMBER_OF_DYNA_SERVOS_IN_HEAD )
 			{
 				// This robot has no side-tilt
 				LastServo = DYNA_CAMERA_TILT_SERVO_ID;
 			}
 
 			int  PositionTicks = 0;
-			int  ServoIDArray[NUMBER_OF_DYNA_SERVOS_IN_HEAD];		// IDs Servos
-			int  ServoValueArray[NUMBER_OF_DYNA_SERVOS_IN_HEAD];	// Values to set
-			int  ServoSpeedArray[NUMBER_OF_DYNA_SERVOS_IN_HEAD];	// Speed to set
+			int  ServoIDArray[NUMBER_OF_DYNA_SERVOS_IN_HEAD+1];		// IDs Servos
+			int  ServoValueArray[NUMBER_OF_DYNA_SERVOS_IN_HEAD+1];	// Values to set
+			int  ServoSpeedArray[NUMBER_OF_DYNA_SERVOS_IN_HEAD+1];	// Speed to set
 			int  nServoToSet = 0;
 			//ROBOT_LOG( TRUE,"\nDYNA DEBUG: HW_SET_BULK_HEAD_POSITION\n")
 
@@ -3088,6 +3111,10 @@ void CDynaControl::HandleCommand( int  Request, int  Param1, int  Param2, int  O
 			// Param2  = Set Speed of servo (True/False)
 			int  PositionTicks = 0;
 			//ROBOT_LOG( TRUE, "DEBUG: HW_SET_BULK_KINECT_POSITION called\n")
+			if( !ROBOT_HAS_KINECT_SERVO )
+			{
+				break;
+			}
 
 			// See if this servo command has been updated
 			if( g_BulkServoCmd[DYNA_KINECT_SCANNER_SERVO_ID].Update)

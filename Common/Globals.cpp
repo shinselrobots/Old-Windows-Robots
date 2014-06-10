@@ -2037,9 +2037,11 @@ double FastTimer::getElapsedTime()
 BOOL IsDynaServoMoving()
 {
 	// Laser Scanner
-	if( abs( g_BulkServoCmd[DYNA_KINECT_SCANNER_SERVO_ID].PositionTenthDegrees - 
-		  g_BulkServoStatus[DYNA_KINECT_SCANNER_SERVO_ID].PositionTenthDegrees ) > KINECT_SERVO_TOLERANCE_NORMAL_TENTHDEGREES ) return TRUE;
-
+	// TODO? if( ROBOT_HAS_KINECT_SERVO )
+	{
+		if( abs( g_BulkServoCmd[DYNA_KINECT_SCANNER_SERVO_ID].PositionTenthDegrees - 
+			  g_BulkServoStatus[DYNA_KINECT_SCANNER_SERVO_ID].PositionTenthDegrees ) > KINECT_SERVO_TOLERANCE_NORMAL_TENTHDEGREES ) return TRUE;
+	}
 	// Camera/Head servos
 	if( abs( g_BulkServoCmd[DYNA_CAMERA_PAN_SERVO_ID].PositionTenthDegrees - 
 		  g_BulkServoStatus[DYNA_CAMERA_PAN_SERVO_ID].PositionTenthDegrees )	> HEAD_JOINT_DELTA_MAX_TENTHDEGREES ) return TRUE;

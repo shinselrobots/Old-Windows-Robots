@@ -711,6 +711,7 @@ OLD -----------------
 
 	//#define KERR_SERVO_TICKS_PER_TENTHDEGREE	  0.341 // not used - see KerrControl.h
 	//#define KERR_SERVO_TENTHDEGREES_PER_TICK	  2.932 //
+	#define ROBOT_HAS_KINECT_SERVO					 1
 
 	//////////////////////////////////////////////////////////////
 	#define DYNA_MULTI_SERVO_ID						 0	// Identify Broadcast servo messages
@@ -977,10 +978,11 @@ OLD -----------------
 	#define DYNA_MULTI_SERVO_ID						 0	// Identify Broadcast servo messages
 	// Reserve ServoID 1 for new servos!
 	#define DYNA_CAMERA_PAN_SERVO_ID				 2
-	#define DYNA_CAMERA_TILT_SERVO_ID				 3
-	#define DYNA_CAMERA_SIDETILT_SERVO_ID			 4
+	#define DYNA_CAMERA_TILT_SERVO_ID				 253 //3
+	#define DYNA_CAMERA_SIDETILT_SERVO_ID			 254 //4
 
-	#define NUMBER_OF_DYNA_SERVOS_IN_HEAD			 2 // 3 // TODO-MUST - Kludge for telepresence robot
+	#define NUMBER_OF_DYNA_SERVOS_IN_HEAD			 0 // 2 // 3 // TODO-MUST - Kludge for telepresence robot
+	#define ROBOT_HAS_KINECT_SERVO					 1 // TODO-MUST - Kludge for non-telepresence robot /Turtle!
 
 	//////////////////////////////////////////////////////////////
 	// ARM SERVOS - Includes Shoulder Joint (even though it's not a Dyna Servo)
@@ -990,7 +992,7 @@ OLD -----------------
 	#define DYNA_RIGHT_ARM_ELBOW_ROTATE_SERVO_ID	   5
 	#define DYNA_RIGHT_ARM_ELBOW_BEND_SERVO_ID		   6
 
-	#define DYNA_KINECT_SCANNER_SERVO_ID			   7	// Replaced arm servo with Kinect servo
+	#define DYNA_KINECT_SCANNER_SERVO_ID			   3 // TODO-MUST-DAVE 7	// Replaced arm servo with Kinect servo
 
 	#define DYNA_RIGHT_ARM_WRIST_SERVO_ID			   8
 	#define DYNA_RIGHT_ARM_CLAW_SERVO_ID			   9
