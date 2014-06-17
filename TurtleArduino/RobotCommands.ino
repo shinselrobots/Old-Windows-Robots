@@ -52,15 +52,15 @@ void HandleCmdFromPC()
     {
       if( 0 != gPicCmdBuffer.Param2 )
       {
-        digitalWrite(SERVO_PWR_18V_PIN, true);
-        digitalWrite(SERVO_PWR_12V_PIN, true);
-        PrintDebug("ACK: SERVO PWR On");
+        //digitalWrite(SERVO_PWR_18V_PIN, true);
+        //digitalWrite(SERVO_PWR_12V_PIN, true);
+        PrintDebug("ACK: SERVO PWR Disabled");
       }
       else
       {
-        digitalWrite(SERVO_PWR_18V_PIN, false);
-        digitalWrite(SERVO_PWR_12V_PIN, false);
-        PrintDebug("ACK: SERVO PWR Off");
+        //digitalWrite(SERVO_PWR_18V_PIN, false);
+        //digitalWrite(SERVO_PWR_12V_PIN, false);
+        PrintDebug("ACK: SERVO PWR Disabled");
       }
       break;
     }
@@ -75,12 +75,14 @@ void HandleCmdFromPC()
     {
       if( 0 != gPicCmdBuffer.Param2 )
       {
-        digitalWrite(AUX_LIGHT_PIN, true);
+        digitalWrite(LIGHT_TOP_PIN, true);
+        digitalWrite(LIGHT_BOTTOM_PIN, true);
         PrintDebug("ACK: Aux Lights On");
       }
       else
       {
-        digitalWrite(AUX_LIGHT_PIN, false);
+        digitalWrite(LIGHT_TOP_PIN, false);
+        digitalWrite(LIGHT_BOTTOM_PIN, false);
         PrintDebug("ACK: Aux Lights Off");
       }
       break;

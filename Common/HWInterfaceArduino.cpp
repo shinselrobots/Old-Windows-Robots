@@ -54,8 +54,7 @@ __itt_string_handle* pshReadIndex = __itt_string_handle_create("ReadIndex = ");
 void HandleArduinoMessage(char *CmdResponseBuf, int nResponseLength)
 {
 
-#if ROBOT_TYPE == LOKI
-// ARDUINO ONLY USED FOR LOKI AT THIS POINT 
+#if ( (SENSOR_CONFIG_TYPE == SENSOR_CONFIG_LOKI) || (SENSOR_CONFIG_TYPE == SENSOR_CONFIG_KOBUKI_WITH_ARDUINO) )
 // Need to figure out what to do for Carbot
 
 	// Handles messages from the Arduino
@@ -156,8 +155,7 @@ void HandleArduinoMessage(char *CmdResponseBuf, int nResponseLength)
 DWORD WINAPI ArduinoCommReadThreadFunc(LPVOID lpParameter)
 {
 
-#if ROBOT_TYPE == LOKI
-// ARDUINO ONLY USED FOR LOKI AT THIS POINT 
+#if ( (SENSOR_CONFIG_TYPE == SENSOR_CONFIG_LOKI) || (SENSOR_CONFIG_TYPE == SENSOR_CONFIG_KOBUKI_WITH_ARDUINO) )
 // Need to figure out what to do for Carbot
 
 	__itt_thread_set_name( "Arduino Read Thread" );

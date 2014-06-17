@@ -142,6 +142,7 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 
 		//case WM_ROBOT_SERVO_STATUS_READY:
 		case WM_ROBOT_SENSOR_STATUS_READY:
+		case WM_ROBOT_KOBUKI_STATUS_READY:
 		{
 			g_bCmdRecognized = TRUE;
 			//BYTE nDistHigh, nDistLow;
@@ -256,7 +257,7 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 				}
 
 			///////////////////////////////////////////////////////////////////////////////////////////////////////////
-			#elif ( (SENSOR_CONFIG_TYPE == SENSOR_CONFIG_LOKI) || (SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TURTLE) || (SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TELEOP) )
+			#elif ( (SENSOR_CONFIG_TYPE == SENSOR_CONFIG_LOKI) || (SENSOR_CONFIG_TYPE == SENSOR_CONFIG_KOBUKI_WITH_ARDUINO) || (SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TELEOP_KOBUKI) )
 
 				if( m_pDriveCtrl->GetCurrentSpeed() < 0 )
 				{

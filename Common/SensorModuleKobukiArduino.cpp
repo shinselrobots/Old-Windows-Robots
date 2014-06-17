@@ -44,7 +44,7 @@ const int  DistanceTable_IRLongRangeKobuki[] =
 
 
 ///////////////////////////////////////////////////////////////////////////////
-#if SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TELEOP_KOBUKI
+#if SENSOR_CONFIG_TYPE == SENSOR_CONFIG_KOBUKI_WITH_ARDUINO
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ProcessSensorStatus()
@@ -52,119 +52,128 @@ const int  DistanceTable_IRLongRangeKobuki[] =
 	// There are different implementations of this function for each robot type.  See "SensorModuleXXX" for each robot type.
 	void CSensorModule::ProcessSensorStatus( UINT uMsg )
 	{
-
-		static int LastRawIR = 0;
-
-		// First thing is to initialize the processed Sensor Status block
-		// Don't memset the structure, it corrupts current position!
-
-		// Basic Data
-		g_pFullSensorStatus->StatusFlags =	0;	// not used for Kobuki
-		g_pFullSensorStatus->LastError =	0;
-		g_pFullSensorStatus->DebugCode =	0;
-
-		// Note that this is the current charge in % remaining, not Voltage!
-		g_pFullSensorStatus->Battery0 = (int)g_pKobukiStatus->BatteryPercent;
-		// Not used yet: g_pFullSensorStatus->Battery1 = 0;	
-
-		// Cliff and Wheel drops
-		g_pFullSensorStatus->WheelDropLeft =	g_pKobukiStatus->WheelDropLeft;
-		g_pFullSensorStatus->WheelDropRight =	g_pKobukiStatus->WheelDropRight;
-
-		// Kobuki has 3 IR Cliff Sensors,  left, right, front
-		if( m_CliffSensorsEnabled )
+		if( WM_ROBOT_SENSOR_STATUS_READY == uMsg )
 		{
-			g_pFullSensorStatus->CliffFront =	g_pKobukiStatus->CliffFront;
-			g_pFullSensorStatus->CliffLeft =	g_pKobukiStatus->CliffLeft;
-			g_pFullSensorStatus->CliffRight =	g_pKobukiStatus->CliffRight;
+			// From Arduino
+			// Get status of Android Phone bluetooth connection, and get commands
+			HandleAndroidPhone();
+
 		}
-		else
+		else if( WM_ROBOT_KOBUKI_STATUS_READY == uMsg )
 		{
-			g_pFullSensorStatus->CliffFront =	false;
-			g_pFullSensorStatus->CliffRight =	false;
-			g_pFullSensorStatus->CliffLeft =	false;
-		}
+			// From Kobuki Base
+			static int LastRawIR = 0;
 
-		// Hardware Bumpers, IR range switches, and pressure sensors
-		g_pFullSensorStatus->HWBumperFront =		g_pKobukiStatus->BumperFront;
-		g_pFullSensorStatus->HWBumperSideLeft =		g_pKobukiStatus->BumperLeft;
-		g_pFullSensorStatus->IRBumperSideRight =	g_pKobukiStatus->BumperRight;
-		g_pFullSensorStatus->HWBumperRear =			0; // no rear bumper on Kobuki
+			// First thing is to initialize the processed Sensor Status block
+			// Don't memset the structure, it corrupts current position!
 
-		// IR Bumpers - No IR Bumpers on Kobuki
-		// Arm and finger sensors - no arms on Teleop
+			// Basic Data
+			g_pFullSensorStatus->StatusFlags =	0;	// not used for Kobuki
+			g_pFullSensorStatus->LastError =	0;
+			g_pFullSensorStatus->DebugCode =	0;
 
-		// Compass - Heading is in degrees
-		// WARNING - THIS IS NOT REALLY COMPASS HEADING!
-		// IT IS DEGREES FROM WHERE KOBUKI WAS POINTING WHEN POWERED ON!
-		// (but still useful for determining turn amount)
-		g_pFullSensorStatus->CompassHeading = (int)(g_pKobukiStatus->GyroDegrees);
+			// Note that this is the current charge in % remaining, not Voltage!
+			g_pFullSensorStatus->Battery0 = (int)g_pKobukiStatus->BatteryPercent;
+			// Not used yet: g_pFullSensorStatus->Battery1 = 0;	
 
+			// Cliff and Wheel drops
+			g_pFullSensorStatus->WheelDropLeft =	g_pKobukiStatus->WheelDropLeft;
+			g_pFullSensorStatus->WheelDropRight =	g_pKobukiStatus->WheelDropRight;
 
-		// Heading and Odometry
-		// Calculations are handled in this funciton, which also calls UpdateMoveDistance, UpdateLocation, etc.
-		UpdateOdometer();
-
-		// Kobuki Dock IR Beacon
-		g_pFullSensorStatus->DockSensorRight =	g_pKobukiStatus->DockRightSignal;
-		g_pFullSensorStatus->DockSensorCenter = g_pKobukiStatus->DockCenterSignal;
-		g_pFullSensorStatus->DockSensorLeft =	g_pKobukiStatus->DockLeftSignal;
-
-		// Get status of Android Phone bluetooth connection, and get commands
-		// HandleAndroidPhone();  // requires Arduino with Bluetooth
-
-		// Other Sensors and state
-
-		// No tilt accelerometer on Loki
-		//g_pFullSensorStatus->TiltAccelX =	0;			// Typically From Arduino.  zero = level
-		//g_pFullSensorStatus->TiltAccelY =	0;	 		// Typically From Arduino.  zero = level
-
-		// Analog Sensors
-		for( int i=0; i<4; i++ )
-		{
-			g_pFullSensorStatus->IR[i] = g_pKobukiStatus->AnalogPort[i];
-		}
-
-		/// TODO-MUST-DAVES - figure out where to factor in offset from front of robot!!!
-		// HandleAnalogSensors();
-		g_pFullSensorStatus->IR[0] = ScaleLongRangeIRKobuki( g_pKobukiStatus->AnalogPort[0], (-BASE_IR_OFFSET_FROM_FRONT_TENTH_INCHES + 0) );	// Left Side Long Range, Compesation
-		g_pFullSensorStatus->IR[1] = ScaleLongRangeIRKobuki( g_pKobukiStatus->AnalogPort[1], (-BASE_IR_OFFSET_FROM_FRONT_TENTH_INCHES + 0) );	// Right Side Long Range, Compensation
-//		g_pFullSensorStatus->IR[2] = ScaleWideIRKobuki( g_pKobukiStatus->AnalogPort[2] );			// Left Side Wide angle Short range
-//		g_pFullSensorStatus->IR[3] = ScaleWideIRKobuki( g_pKobukiStatus->AnalogPort[3] );			// Left Side Wide angle Short range
-
-
-		/* DEBUG
-		int AveIR = (g_pKobukiStatus->AnalogPort[0] + g_pKobukiStatus->AnalogPort[1] + LastRawIR ) / 3;
-		int DeltaIR = g_pKobukiStatus->AnalogPort[1] - g_pKobukiStatus->AnalogPort[0];
-		TRACE("IR Inches 0 = %3d, 1 = %3d,   RAW: IR0 = %4d,  IR1 = %4d,  Average = %4d, Delta = 4%d\n", 
-			g_pFullSensorStatus->IR[0]/10, g_pFullSensorStatus->IR[1]/10, g_pKobukiStatus->AnalogPort[0],  g_pKobukiStatus->AnalogPort[1], AveIR, DeltaIR );
-
-		LastRawIR = AveIR; // FOR DEBUG!!!
-		*/
-
-		/*
-		// For DEBUG, show the values in Inches
-			TRACE( "\nIR: (Raw,Inches) ");
-			for( int nSensorNumber=0; nSensorNumber< 2; nSensorNumber++ ) // NUM_IR_SENSORS
+			// Kobuki has 3 IR Cliff Sensors,  left, right, front
+			if( m_CliffSensorsEnabled )
 			{
-				TRACE("  %2u=%3u, %3u Inches",
-					nSensorNumber, g_pKobukiStatus->AnalogPort[nSensorNumber], g_pFullSensorStatus->IR[nSensorNumber]/10 );
+				g_pFullSensorStatus->CliffFront =	g_pKobukiStatus->CliffFront;
+				g_pFullSensorStatus->CliffLeft =	g_pKobukiStatus->CliffLeft;
+				g_pFullSensorStatus->CliffRight =	g_pKobukiStatus->CliffRight;
 			}
-			TRACE( "\n" );
-			ROBOT_LOG( TRUE,  "\n" );
-		*/
+			else
+			{
+				g_pFullSensorStatus->CliffFront =	false;
+				g_pFullSensorStatus->CliffRight =	false;
+				g_pFullSensorStatus->CliffLeft =	false;
+			}
+
+			// Hardware Bumpers, IR range switches, and pressure sensors
+			g_pFullSensorStatus->HWBumperFront =		g_pKobukiStatus->BumperFront;
+			g_pFullSensorStatus->HWBumperSideLeft =		g_pKobukiStatus->BumperLeft;
+			g_pFullSensorStatus->IRBumperSideRight =	g_pKobukiStatus->BumperRight;
+			g_pFullSensorStatus->HWBumperRear =			0; // no rear bumper on Kobuki
+
+			// IR Bumpers - No IR Bumpers on Kobuki
+			// Arm and finger sensors - no arms on Teleop
+
+			// Compass - Heading is in degrees
+			// WARNING - THIS IS NOT REALLY COMPASS HEADING!
+			// IT IS DEGREES FROM WHERE KOBUKI WAS POINTING WHEN POWERED ON!
+			// (but still useful for determining turn amount)
+			g_pFullSensorStatus->CompassHeading = (int)(g_pKobukiStatus->GyroDegrees);
 
 
-		///////////////////////////////////////////////////////////////////////////
-		// Done processing sensor data.
-		// Now do sensor fusion to combine the data in a meaningful way
-		DoSensorFusion();
+			// Heading and Odometry
+			// Calculations are handled in this funciton, which also calls UpdateMoveDistance, UpdateLocation, etc.
+			UpdateOdometer();
 
-		// Now post the status to the GUI display (local or remote)
-		SendResponse( WM_ROBOT_DISPLAY_BULK_ITEMS,	// command
-			ROBOT_RESPONSE_PIC_STATUS,				// Param1 = Bulk data command
-			0 );									// Param2 = not used
+			// Kobuki Dock IR Beacon
+			g_pFullSensorStatus->DockSensorRight =	g_pKobukiStatus->DockRightSignal;
+			g_pFullSensorStatus->DockSensorCenter = g_pKobukiStatus->DockCenterSignal;
+			g_pFullSensorStatus->DockSensorLeft =	g_pKobukiStatus->DockLeftSignal;
 
+			// Get status of Android Phone bluetooth connection, and get commands
+			// HandleAndroidPhone();  // requires Arduino with Bluetooth
+
+			// Other Sensors and state
+
+			// No tilt accelerometer on Loki
+			//g_pFullSensorStatus->TiltAccelX =	0;			// Typically From Arduino.  zero = level
+			//g_pFullSensorStatus->TiltAccelY =	0;	 		// Typically From Arduino.  zero = level
+
+			// Analog Sensors
+			for( int i=0; i<4; i++ )
+			{
+				g_pFullSensorStatus->IR[i] = g_pKobukiStatus->AnalogPort[i];
+			}
+
+			/// TODO-MUST-DAVES - figure out where to factor in offset from front of robot!!!
+			// HandleAnalogSensors();
+			//g_pFullSensorStatus->IR[0] = ScaleLongRangeIRKobuki( g_pKobukiStatus->AnalogPort[0], (-BASE_IR_OFFSET_FROM_FRONT_TENTH_INCHES + 0) );	// Left Side Long Range, Compesation
+			//g_pFullSensorStatus->IR[1] = ScaleLongRangeIRKobuki( g_pKobukiStatus->AnalogPort[1], (-BASE_IR_OFFSET_FROM_FRONT_TENTH_INCHES + 0) );	// Right Side Long Range, Compensation
+	//		g_pFullSensorStatus->IR[2] = ScaleWideIRKobuki( g_pKobukiStatus->AnalogPort[2] );			// Left Side Wide angle Short range
+	//		g_pFullSensorStatus->IR[3] = ScaleWideIRKobuki( g_pKobukiStatus->AnalogPort[3] );			// Left Side Wide angle Short range
+
+
+			/* DEBUG
+			int AveIR = (g_pKobukiStatus->AnalogPort[0] + g_pKobukiStatus->AnalogPort[1] + LastRawIR ) / 3;
+			int DeltaIR = g_pKobukiStatus->AnalogPort[1] - g_pKobukiStatus->AnalogPort[0];
+			TRACE("IR Inches 0 = %3d, 1 = %3d,   RAW: IR0 = %4d,  IR1 = %4d,  Average = %4d, Delta = 4%d\n", 
+				g_pFullSensorStatus->IR[0]/10, g_pFullSensorStatus->IR[1]/10, g_pKobukiStatus->AnalogPort[0],  g_pKobukiStatus->AnalogPort[1], AveIR, DeltaIR );
+
+			LastRawIR = AveIR; // FOR DEBUG!!!
+			*/
+
+			/*
+			// For DEBUG, show the values in Inches
+				TRACE( "\nIR: (Raw,Inches) ");
+				for( int nSensorNumber=0; nSensorNumber< 2; nSensorNumber++ ) // NUM_IR_SENSORS
+				{
+					TRACE("  %2u=%3u, %3u Inches",
+						nSensorNumber, g_pKobukiStatus->AnalogPort[nSensorNumber], g_pFullSensorStatus->IR[nSensorNumber]/10 );
+				}
+				TRACE( "\n" );
+				ROBOT_LOG( TRUE,  "\n" );
+			*/
+
+
+			///////////////////////////////////////////////////////////////////////////
+			// Done processing sensor data.
+			// Now do sensor fusion to combine the data in a meaningful way
+			DoSensorFusion();
+
+			// Now post the status to the GUI display (local or remote)
+			SendResponse( WM_ROBOT_DISPLAY_BULK_ITEMS,	// command
+				ROBOT_RESPONSE_PIC_STATUS,				// Param1 = Bulk data command
+				0 );									// Param2 = not used
+		}
 	}  // ProcessSensorStatus
 
 

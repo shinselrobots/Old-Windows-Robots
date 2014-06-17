@@ -42,10 +42,13 @@ static char THIS_FILE[] = __FILE__;
 #if SENSOR_CONFIG_TYPE == SENSOR_CONFIG_CARBOT
 	int		TempCompass = 0;	// Initialize at 0 (North)
 
-#elif SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TURTLE
+#elif SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TURTLE_IROBOT
 	int		TempCompass = 0;	// Initialize at 0 (North)
 
-#elif SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TELEOP
+#elif SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TELEOP_KOBUKI
+	int		TempCompass = 0;	// Initialize at 0 (North)
+
+#elif SENSOR_CONFIG_TYPE == SENSOR_CONFIG_KOBUKI_WITH_ARDUINO
 	int		TempCompass = 0;	// Initialize at 0 (North)
 
 #elif SENSOR_CONFIG_TYPE == SENSOR_CONFIG_LOKI
@@ -106,7 +109,7 @@ void SimulateHardware( DWORD Cmd, DWORD Param1, DWORD Param2 )
 
 				g_RawArduinoStatus.Bumper = 0;
 
-			#elif ( (SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TURTLE) || (SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TELEOP) )
+			#elif ( (SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TURTLE_IROBOT) || (SENSOR_CONFIG_TYPE == SENSOR_CONFIG_KOBUKI_WITH_ARDUINO) || (SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TELEOP_KOBUKI) )
 				g_RawArduinoStatus.IRBumper = 0;
 				g_RawArduinoStatus.HWBumper = 0;
 

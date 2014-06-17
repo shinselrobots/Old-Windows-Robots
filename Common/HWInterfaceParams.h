@@ -15,10 +15,13 @@
 	#include "HWInterfaceLokiArduino.h"
 	//#include "HWInterfaceLokiPic.h"
 
-#elif SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TURTLE
-	#include "HWInterfaceTurtle.h"
+#elif SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TURTLE_IROBOT
+	#include "HWInterfaceTurtleIrobot.h"
 
-#elif SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TELEOP
+#elif SENSOR_CONFIG_TYPE == SENSOR_CONFIG_KOBUKI_WITH_ARDUINO
+	#include "HWInterfaceKobukiArduino.h"
+
+#elif SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TELEOP_KOBUKI
 	#include "HWInterfaceTeleop.h"
 
 #else

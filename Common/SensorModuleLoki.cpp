@@ -28,7 +28,7 @@ static char THIS_FILE[] = __FILE__;
 	// ProcessSensorStatus()
 	// This is where Raw sensor data from Arduino or other sources (Like Kobuki base) get repackaged and copied to g_pFullSensorStatus
 	// There are different implementations of this function for each robot type.  See "SensorModuleXXX" for each robot type.
-	void CSensorModule::ProcessSensorStatus()
+	void CSensorModule::ProcessSensorStatus( UINT uMsg )
 	{
 		//int nSensorNumber = 0;
 
@@ -687,67 +687,6 @@ static char THIS_FILE[] = __FILE__;
 
 	} // UpdateOdometer
 
-
-	//////////////////////////////////////////////////////////////////////////
-	void CSensorModule::HandleAndroidPhone()
-	{
-		// Commands from Android Phone (if connected)
-		// Android communicates to robot via bluetooth module on the Arduino
-
-		if( g_pFullSensorStatus->AndroidConnected != (BOOL)g_RawArduinoStatus.AndroidConnected )
-		{
-			g_pFullSensorStatus->AndroidConnected = (BOOL)g_RawArduinoStatus.AndroidConnected;
-			if( g_pFullSensorStatus->AndroidConnected )
-			{
-				ROBOT_LOG( TRUE,  "****** Android Connected! ******\n" )
-			}
-			else
-			{
-				ROBOT_LOG( TRUE,  "****** Android Disconnected! ******\n" )
-				g_pFullSensorStatus->AndroidCommand = 0;
-				g_pFullSensorStatus->AndroidCompass = 0;
-				g_pFullSensorStatus->AndroidPitch = 0;
-				g_pFullSensorStatus->AndroidRoll = 0;
-			}
-		}
-
-		if( g_pFullSensorStatus->AndroidConnected )
-		{
-			g_pFullSensorStatus->AndroidCommand = g_RawArduinoStatus.AndroidCmd;
-			g_pFullSensorStatus->AndroidAccEnabled = g_RawArduinoStatus.AndroidAccEnabled;
-			if( 0 != g_pFullSensorStatus->AndroidCommand )
-			{
-				ROBOT_LOG( TRUE,  "DEBUG: AndroidCommand = %d", g_pFullSensorStatus->AndroidCommand )
-			}
-
-			if( g_pFullSensorStatus->AndroidAccEnabled )
-			{
-				// Accelerometer and compass measurements are in degrees
-				signed short  TempAndroidCompass = g_RawArduinoStatus.AndroidCompassHigh <<8;
-				TempAndroidCompass += g_RawArduinoStatus.AndroidCompassLow;
-				g_pFullSensorStatus->AndroidCompass = TempAndroidCompass;
-
-				signed short  TempAndroidPitch = g_RawArduinoStatus.AndroidPitchHigh <<8;
-				TempAndroidPitch += g_RawArduinoStatus.AndroidPitchLow;
-				g_pFullSensorStatus->AndroidPitch = TempAndroidPitch;
-
-				signed short  TempAndroidRoll = g_RawArduinoStatus.AndroidRollHigh <<8;
-				TempAndroidRoll += g_RawArduinoStatus.AndroidRollLow;
-				g_pFullSensorStatus->AndroidRoll = TempAndroidRoll;
-				ROBOT_LOG( TRUE,  "DEBUG: AndroidCompass = %d", g_pFullSensorStatus->AndroidCompass )
-				ROBOT_LOG( TRUE,  "DEBUG: AndroidPitch = %d", g_pFullSensorStatus->AndroidPitch )
-				ROBOT_LOG( TRUE,  "DEBUG: AndroidRoll = %d\n", g_pFullSensorStatus->AndroidRoll )
-			}
-			else
-			{
-				g_pFullSensorStatus->AndroidCompass = 0;
-				g_pFullSensorStatus->AndroidPitch = 0;
-				g_pFullSensorStatus->AndroidRoll = 0;
-			}
-		}
-
-
-	}	// HandleAndroidPhone
 
 	//////////////////////////////////////////////////////////////////////////
 	void CSensorModule::HandleThermalSensor()

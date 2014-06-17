@@ -401,7 +401,7 @@ public:
 
 
 	void ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam );
-	void ProcessSensorStatus(); // different implementations for each robot type
+	void ProcessSensorStatus( UINT uMsg ); // different implementations for each robot type
 	void SetCompassCorrection( int CompassCorrection );
 	void UpdateFromTwoOdometers( double OdometerUpdateTenthInchesL, double OdometerUpdateTenthInchesR);
 
@@ -423,9 +423,9 @@ public:
 	void	DoSensorFusion();
 	void	FuseLaserAndKinectData();
 	void	UpdateOdometer();
+	void	HandleAndroidPhone();
 
 	#if SENSOR_CONFIG_TYPE == SENSOR_CONFIG_LOKI
-		void	HandleAndroidPhone();
 		void	HandleThermalSensor();
 		void	HandleAnalogSensors();
 	#endif

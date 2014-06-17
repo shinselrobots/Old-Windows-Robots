@@ -114,12 +114,17 @@ __itt_string_handle* psh_Sleep = __itt_string_handle_create("Sleep");
 
 
 ////////////////////////////////////////////////////////////////
-#elif SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TURTLE
+#elif SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TURTLE_IROBOT
 	#define SENSOR_SAMPLE_RATE		(LOOP_TIMES_PER_SECOND/5)	// 200 ms!
 
 
 ////////////////////////////////////////////////////////////////
-#elif SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TELEOP
+#elif SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TELEOP_KOBUKI
+	#define SENSOR_SAMPLE_RATE		(LOOP_TIMES_PER_SECOND/5)	// 200 ms!
+
+
+////////////////////////////////////////////////////////////////
+#elif SENSOR_CONFIG_TYPE == SENSOR_CONFIG_KOBUKI_WITH_ARDUINO
 	#define SENSOR_SAMPLE_RATE		(LOOP_TIMES_PER_SECOND/5)	// 200 ms!
 
 

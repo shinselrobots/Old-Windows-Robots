@@ -31,7 +31,7 @@ static char THIS_FILE[] = __FILE__;
 	// ProcessSensorStatus()
 	// This is where Raw sensor data from Arduino or other sources (Like Kobuki base) get repackaged and copied to g_pFullSensorStatus
 	// There are different implementations of this function for each robot type.  See "SensorModuleXXX" for each robot type.
-	void CSensorModule::ProcessSensorStatus()
+	void CSensorModule::ProcessSensorStatus( UINT uMsg )
 	{
 		int nSensorNumber = 0;
 
@@ -39,7 +39,7 @@ static char THIS_FILE[] = __FILE__;
 		// Don't memset the structure, it corrupts current position!
 
 		// Copy basic stuff first
-		g_pFullSensorStatus->StatusFlags =	g_RawArduinoStatus.StatusFlags;
+		g_pFullSensorStatus->StatusFlags =		g_RawArduinoStatus.StatusFlags;
 		g_pFullSensorStatus->LastError =		g_RawArduinoStatus.LastError;
 		g_pFullSensorStatus->DebugCode =		g_RawArduinoStatus.DebugCode;
 

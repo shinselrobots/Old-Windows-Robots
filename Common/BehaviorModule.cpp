@@ -760,6 +760,7 @@ void CBehaviorModule::ProcessMessage(
 		case WM_ROBOT_KINECT_SEARCH_COMPLETE:
 		case WM_ROBOT_SERVO_STATUS_READY:
 		case WM_ROBOT_SENSOR_STATUS_READY:
+		case WM_ROBOT_KOBUKI_STATUS_READY:
 		// ============================================================================================================
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////
 		{

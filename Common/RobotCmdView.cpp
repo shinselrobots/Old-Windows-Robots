@@ -1345,7 +1345,7 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 			***/
 		
 		///////////////////////////////////////////////////////////////////////////////
-		#elif SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TURTLE
+		#elif SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TURTLE_IROBOT
 
 			ROBOT_ASSERT(0); // TODO g_pKobukiStatus
 
@@ -1422,7 +1422,7 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 */
 
 		///////////////////////////////////////////////////////////////////////////////
-		#elif SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TELEOP
+		#elif ( (SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TELEOP_KOBUKI) || (SENSOR_CONFIG_TYPE == SENSOR_CONFIG_KOBUKI_WITH_ARDUINO) )
 
 			// Note: Teleop Robot data in g_KobukiStatus, not g_pFullSensorStatus
 			//int BatteryChargeLevel = ( g_pIRobotStatus->BatteryCapacity != 0 ? 
@@ -1886,12 +1886,17 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 
 
 		///////////////////////////////////////////////////////////////////////////////
-		#elif SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TURTLE
+		#elif SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TURTLE_IROBOT
 
 			// TODO-TURTLE
 
 		///////////////////////////////////////////////////////////////////////////////
-		#elif SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TELEOP
+		#elif SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TELEOP_KOBUKI
+
+			// TODO-TURTLE
+
+		///////////////////////////////////////////////////////////////////////////////
+		#elif SENSOR_CONFIG_TYPE == SENSOR_CONFIG_KOBUKI_WITH_ARDUINO
 
 			// TODO-TURTLE
 

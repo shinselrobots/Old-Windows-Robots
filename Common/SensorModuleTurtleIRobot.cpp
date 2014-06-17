@@ -23,13 +23,13 @@ static char THIS_FILE[] = __FILE__;
 
 
 ///////////////////////////////////////////////////////////////////////////////
-#if SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TURTLE
+#if SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TURTLE_IROBOT
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ProcessSensorStatus()
 	// This is where Raw sensor data from Arduino or other sources (Like Kobuki base) get repackaged and copied to g_SensorStatus
 	// There are different implementations of this function for each robot type.  See "SensorModuleXXX" for each robot type.
-	void CSensorModule::ProcessSensorStatus()
+	void CSensorModule::ProcessSensorStatus( UINT uMsg )
 	{
 		// See MotorControlIRobot.cpp for capabilities of the iRobot Create base
 
@@ -327,6 +327,6 @@ static char THIS_FILE[] = __FILE__;
 
 	}
 
-#endif // SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TELEOP
+#endif // SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TURTLE_IROBOT
 
 #endif // ROBOT_SERVER	// This module used for Robot Server only

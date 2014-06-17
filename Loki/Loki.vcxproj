@@ -283,7 +283,10 @@ xcopy C:\Dev\_Robot\RemoteDbg\Loki.pdb  \\Loki\Dev\_Robot\RemoteDbg /Y</Command>
     <ClCompile Include="..\Common\RotateMapDlg.cpp" />
     <ClCompile Include="..\Common\SensorModule.cpp" />
     <ClCompile Include="..\Common\SensorModuleCarbot.cpp" />
+    <ClCompile Include="..\Common\SensorModuleKobukiArduino.cpp" />
     <ClCompile Include="..\Common\SensorModuleLoki.cpp" />
+    <ClCompile Include="..\Common\SensorModuleTeleop.cpp" />
+    <ClCompile Include="..\Common\SensorModuleTurtleIRobot.cpp" />
     <ClCompile Include="..\Common\ServerSock.cpp" />
     <ClCompile Include="..\Common\SetupDoc.cpp" />
     <ClCompile Include="..\Common\SetupView.cpp" />

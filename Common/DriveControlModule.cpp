@@ -356,7 +356,7 @@ BOOL CDriveControlModule::SetTurnRotation( int  Module, int Speed, int Turn, int
 	m_Turn = Turn;	// This sets the speed/tightness of the turn
 	m_TurnRotationRemaining = AbsTurnAmountDegrees; // Non-Zero tells other modules that turn not completed.
 
-	//TODO-MUST #if( SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TELEOP )
+	//TODO-MUST #if( SENSOR_CONFIG_TYPE == SENSOR_CONFIG_KOBUKI_WITH_ARDUINO )
 		// Using the Kobuki base.  Gyro is best accuracy!
 		m_TrackCompassHeading = TRUE; // Indicate heading in progress
 		if( m_Turn < 0 )

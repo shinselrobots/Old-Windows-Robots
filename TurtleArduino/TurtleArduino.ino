@@ -32,25 +32,25 @@ void setup(void)
 { 
   Serial.begin(19200);   // communication with the PC
   Serial1.begin(115200); // bluetooth connection with Android phone
-  Wire.begin();           // For I2C
+  //Wire.begin();           // For I2C
   
-  attachInterrupt(INT_0, CounterISR0, CHANGE);
-  attachInterrupt(INT_1, CounterISR1, CHANGE);
+  //attachInterrupt(INT_0, CounterISR0, CHANGE);
+  //attachInterrupt(INT_1, CounterISR1, CHANGE);
   
   pinMode(HEARTBEAT_LED_PIN, OUTPUT);      
   pinMode(STATUS_LED_PIN, OUTPUT);      
-  pinMode(DIR_0_PIN, INPUT);      
-  pinMode(DIR_1_PIN, INPUT); 
+  //pinMode(DIR_0_PIN, INPUT);      
+  //pinMode(DIR_1_PIN, INPUT); 
 
-  // Setup Relay contol pins
-  pinMode(RELAY_BOARD_PIN_0, OUTPUT);      
-  pinMode(AUX_LIGHT_PIN, OUTPUT);      
-  pinMode(SERVO_PWR_18V_PIN, OUTPUT);      
-  pinMode(SERVO_PWR_12V_PIN, OUTPUT);  
-  digitalWrite(RELAY_BOARD_PIN_0, false);  // N/C
-  digitalWrite(AUX_LIGHT_PIN, false);      // Blue lights off by default
-  digitalWrite(SERVO_PWR_18V_PIN, true);   // Servo Power ON by default, FOR NOW!
-  digitalWrite(SERVO_PWR_12V_PIN, true);
+  // Setup Relay / Lights contol pins
+  pinMode(LIGHT_TOP_PIN, OUTPUT);      
+  pinMode(LIGHT_BOTTOM_PIN, OUTPUT);      
+  //pinMode(SERVO_PWR_18V_PIN, OUTPUT);      
+  //pinMode(SERVO_PWR_12V_PIN, OUTPUT);  
+  digitalWrite(LIGHT_TOP_PIN, false);  // N/C
+  digitalWrite(LIGHT_TOP_PIN, false);      // Blue lights off by default
+  //digitalWrite(SERVO_PWR_18V_PIN, true);   // Servo Power ON by default, FOR NOW!
+  //digitalWrite(SERVO_PWR_12V_PIN, true);
 
   // Bluetooth using Amarilo - register callback functions for Bluetooth
   meetAndroid.registerFunction(ConnectionEvent, 'C');  
@@ -65,8 +65,8 @@ void setup(void)
   // DDRD = DDRD | B11111100; // example for setting selected pins only
   // PORTx = B10101000; // sets digital pins 7,5,3 HIGH.  PORTx can be used for read or write
   // PINx // Read port at once. read only.
-  DDRA = 0x00; // same as B00000000;  // sets Arduino Port A [pins7...0], 1=output, 0=input
-  DDRC = 0x00; // same as B00000000;  // sets Arduino Port A [pins7...0], 1=output, 0=input
+  //DDRA = 0x00; // same as B00000000;  // sets Arduino Port A [pins7...0], 1=output, 0=input
+  //DDRC = 0x00; // same as B00000000;  // sets Arduino Port A [pins7...0], 1=output, 0=input
   PORTA = 0xFF; // Set pullup resistors on to avoid noise on unused pins
   PORTC = 0x0F; // Set pullup resistors on to avoid noise on unused pins
  
@@ -131,14 +131,14 @@ void loop(void)
   if( TimeToSendStatus() )
   {
     digitalWrite(STATUS_LED_PIN, LOW);   // Active Low
-    SetArmLED( I2C_PCF8574_LEFT_ARM, HIGH ); // blink the arms too
-    SetArmLED( I2C_PCF8574_RIGHT_ARM, HIGH );
-    ReadSensors();
+    //SetArmLED( I2C_PCF8574_LEFT_ARM, HIGH ); // blink the arms too
+    //SetArmLED( I2C_PCF8574_RIGHT_ARM, HIGH );
+    //ReadSensors();
     SendStatusToPC();   
   }
 
   // Update Robot Eyes state (gradual open or close for blinking)
-  BlinkEyes();
+  //BlinkEyes();
   
   // Blink Heartbeat LED if it's time
   if( TimeToBlinkHeartBeat() )
