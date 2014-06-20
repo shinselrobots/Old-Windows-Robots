@@ -1162,7 +1162,6 @@ void CKinectModule::ProcessMessage(
 
 		// ============================================================================================================
 		case WM_ROBOT_SENSOR_STATUS_READY:
-		case WM_ROBOT_KOBUKI_STATUS_READY:
 		case WM_ROBOT_SERVO_STATUS_READY:
 		// ============================================================================================================
 		{
@@ -1203,7 +1202,7 @@ void CKinectModule::ProcessMessage(
 						case 2:	// Wait for Servo to reach commanded position
 						{	
 							//ROBOT_LOG( TRUE, "DEBUG KINECT_TASK_SCAN_FLOOR_FOR_CLOSEST_OBJECT : CheckServoPosition ")
-							//if( WM_ROBOT_SENSOR_STATUS_READY == uMsg ) ROBOT_LOG( TRUE," - Arduino\n") // TODO case WM_ROBOT_KOBUKI_STATUS_READY:
+							//if( WM_ROBOT_SENSOR_STATUS_READY == uMsg ) ROBOT_LOG( TRUE," - Arduino\n") 
 							//else if( WM_ROBOT_SERVO_STATUS_READY == uMsg ) ROBOT_LOG( TRUE," - SERVO\n")
 
 							/*

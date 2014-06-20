@@ -4,12 +4,11 @@
 #ifndef __ROBOT_HW_INTERFACE_TURTLE_H__
 #define __ROBOT_HW_INTERFACE_TURTLE_H__
 
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 //                                       KOBUKI TURTLE WITH ARDUINO
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	#define ARDUINO_CODE_VERSION		3 // Must match between PC and Arduino.  This file is shared by both
+	#define ARDUINO_CODE_VERSION		4 // Must match between PC and Arduino.  This file is shared by both
 
 	// Message Types from the Arduino
 	#define ARDUINO_MESSAGE_STATUS	1
@@ -46,23 +45,23 @@
 	// Raw data from the Arduino for Loki
 	typedef struct
 	{
-		BYTE StatusFlags;		// 3
-		BYTE LastError;			// 4
-		BYTE DebugCode;			// 5
-		BYTE HWBumper;			// 6
-		BYTE IRBumper;			// 7
-		BYTE ArmBumperL;		// 8
-		BYTE ArmBumperR;		// 9
-		BYTE Battery0;			//10
-		BYTE CompassHigh;		//11
-		BYTE CompassLow;		//12
-		BYTE OdometerHighL;		//13
-		BYTE OdometerLowL;		//14
-		BYTE OdometerHighR;		//15
-		BYTE OdometerLowR;		//16
+		BYTE StatusFlags;		
+		BYTE DebugCode;			
+		BYTE HWBumper;			
+		BYTE IRBumper;			
+		BYTE ArmBumperL;		
+		BYTE ArmBumperR;		
+		BYTE Battery0;			
+		BYTE CompassHigh;		
+		BYTE CompassLow;		
+		BYTE OdometerHighL;		
+		BYTE OdometerLowL;		
+		BYTE OdometerHighR;		
+		BYTE OdometerLowR;		
 		BYTE AndroidConnected;
 		BYTE AndroidAccEnabled;
 		BYTE AndroidCmd;
+		BYTE AndroidUpdatePending;			
 		BYTE AndroidCompassHigh;	
 		BYTE AndroidCompassLow;		
 		BYTE AndroidRollHigh;
@@ -165,7 +164,6 @@
 #define ARM_R_IR_BUMPER_OBJECT_ELBOW		(  ARM_R_IR_SENSOR_ELBOW < (S_FOREARM_BONE_LEN_TENTH_INCHES_R+IR_ELBOW_HIT_RANGE_TENTH_INCHES)  ) // I2C-IT Sensor: True if object detected within N Tenth_Inches
 */
 
-/*
 ////////////////////////////////////////////////////////////////
 // Packet Structure for Comands to Arduino
 #ifndef __ARDUINO_TARGET	// Arduino Compiler does not understand pack
@@ -193,7 +191,6 @@ typedef struct
 #define SIO_SYNC_1							0x5F
 #define CMD_TERM_CHAR						0xC4	// Serial Command termination character (use for check)
 #define SERIAL_CMD_SIZE 					   8	// Fixed length of a command from the Host to the Arduino
-*/
 
 
 #endif	//__ROBOT_HW_INTERFACE_TURTLE_H__

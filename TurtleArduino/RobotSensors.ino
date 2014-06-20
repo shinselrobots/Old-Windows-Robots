@@ -8,8 +8,7 @@ void ReadSensors()
   
   // Read all Sensors, and update the status block for sending to the PC
   Status.StatusFlags = 0;
-  Status.LastError = 0;
-  Status.DebugCode = 0;
+  Status.DebugCode = 5;
   //Status.HWBumper = PortC;
   //Status.IRBumper = PortA;
   Status.ArmBumperL = 0;
@@ -21,28 +20,28 @@ void ReadSensors()
   //Status.OdometerLowL;
   //Status.OdometerHighR;
   //Status.OdometerLowR;
-   Status.nOdometerSamples = 1;	// TODO - remove this
-   Status.LeftHandPressureL = 0;
-   Status.LeftHandPressureR = 0;
+   //Status.nOdometerSamples = 1;	// TODO - remove this
+   //Status.LeftHandPressureL = 0;
+   //Status.LeftHandPressureR = 0;
   //Status.IR[NUM_AD_IR_SENSORS];   // UP TO N, may be less! - Arduino Board A/D
   //Status.IR3[NUM_IR3_SENSORS]; // UP TO N, may be less! - I2C-IT IR Rangers
   
-  Status.HWBumper = Read_Digital_Port_C();
-  Status.IRBumper = Read_Digital_Port_A();
-  Read_Wheel_Odometers();
+  //Status.HWBumper = Read_Digital_Port_C();
+  //Status.IRBumper = Read_Digital_Port_A();
+  //Read_Wheel_Odometers();
 
-  Status.ArmBumperL = ReadPCF8574(I2C_PCF8574_LEFT_ARM);
-  Status.ArmBumperR = ReadPCF8574(I2C_PCF8574_RIGHT_ARM);
+  //Status.ArmBumperL = ReadPCF8574(I2C_PCF8574_LEFT_ARM);
+  //Status.ArmBumperR = ReadPCF8574(I2C_PCF8574_RIGHT_ARM);
   
-  Read_I2C_Digital_Ports();
+  //Read_I2C_Digital_Ports();
   
-  Read_I2C_IT_IR_Rangers();
+  //Read_I2C_IT_IR_Rangers();
 // SensorTime = millis() - SensorStartTime;
 // PrintDebugDec("i2c-it = ", SensorTime);
 
-  Read_Hand_Pressure();
+  //Read_Hand_Pressure();
 
-  Read_Compass();
+  //Read_Compass();
 // SensorTime = millis() - SensorStartTime;
 // PrintDebugDec("compass = ", SensorTime);
 
@@ -57,7 +56,7 @@ void ReadSensors()
 void Read_Wheel_Odometers( )
 {
   // WheelCounters are pulse counts since last time we checked.  The counter is reset when "count" is called
- 
+/* 
   boolean      RevRight = false;
   boolean      RevLeft = false;
   unsigned int WheelCountLeft = 0;
@@ -105,7 +104,7 @@ void Read_Wheel_Odometers( )
     Status.OdometerHighR |= 0x80; // set the high bit
   }
   Status.OdometerLowR = (byte)( WheelCountRight & 0xFF);		// Low Byte
-  
+*/ 
 }
 
 
@@ -154,13 +153,14 @@ void Read_Hand_Pressure()
 {  
   // Read Hand pressure sensors via I2C Adafruit ADS1015 4 channel A2D
   //int16_t adc0;
+/*  
   int adc;
 
   adc = ads1015.readADC_SingleEnded(0);  
   Status.LeftHandPressureL = (byte)((adc >>3)& 0xFF);
   adc = ads1015.readADC_SingleEnded(1);  
   Status.LeftHandPressureR = (byte)((adc >>3)& 0xFF);
-
+*/
 //  adc1 = ads1015.readADC_SingleEnded(1);  
 //  adc2 = ads1015.readADC_SingleEnded(2);  
 //  adc3 = ads1015.readADC_SingleEnded(3);  

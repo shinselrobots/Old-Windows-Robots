@@ -313,11 +313,17 @@ void CRobotModule::SendHardwareCmd(WORD Request, DWORD wParam, DWORD lParam)
 		return;
 	}
 
-	#if ROBOT_TYPE == TURTLE
-		// On Turtle, LED Lights are controled through the iRobot base
+	#if ( (MOTOR_CONTROL_TYPE == IROBOT_MOTOR_CONTROL) || (MOTOR_CONTROL_TYPE == KOBUKI_MOTOR_CONTROL)  )
 		if( HW_SET_AUX_LIGHT_POWER == Request )
 		{
-			PostThreadMessage( g_dwMotorCommThreadId, (WM_ROBOT_MESSAGE_BASE+Request), wParam, lParam );
+			#if (TURTLE_TYPE == TURTLE_KOBUKI_WITH_ARDUINO )
+				// When arduino used, control lights with the Arduino
+				// Send the command to the Arduino Comm Write Thread
+				PostThreadMessage( g_dwArduinoCommWriteThreadId, (WM_ROBOT_MESSAGE_BASE+Request), wParam, lParam );
+			#else
+				// On Turtle, LED Lights are usually controled through the iRobot base
+				PostThreadMessage( g_dwMotorCommThreadId, (WM_ROBOT_MESSAGE_BASE+Request), wParam, lParam );
+			#endif
 			return;
 		}
 	#endif
@@ -620,7 +626,6 @@ CUserCmdModule::CUserCmdModule( CDriveControlModule *pDriveControlModule )
 	m_pSharedMemory = NULL;
 	m_CameraRequest.RequestData.FaceRequest.PersonID = 0;
 	m_CameraRequest.RequestData.FaceRequest.PersonName[0] = 0;
-	m_AndroidHasMotorControl = FALSE;
 	m_NextChatPhrase = 0;
 
 	#if ( ROBOT_SERVER == 1 ) //////////////// SERVER ONLY //////////////////
@@ -655,7 +660,6 @@ void CUserCmdModule::ProcessMessage(
 {
 	switch( uMsg )  
 	{
-		//case WM_ROBOT_SERVO_STATUS_READY:
 		case WM_ROBOT_SENSOR_STATUS_READY:
 		{
 			g_bCmdRecognized = TRUE;
@@ -666,12 +670,7 @@ void CUserCmdModule::ProcessMessage(
 			// and accelerometer
 			// These commands come from the Arduino board (which is connected via BT to the Android phone)
 
-			if( g_pFullSensorStatus->AndroidConnected )
-			{
-				// Handle Bluetooth Phone control
-				HandleAndroidInput();
-			}	
-			else
+			//if( !g_pFullSensorStatus->AndroidConnected )
 			{
 				// reissue last drive command continuously to keep control of wheels
 				if( gLocalUserCmdTimer > 0 )
@@ -687,10 +686,13 @@ void CUserCmdModule::ProcessMessage(
 				else
 				{
 					// Have not received a local user command recently
-					m_RemoteSpeed = SPEED_STOP;
-					m_RemoteTurn = TURN_CENTER;
-					m_LocalSpeed = SPEED_STOP;
-					m_LocalTurn = TURN_CENTER;
+					if( !g_pFullSensorStatus->AndroidAccEnabled )
+					{
+						m_RemoteSpeed = SPEED_STOP;
+						m_RemoteTurn = TURN_CENTER;
+						m_LocalSpeed = SPEED_STOP;
+						m_LocalTurn = TURN_CENTER;
+					}
 				}
 			}
 
@@ -803,6 +805,8 @@ void CUserCmdModule::ProcessMessage(
 			gLocalUserCmdTimer = 5; // TenthSeconds, so robot stays stopped for at least 1/2 second
 			m_LocalSpeed = SPEED_STOP;
 			m_LocalTurn = TURN_CENTER;
+			m_RemoteSpeed = SPEED_STOP;
+			m_RemoteTurn = TURN_CENTER;
 			m_pDriveCtrl->SetSpeedAndTurn( LOCAL_USER_MODULE, m_LocalSpeed, m_LocalTurn );
 		}
 		break;
@@ -902,6 +906,12 @@ void CUserCmdModule::ProcessMessage(
 				m_pDriveCtrl->SetSpeedAndTurn( Owner, m_RemoteSpeed, m_RemoteTurn );
 			#endif
 
+			return;
+		}
+
+		case WM_ROBOT_RELEASE_OWNER_CMD:
+		{
+			m_pDriveCtrl->ReleaseOwner( wParam ); // wParam is the owner ID
 			return;
 		}
 
@@ -1332,214 +1342,5 @@ void CUserCmdModule::ProcessMessage(
 }
 
 
-void CUserCmdModule::HandleAndroidInput( )
-{
 
-	switch( g_pFullSensorStatus->AndroidCommand )
-	{				
-		case 0: // No new command
-		{
-			break;
-		}
-		case 1: // Wave and say hello
-		{
-			SendCommand( WM_ROBOT_SET_ARM_MOVEMENT, (DWORD)RIGHT_ARM, (DWORD)ARM_MOVEMENT_WAVE );
-			ROBOT_LOG( TRUE,  "Got Android command: Wave\n")
-			break;
-		}
-		case 2: // Head Center
-		{
-			SendCommand( WM_ROBOT_USER_CAMERA_PAN_CMD, (DWORD)CAMERA_PAN_ABS_CENTER, 5 );
-			SendCommand( WM_ROBOT_CAMERA_SIDETILT_ABS_CMD, (DWORD)CAMERA_SIDETILT_CENTER, 5 );
-			ROBOT_LOG( TRUE,  "Got Android command: Head Center\n")
-			break;
-		}
-		case 3: //  "New Chat" - chat with adults  // OLD: New Child Conversation
-		{
-			ROBOT_LOG( TRUE,  "Got Android command: New Adult Chat\n")
-			SendCommand( WM_ROBOT_SET_ACTION_CMD, (DWORD)ACTION_MODE_CHAT_DEMO_WITH_ADULT, 1 );	// TRUE = start mode
-			break;
-		}
-		case 4: // "Quick Chat" - say a quick phrase   // OLD: New Child Conversation
-		{
-			ROBOT_LOG( TRUE,  "Got Android command: New Quick Chat\n")
-			CString TextToSpeak;
-			switch( m_NextChatPhrase++ )
-			{
-				case 0:   TextToSpeak =  "My name is Low Key" ;break;
-				case 1:   TextToSpeak =  "What is your name?" ;break;
-				case 2:   TextToSpeak =  "Do you like robots?" ;break;
-				case 3:   TextToSpeak =  "want to hear some jokes?" ;break;
-				default:  
-					m_NextChatPhrase = 0;
-					TextToSpeak =  "Do you live here?" ;
-					break;
-			}
-			SpeakText( TextToSpeak );
-			//g_MoveArmsWhileSpeaking = FALSE;
-			break;
-		}
-		case 5: // Follow Me
-		{
-			ROBOT_LOG( TRUE,  "Got Android command: Follow Me\n")
-			SendCommand( WM_ROBOT_SET_ACTION_CMD, (DWORD)ACTION_MODE_FOLLOW_PERSON, (DWORD)TRUE );	// TRUE = start mode
-			SpeakText( "I will follow you" );
-			break;
-		}
-		case 6: // Tell Joke
-		{
-			ROBOT_LOG( TRUE,  "Got Android command: Tell Joke\n")
-			SendCommand( WM_ROBOT_SET_ACTION_CMD, (DWORD)ACTION_MODE_TELL_JOKES, (DWORD)0 ); // single joke only
-			break;
-		}
-		// TODO - Make this "come here"?
-		case 7: // Take Picture // OLD: Pan/Tilt Head by Accelerometer
-		{
-
-			ROBOT_DISPLAY( TRUE, "android  Command Recognized: Arms/Hands UP")
-			SendCommand( WM_ROBOT_SET_ARM_MOVEMENT, (DWORD)BOTH_ARMS, (DWORD)ARM_MOVEMENT_ARM_UP_FULL );	// Right/Left arm, Movement to execute, 
-			RobotSleep(100, pDomainSpeakThread); // give time for arm to raise 
-			// Respond with random phrases
-			int RandomNumber = ((3 * rand()) / RAND_MAX);
-			ROBOT_LOG( TRUE, "DEBUG: RAND = %d\n", RandomNumber)
-			switch( RandomNumber )
-			{
-				case 0: SpeakText( "Ok, Don't shoot" ); break;
-				default:  SpeakText( "I am not the droid you are looking for" );// If const is larger number, this gets called more often
-			}
-			
-			//ROBOT_LOG( TRUE,  "Got Android command: Take Picture \n")
-			//SendCommand( WM_ROBOT_SET_ACTION_CMD, (DWORD)ACTION_MODE_TAKE_PHOTO, (DWORD)TRUE );	// TRUE = start mode
-
-			/* Set Speed
-			m_pHeadControl->SetHeadSpeed(HEAD_OWNER_USER_CONTROL, WiiRollPanServoSpeed, WiiPitchTiltServoSpeed, NOP );
-			// Set position
-			m_pHeadControl->SetHeadPositionRelative( HEAD_OWNER_USER_CONTROL,
-				WiiRollPanChangeTenthDegrees, WiiPitchTiltChangeTenthDegrees, NOP, FALSE ); // TRUE = Limit to front of robot
-			m_pHeadControl->ExecutePositionAndSpeed( HEAD_OWNER_USER_CONTROL );
-			*/
-						
-			break;
-		}
-		case 8: // Shake
-		{
-			ROBOT_LOG( TRUE,  "Got Android command: Shake Hands\n")
-			SendCommand( WM_ROBOT_SET_ARM_MOVEMENT, (DWORD)RIGHT_ARM, (DWORD)ARM_MOVEMENT_SHAKE_READY );
-			break;
-		}
-
-		case 9: // Have Something
-		{
-			SendCommand( WM_ROBOT_SET_ARM_MOVEMENT, (DWORD)LEFT_ARM, (DWORD)ARM_MOVEMENT_EXTEND_ARM_AUTO_CLAW );
-			break;
-		}
-		case 10: // Throw Away
-		{
-			SendCommand( WM_ROBOT_SET_ARM_MOVEMENT, (DWORD)LEFT_ARM, (DWORD)ARM_MOVEMENT_PUT_IN_BASKET );
-			// Respond with random phrases
-			int RandomNumber = ((4 * rand()) / RAND_MAX);
-			ROBOT_LOG( TRUE, "DEBUG: RAND = %d\n", RandomNumber)
-			switch( RandomNumber )
-			{
-				case 0:  SpeakText( "easy come, easy go" );break;
-				case 1:  SpeakText( "I will take care of this later" );break;
-				case 3:  SpeakText( "OK, if you say so" );break;
-				default: SpeakText( "Good idea" ); // If const is larger number, this gets called more often
-			}
-			break;
-		}
-		case 11: // Clean Up
-		{
-			SendCommand( WM_ROBOT_SET_ACTION_CMD, (DWORD)ACTION_MODE_PICKUP_OBJECTS, (DWORD)1 );
-			SpeakText( "A robots work is never done" );break;
-			break;
-		}
-		case 12: // Intro
-		{
-			ROBOT_LOG( TRUE,  "Got Android command: 12 Intro \n")
-			PostThreadMessage( g_dwSpeakThreadId, WM_ROBOT_SPEAK_TEXT, SPEAK_INTRO, 0 );
-			break;
-		}
-
-		case 13: // EMERGENCY STOP!
-		{
-			m_pDriveCtrl->SetSpeedAndTurn( LOCAL_USER_MODULE, SPEED_STOP, TURN_CENTER );
-			m_AndroidHasMotorControl = TRUE;
-			ROBOT_LOG( TRUE,  "Got Android command: STOP\n")
-			SendCommand( WM_ROBOT_STOP_CMD, 0, 0 ); // Forces stops and tells all modules to reset (cancel current behavior)
-			break;
-		}
-		case 14: // What Time
-		{
-			ROBOT_LOG( TRUE,  "Got Android command: 17 What Time \n")
-			SendCommand( WM_ROBOT_SET_ACTION_CMD, (DWORD)ACTION_MODE_WHAT_TIME_IS_IT, (DWORD)0 );
-			break;
-		}
-		case 15: // Danger
-		{
-			ROBOT_LOG( TRUE,  "Got Android command: 18 Danger\n")
-			SendCommand( WM_ROBOT_SET_ACTION_CMD, (DWORD)ACTION_MODE_FREAK_OUT, (DWORD)0 );
-			break;
-		}
-
-		default:
-			ROBOT_LOG( TRUE,  "ERROR! Unhandled Android Button: %d\n", g_pFullSensorStatus->AndroidCommand)
-	}
-					
-
-	// Handle Accelerometer
-	if( g_pFullSensorStatus->AndroidAccEnabled )
-	{
-		int AndoidCmdSpeed = 0;
-		int AndoidCmdTurn = 0;
-
-		// Pitch can go to over 90 degrees, but then roll does not work well, so max at pitch = 60 degrees
-		// Convert Speed from +/- 60 to +/- 127, but leave guard band at center				
-		int Pitch = g_pFullSensorStatus->AndroidPitch - 10; //  To make it comfortable to hold the phone, "neutral" is 10 degrees up
-		if( (Pitch > -15) && (Pitch< 10) )
-		{
-			AndoidCmdSpeed = 0;
-		}
-		else
-		{					
-			AndoidCmdSpeed = (int)( ((double)Pitch * -127.0) / 60.0 );	// Invert, down = forward.
-			if( AndoidCmdSpeed > 127 ) AndoidCmdSpeed = 127;
-			if( AndoidCmdSpeed < -127 ) AndoidCmdSpeed = -127;
-		}
-
-		// Convert Turn from +/- 90 to +/- 64, but leave guard band at center
-		if( (g_pFullSensorStatus->AndroidRoll > -10) && (g_pFullSensorStatus->AndroidRoll < 10) )
-		{
-			AndoidCmdTurn = 0;
-		}
-		else
-		{					
-			AndoidCmdTurn = (int)( ((double)g_pFullSensorStatus->AndroidRoll * 64.0) / 80.0 ); // slightly less then 90 to ease wrist motion
-			if( AndoidCmdTurn > 64 ) AndoidCmdTurn = 64;
-			if( AndoidCmdTurn < -64 ) AndoidCmdTurn = -64;
-		}
-
-		ROBOT_LOG( TRUE,  "AndoidCmdSpeed = %d, AndoidCmdTurn = %d\n", AndoidCmdSpeed, AndoidCmdTurn)
-
-		m_pDriveCtrl->SetSpeedAndTurn( LOCAL_USER_MODULE, AndoidCmdSpeed, AndoidCmdTurn );
-		m_AndroidHasMotorControl = TRUE;
-	}	
-	else
-	{
-		if( m_AndroidHasMotorControl )
-		{
-			// Android had control, but now released (or dropped connection!). Force a stop
-			m_pDriveCtrl->SetSpeedAndTurn( LOCAL_USER_MODULE, SPEED_STOP, TURN_CENTER );
-			m_AndroidHasMotorControl = FALSE;
-		}
-		else if( m_pDriveCtrl->IsOwner(LOCAL_USER_MODULE) )
-		{
-			// On a previous pass, we took over control
-			// Now, reset back to normal operation
-			m_pDriveCtrl->ReleaseOwner( LOCAL_USER_MODULE );
-		}
-	}
-
-
-}
 

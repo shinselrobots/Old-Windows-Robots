@@ -142,7 +142,6 @@ void CAvoidObjectModule::ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam
 
 		//case WM_ROBOT_SERVO_STATUS_READY:
 		case WM_ROBOT_SENSOR_STATUS_READY:
-		case WM_ROBOT_KOBUKI_STATUS_READY:
 		{
 			g_bCmdRecognized = TRUE;
 			//BYTE nDistHigh, nDistLow;

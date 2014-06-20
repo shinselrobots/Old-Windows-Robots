@@ -54,6 +54,7 @@ using namespace std;
 // Global to both KobukiManager and main - todo fix this
 	LPCTSTR			 pStatusSharedMemory = NULL;
 	HANDLE			 hStatusEvent = NULL;
+	unsigned int	 gWheelDrop = 0;	// monitor wheel drops to immediately stop motors
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -142,9 +143,11 @@ public:
 		}
 
 		Status.WheelDrop = CoreData.wheel_drop;
+		gWheelDrop = Status.WheelDrop;
 		if( Status.WheelDrop != 0 )
 		{
 			cout << std::hex << " Wheel Drop = " << Status.WheelDrop <<  endl;
+			// if Wheel Drop, immediately stop motors, until the PC can handle the situation
 		}
 
 		Status.Cliff = CoreData.cliff;
@@ -621,6 +624,18 @@ int _tmain(int argc, _TCHAR* argv[])
 						cout << "KOBUKI COMMAND LED STATE = " << Command->LEDState << endl;
 						KobukiManager.SetLedState( Command->LEDState );
 						LastCommand->LEDState = Command->LEDState;
+					}
+				}
+				else
+				{
+					// no command received.  Check wheel drop to see if we should stop
+					if( gWheelDrop != 0 )
+					{
+						cout << std::hex << " Wheel Drop and No Command.  Stopping! " << endl;
+						// if Wheel Drop, immediately stop motors, until the PC can handle the situation
+						AccelerationRamp = ACCELERATION_INSTANT_RAMP_AMOUNT;
+						TargetSpeed = 0;
+						TargetTurn = 0;
 					}
 				}
 			}

@@ -36,6 +36,7 @@
 	////////////////////////////////////////////////////////////////
 	// ALSO USED FOR SIMULATION - TODO - FIX THIS
 	//
+/***
 	#ifndef __ARDUINO_TARGET	// Arduino Compiler does not understand pack
 	#pragma pack( 1 )
 	#endif
@@ -62,7 +63,7 @@
 //		BYTE ThermalArray[9];	//			- Ambient + 8 Pixels - Devantech TPA81 Thermal Array Sensor
 //		BYTE US[NUM_US_SENSORS];//
 
-	} ARDUINO_STATUS_T;
+	} KOBUKI_STATUS_T;
 	#ifndef __ARDUINO_TARGET
 	#pragma pack( 4 )
 	#endif

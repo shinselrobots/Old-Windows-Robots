@@ -48,16 +48,18 @@ void AllLedsOff()
 {
   digitalWrite(HEARTBEAT_LED_PIN, LOW); // Active High
   digitalWrite(STATUS_LED_PIN, HIGH);   // Active Low
-  SetArmLED( I2C_PCF8574_LEFT_ARM, LOW ); // blink the arms too
-  SetArmLED( I2C_PCF8574_RIGHT_ARM, LOW );
+  //digitalWrite(STATUS_LED_PIN2, HIGH);   // Active Low
+  //SetArmLED( I2C_PCF8574_LEFT_ARM, LOW ); // blink the arms too
+  //SetArmLED( I2C_PCF8574_RIGHT_ARM, LOW );
 }
 
 void AllLedsOn()
 {
   digitalWrite(HEARTBEAT_LED_PIN, HIGH); // Active High
   digitalWrite(STATUS_LED_PIN, LOW);   // Active Low
-  SetArmLED( I2C_PCF8574_LEFT_ARM, HIGH ); // blink the arms too
-  SetArmLED( I2C_PCF8574_RIGHT_ARM, HIGH );
+  //digitalWrite(STATUS_LED_PIN2, LOW);   // Active Low
+  //SetArmLED( I2C_PCF8574_LEFT_ARM, HIGH ); // blink the arms too
+  //SetArmLED( I2C_PCF8574_RIGHT_ARM, HIGH );
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -120,6 +122,7 @@ void PrintDebugDec(char *Message, int Value)
 
 /////////////////////////////////////////////////////////////////////////////////////
 // Interrupt service routines for monitoring the wheel odometers
+/*
 void CounterISR0()
 { 
   Counter0.poll();
@@ -128,6 +131,7 @@ void CounterISR1()
 { 
   Counter1.poll();
 }
+*/
 
 /////////////////////////////////////////////////////////////////////////////////////
 void SendStatusToPC()
@@ -147,6 +151,7 @@ void SendStatusToPC()
   
   // Reset some data after sending it to the PC:
   Status.AndroidCmd = 0;
+  Status.AndroidUpdatePending = 0; // Set to true by Bluetooth code when new data received
   
 }
 
@@ -238,7 +243,7 @@ boolean CheckForSerialData()
 
   return false;
 }
-
+/*
 void BlinkEyes()
 {
   static int BlinkTimer = 0;
@@ -299,8 +304,8 @@ void BlinkEyes()
       gEyeState++;
     }
   }
-
 }
+*/
 
 
 

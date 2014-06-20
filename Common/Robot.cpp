@@ -182,6 +182,8 @@ BOOL CRobotApp::InitInstance()
 	// Memory Allocations 
 	// Must have matching delete in ExitInstance - see "Release allocated robot data" at the end of ExitInstance
 
+	memset( &g_RawArduinoStatus, '\0', sizeof(ARDUINO_STATUS_T) );	// clean out garbage chars
+
 	g_pGPSData = new GPS_MESSAGE_T;
 	memset( g_pGPSData, 0x00, sizeof( GPS_MESSAGE_T ) );
 

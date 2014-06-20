@@ -617,26 +617,21 @@ BOOL CDriveControlModule::IsOwner( int  Module )
 
 BOOL CDriveControlModule::ReleaseOwner( int  Module )
 {
-	if( Module < m_DriveOwner )
+	if( Module == m_DriveOwner )
 	{
-		// Higher priority module has control already so just ignore.
-/*		CString MsgString, ModuleName, OwnerName;
+		// Release Drive owner.
+		CString MsgString, ModuleName;
 		ModuleNumberToName( Module, ModuleName );
-		ModuleNumberToName( m_DriveOwner, OwnerName );
-		MsgString.Format( "Module %s releasing control, but %s already has it",ModuleName, OwnerName );
+		MsgString.Format( "Module %s releasing control",ModuleName );
 		ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
-*/
-		return FALSE;
+		ROBOT_DISPLAY( TRUE, "==================================================================")
+		m_DriveOwner = NO_MODULE;
+		return TRUE;
 	}
-
-	// No one with higher priority has control.  Release Drive owner.
-	CString MsgString, ModuleName;
-	ModuleNumberToName( Module, ModuleName );
-	MsgString.Format( "Module %s releasing control",ModuleName );
-	ROBOT_DISPLAY( TRUE,  (LPCTSTR)MsgString )
-	ROBOT_DISPLAY( TRUE, "==================================================================")
-	m_DriveOwner = NO_MODULE;
-	return TRUE;
+	else
+	{
+		return FALSE; // not the owner
+	}
 
 }
 

@@ -124,7 +124,7 @@ void CKobukiControl::SetDigitalIO( unsigned int Pins)
 	{
 		CopyMemory((PVOID)g_pKobukiCommandSharedMemory, &m_KobukiCommand, (sizeof(KOBUKI_COMMAND_T)));
 		SetEvent( g_hKobukiCommandEvent );  // Tell Kobuki app that a new command is pending
-		ROBOT_LOG( TRUE, "Sending message to KobukiControl app to shut down\n" )
+		ROBOT_LOG( TRUE, "Sending message to KobukiControl app - Digital IO\n" )
 	}
 	else
 	{
@@ -176,7 +176,7 @@ void CKobukiControl::SetExternalPower( )
 	{
 		CopyMemory((PVOID)g_pKobukiCommandSharedMemory, &m_KobukiCommand, (sizeof(KOBUKI_COMMAND_T)));
 		SetEvent( g_hKobukiCommandEvent );  // Tell Kobuki app that a new command is pending
-		ROBOT_LOG( TRUE, "Sending message to KobukiControl app to shut down\n" )
+		ROBOT_LOG( TRUE, "Sending message to KobukiControl app - External Power\n" )
 	}
 	else
 	{
@@ -243,7 +243,7 @@ void CKobukiControl::ShutDown()
 		m_KobukiCommand.bShutDown = true;
 		CopyMemory((PVOID)g_pKobukiCommandSharedMemory, &m_KobukiCommand, (sizeof(KOBUKI_COMMAND_T)));
 		SetEvent( g_hKobukiCommandEvent );  // Tell Kobuki app that a new command is pending
-		ROBOT_LOG( TRUE, "Sending message to KobukiControl app to shut down\n" )
+		ROBOT_LOG( TRUE, "Sending message to KobukiControl app - Shut Down!\n" )
 	}
 	else
 	{

@@ -31,6 +31,11 @@
 	#define US_SENSOR_FRONT_RIGHT								  2
 
 	// Raw data from the Arduino for Loki
+	////////////////////////////////////////////////////////////////
+	#ifndef __PIC_TARGET	// Arduino Compiler does not understand pack
+	#pragma pack( 1 )
+	#endif
+
 	typedef struct
 	{
 		BYTE StatusFlags;		// 3
@@ -53,15 +58,11 @@
 //		BYTE ThermalArray[9];	//			- Ambient + 8 Pixels - Devantech TPA81 Thermal Array Sensor
 //		BYTE US[NUM_US_SENSORS];//
 
-	} ARDUINO_STATUS_T;
-	#ifndef __ARDUINO_TARGET
+	} PIC_STATUS_T;
+	#ifndef __PIC_TARGET
 	#pragma pack( 4 )
 	#endif
 
-	////////////////////////////////////////////////////////////////
-	#ifndef __ARDUINO_TARGET	// Arduino Compiler does not understand pack
-	#pragma pack( 1 )
-	#endif
 
 
 // I2C-IT Sensors

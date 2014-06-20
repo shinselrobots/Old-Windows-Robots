@@ -401,7 +401,8 @@ public:
 
 
 	void ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam );
-	void ProcessSensorStatus( UINT uMsg ); // different implementations for each robot type
+	void ProcessSensorStatus( ); // different implementations for each robot type
+	void ProcessKobukiStatus( ); // different implementations for each robot type
 	void SetCompassCorrection( int CompassCorrection );
 	void UpdateFromTwoOdometers( double OdometerUpdateTenthInchesL, double OdometerUpdateTenthInchesR);
 
@@ -423,7 +424,6 @@ public:
 	void	DoSensorFusion();
 	void	FuseLaserAndKinectData();
 	void	UpdateOdometer();
-	void	HandleAndroidPhone();
 
 	#if SENSOR_CONFIG_TYPE == SENSOR_CONFIG_LOKI
 		void	HandleThermalSensor();
@@ -512,8 +512,6 @@ public:
 	CUserCmdModule( CDriveControlModule *pDriveControlModule );
 	~CUserCmdModule();
 	void ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam );
-	void HandleAndroidInput( );
-
 
 protected:
 	CDriveControlModule	   *m_pDriveCtrl;
@@ -522,7 +520,6 @@ protected:
 	int						m_RemoteSpeed;
 	int						m_RemoteTurn;
 	//BOOL					m_UserOwnerRequested;
-	BOOL					m_AndroidHasMotorControl; // for Android phone contol of motors
 	BOOL					m_VidCapProcessingEnabled;
 	BOOL					m_IRTrackingEnabled;
 	BOOL					m_FaceTrackingEnabled;

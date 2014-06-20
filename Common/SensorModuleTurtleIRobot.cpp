@@ -29,7 +29,7 @@ static char THIS_FILE[] = __FILE__;
 	// ProcessSensorStatus()
 	// This is where Raw sensor data from Arduino or other sources (Like Kobuki base) get repackaged and copied to g_SensorStatus
 	// There are different implementations of this function for each robot type.  See "SensorModuleXXX" for each robot type.
-	void CSensorModule::ProcessSensorStatus( UINT uMsg )
+	void CSensorModule::ProcessSensorStatus( )
 	{
 		// See MotorControlIRobot.cpp for capabilities of the iRobot Create base
 

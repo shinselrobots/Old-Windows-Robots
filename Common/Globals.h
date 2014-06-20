@@ -467,6 +467,7 @@ public:
 	BOOL	AndroidConnected;
 	BOOL	AndroidAccEnabled;
 	int		AndroidCommand;				// Commands received from Android phone over Bluetooth
+	BOOL	AndroidUpdatePending;		// Indicates new Accelerometer data was received, but not yet handled
 	int		AndroidCompass;				// X,Y,Z data received from Android phone over Bluetooth
 	int		AndroidRoll;
 	int		AndroidPitch;
@@ -992,6 +993,7 @@ void InitScannerSummaryData( SCANNER_SUMMARY_T* Summary );
 //
 
 extern ARDUINO_STATUS_T		g_RawArduinoStatus;
+extern KOBUKI_STATUS_T		g_RawKobukiStatus;				// If Kobuki base used
 
 extern FullSensorStatus*	g_pFullSensorStatus;			// Current status of all sensors
 

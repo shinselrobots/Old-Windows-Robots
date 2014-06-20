@@ -392,6 +392,7 @@ BOOL				g_PhraseDoneTokenProcessed; // Threads can queue a token, so they know w
 
 
 ARDUINO_STATUS_T	g_RawArduinoStatus;				// Initialized in ?
+KOBUKI_STATUS_T		g_RawKobukiStatus;				// Initialized in ?
 
 BOOL				g_IRDA_Socket = FALSE;
 FullSensorStatus*	g_pFullSensorStatus;			// Initialized in ?		// Current status of all sensors
@@ -2781,6 +2782,7 @@ void FullSensorStatus::InitializeDefaults()
 	AndroidConnected =			false;
 	AndroidAccEnabled =			false;
 	AndroidCommand =			0;			// Commands received from Android phone over Bluetooth
+	AndroidUpdatePending =		false;
 	AndroidCompass =			0;			// X,Y,Z data received from Android phone over Bluetooth
 	AndroidRoll =				0;	
 	AndroidPitch =				0;	

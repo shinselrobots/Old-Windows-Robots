@@ -21,13 +21,14 @@ const int    INT_1_PIN =           3;   // Left Wheel Speed
 const int    DIR_0_PIN =           4;   // Right Wheel Direction
 const int    DIR_1_PIN =           5;   // Left Wheel Direction
 
-const int    LIGHT_BOTTOM_PIN =     8;   // Blue aux lightsd
-const int    LIGHT_TOP_PIN =        9;   // Blue aux lights
-//const int    SERVO_PWR_18V_PIN =  10;   // 18v Servo power for RX64
-//const int    SERVO_PWR_12V_PIN =  11;   // 12v Servo power for all other servos
+const int    AUX_LIGHT_PIN_0 =     8;   // N/C - goes to relay control board
+const int    AUX_LIGHT_PIN_1 =     9;   // Blue aux lights
+const int    AUX_LIGHT_PIN_2 =    10;   // 18v Servo power for RX64
+//const int    AUX_LIGHT_PIN_3 =    11;   // 12v Servo power for all other servos
 
 const int    HEARTBEAT_LED_PIN =  13;  // Red Heartbeat Led
-const int    STATUS_LED_PIN =     11;  // Blue Status to PC indicator
+//const int    STATUS_LED_PIN2 =    12;  // Not connected
+const int    STATUS_LED_PIN =     11;  // Red Status to PC indicator
 
 const int    NUM_AD_IR_SENSORS =   6;  // Plugged into the Arduino Analog port AD0-7    
 ////////////////////////////////////////////////////////////////

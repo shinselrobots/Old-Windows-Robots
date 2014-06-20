@@ -71,7 +71,6 @@ ArmControl::ArmControl( int  ArmNumber )
 	m_PressureSensorCalibrationL = 0;
 	m_PressureSensorCalibrationR = 0;
 
-
 	if(RIGHT_ARM == m_ArmNumber )
 	{
 		m_ShoulderServoID =		KERR_RIGHT_ARM_SHOULDER_SERVO_ID;
@@ -101,10 +100,20 @@ ArmControl::~ArmControl()
 	ROBOT_LOG( TRUE,"~ArmControl done\n")
 }
 
-
+bool ArmControl::ArmInstalled( )
+{
+	if( (RIGHT_ARM == m_ArmNumber) && ROBOT_HAS_RIGHT_ARM )
+		return true;
+	else if( (LEFT_ARM == m_ArmNumber) && ROBOT_HAS_LEFT_ARM )
+		return true;
+	else
+		return false;
+}
 
 BOOL ArmControl::IsObjectInPickupZone( int ObjectTenthInchesY, int ObjectTenthInchesX )
 {
+	if( !ArmInstalled() ) return FALSE;
+
 	if(LEFT_ARM != m_ArmNumber )
 	{
 		return FALSE; // TODO: Right Arm NOT IMPLEMENTED!
@@ -131,6 +140,8 @@ BOOL ArmControl::IsObjectInPickupZone( int ObjectTenthInchesY, int ObjectTenthIn
 //-----------------------------------------------------------------------------
 void ArmControl::MoveArmHome( int  Speed )
 {
+	if( !ArmInstalled() ) return;
+
 	__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, pshMoveArmHome);
 
 	if( SERVO_NO_CHANGE != Speed )	// Optional Parameter
@@ -202,6 +213,8 @@ void ArmControl::MoveArmHome( int  Speed )
 //-----------------------------------------------------------------------------
 void ArmControl::MoveArmToSafePosition( int  Speed )
 {
+	if( !ArmInstalled() ) return;
+
 	__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, pshMoveArmHome);
 
 	if( SERVO_NO_CHANGE != Speed )	// Optional Parameter
@@ -272,12 +285,14 @@ void ArmControl::MoveArmToSafePosition( int  Speed )
 //-----------------------------------------------------------------------------
 void ArmControl::SetArmPosition(int Shoulder, int ElbowRotate, int ElbowBend, int Wrist, int Claw )
 {
+	if( !ArmInstalled() ) return;
+
 	__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, pshSetArmPosition);
 
 //	ROBOT_LOG( TRUE,"SetArmPosition:  Shoulder = %d, ElbowRotate = %d, ElbowBend = %d, Wrist = %d, Claw = %d  degrees (MAX=NOP)\n",
 //		 Shoulder, ElbowRotate, ElbowBend, Wrist, Claw )
 
-	ROBOT_ASSERT(0);
+	/// TODO-DAVE ROBOT_ASSERT(0);
 
 	__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, psh_csServoLock);
 	EnterCriticalSection(&g_csServoLock);
@@ -338,6 +353,8 @@ void ArmControl::SetArmPosition(int Shoulder, int ElbowRotate, int ElbowBend, in
 //-----------------------------------------------------------------------------
 void ArmControl::SetArmSpeed(int  Shoulder, int  ElbowRotate, int  ElbowBend, int  Wrist, int  Claw )
 {
+	if( !ArmInstalled() ) return;
+
 	__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, pshSetArmSpeed);
 
 	if( SERVO_NO_CHANGE != Shoulder )
@@ -376,6 +393,8 @@ void ArmControl::SetArmSpeed(int  Shoulder, int  ElbowRotate, int  ElbowBend, in
 //-----------------------------------------------------------------------------
 void ArmControl::SetArmDelay(int  Shoulder, int  ElbowRotate, int  ElbowBend, int  Wrist, int  Claw )
 {
+	if( !ArmInstalled() ) return;
+
 	if( SERVO_NO_CHANGE != Shoulder )
 	{
 		g_BulkServoCmd[m_ShoulderServoID].Delay = Shoulder;
@@ -405,6 +424,7 @@ void ArmControl::SetArmDelay(int  Shoulder, int  ElbowRotate, int  ElbowBend, in
 //-----------------------------------------------------------------------------
 void ArmControl::SetClawTorque( int  Torque )
 {
+	if( !ArmInstalled() ) return;
 
 	if( Torque > DYNA_TORQUE_LIMIT_MAX )
 	{
@@ -422,6 +442,8 @@ void ArmControl::SetClawTorque( int  Torque )
 //-----------------------------------------------------------------------------
 void ArmControl::ClawRegripObject( )
 {
+	if( !ArmInstalled() ) return;
+
 	// Current commanded position might be much tigher than physical condition, which can eventually overheat the servo
 	// Get current position, plus a little less, and make that the commanded position
 	// Note: leaves torque at prior value, which should normally be DYNA_TORQUE_LIMIT_MAX to assure a strong grip
@@ -446,6 +468,8 @@ void ArmControl::ClawRegripObject( )
 
 void ArmControl::ClearServoStallTimers()
 {
+	if( !ArmInstalled() ) return;
+
 	if(LEFT_ARM == m_ArmNumber )
 	{
 		g_BulkServoStatus[KERR_LEFT_ARM_SHOULDER_SERVO_ID].StallTimer = TIMER_NOT_SET;
@@ -473,6 +497,8 @@ void ArmControl::ClearServoStallTimers()
 //-----------------------------------------------------------------------------
 void ArmControl::ExecutePosition()
 {
+	if( !ArmInstalled() ) return;
+
 	__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, pshExecutePosition);
 	//ROBOT_DISPLAY( TRUE, "DEBUG: ExecutePosition\n" )
 
@@ -491,6 +517,8 @@ void ArmControl::ExecutePosition()
 //-----------------------------------------------------------------------------
 void ArmControl::ExecutePositionAndSpeed()
 {
+	if( !ArmInstalled() ) return;
+
 	__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, pshExecutePositionAndSpeed);
 	//ROBOT_DISPLAY( TRUE, "DEBUG: ExecutePositionAndSpeed\n" )
 
@@ -519,6 +547,8 @@ void ArmControl::ExecutePositionAndSpeed()
 //-----------------------------------------------------------------------------
 void ArmControl::SetServoTimeout( int  nOwner, int  Timeout )
 {
+	if( !ArmInstalled() ) return;
+
 	//IGNORE_UNUSED_PARAM (nOwner);
 	m_ArmMoveTimeLimit = Timeout;
 }
@@ -533,6 +563,8 @@ void ArmControl::SetServoTimeout( int  nOwner, int  Timeout )
 //-----------------------------------------------------------------------------
 void ArmControl::GetTargetArmXYZ( FPOINT3D_T &ArmXYZ, double nObjectDistance )
 {
+	if( !ArmInstalled() ) return;
+
 	__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, pshGetTargetArmXYZ);
 	// Target position info was requested
 	// ArmXYZ returns X,Y,Z, in Floating Point TENTH INCHES
@@ -552,6 +584,8 @@ void ArmControl::GetTargetArmXYZ( FPOINT3D_T &ArmXYZ, double nObjectDistance )
 //-----------------------------------------------------------------------------
 void ArmControl::GetCurrentArmXYZ( FPOINT3D_T &ArmXYZ, double nObjectDistance )
 {
+	if( !ArmInstalled() ) return;
+
 	__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, pshGetCurrentArmXYZ);
 	// Current position info was requested
 	// ArmXYZ returns X,Y,Z, in Floating Point TENTH INCHES
@@ -570,8 +604,9 @@ void ArmControl::GetCurrentArmXYZ( FPOINT3D_T &ArmXYZ, double nObjectDistance )
 
 //-----------------------------------------------------------------------------
 void ArmControl::CalculateArmXYZ(FPOINT3D_T &ArmXYZ, ARM_SERVOS_POSITION_T Servo, double nObjectDistance )
-
 {
+	if( !ArmInstalled() ) return;
+
 	__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, pshCalculateArmXYZ);
 	// ArmXYZ returns X,Y,Z, in Floating Point TENTH INCHES
 	ArmXYZ.X = 0.0;
@@ -700,6 +735,8 @@ void ArmControl::CalculateArmXYZ(FPOINT3D_T &ArmXYZ, ARM_SERVOS_POSITION_T Servo
 
 BOOL ArmControl::CalculateArmMoveToXYZ(FPOINT3D_T &TargetXYZ, ARM_SERVOS_POSITION_T &Servo )
 {
+	if( !ArmInstalled() ) return FALSE;
+
 	__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, pshCalculateArmMoveToXYZ);
 	// Iterate to find optimal position
 	// Uses "virtual arm" movements to iterate
@@ -877,6 +914,7 @@ BOOL ArmControl::CalculateArmMoveToXYZ(FPOINT3D_T &TargetXYZ, ARM_SERVOS_POSITIO
 //-----------------------------------------------------------------------------
 int ArmControl::CheckServoPosition( const char *ServoName, int ServoID, int Delta, int &LastPosition, int ToleranceTenthDegrees )
 {
+	if( !ArmInstalled() ) return SERVO_IN_POSITION;
 
 	int Status = SERVO_MOVING;
 	int CurrentPosition = g_BulkServoStatus[ServoID].PositionTenthDegrees;
@@ -946,6 +984,8 @@ int ArmControl::CheckServoPosition( const char *ServoName, int ServoID, int Delt
 BOOL ArmControl::CheckArmPosition(BOOL verbose, int  ToleranceTenthDegrees,
 		int DesiredShoulderDegrees, int DesiredElbowRotateDegrees, int DesiredElbowBendDegrees, int DesiredWristDegrees, int DesiredClawDegrees )
 {
+	if( !ArmInstalled() ) return FALSE;
+
 	__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, pshCheckArmPosition);
 
 ///	HandleGlobalPause();
@@ -1144,6 +1184,9 @@ BOOL ArmControl::CheckArmPosition(BOOL verbose, int  ToleranceTenthDegrees,
 //-----------------------------------------------------------------------------
 int  ArmControl::GetClawTorque( )
 {
+	if( !ArmInstalled() ) return 0;
+
+
 	// Note: Negative torque means hand blocked while opening!
 	__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, pshGetClawTorque);
 
@@ -1166,6 +1209,8 @@ int  ArmControl::GetClawTorque( )
 //-----------------------------------------------------------------------------
 BOOL ArmControl::IsObjectInClaw( )
 {
+	if( !ArmInstalled() ) return FALSE;
+
 	if( LEFT_ARM == m_ArmNumber )
 	{
 		if( (GetPressureLoadPercent() > 30) ||  // Pressure sensors sense somehing in the hand (> 30% force)
@@ -1191,6 +1236,7 @@ BOOL ArmControl::IsObjectInClaw( )
 //-----------------------------------------------------------------------------
 int ArmControl::GetClawPosition( )
 {
+	if( !ArmInstalled() ) return 0;
 	return g_BulkServoStatus[m_ClawServoID].PositionTenthDegrees / 10;
 }
 
@@ -1200,6 +1246,7 @@ int ArmControl::GetClawPosition( )
 //-----------------------------------------------------------------------------
 int ArmControl::GetWristPosition( )
 {
+	if( !ArmInstalled() ) return 0;
 	return g_BulkServoStatus[m_WristServoID].PositionTenthDegrees / 10;
 }
 
@@ -1210,6 +1257,7 @@ int ArmControl::GetWristPosition( )
 //-----------------------------------------------------------------------------
 int ArmControl::GetShoulderPosition( )
 {
+	if( !ArmInstalled() ) return 0;
 	return g_BulkServoStatus[m_ShoulderServoID].PositionTenthDegrees / 10;
 }
 
@@ -1219,6 +1267,8 @@ int ArmControl::GetShoulderPosition( )
 //-----------------------------------------------------------------------------
 void ArmControl::GetArmPosition( int &Shoulder, int &ElbowRotate, int &ElbowBend, int &Wrist, int &Claw  )
 {
+	if( !ArmInstalled() ) return;
+
 	__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, pshGetArmPosition);
 
 	Shoulder = g_BulkServoStatus[m_ShoulderServoID].PositionTenthDegrees / 10;
@@ -1243,6 +1293,8 @@ void ArmControl::GetArmPosition( int &Shoulder, int &ElbowRotate, int &ElbowBend
 
 void ArmControl::CheckServoLimit( int  ServoID, int &PositionTenthDegrees )
 {
+	if( !ArmInstalled() ) return;
+
 	// Make sure servo command is within Degree limits
 	__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, pshCheckServoLimit);
 
@@ -1409,6 +1461,8 @@ void ArmControl::CheckServoLimit( int  ServoID, int &PositionTenthDegrees )
 //-----------------------------------------------------------------------------
 BOOL ArmControl::CalibratePressureSensors()
 {
+	if( !ArmInstalled() ) return false;
+
 	if(LEFT_ARM == m_ArmNumber )
 	{
 		// Get current values for pressure sensors, and save as a baseline 
@@ -1444,6 +1498,8 @@ BOOL ArmControl::CalibratePressureSensors()
 //-----------------------------------------------------------------------------
 int ArmControl::GetPressureLoadPercent()
 {
+	if( !ArmInstalled() ) return 0;
+
 	if( (0 == m_PressureSensorCalibrationL) || (0 == m_PressureSensorCalibrationR) )
 	{
 		// Not calibrated, ignore
@@ -1479,8 +1535,9 @@ int ArmControl::GetPressureLoadPercent()
 //-----------------------------------------------------------------------------
 void ArmControl::EnableIdleArmMovement( BOOL bEnable )
 {
+	if( !ArmInstalled() ) return;
 
-if( LEFT_ARM == m_ArmNumber )
+	if( LEFT_ARM == m_ArmNumber )
 	{
 		gArmIdleLeft = bEnable;
 	}
@@ -1498,6 +1555,8 @@ if( LEFT_ARM == m_ArmNumber )
 //-----------------------------------------------------------------------------
 BOOL ArmControl::IdleArmMovementEnabled()
 {
+	if( !ArmInstalled() ) return false;
+
 	if( LEFT_ARM == m_ArmNumber )
 	{
 		return gArmIdleLeft;
@@ -1518,6 +1577,7 @@ BOOL ArmControl::IdleArmMovementEnabled()
 //-----------------------------------------------------------------------------
 void ArmControl::DoIdleArmMovement()
 {
+	if( !ArmInstalled() ) return;
 
 	///////////////////////////////////////////////////////////
 	// TODO!  DISABLED FOR NOW!!!

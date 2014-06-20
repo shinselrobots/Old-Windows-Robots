@@ -50,7 +50,7 @@ const int  DistanceTable_IRLongRangeKobuki[] =
 	// ProcessSensorStatus()
 	// This is where Raw sensor data from Arduino or other sources (Like Kobuki base) get repackaged and copied to g_pFullSensorStatus
 	// There are different implementations of this function for each robot type.  See "SensorModuleXXX" for each robot type.
-	void CSensorModule::ProcessSensorStatus( UINT uMsg )
+	void CSensorModule::ProcessSensorStatus( )
 	{
 
 		static int LastRawIR = 0;

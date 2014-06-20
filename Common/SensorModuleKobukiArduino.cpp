@@ -1,4 +1,4 @@
-// SensorModuleLoki.cpp: SensorModule Loki specific functions 
+// SensorModuleKobukiArduino.cpp: SensorModule Kobuki with Arduino specific functions 
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -18,162 +18,158 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-//#define BUMPER_DEBUG_ENABLED
-#define ENABLE_BUMPERS 1 // Enable or disable reacting to bumper hits.  Disable if debugging or hardware problem
 
-// Scale for A/D converter on Kobuki
-const int  DistanceTable_IRWideAngleKobuki[] = 
-//   0    1    2    3    4    5    6    7    8    9   10   11   12   13   14   15   16   17   18   19   20   21   22   23   24     // Inches
-{ 3000,3000,2500,1720,1340,1140, 950, 840, 740, 660, 600, 550, 500, 470, 430, 405, 375, 350, 320, 290, 275, 265, 250, 235, 220 };  // Reading
+	//#define BUMPER_DEBUG_ENABLED
+	#define ENABLE_BUMPERS 1 // Enable or disable reacting to bumper hits.  Disable if debugging or hardware problem
 
-
-const int  DistanceTable_IRLongRangeKobuki[] =	
-//feet 0		                                                   1		                                                   2
-//in   0    1    2    3    4    5    6    7    8    9   10   11   12   13   14   15   16   17   18   19   20   21   22	 23   24
-  { 3500,3500,3500,3500,3440,3300,3320,3180,2933,2722,2540,2350,2180,2040,1900,1785,1680,1590,1445,1370,1310,1245,1195,1150,1100,
-//feet 		                                                       3		                                                   4
-//in       25   26   27   28   29   30   31   32   33   34   35   36   37   38   39   40   41   42   43   44   45   46   47   48
-         1060,1055,1020, 975, 945, 920, 885, 860, 830, 815, 800, 765, 750, 740, 720, 705, 690, 680, 660, 650, 640, 625, 615, 600,
-//feet 		                                                       5		                                                   6
-//in       49   50   51   52   53   54   55   56   67   58   59   60   61   62   63   64   65   66   67   68   69   70   71   72
-          580, 575, 570, 550, 545,  535, 530, 525, 515, 505, 500, 490, 480, 470, 460, 450, 440, 435, 425, 420, 415, 410, 405, 400 };
+	// Scale for A/D converter on Kobuki
+	const int  DistanceTable_IRWideAngleKobuki[] = 
+	//   0    1    2    3    4    5    6    7    8    9   10   11   12   13   14   15   16   17   18   19   20   21   22   23   24     // Inches
+	{ 3000,3000,2500,1720,1340,1140, 950, 840, 740, 660, 600, 550, 500, 470, 430, 405, 375, 350, 320, 290, 275, 265, 250, 235, 220 };  // Reading
 
 
-
+	const int  DistanceTable_IRLongRangeKobuki[] =	
+	//feet 0		                                                   1		                                                   2
+	//in   0    1    2    3    4    5    6    7    8    9   10   11   12   13   14   15   16   17   18   19   20   21   22	 23   24
+	  { 3500,3500,3500,3500,3440,3300,3320,3180,2933,2722,2540,2350,2180,2040,1900,1785,1680,1590,1445,1370,1310,1245,1195,1150,1100,
+	//feet 		                                                       3		                                                   4
+	//in       25   26   27   28   29   30   31   32   33   34   35   36   37   38   39   40   41   42   43   44   45   46   47   48
+			 1060,1055,1020, 975, 945, 920, 885, 860, 830, 815, 800, 765, 750, 740, 720, 705, 690, 680, 660, 650, 640, 625, 615, 600,
+	//feet 		                                                       5		                                                   6
+	//in       49   50   51   52   53   54   55   56   67   58   59   60   61   62   63   64   65   66   67   68   69   70   71   72
+			  580, 575, 570, 550, 545,  535, 530, 525, 515, 505, 500, 490, 480, 470, 460, 450, 440, 435, 425, 420, 415, 410, 405, 400 };
 
 
 
-///////////////////////////////////////////////////////////////////////////////
-#if SENSOR_CONFIG_TYPE == SENSOR_CONFIG_KOBUKI_WITH_ARDUINO
+	#if ( SENSOR_CONFIG_TYPE != SENSOR_CONFIG_KOBUKI_WITH_ARDUINO )
+		#error
+	#endif
+
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ProcessSensorStatus()
 	// This is where Raw sensor data from Arduino or other sources (Like Kobuki base) get repackaged and copied to g_pFullSensorStatus
 	// There are different implementations of this function for each robot type.  See "SensorModuleXXX" for each robot type.
-	void CSensorModule::ProcessSensorStatus( UINT uMsg )
+	void CSensorModule::ProcessSensorStatus( )
 	{
-		if( WM_ROBOT_SENSOR_STATUS_READY == uMsg )
-		{
-			// From Arduino
-			// Get status of Android Phone bluetooth connection, and get commands
-			HandleAndroidPhone();
+		// From Arduino - currently nothing
 
+	}
+
+
+	void CSensorModule::ProcessKobukiStatus( )
+	{
+		// From Kobuki Base
+		static int LastRawIR = 0;
+
+		// First thing is to initialize the processed Sensor Status block
+		// Don't memset the structure, it corrupts current position!
+
+		// Basic Data
+		g_pFullSensorStatus->StatusFlags =	0;	// not used for Kobuki
+		g_pFullSensorStatus->LastError =	0;
+		g_pFullSensorStatus->DebugCode =	0;
+
+		// Note that this is the current charge in % remaining, not Voltage!
+		g_pFullSensorStatus->Battery0 = (int)g_pKobukiStatus->BatteryPercent;
+		// Not used yet: g_pFullSensorStatus->Battery1 = 0;	
+
+		// Cliff and Wheel drops
+		g_pFullSensorStatus->WheelDropLeft =	g_pKobukiStatus->WheelDropLeft;
+		g_pFullSensorStatus->WheelDropRight =	g_pKobukiStatus->WheelDropRight;
+
+		// Kobuki has 3 IR Cliff Sensors,  left, right, front
+		if( m_CliffSensorsEnabled )
+		{
+			g_pFullSensorStatus->CliffFront =	g_pKobukiStatus->CliffFront;
+			g_pFullSensorStatus->CliffLeft =	g_pKobukiStatus->CliffLeft;
+			g_pFullSensorStatus->CliffRight =	g_pKobukiStatus->CliffRight;
 		}
-		else if( WM_ROBOT_KOBUKI_STATUS_READY == uMsg )
+		else
 		{
-			// From Kobuki Base
-			static int LastRawIR = 0;
+			g_pFullSensorStatus->CliffFront =	false;
+			g_pFullSensorStatus->CliffRight =	false;
+			g_pFullSensorStatus->CliffLeft =	false;
+		}
 
-			// First thing is to initialize the processed Sensor Status block
-			// Don't memset the structure, it corrupts current position!
+		// Hardware Bumpers, IR range switches, and pressure sensors
+		g_pFullSensorStatus->HWBumperFront =		g_pKobukiStatus->BumperFront;
+		g_pFullSensorStatus->HWBumperSideLeft =		g_pKobukiStatus->BumperLeft;
+		g_pFullSensorStatus->IRBumperSideRight =	g_pKobukiStatus->BumperRight;
+		g_pFullSensorStatus->HWBumperRear =			0; // no rear bumper on Kobuki
 
-			// Basic Data
-			g_pFullSensorStatus->StatusFlags =	0;	// not used for Kobuki
-			g_pFullSensorStatus->LastError =	0;
-			g_pFullSensorStatus->DebugCode =	0;
+		// IR Bumpers - No IR Bumpers on Kobuki
+		// Arm and finger sensors - no arms on Teleop
 
-			// Note that this is the current charge in % remaining, not Voltage!
-			g_pFullSensorStatus->Battery0 = (int)g_pKobukiStatus->BatteryPercent;
-			// Not used yet: g_pFullSensorStatus->Battery1 = 0;	
-
-			// Cliff and Wheel drops
-			g_pFullSensorStatus->WheelDropLeft =	g_pKobukiStatus->WheelDropLeft;
-			g_pFullSensorStatus->WheelDropRight =	g_pKobukiStatus->WheelDropRight;
-
-			// Kobuki has 3 IR Cliff Sensors,  left, right, front
-			if( m_CliffSensorsEnabled )
-			{
-				g_pFullSensorStatus->CliffFront =	g_pKobukiStatus->CliffFront;
-				g_pFullSensorStatus->CliffLeft =	g_pKobukiStatus->CliffLeft;
-				g_pFullSensorStatus->CliffRight =	g_pKobukiStatus->CliffRight;
-			}
-			else
-			{
-				g_pFullSensorStatus->CliffFront =	false;
-				g_pFullSensorStatus->CliffRight =	false;
-				g_pFullSensorStatus->CliffLeft =	false;
-			}
-
-			// Hardware Bumpers, IR range switches, and pressure sensors
-			g_pFullSensorStatus->HWBumperFront =		g_pKobukiStatus->BumperFront;
-			g_pFullSensorStatus->HWBumperSideLeft =		g_pKobukiStatus->BumperLeft;
-			g_pFullSensorStatus->IRBumperSideRight =	g_pKobukiStatus->BumperRight;
-			g_pFullSensorStatus->HWBumperRear =			0; // no rear bumper on Kobuki
-
-			// IR Bumpers - No IR Bumpers on Kobuki
-			// Arm and finger sensors - no arms on Teleop
-
-			// Compass - Heading is in degrees
-			// WARNING - THIS IS NOT REALLY COMPASS HEADING!
-			// IT IS DEGREES FROM WHERE KOBUKI WAS POINTING WHEN POWERED ON!
-			// (but still useful for determining turn amount)
-			g_pFullSensorStatus->CompassHeading = (int)(g_pKobukiStatus->GyroDegrees);
+		// Compass - Heading is in degrees
+		// WARNING - THIS IS NOT REALLY COMPASS HEADING!
+		// IT IS DEGREES FROM WHERE KOBUKI WAS POINTING WHEN POWERED ON!
+		// (but still useful for determining turn amount)
+		g_pFullSensorStatus->CompassHeading = (int)(g_pKobukiStatus->GyroDegrees);
 
 
-			// Heading and Odometry
-			// Calculations are handled in this funciton, which also calls UpdateMoveDistance, UpdateLocation, etc.
-			UpdateOdometer();
+		// Heading and Odometry
+		// Calculations are handled in this funciton, which also calls UpdateMoveDistance, UpdateLocation, etc.
+		UpdateOdometer();
 
-			// Kobuki Dock IR Beacon
-			g_pFullSensorStatus->DockSensorRight =	g_pKobukiStatus->DockRightSignal;
-			g_pFullSensorStatus->DockSensorCenter = g_pKobukiStatus->DockCenterSignal;
-			g_pFullSensorStatus->DockSensorLeft =	g_pKobukiStatus->DockLeftSignal;
+		// Kobuki Dock IR Beacon
+		g_pFullSensorStatus->DockSensorRight =	g_pKobukiStatus->DockRightSignal;
+		g_pFullSensorStatus->DockSensorCenter = g_pKobukiStatus->DockCenterSignal;
+		g_pFullSensorStatus->DockSensorLeft =	g_pKobukiStatus->DockLeftSignal;
 
-			// Get status of Android Phone bluetooth connection, and get commands
-			// HandleAndroidPhone();  // requires Arduino with Bluetooth
 
-			// Other Sensors and state
+		// Other Sensors and state
 
-			// No tilt accelerometer on Loki
-			//g_pFullSensorStatus->TiltAccelX =	0;			// Typically From Arduino.  zero = level
-			//g_pFullSensorStatus->TiltAccelY =	0;	 		// Typically From Arduino.  zero = level
+		// No tilt accelerometer on Loki
+		//g_pFullSensorStatus->TiltAccelX =	0;			// Typically From Arduino.  zero = level
+		//g_pFullSensorStatus->TiltAccelY =	0;	 		// Typically From Arduino.  zero = level
 
-			// Analog Sensors
-			for( int i=0; i<4; i++ )
-			{
-				g_pFullSensorStatus->IR[i] = g_pKobukiStatus->AnalogPort[i];
-			}
+		// Analog Sensors
+		for( int i=0; i<4; i++ )
+		{
+			g_pFullSensorStatus->IR[i] = g_pKobukiStatus->AnalogPort[i];
+		}
 
-			/// TODO-MUST-DAVES - figure out where to factor in offset from front of robot!!!
-			// HandleAnalogSensors();
-			//g_pFullSensorStatus->IR[0] = ScaleLongRangeIRKobuki( g_pKobukiStatus->AnalogPort[0], (-BASE_IR_OFFSET_FROM_FRONT_TENTH_INCHES + 0) );	// Left Side Long Range, Compesation
-			//g_pFullSensorStatus->IR[1] = ScaleLongRangeIRKobuki( g_pKobukiStatus->AnalogPort[1], (-BASE_IR_OFFSET_FROM_FRONT_TENTH_INCHES + 0) );	// Right Side Long Range, Compensation
+		/// TODO-MUST-DAVES - figure out where to factor in offset from front of robot!!!
+		// HandleAnalogSensors();
+		//g_pFullSensorStatus->IR[0] = ScaleLongRangeIRKobuki( g_pKobukiStatus->AnalogPort[0], (-BASE_IR_OFFSET_FROM_FRONT_TENTH_INCHES + 0) );	// Left Side Long Range, Compesation
+		//g_pFullSensorStatus->IR[1] = ScaleLongRangeIRKobuki( g_pKobukiStatus->AnalogPort[1], (-BASE_IR_OFFSET_FROM_FRONT_TENTH_INCHES + 0) );	// Right Side Long Range, Compensation
 	//		g_pFullSensorStatus->IR[2] = ScaleWideIRKobuki( g_pKobukiStatus->AnalogPort[2] );			// Left Side Wide angle Short range
 	//		g_pFullSensorStatus->IR[3] = ScaleWideIRKobuki( g_pKobukiStatus->AnalogPort[3] );			// Left Side Wide angle Short range
 
 
-			/* DEBUG
-			int AveIR = (g_pKobukiStatus->AnalogPort[0] + g_pKobukiStatus->AnalogPort[1] + LastRawIR ) / 3;
-			int DeltaIR = g_pKobukiStatus->AnalogPort[1] - g_pKobukiStatus->AnalogPort[0];
-			TRACE("IR Inches 0 = %3d, 1 = %3d,   RAW: IR0 = %4d,  IR1 = %4d,  Average = %4d, Delta = 4%d\n", 
-				g_pFullSensorStatus->IR[0]/10, g_pFullSensorStatus->IR[1]/10, g_pKobukiStatus->AnalogPort[0],  g_pKobukiStatus->AnalogPort[1], AveIR, DeltaIR );
+		/* DEBUG
+		int AveIR = (g_pKobukiStatus->AnalogPort[0] + g_pKobukiStatus->AnalogPort[1] + LastRawIR ) / 3;
+		int DeltaIR = g_pKobukiStatus->AnalogPort[1] - g_pKobukiStatus->AnalogPort[0];
+		TRACE("IR Inches 0 = %3d, 1 = %3d,   RAW: IR0 = %4d,  IR1 = %4d,  Average = %4d, Delta = 4%d\n", 
+			g_pFullSensorStatus->IR[0]/10, g_pFullSensorStatus->IR[1]/10, g_pKobukiStatus->AnalogPort[0],  g_pKobukiStatus->AnalogPort[1], AveIR, DeltaIR );
 
-			LastRawIR = AveIR; // FOR DEBUG!!!
-			*/
+		LastRawIR = AveIR; // FOR DEBUG!!!
+		*/
 
-			/*
-			// For DEBUG, show the values in Inches
-				TRACE( "\nIR: (Raw,Inches) ");
-				for( int nSensorNumber=0; nSensorNumber< 2; nSensorNumber++ ) // NUM_IR_SENSORS
-				{
-					TRACE("  %2u=%3u, %3u Inches",
-						nSensorNumber, g_pKobukiStatus->AnalogPort[nSensorNumber], g_pFullSensorStatus->IR[nSensorNumber]/10 );
-				}
-				TRACE( "\n" );
-				ROBOT_LOG( TRUE,  "\n" );
-			*/
+		/*
+		// For DEBUG, show the values in Inches
+			TRACE( "\nIR: (Raw,Inches) ");
+			for( int nSensorNumber=0; nSensorNumber< 2; nSensorNumber++ ) // NUM_IR_SENSORS
+			{
+				TRACE("  %2u=%3u, %3u Inches",
+					nSensorNumber, g_pKobukiStatus->AnalogPort[nSensorNumber], g_pFullSensorStatus->IR[nSensorNumber]/10 );
+			}
+			TRACE( "\n" );
+			ROBOT_LOG( TRUE,  "\n" );
+		*/
 
 
-			///////////////////////////////////////////////////////////////////////////
-			// Done processing sensor data.
-			// Now do sensor fusion to combine the data in a meaningful way
-			DoSensorFusion();
+		///////////////////////////////////////////////////////////////////////////
+		// Done processing sensor data.
+		// Now do sensor fusion to combine the data in a meaningful way
+		DoSensorFusion();
 
-			// Now post the status to the GUI display (local or remote)
-			SendResponse( WM_ROBOT_DISPLAY_BULK_ITEMS,	// command
-				ROBOT_RESPONSE_PIC_STATUS,				// Param1 = Bulk data command
-				0 );									// Param2 = not used
-		}
+		// Now post the status to the GUI display (local or remote)
+		SendResponse( WM_ROBOT_DISPLAY_BULK_ITEMS,	// command
+			ROBOT_RESPONSE_PIC_STATUS,				// Param1 = Bulk data command
+			0 );									// Param2 = not used
+
 	}  // ProcessSensorStatus
 
 
@@ -457,7 +453,5 @@ const int  DistanceTable_IRLongRangeKobuki[] =
 		}
 		return NO_OBJECT_IN_RANGE;	// No object in sensor range
 	}
-
-#endif // SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TELEOP_KOBUKI
 
 #endif // ROBOT_SERVER	// This module used for Robot Server only

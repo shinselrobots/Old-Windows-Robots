@@ -65,7 +65,7 @@ void eXecuteCmdEvent(byte flag, byte numOfValues)
 void AccelerometerEvent(byte flag, byte numOfValues)
 {
   // Received Azimuth (compass), Pitch, Roll
-  
+  Status.AndroidUpdatePending = 1; // indicate that new data is available
   int AccelerometerValues[3];
 
   //Serial.print("Received Acc Az,Pitch,Roll: ");

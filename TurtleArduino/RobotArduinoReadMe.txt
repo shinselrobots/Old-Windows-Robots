@@ -13,3 +13,9 @@ File-> Preferences -> Sketchbook location: C:\Dev\Arduino
     Hint: If you see "Firefly ABCD" the <ABCD> is the last two digits of
     the device; eg. 00:06:66:1F:AB:CD
 
+TO SETUP A NEW DEVICE:
+1.  On the Android phone, install Amarino!  
+    From command line:  "adb install Amarino_2_xxx.apk"
+2.  Run Amarino and add BT devices!
+(if you skip these steps, the App will never connect)
+

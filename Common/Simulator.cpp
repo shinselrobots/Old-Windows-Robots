@@ -102,7 +102,7 @@ void SimulateHardware( DWORD Cmd, DWORD Param1, DWORD Param2 )
 			g_RawArduinoStatus.StatusFlags = 
 				HW_STATUS_RC_BUTTON_PWR_ENABLE | HW_STATUS_RC_BUTTON_2;	
 
-			g_RawArduinoStatus.LastError = 0;
+			//g_RawArduinoStatus.LastError = 0;
 			g_RawArduinoStatus.DebugCode = 0;
 
 			#if SENSOR_CONFIG_TYPE == SENSOR_CONFIG_CARBOT

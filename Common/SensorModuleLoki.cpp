@@ -28,7 +28,7 @@ static char THIS_FILE[] = __FILE__;
 	// ProcessSensorStatus()
 	// This is where Raw sensor data from Arduino or other sources (Like Kobuki base) get repackaged and copied to g_pFullSensorStatus
 	// There are different implementations of this function for each robot type.  See "SensorModuleXXX" for each robot type.
-	void CSensorModule::ProcessSensorStatus( UINT uMsg )
+	void CSensorModule::ProcessSensorStatus( )
 	{
 		//int nSensorNumber = 0;
 
@@ -37,7 +37,7 @@ static char THIS_FILE[] = __FILE__;
 
 		// Basic Data
 		g_pFullSensorStatus->StatusFlags =	g_RawArduinoStatus.StatusFlags;
-		g_pFullSensorStatus->LastError =	g_RawArduinoStatus.LastError;
+		//g_pFullSensorStatus->LastError =	g_RawArduinoStatus.LastError;
 		g_pFullSensorStatus->DebugCode =	g_RawArduinoStatus.DebugCode;
 
 		if( 0 != g_RawArduinoStatus.Battery0 )
@@ -145,7 +145,7 @@ static char THIS_FILE[] = __FILE__;
 		//g_pFullSensorStatus->DockSensorLeft =			0;	
 
 		// Get status of Android Phone bluetooth connection, and get commands
-		HandleAndroidPhone();
+		//HandleAndroidPhone();
 
 		// Other Sensors and state
 		g_pFullSensorStatus->PIRMotionLeft =	(g_RawArduinoStatus.IRBumper & IR_BUMPER_PIR_LEFT_MASK) != 0;

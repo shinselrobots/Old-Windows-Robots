@@ -46,7 +46,6 @@
 #define TURN_AMOUNT_90_DEGREES				  80
 #define TURN_AMOUNT_180_DEGREES			 	 170
 
-
 /////////////////////////////////////////////////////////////////////////////
 enum WM_ROBOT_MESSAGES { 
 
@@ -58,12 +57,12 @@ enum WM_ROBOT_MESSAGES {
 		WM_ROBOT_STOP_CMD,							// Will force a stop.
 		WM_ROBOT_DRIVE_LOCAL_CMD,					// User has local, direct control of the robot, wParam = Speed, lParam = Turn 
 		WM_ROBOT_DRIVE_REMOTE_CMD,					// User is remote (can't see robot directly), wParam = Speed, lParam = Turn
+		WM_ROBOT_RELEASE_OWNER_CMD,					// if module is current owner, release immediately wParam = Owner		
 		WM_ROBOT_GET_SERVO_STATUS,				
 
 		// HW Responses
-		WM_ROBOT_SENSOR_STATUS_READY,				
-		WM_ROBOT_KOBUKI_STATUS_READY,				
-		//WM_ROBOT_PIC_VERSION_READY,				
+		WM_ROBOT_SENSOR_STATUS_READY,				// Data from Arduino			
+		WM_ROBOT_KOBUKI_STATUS_READY,				// Data from Kobuki Base
 		WM_ROBOT_GPS_DATA_READY,					
 		WM_ROBOT_ER1_ODOMETER_READY,				
 		WM_ROBOT_SERVO_STATUS_READY,				

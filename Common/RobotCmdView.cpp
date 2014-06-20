@@ -679,10 +679,9 @@ void CRobotCmdView::OnCenterButton()
 	strText.Format("0");
 	SetDlgItemText(IDC_MOTOR_TURN_STATIC, strText);
 
-	// Send the command to the motor control.  Loop in globals.cpp filters multiple small changes
-	///g_MotorCurrentTurnCmd = 0;	// Center
-
+	// Send the command to the motor control. 
 	// NEW WAY!
+	g_GUICurrentTurn = 0;	// Center
 	SendDriveCommand( g_GUICurrentSpeed, g_GUICurrentTurn );
 
 
@@ -699,6 +698,9 @@ void CRobotCmdView::OnStopButton()
 	strText.Format("0");
 	SetDlgItemText(IDC_MOTOR_SPEED_STATIC, strText);
 	OnCenterButton();	// Center the wheels on Stop command
+
+	g_GUICurrentTurn = 0;	// Center
+	g_GUICurrentSpeed = 0;	// Stop
 
 
 	// Manual Stop button will override collision and avoidance behaviors, causing an immediate stop
@@ -1108,9 +1110,11 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 				strText.Format( _T("ERROR") );
 			SetDlgItemText( IDC_ARM_R_STATUS, (LPCTSTR)strText );
 			LastArmReady_R = g_RightArmSubSystemStatus;
-		}
+		} 
+	#endif // Loki
 
-	#else
+	#if ( (SENSOR_CONFIG_TYPE != SENSOR_CONFIG_LOKI) && (SENSOR_CONFIG_TYPE != SENSOR_CONFIG_KOBUKI_WITH_ARDUINO) )
+
 		if( g_ArduinoSubSystemStatus != SUBSYSTEM_DISABLED )
 		{
 			g_ArduinoSubSystemStatus = SUBSYSTEM_DISABLED;
@@ -1118,7 +1122,7 @@ LRESULT CRobotCmdView::OnRobotDisplayBulkItem(WPARAM Item, LPARAM lParam)
 			SetDlgItemText( IDC_PIC_STATUS, (LPCTSTR)strText );
 			LastConnectedToPIC = g_ArduinoSubSystemStatus;
 		}
-	#endif // LOKI
+	#endif
 
 
 	// Report Initial Status

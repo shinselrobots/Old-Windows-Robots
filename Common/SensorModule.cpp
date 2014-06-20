@@ -253,21 +253,33 @@ void CSensorModule::ProcessMessage(
 		break;
 
 
-		case WM_ROBOT_SENSOR_STATUS_READY:
+		#if( MOTOR_CONTROL_TYPE == KOBUKI_MOTOR_CONTROL )
 		case WM_ROBOT_KOBUKI_STATUS_READY:
 		{
 			g_bCmdRecognized = TRUE;
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			// ProcessSensorStatus()
-			// This is where Raw sensor data from Arduino or other sources (Like Kobuki base) get repackaged and copied to g_pFullSensorStatus
+			// ProcessKobukiStatus()
+			// This is where Raw sensor data from Kobuki base gets repackaged and copied to g_pFullSensorStatus
 			// There are different implementations of this function for each robot type.  See "SensorModuleXXX" for each robot type.
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			ProcessSensorStatus( uMsg ); 
-
+			ProcessKobukiStatus( ); 
 		}
 		break;
+		#endif
 
+		case WM_ROBOT_SENSOR_STATUS_READY:
+		{
+			g_bCmdRecognized = TRUE;
+
+			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			// ProcessSensorStatus()
+			// This is where Raw sensor data from Arduino gets repackaged and copied to g_pFullSensorStatus
+			// There are different implementations of this function for each robot type.  See "SensorModuleXXX" for each robot type.
+			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			ProcessSensorStatus( ); 
+		}
+		break;
 
 		case WM_ROBOT_ER1_ODOMETER_READY:
 		{
@@ -1202,65 +1214,5 @@ int	CSensorModule::GetObjectDirection( int  SummaryLeft, int  SummaryRight,
 	return ObjectDirection;
 }
 
-	//////////////////////////////////////////////////////////////////////////
-	void CSensorModule::HandleAndroidPhone()
-	{
-		// Commands from Android Phone (if connected)
-		// Android communicates to robot via bluetooth module on the Arduino
-
-		if( g_pFullSensorStatus->AndroidConnected != (BOOL)g_RawArduinoStatus.AndroidConnected )
-		{
-			g_pFullSensorStatus->AndroidConnected = (BOOL)g_RawArduinoStatus.AndroidConnected;
-			if( g_pFullSensorStatus->AndroidConnected )
-			{
-				ROBOT_LOG( TRUE,  "****** Android Connected! ******\n" )
-			}
-			else
-			{
-				ROBOT_LOG( TRUE,  "****** Android Disconnected! ******\n" )
-				g_pFullSensorStatus->AndroidCommand = 0;
-				g_pFullSensorStatus->AndroidCompass = 0;
-				g_pFullSensorStatus->AndroidPitch = 0;
-				g_pFullSensorStatus->AndroidRoll = 0;
-			}
-		}
-
-		if( g_pFullSensorStatus->AndroidConnected )
-		{
-			g_pFullSensorStatus->AndroidCommand = g_RawArduinoStatus.AndroidCmd;
-			g_pFullSensorStatus->AndroidAccEnabled = g_RawArduinoStatus.AndroidAccEnabled;
-			if( 0 != g_pFullSensorStatus->AndroidCommand )
-			{
-				ROBOT_LOG( TRUE,  "DEBUG: AndroidCommand = %d", g_pFullSensorStatus->AndroidCommand )
-			}
-
-			if( g_pFullSensorStatus->AndroidAccEnabled )
-			{
-				// Accelerometer and compass measurements are in degrees
-				signed short  TempAndroidCompass = g_RawArduinoStatus.AndroidCompassHigh <<8;
-				TempAndroidCompass += g_RawArduinoStatus.AndroidCompassLow;
-				g_pFullSensorStatus->AndroidCompass = TempAndroidCompass;
-
-				signed short  TempAndroidPitch = g_RawArduinoStatus.AndroidPitchHigh <<8;
-				TempAndroidPitch += g_RawArduinoStatus.AndroidPitchLow;
-				g_pFullSensorStatus->AndroidPitch = TempAndroidPitch;
-
-				signed short  TempAndroidRoll = g_RawArduinoStatus.AndroidRollHigh <<8;
-				TempAndroidRoll += g_RawArduinoStatus.AndroidRollLow;
-				g_pFullSensorStatus->AndroidRoll = TempAndroidRoll;
-				ROBOT_LOG( TRUE,  "DEBUG: AndroidCompass = %d", g_pFullSensorStatus->AndroidCompass )
-				ROBOT_LOG( TRUE,  "DEBUG: AndroidPitch = %d", g_pFullSensorStatus->AndroidPitch )
-				ROBOT_LOG( TRUE,  "DEBUG: AndroidRoll = %d\n", g_pFullSensorStatus->AndroidRoll )
-			}
-			else
-			{
-				g_pFullSensorStatus->AndroidCompass = 0;
-				g_pFullSensorStatus->AndroidPitch = 0;
-				g_pFullSensorStatus->AndroidRoll = 0;
-			}
-		}
-
-
-	}	// HandleAndroidPhone
 
 #endif // ROBOT_SERVER	// This module used for Robot Server only

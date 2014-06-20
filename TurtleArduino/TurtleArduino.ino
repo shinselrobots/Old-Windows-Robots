@@ -2,15 +2,13 @@
 #include <FreqPeriodCounter.h> // For wheel odometer pulse monitoring
 #include "RobotConstants.h"
 #include "C:\Dev\Robots\Common\HardwareCmds.h"
-#include "C:\Dev\Robots\Common\HWInterfaceLokiArduino.h"
+#include "C:\Dev\Robots\Common\HWInterfaceKobukiArduino.h"
 #include <MeetAndroid.h>
 #include <Adafruit_ADS1015.h>
 
 /////////////////////////////////////////////////////////////////////////////////////
 // Global Variables
 MeetAndroid      meetAndroid; // For Android Bluetooth connection
-int              gLedEyeMode = LED_EYES_CLOSE; // Start with eyes closed
-int              gEyeState = 0;
 boolean          PowerIsOn = false; // Keeps board from running on USB power; requres external power to be turned on
 int              TestAndroidCmd = 0;
 // Status and Command buffers for communicating with the PC
@@ -18,10 +16,6 @@ ARDUINO_STATUS_T Status;
 byte            *pStatusBuf; 
 int              StatusSize = 0;
 ARDUINO_CMD_T    gPicCmdBuffer;	// Used for incoming characters
-
-// Instantiate the library counter class for the pin, micro/miliseconds, and debounce time
-FreqPeriodCounter Counter0(INT_0_PIN, micros, 0);  // Right Wheel
-FreqPeriodCounter Counter1(INT_1_PIN, micros, 0);  // Left Wheel
 
 Adafruit_ADS1015 ads1015;
 
@@ -32,25 +26,20 @@ void setup(void)
 { 
   Serial.begin(19200);   // communication with the PC
   Serial1.begin(115200); // bluetooth connection with Android phone
-  //Wire.begin();           // For I2C
-  
-  //attachInterrupt(INT_0, CounterISR0, CHANGE);
-  //attachInterrupt(INT_1, CounterISR1, CHANGE);
+  Wire.begin();           // For I2C
   
   pinMode(HEARTBEAT_LED_PIN, OUTPUT);      
   pinMode(STATUS_LED_PIN, OUTPUT);      
+  //pinMode(STATUS_LED_PIN2, OUTPUT);      
   //pinMode(DIR_0_PIN, INPUT);      
-  //pinMode(DIR_1_PIN, INPUT); 
 
-  // Setup Relay / Lights contol pins
-  pinMode(LIGHT_TOP_PIN, OUTPUT);      
-  pinMode(LIGHT_BOTTOM_PIN, OUTPUT);      
-  //pinMode(SERVO_PWR_18V_PIN, OUTPUT);      
-  //pinMode(SERVO_PWR_12V_PIN, OUTPUT);  
-  digitalWrite(LIGHT_TOP_PIN, false);  // N/C
-  digitalWrite(LIGHT_TOP_PIN, false);      // Blue lights off by default
-  //digitalWrite(SERVO_PWR_18V_PIN, true);   // Servo Power ON by default, FOR NOW!
-  //digitalWrite(SERVO_PWR_12V_PIN, true);
+  // Setup Relay contol pins
+  pinMode(AUX_LIGHT_PIN_0, OUTPUT);      
+  pinMode(AUX_LIGHT_PIN_1, OUTPUT);      
+  pinMode(AUX_LIGHT_PIN_2, OUTPUT);      
+  digitalWrite(AUX_LIGHT_PIN_0, false);      // Blue lights off by default
+  digitalWrite(AUX_LIGHT_PIN_1, false);      // Blue lights off by default
+  digitalWrite(AUX_LIGHT_PIN_2, false);      // Blue lights off by default
 
   // Bluetooth using Amarilo - register callback functions for Bluetooth
   meetAndroid.registerFunction(ConnectionEvent, 'C');  
@@ -65,8 +54,8 @@ void setup(void)
   // DDRD = DDRD | B11111100; // example for setting selected pins only
   // PORTx = B10101000; // sets digital pins 7,5,3 HIGH.  PORTx can be used for read or write
   // PINx // Read port at once. read only.
-  //DDRA = 0x00; // same as B00000000;  // sets Arduino Port A [pins7...0], 1=output, 0=input
-  //DDRC = 0x00; // same as B00000000;  // sets Arduino Port A [pins7...0], 1=output, 0=input
+  DDRA = 0x00; // same as B00000000;  // sets Arduino Port A [pins7...0], 1=output, 0=input
+  DDRC = 0x00; // same as B00000000;  // sets Arduino Port A [pins7...0], 1=output, 0=input
   PORTA = 0xFF; // Set pullup resistors on to avoid noise on unused pins
   PORTC = 0x0F; // Set pullup resistors on to avoid noise on unused pins
  
@@ -123,7 +112,7 @@ void loop(void)
   // See if a command from the PC is pending
   if( CheckForSerialData() )
   {
-     //PrintDebugHex("Got Command: ", gPicCmdBuffer.Cmd); // print the command number
+     PrintDebugHex("Got Command: ", gPicCmdBuffer.Cmd); // print the command number
      HandleCmdFromPC();
   }
 
@@ -131,6 +120,7 @@ void loop(void)
   if( TimeToSendStatus() )
   {
     digitalWrite(STATUS_LED_PIN, LOW);   // Active Low
+    //digitalWrite(STATUS_LED_PIN2, LOW);   // Active Low
     //SetArmLED( I2C_PCF8574_LEFT_ARM, HIGH ); // blink the arms too
     //SetArmLED( I2C_PCF8574_RIGHT_ARM, HIGH );
     //ReadSensors();
@@ -160,7 +150,7 @@ void loop(void)
      while( LoopTime < (LOOP_TIME_MS - 5) )
      {
       // read sensors instead of sitting idle
-      Read_Next_Analog_Port();    // read an analog port (need time between reads)
+      //Read_Next_Analog_Port();    // read an analog port (need time between reads)
       delay(2);
       LoopTime = millis() - LoopStartTime; // see how much time is still left       
      }

@@ -25,6 +25,7 @@ public:
 
 	ArmControl::~ArmControl();
 
+	bool ArmControl::ArmInstalled(); // test to see if arm is even installed on the robot.
 
 	BOOL IsObjectInPickupZone( int ObjectTenthInchesY, int ObjectTenthInchesX );
 

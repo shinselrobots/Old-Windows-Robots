@@ -632,7 +632,7 @@ void Setup::OnInitialUpdate()
 
 		ROBOT_LOG( TRUE,  "\n********************************************\n" )
 		ROBOT_LOG( TRUE,  "Opening COM Ports...\n" )
-		if( TURTLE != ROBOT_TYPE )
+		if ( (SENSOR_CONFIG_TYPE == SENSOR_CONFIG_LOKI) || (SENSOR_CONFIG_TYPE == SENSOR_CONFIG_KOBUKI_WITH_ARDUINO) )
 		{
 			ROBOT_LOG( TRUE,  "     Arduino PORT\n" )
 			OpenArduinoPort();
@@ -1262,9 +1262,9 @@ void Setup::OpenArduinoPort()
 		}
 		else 
 		{
-			if( SENSOR_CONFIG_TYPE == SENSOR_CONFIG_LOKI )
+			if( (SENSOR_CONFIG_TYPE == SENSOR_CONFIG_LOKI) || (SENSOR_CONFIG_TYPE ==  SENSOR_CONFIG_KOBUKI_WITH_ARDUINO) )
 			{
-				// Loki REQUIRES Arduino!
+				// Loki and Turtle with Arduino REQUIRES Arduino!
 				ROBOT_DISPLAY( TRUE, "Error!! Unable to open Arduino COM Port %s", m_strPicSerialPort )
 				ROBOT_ASSERT(0);
 			}

@@ -15,8 +15,8 @@ void HandleCmdFromPC()
   case HW_RESET_CPU:
     {
       // Arduino does not have a sofware reset!
-      gLedEyeMode = LED_EYES_OFF;  // go to sleep, little robot...
-      SetLedEyes(0);	// SetLedEyes will handle the bottom 3 bits
+      //gLedEyeMode = LED_EYES_OFF;  // go to sleep, little robot...
+      //SetLedEyes(0);	// SetLedEyes will handle the bottom 3 bits
       //Initialize();
       //delay_ms(500);
       //reset_cpu();
@@ -54,35 +54,51 @@ void HandleCmdFromPC()
       {
         //digitalWrite(SERVO_PWR_18V_PIN, true);
         //digitalWrite(SERVO_PWR_12V_PIN, true);
-        PrintDebug("ACK: SERVO PWR Disabled");
+        PrintDebug("ACK: SERVO PWR On");
       }
       else
       {
         //digitalWrite(SERVO_PWR_18V_PIN, false);
         //digitalWrite(SERVO_PWR_12V_PIN, false);
-        PrintDebug("ACK: SERVO PWR Disabled");
+        PrintDebug("ACK: SERVO PWR Off");
       }
       break;
     }
 
   case HW_SET_LIGHT_POWER: // Not Connected
     {
-      PrintDebug("TODO: LIGHT POWER");
-      break;
+     PrintDebug("TODO: LIGHT POWER");
+     if( 0 != gPicCmdBuffer.Param2 )
+      {
+        digitalWrite(AUX_LIGHT_PIN_0, true);
+        digitalWrite(AUX_LIGHT_PIN_1, true);
+        digitalWrite(AUX_LIGHT_PIN_2, true);
+        PrintDebug("ACK: Aux Lights On");
+      }
+      else
+      {
+        digitalWrite(AUX_LIGHT_PIN_0, false);
+        digitalWrite(AUX_LIGHT_PIN_1, false);
+        digitalWrite(AUX_LIGHT_PIN_2, false);
+        PrintDebug("ACK: Aux Lights Off");
+      }
+       break;
     }
 
   case HW_SET_AUX_LIGHT_POWER:
     {
       if( 0 != gPicCmdBuffer.Param2 )
       {
-        digitalWrite(LIGHT_TOP_PIN, true);
-        digitalWrite(LIGHT_BOTTOM_PIN, true);
+        digitalWrite(AUX_LIGHT_PIN_0, true);
+        digitalWrite(AUX_LIGHT_PIN_1, true);
+        digitalWrite(AUX_LIGHT_PIN_2, true);
         PrintDebug("ACK: Aux Lights On");
       }
       else
       {
-        digitalWrite(LIGHT_TOP_PIN, false);
-        digitalWrite(LIGHT_BOTTOM_PIN, false);
+        digitalWrite(AUX_LIGHT_PIN_0, false);
+        digitalWrite(AUX_LIGHT_PIN_1, false);
+        digitalWrite(AUX_LIGHT_PIN_2, false);
         PrintDebug("ACK: Aux Lights Off");
       }
       break;
@@ -112,6 +128,7 @@ void HandleCmdFromPC()
 
   case HW_SET_LED_EYES:
     {
+ /*     
       // Set eye mode, to open, closed, or blink
       gLedEyeMode = gPicCmdBuffer.Param1;  
 
@@ -140,9 +157,11 @@ void HandleCmdFromPC()
         // Close Eye in stages, then open again
         gEyeState = 0;	// Start opened
       }
+*/      
       //sprintf(gResponseMsg, "AK1:EYES %02X", gPicCmd.Param1 );
       //SendResponse(0);
-      PrintDebugHex("ACK: HW_SET_LED_EYES = ", gLedEyeMode);
+      PrintDebugHex("ACK: HW_SET_LED_EYES ", 0);
+      //PrintDebugHex("ACK: HW_SET_LED_EYES = ", gLedEyeMode);
 
       break;
     }

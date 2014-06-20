@@ -27,8 +27,8 @@
 	/////////////////////////////////////////////////////
 	// Turtle Sub-types - SET THIS TO MATCH TURTLE TYPE!
 	//#define TURTLE_TYPE					TURTLE_IROBOT_BASE
-	#define TURTLE_TYPE					TURTLE_TELEPRESENSE
-	//#define TURTLE_TYPE					TURTLE_KOBUKI_WITH_ARDUINO
+	//#define TURTLE_TYPE					TURTLE_TELEPRESENSE
+	#define TURTLE_TYPE					TURTLE_KOBUKI_WITH_ARDUINO
 #endif
 
 

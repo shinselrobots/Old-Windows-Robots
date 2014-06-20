@@ -37,6 +37,12 @@
 	#define US_SENSOR_FRONT_RIGHT								  2
 
 	// Raw data from the Arduino for Loki
+
+	////////////////////////////////////////////////////////////////
+	#ifndef __ARDUINO_TARGET	// Arduino Compiler does not understand pack
+	#pragma pack( 1 )
+	#endif
+
 	typedef struct
 	{
 		BYTE StatusFlags;		
@@ -57,6 +63,7 @@
 		BYTE AndroidConnected;
 		BYTE AndroidAccEnabled;
 		BYTE AndroidCmd;
+		BYTE AndroidUpdatePending;			
 		BYTE AndroidCompassHigh;	
 		BYTE AndroidCompassLow;		
 		BYTE AndroidRollHigh;
@@ -73,11 +80,6 @@
 	} ARDUINO_STATUS_T;
 	#ifndef __ARDUINO_TARGET
 	#pragma pack( 4 )
-	#endif
-
-	////////////////////////////////////////////////////////////////
-	#ifndef __ARDUINO_TARGET	// Arduino Compiler does not understand pack
-	#pragma pack( 1 )
 	#endif
 
 

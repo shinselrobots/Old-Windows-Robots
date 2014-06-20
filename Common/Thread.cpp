@@ -155,7 +155,7 @@ DWORD WINAPI ControlThreadProc( LPVOID NotUsed )
 
 			// Dispatch the message to each module
 			// Sensor modules are called first, so all sensor data gets processed and fused to sensor summary other modues can use.
-			if( (WM_ROBOT_SENSOR_STATUS_READY == (msg.message)) || (WM_ROBOT_KOBUKI_STATUS_READY == (msg.message)) )
+			if( WM_ROBOT_SENSOR_STATUS_READY == msg.message )
 			{
 				pDriveControlModule->BeginSensorUpdate();
 			}
@@ -229,7 +229,7 @@ DWORD WINAPI ControlThreadProc( LPVOID NotUsed )
 			{
 				// DriveControlModule arbitrates requests from other modules and issues
 				// the command to the motor control.  Send motor commands after each status update
-				if( (WM_ROBOT_SENSOR_STATUS_READY == (msg.message)) || (WM_ROBOT_KOBUKI_STATUS_READY == (msg.message)) )
+				if( WM_ROBOT_SENSOR_STATUS_READY == msg.message )
 				{
 					///TAL_SCOPED_TASK_NAMED("Execute Drive Control");
 	//				ROBOT_LOG( TRUE,  "DBG: Thread Execute Cmd %02X\n",(msg.message) )

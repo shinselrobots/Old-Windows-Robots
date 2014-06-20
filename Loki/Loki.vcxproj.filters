@@ -213,9 +213,6 @@
     <ClInclude Include="..\Common\HWInterfaceSeeker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Common\HWInterfaceTurtle.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\Common\HWInterfaceOther.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -393,15 +390,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\DriveAvoidanceModule.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Common\SensorModuleTeleop.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Common\SensorModuleKobukiArduino.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Common\SensorModuleTurtleIRobot.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
