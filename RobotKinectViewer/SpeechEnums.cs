@@ -19,6 +19,7 @@ namespace RobotKinect.Speech
         SpeechCmd_None = 0,
         SpeechCmd_RobotName,
         SpeechCmd_Stop,
+        SpeechCmd_Thanks,
         SpeechCmd_Yes,
         SpeechCmd_No,
         SpeechCmd_Wave,

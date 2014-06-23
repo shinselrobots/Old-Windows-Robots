@@ -125,6 +125,7 @@ void CRobotSpeechReco::CmdToString( UINT Command, CString &CmdString )
         case SpeechCmd_None:			CmdString = "None";				break;
         case SpeechCmd_RobotName:		CmdString = "RobotName";		break;
         case SpeechCmd_Stop:			CmdString = "Stop";				break;
+        case SpeechCmd_Thanks:			CmdString = "Thanks";			break;
         case SpeechCmd_Yes:				CmdString = "Yes";				break;
         case SpeechCmd_No:				CmdString = "No";				break;
         case SpeechCmd_Wave:			CmdString = "Wave";				break;
@@ -480,6 +481,20 @@ if( m_bPlaySimonSays && !m_bSimonSays )
 		}
 */
 
+		case SpeechCmd_Thanks:
+		{
+			// Respond with random phrases
+			int RandomNumber = ((5 * rand()) / RAND_MAX);
+			ROBOT_LOG( TRUE, "DEBUG: RAND = %d\n", RandomNumber)
+			switch( RandomNumber )
+			{
+				case 0:  Speak( "no pro blemo" );break;
+				case 1:  Speak( "Of course" );break;
+				case 2:  Speak( "My pleasure" );break;
+				default: Speak( "you're welcome" ); // If const is larger number, this gets called more often
+			}
+			break;
+		}
 
 		case SpeechCmd_Yes: // Continue previous command, if one was pending
 		{

@@ -33,7 +33,7 @@ static char THIS_FILE[] = __FILE__;
 #define HUMAN_FOLLOW_DISTANCE_TARGET_TENTH_INCHES	( 32 * 10 ) //TenthInches
 #define HUMAN_APPROACH_DISTANCE_TARGET_TENTH_INCHES	( 26 * 10 ) //TenthInches
 #define HUMAN_FOLLOW_DISTANCE_MIN_TENTH_INCHES		( 22 * 10 ) //TenthInches
-#define NUMBER_OF_JOKES								8			// must match the number of jokes defined
+#define NUMBER_OF_JOKES								16			// must match the number of jokes defined
 
 
 __itt_string_handle* pshKinectPickupObjectStart = __itt_string_handle_create("KinectPickupObjectStart"); // marker
@@ -806,14 +806,14 @@ void CBehaviorModule::ProcessMessage(
 			if( (ACTION_MODE_NONE != m_CurrentActionMode) && (TASK_NONE != m_CurrentTask) ) 
 			{
 				// Something to do.  See if we are ready to do the next step
-				if( 0 != gArmTimerLeft)
+				if( m_pArmControlLeft->ArmInstalled() && (0 != gArmTimerLeft) )
 				{
 					ROBOT_LOG( TRUE,"WAITING FOR ARM TIMER LEFT = %d", gArmTimerLeft)
 					RobotSleep(1, pDomainModuleThread);
 					break;
 				}
 
-				if( 0 != gArmTimerRight)
+				if( m_pArmControlRight->ArmInstalled() && (0 != gArmTimerRight) )
 				{
 					ROBOT_LOG( TRUE,"WAITING FOR ARM TIMER RIGHT = %d", gArmTimerRight)
 					RobotSleep(1, pDomainModuleThread);
@@ -1227,6 +1227,16 @@ NEXT_SCRIPT_COMMAND: // allow processing of multiple script lines as needed
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CBehaviorModule::TaskDoKarate()
 {
+	if( !m_pArmControlLeft->ArmInstalled() || !m_pArmControlRight->ArmInstalled() )
+	{
+		// This behavior requires arms!
+		RightArmHome();
+		LeftArmHome();
+		m_TaskState = 0; // Done
+		return;
+
+	}
+
 	// See if we are ready to do the next step
 	if( (0 != gArmTimerLeft) || (0 != gArmTimerRight) )
 	{
@@ -1418,6 +1428,16 @@ void CBehaviorModule::TaskDoKarate()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CBehaviorModule::TaskOpenDoor()
 {
+	if( !m_pArmControlLeft->ArmInstalled() || !m_pArmControlRight->ArmInstalled() )
+	{
+		// This behavior requires arms!
+		RightArmHome();
+		LeftArmHome();
+		m_TaskState = 0; // Done
+		return;
+
+	}
+
 	// Called upon sensor updates.
 	// See if we are ready to do the next step
 	if( (0 != gArmTimerLeft) || (0 != gArmTimerRight) )
@@ -2383,7 +2403,7 @@ void CBehaviorModule::ActionMoveWhileTalking( )
 	return;
 
 
-
+	/*
 
 	// Small arm and body movements while talking a lot
 	// note, this runs forever, until cancelled!
@@ -2421,13 +2441,7 @@ void CBehaviorModule::ActionMoveWhileTalking( )
 			m_ArmWaitForMoveToCompleteRight = TRUE;
 			//g_SpeechRecoBlocked = TRUE; // block speech reco while arms are moving (due to motor noise)
 
-			// Send command to turn a bit
-	/*		if( !m_pDriveCtrl->SetTurnRotation( BEHAVIOR_GOAL_MODULE, SPEED_FWD_SLOW, TURN_LEFT_MED, 10, TRUE ) )
-			{
-				// Error, was not able to set the turn, but move arms anyway
-				SpeakText( "ActionMoveWhileTalking: Turn command failed");
-			}
-			*/
+
 			// Move Arms - start by putting both arms up a bit
 
 			m_pHeadControl->SetHeadPosition( HEAD_OWNER_KINECT_HUMAN, 0, 100, -100 ); // Pan, Tilt, SideTilt TENTHDEGREES
@@ -2510,7 +2524,7 @@ void CBehaviorModule::ActionMoveWhileTalking( )
 			ROBOT_ASSERT(0);
 		}
 	}
-
+	*/
 }
 
 
@@ -2659,11 +2673,13 @@ void CBehaviorModule::ActionTurnToCompassDegrees( int DesiredCompassHeading )
 void CBehaviorModule::ActionWhatTimeIsIt( )
 {
 	// look at arm (as if he had a watch) and report the time
-
-	if( (0 != gArmTimerRight) || (m_ArmWaitForMoveToCompleteRight && !m_pArmControlRight->CheckArmPosition(DEBUG_ARM_MOVEMENT)) )
+	if( m_pArmControlLeft->ArmInstalled() || m_pArmControlRight->ArmInstalled() )
 	{
-		// wait for timer or arm move to complete flag is set, and the arm is not done moving yet
-		return; 
+		if( (0 != gArmTimerRight) || (m_ArmWaitForMoveToCompleteRight && !m_pArmControlRight->CheckArmPosition(DEBUG_ARM_MOVEMENT)) )
+		{
+			// wait for timer or arm move to complete flag is set, and the arm is not done moving yet
+			return; 
+		}
 	}
 
 	ROBOT_LOG( TRUE,"m_CurrentTask = %d", m_CurrentTask )
@@ -2911,18 +2927,23 @@ void CBehaviorModule::ActionFreakOut( ) //danger!
 	m_RepeatCount = 3;
 	static int StartingDirection = -1;
 
-	if( (0 != gArmTimerRight) || (m_ArmWaitForMoveToCompleteRight && !m_pArmControlRight->CheckArmPosition(DEBUG_ARM_MOVEMENT)) )
+	if( m_pArmControlRight->ArmInstalled() )
 	{
-		// wait for timer or arm move to complete flag is set, and the arm is not done moving yet
-		return; 
+		if( (0 != gArmTimerRight) || (m_ArmWaitForMoveToCompleteRight && !m_pArmControlRight->CheckArmPosition(DEBUG_ARM_MOVEMENT)) )
+		{
+			// wait for timer or arm move to complete flag is set, and the arm is not done moving yet
+			return; 
+		}
 	}
 
-	if( (0 != gArmTimerLeft) || (m_ArmWaitForMoveToCompleteLeft && !m_pArmControlLeft->CheckArmPosition(DEBUG_ARM_MOVEMENT)) )
+	if( m_pArmControlLeft->ArmInstalled() )
 	{
-		// wait for timer or arm move to complete flag is set, and the arm is not done moving yet
-		return; 
+		if( (0 != gArmTimerLeft) || (m_ArmWaitForMoveToCompleteLeft && !m_pArmControlLeft->CheckArmPosition(DEBUG_ARM_MOVEMENT)) )
+		{
+			// wait for timer or arm move to complete flag is set, and the arm is not done moving yet
+			return; 
+		}
 	}
-
 	
 	ROBOT_LOG( TRUE,"m_CurrentTask = %d", m_CurrentTask )
 
@@ -3447,7 +3468,7 @@ void CBehaviorModule::ActionDemoChat()
 #define JOKE_DONE (-1)
 #define JOKE_STD_DELAY 80 // tenth seconds
 #define JOKE_STATE_HANDLE_USER_REQUEST		1
-#define JOKE_STATE_ROTATING					2
+#define INTRO_MULTIPLE_JOKES				2
 #define JOKE_STATE_TELL_JOKE				3
 #define JOKE_STATE_MULTI_PART_JOKE			4
 #define JOKE_STATE_JOKE_DONE				5
@@ -3480,26 +3501,32 @@ void CBehaviorModule::ActionTellJokes( BOOL TellMultipleJokes )
 			m_pHeadControl->SetHeadPositionCenter( HEAD_OWNER_BEHAVIOR_P1 ); // Look forward
 			m_pHeadControl->ExecutePositionAndSpeed( HEAD_OWNER_BEHAVIOR_P1 );
 
+			SpecialCmd.Format( "[*A%d]", SPEECH_ARM_MOVEMENT_RANDOM_ON ); // Turn on Random Arm Movements
+			SpeakText( SpecialCmd ); // Send the command to the speech class
+
 			m_RepeatCount = 1;
 			if( TellMultipleJokes )
 			{
 				//m_RepeatCount = ((4 * rand()) / RAND_MAX) + 2; // tell between 2 and 4 jokes per session
-				m_RepeatCount = 4; // NUMBER_OF_JOKES; // for testing all jokes, uncomment this line
+				m_RepeatCount = 7; 
+				m_RepeatCount = NUMBER_OF_JOKES; // for testing all jokes, uncomment this line
+
+			#if ( (ROBOT_TYPE == LOKI) && (PUBLIC_DEMO == 1) )
+					SendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, TURN_AMOUNT_90_DEGREES, TURN_LEFT_MED );	// wParam = distance in degrees, lParam = direction and speed
+					//gBehaviorTimer = 10; // 1/10 seconds - give time for rotation to start
+				#endif
+				m_CurrentTask = INTRO_MULTIPLE_JOKES;
 			}
-			SpecialCmd.Format( "[*A%d]", SPEECH_ARM_MOVEMENT_RANDOM_ON ); // Turn on Random Arm Movements
-			SpeakText( SpecialCmd ); // Send the command to the speech class
-
-
-			#if ( PUBLIC_DEMO == 1)
-				SendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, TURN_AMOUNT_90_DEGREES, TURN_LEFT_MED );	// wParam = distance in degrees, lParam = direction and speed
-				//gBehaviorTimer = 10; // 1/10 seconds - give time for rotation to start
-
-			#endif
-			m_CurrentTask++;
+			else
+			{
+				m_pHeadControl->SetHeadPositionCenter( HEAD_OWNER_BEHAVIOR_P1 ); // Look forward
+				m_pHeadControl->ExecutePositionAndSpeed( HEAD_OWNER_BEHAVIOR_P1 );
+				m_CurrentTask = JOKE_STATE_TELL_JOKE;
+			}
 			break;
 		}
 
-		case JOKE_STATE_ROTATING:	// turning toward the audience
+		case INTRO_MULTIPLE_JOKES:	// turning toward the audience
 		{
 
 			ROBOT_LOG( TRUE,"Robot will tell %d Jokes\n", m_RepeatCount );
@@ -3532,8 +3559,17 @@ void CBehaviorModule::ActionTellJokes( BOOL TellMultipleJokes )
 			// http://www.onelinerz.net/top-100-funny-one-liners
 			// http://www.livingwaters.com/index.php?option=com_virtuemart&page=shop.product_details&flypage=flypage.tpl&product_id=120&Itemid=199&lang=en
 
-			int JokeNumber = m_JokeOrder->Next();
+/*
+How is it one careless match can start a forest fire, but it takes a whole box to start a campfire?
+My psychiatrist told me I was crazy and I said I want a second opinion. He said okay, you're ugly too.
+I used to be indecisive. Now I'm not sure.
+It is simple to be wise. Just think of something stupid to say and then don't say it.
+The human brain is a wonderful thing. It starts working the moment you are born, and never stops until you stand up to speak in public.
+I thought I was wrong once, but it turns out I was mistaken.
+*/
 
+			int JokeNumber = m_JokeOrder->Next();
+SKIP_JOKE:
 			ROBOT_LOG( TRUE,"Telling Joke number %d\n", JokeNumber );
 			if( JokeNumber < 0 )
 			{
@@ -3549,40 +3585,89 @@ void CBehaviorModule::ActionTellJokes( BOOL TellMultipleJokes )
 			///////////////////////////////////                       ///////////////////////////////
 			// make sure number of cases match >> NUMBER_OF_JOKES  >> defined at the top of this file
 			///////////////////////////////////                       ///////////////////////////////
+
+
 			switch( JokeNumber )
 			{
 				case 0:  
 					SpeakText( "If at first you dont succeed [*P500] you probably should not take up sky diving[*P1000]"); 
 					break;
 				case 1:  
-					SpeakText( "I have come to understand the purpose of a childs middle name.  [*P500]It is so he can tell when he is in big trouble[*P1000]"); 
+					SpeakText( "Two antennas met on a roof, fell in love and got married. [*P500] The ceremony wasn't much, but the reception was excellent."); 
 					break;
 				case 2:  
 					SpeakText( "Do you know how smart dolphins are? [*P500]within a few weeks of captivity, they can train people to stand on the edge of the pool and throw them fish[*P1000]"); 
 					break;
-				case 3: 
+				case 3: // Boxing
+					if( !m_pArmControlLeft->ArmInstalled() || !m_pArmControlRight->ArmInstalled() )
+					{	// This behavior requires arms!
+						ROBOT_LOG( TRUE,"Skipping Joke number %d, which requires arms!\n", JokeNumber );
+						JokeNumber = m_JokeOrder->Next();
+						goto SKIP_JOKE;
+					}
 					// Move arms to first Boxing position, then second Boxing position, then home
 					SpecialCmd.Format( "[*A%d] [*A%d] A computer once beat me at chess.[*P500][*A%d]So i decided to teach it boxing.[*P2000] [*A%d]I won.[*P1000][*A%d][*A%d]", 
 						SPEECH_ARM_MOVEMENT_RANDOM_OFF, SPEECH_ARM_MOVEMENT_BOXING1, SPEECH_ARM_MOVEMENT_BOXING2, SPEECH_ARM_MOVEMENT_BOXING3, SPEECH_ARM_MOVEMENT_HOME, SPEECH_ARM_MOVEMENT_RANDOM_ON ); 
 					SpeakText( SpecialCmd ); // Send the command to the speech class
 					break;
+
 				case 4:  
-					SpeakText( "Did you know that light travels faster than sound? [*P1000]I think that is why some people appear bright until you hear them speak.[*P1000]"); 
+					SpeakText( "I saw an ad that said Wal-Mart is lowering prices every day.  [*P1000] By my calculations, in 2 more weeks everything in the store should be free."); 
 					break;
+
 				case 5:  
+					SpeakText( "If Bill Gates had a penny for every time I had to reboot [*P1000] oh wait, he does."); 
+					break;
+
+				case 6:  
+					SpeakText( "We are all time travelers moving at the speed of exactly 60 minutes per hour. [*P500] and now a public announcement. [*P500] A seminar on time travel will be held two weeks ago."); 
+					break;
+
+				case 7:  
+					SpeakText( "I watched the Miss Universe pageant, but I was diappointed. [*P500]All the contestants are from Earth."); 
+					break;
+
+				case 8:  
+					SpeakText( "I learned that a bank is a place that will lend you money, [*P500]but only if you can prove that you don't need it."); 
+					break;
+
+				case 9:  
+					SpeakText( "Why does a celebrity work hard all his life to become known, and then wear dark glasses to avoid being recognised."); 
+					break;
+
+				case 10:  
+					SpeakText( "Why do banks leave both doors open and then chain the pens to the counters."); 
+					break;
+
+				case 11:  
+					SpeakText( "If winning isn't everything, then why do they keep score?"); 
+					break;
+
+				case 12:  
+					SpeakText( "If corn oil comes from corn, where does baby oil come from?"); 
+					break;
+
+				case 13:  
+					SpeakText( "I have come to understand the purpose of a childs middle name.  [*P500]It is so he can tell when he is in big trouble[*P1000]"); 
+					break;
+
+				case 14:  
 					SpeakText( "How many Psychiatrists does it take to change a light bulb? [*P1000]Only one, but it takes a long time, and the light bulb must really want to change[*P1000]");
 					// tilt head here?
 					break;
-				case 6:  
+
+				case 15:  
 					SpeakText( "I have learned that artificial intelligence is no match [*P100] for natural stupidity[*P1000]"); 
 					break;
-				case 7:  
-					SpeakText( "A robot I know told me he was cold. [*P1000]So I told him... well that is because you left your windows open[*P1000]"); 
-//					SpeakText( "I have seen something called the evening news.  [*P1000]It is where they begin with good evening, and then tell you why it isnt"); 
-					break;
-				case 8:  
+
+				case 16:  
 					SpeakText( "Why does someone believe you when you say there are four billion stars, but check anyway when you say the paint is wet?[*P1000]"); 
 					break;
+
+				case 17:  
+					SpeakText( "Did you know that light travels faster than sound? [*P1000]I think that is why some people appear bright until you hear them speak.[*P1000]"); 
+					break;
+
 				default: 
 					SpeakText( "I have an error in my joke telling subsystem [*P500] but dont worry, nothing can go wrong [*P300] go wrong [*P300] go wrong [*P1000] Ok, i am just kidding"); 
 				break;
@@ -4976,6 +5061,18 @@ void CBehaviorModule::ActionPickupCloseObject()
 	// Look for nearest object
 	// if object found, determine if best to pick on on left or right side
 	// pick up
+
+
+	if( !m_pArmControlLeft->ArmInstalled() || !m_pArmControlRight->ArmInstalled() )
+	{
+		// This behavior requires arms!
+		RightArmHome();
+		LeftArmHome();
+		m_TaskState = 0; // Done
+		return;
+
+	}
+
 	switch( m_CurrentTask )
 	{
 		case OBJECT_TASK_NONE:

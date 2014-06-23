@@ -33,12 +33,14 @@ namespace RobotKinect.Speech
 #if (ROBOT_TYPE_LOKI )
         string RobotName = @"loki";
 #else
-        string RobotName = @"drone";
+        string RobotName = @"alice";
+        //string RobotName = @"drone";
 #endif
         private readonly Dictionary<string, int> CommandPhrase = new Dictionary<string, int>
             {
                 { "ROBOT_NAME",         (int)SPEECH_CMD.SpeechCmd_RobotName },
                 { "STOP",               (int)SPEECH_CMD.SpeechCmd_Stop },
+                { "THANKS",             (int)SPEECH_CMD.SpeechCmd_Thanks },
                 { "WAVE",               (int)SPEECH_CMD.SpeechCmd_Wave },
                 { "SAY_HI",             (int)SPEECH_CMD.SpeechCmd_SayHi },
                 { "SAY_BYE",            (int)SPEECH_CMD.SpeechCmd_SayBye },

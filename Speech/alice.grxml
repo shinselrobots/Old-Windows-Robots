@@ -18,22 +18,21 @@ xmlns="http://www.w3.org/2001/06/grammar">
 
     <one-of>
         
-      <item>
-        <!-- Robot name said, with no command -->
-        <token>loki</token>
-        <tag> $.RobotNameSaid="TRUE"; </tag>
-        <tag> $.RecoType="COMMAND"; </tag>
-        <tag> $.Param1="ROBOT_NAME"; </tag>
-        <tag> $.Param2="NA"; </tag>
-        <tag> $.Param3="NA"; </tag>
-        <tag> $.Param4="NA"; </tag>
-        <tag> $.Param5="NA"; </tag>
-        <tag> $.nResponses="NA"; </tag>
-      </item>
+        <item>
+          <!-- Robot name said, with no command -->
+          <token>alice</token> <tag> $.RobotNameSaid="TRUE"; </tag>
+          <tag> $.RecoType="COMMAND"; </tag>
+          <tag> $.Param1="ROBOT_NAME"; </tag>
+          <tag> $.Param2="NA"; </tag>
+          <tag> $.Param3="NA"; </tag>
+          <tag> $.Param4="NA"; </tag>
+          <tag> $.Param5="NA"; </tag>
+          <tag> $.nResponses="NA"; </tag>
+        </item>
 
       <item>
         <!-- thanks, Robot name  -->
-        <token>thanks loki</token>
+        <token>thanks alice</token>
         <tag> $.RobotNameSaid="TRUE"; </tag>
         <tag> $.RecoType="COMMAND"; </tag>
         <tag> $.Param1="THANKS"; </tag>
@@ -44,9 +43,10 @@ xmlns="http://www.w3.org/2001/06/grammar">
         <tag> $.nResponses="NA"; </tag>
       </item>
 
+
       <item>
         <!-- thanks, Robot name  -->
-        <token>thank you loki</token>
+        <token>thank you alice</token>
         <tag> $.RobotNameSaid="TRUE"; </tag>
         <tag> $.RecoType="COMMAND"; </tag>
         <tag> $.Param1="THANKS"; </tag>
@@ -60,7 +60,7 @@ xmlns="http://www.w3.org/2001/06/grammar">
 
       <item>
           <!-- Robot name optional with command -->
-          <item repeat="0-1"> <token>loki</token> <tag> $.RobotNameSaid="TRUE"; </tag> </item>
+          <item repeat="0-1"> <token>alice</token> <tag> $.RobotNameSaid="TRUE"; </tag> </item>
           <ruleref uri="C:/Dev/Robots/Speech/Commands.grxml#command" />
           <tag> $.RecoType="COMMAND"; </tag>
           <tag> $.Param1=$$.Param1; </tag>
@@ -71,6 +71,32 @@ xmlns="http://www.w3.org/2001/06/grammar">
           <tag> $.nResponses=$$.nResponses; </tag>
         </item>
       
+      <item>
+        <!-- Robot name optional with question -->
+        <item repeat="0-1"> <token>alice</token> <tag> $.RobotNameSaid="TRUE"; </tag> </item>
+        <ruleref uri="C:/Dev/Robots/Speech/Questions_TP.grxml#question" />
+        <tag> $.RecoType="QUESTION"; </tag>
+        <tag> $.Param1=$$.Param1; </tag>
+        <tag> $.Param2=$$.Param2; </tag>
+        <tag> $.Param3=$$.Param3; </tag>
+        <tag> $.Param4=$$.Param4; </tag>
+        <tag> $.Param5=$$.Param5; </tag>
+        <tag> $.nResponses=$$.nResponses; </tag>
+      </item>
+
+      <item>
+        <!-- Robot name optional with statement -->
+        <item repeat="0-1"> <token>alice</token> <tag> $.RobotNameSaid="TRUE"; </tag> </item>
+        <ruleref uri="C:/Dev/Robots/Speech/Statements.grxml#statement" />
+        <tag> $.RecoType="STATEMENT"; </tag>
+        <tag> $.Param1=$$.Param1; </tag>
+        <tag> $.Param2=$$.Param2; </tag>
+        <tag> $.Param3=$$.Param3; </tag>
+        <tag> $.Param4=$$.Param4; </tag>
+        <tag> $.Param5=$$.Param5; </tag>
+        <tag> $.nResponses=$$.nResponses; </tag>
+      </item>
+
 
     </one-of>
   </rule>

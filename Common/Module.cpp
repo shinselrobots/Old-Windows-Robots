@@ -854,7 +854,7 @@ void CUserCmdModule::ProcessMessage(
 			#else // Not Servo motor control
 				m_LocalSpeed = NewSpeed;
 				m_LocalTurn = NewTurn;
-				m_pDriveCtrl->SetSpeedAndTurn( Owner, m_LocalSpeed, m_LocalTurn );
+				m_pDriveCtrl->SetSpeedAndTurn( Owner, m_LocalSpeed, m_LocalTurn, ACCELERATION_FAST ); // Local control snappy, remote a little slower
 			#endif
 
 			return;

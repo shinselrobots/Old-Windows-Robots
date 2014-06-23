@@ -120,7 +120,12 @@ void HandleAndroidInput( )
 
 
 	switch( g_pFullSensorStatus->AndroidCommand )
-	{				
+	{	
+
+		// Handle Button commands from Android
+
+	#if ( ROBOT_TYPE == LOKI )
+
 		case 0: // No new command
 		{
 			break;
@@ -133,8 +138,8 @@ void HandleAndroidInput( )
 		}
 		case 2: // Head Center
 		{
-			//SendCommand( WM_ROBOT_USER_CAMERA_PAN_CMD, (DWORD)CAMERA_PAN_ABS_CENTER, 5 );
-			//SendCommand( WM_ROBOT_CAMERA_SIDETILT_ABS_CMD, (DWORD)CAMERA_SIDETILT_CENTER, 5 );
+			SendCommand( WM_ROBOT_USER_CAMERA_PAN_CMD, (DWORD)CAMERA_PAN_ABS_CENTER, 5 );
+			SendCommand( WM_ROBOT_CAMERA_SIDETILT_ABS_CMD, (DWORD)CAMERA_SIDETILT_CENTER, 5 );
 
 			// KLUDGE - also toggle lights
 			ROBOT_LOG( TRUE,  "Processing command from Android: Toggle Lights\n")
@@ -280,7 +285,160 @@ void HandleAndroidInput( )
 		default:
 			ROBOT_LOG( TRUE,  "ERROR! Unhandled Android Button: %d\n", g_pFullSensorStatus->AndroidCommand)
 	}
-					
+	
+
+	#else // Not Loki
+		case 0: // No new command
+		{
+			break;
+		}
+		case 1:
+		{
+			ROBOT_LOG( TRUE,  "Got Android command: Say Hello\n")
+			// Respond with random phrases
+			int RandomNumber = ((6 * rand()) / RAND_MAX);
+			ROBOT_LOG( TRUE,"DEBUG: RAND = %d\n", RandomNumber)
+			switch( RandomNumber )
+			{
+				case 0:  SpeakText( "Hello" );break;
+				case 1:  SpeakText( "Hi there!" );break;
+				case 2:  SpeakText( "Hey there");break;
+				case 3:  SpeakText( "Hi" );break;									
+				default: SpeakText( "Hello!" ); // If const is larger number, this gets called more often
+			}
+			break;
+		}
+		case 2: // "Quick Chat" - rotate through quick phrases
+		{
+			ROBOT_LOG( TRUE,  "Got Android command: New Quick Chat\n")
+			CString TextToSpeak;
+			switch( NextChatPhrase++ )
+			{
+				case 0:   SpeakText( "My name is Tee Key" ) ;break;
+				case 1:   SpeakText( "What is your name?" ) ;break;
+				case 2:   SpeakText( "Do you like my lights?" ) ;break;
+				case 3:   SpeakText( "want to hear some jokes?" ) ;break;
+				default:  
+					NextChatPhrase = 0;
+					break;
+			}
+			break;
+		}
+		case 3: 
+		{
+			ROBOT_LOG( TRUE,  "Got Android command: May I assist\n")
+			// Respond with random phrases
+			int RandomNumber = ((4 * rand()) / RAND_MAX);
+			ROBOT_LOG( TRUE,"DEBUG: RAND = %d\n", RandomNumber)
+			switch( RandomNumber )
+			{
+				case 0:  SpeakText( "What do you want?" );break;
+				case 1:  SpeakText( "How may I be of service?" );break;
+				default: SpeakText( "May I assist you?" ); // If const is larger number, this gets called more often
+			}
+			break;
+		}
+		case 4: 
+		{
+			ROBOT_LOG( TRUE,  "Got Android command: No Disassemble!\n")
+			SpeakText( "No dis assemble!  no dis assemble!" );
+			break;
+		}
+		case 5: 
+		{
+			ROBOT_LOG( TRUE,  "Got Android command: Say Yes\n")
+			SpeakText( "yes" );
+			break;
+		}
+		case 6: 
+		{
+			ROBOT_LOG( TRUE,  "Got Android command: Say No\n")
+			SpeakText( "no" );
+			break;
+		}
+		case 7: 
+		{
+			ROBOT_LOG( TRUE,  "Got Android command: Say You are welcome\n")
+			SpeakText( "Youre welcome" );
+			break;
+		}
+		case 8: 
+		{
+			ROBOT_LOG( TRUE,  "Got Android command: Say thank you\n")
+			SpeakText( "thank you" );
+			break;
+		}
+		case 9: // Follow Me
+		{
+			ROBOT_LOG( TRUE,  "Got Android command: Follow Me\n")
+			SendCommand( WM_ROBOT_SET_ACTION_CMD, (DWORD)ACTION_MODE_FOLLOW_PERSON, (DWORD)TRUE );	// TRUE = start mode
+			SpeakText( "I will follow you" );
+			break;
+		}
+		case 10: // Tell Joke
+		{
+			ROBOT_LOG( TRUE,  "Got Android command: Tell Joke\n")
+			SendCommand( WM_ROBOT_SET_ACTION_CMD, (DWORD)ACTION_MODE_TELL_JOKES, (DWORD)0 ); // single joke only
+			break;
+		}
+		case 11: // Danger
+		{
+			ROBOT_LOG( TRUE,  "Got Android command: 18 Danger\n")
+			SendCommand( WM_ROBOT_SET_ACTION_CMD, (DWORD)ACTION_MODE_FREAK_OUT, (DWORD)0 );
+			break;
+		}
+		case 12: 
+		{
+			ROBOT_LOG( TRUE,  "Got Android command: Anyting Else?\n")
+			// Respond with random phrases
+			int RandomNumber = ((4 * rand()) / RAND_MAX);
+			ROBOT_LOG( TRUE,"DEBUG: RAND = %d\n", RandomNumber)
+			switch( RandomNumber )
+			{
+				case 0:  SpeakText( "May I do anyting else for you?" );break;
+				case 1:  SpeakText( "How else may I serve you?" );break;
+				default: SpeakText( "Will there be anyting else?" ); // If const is larger number, this gets called more often
+			}
+			break;
+		}
+		case 13: // EMERGENCY STOP!
+		{
+			AndroidHasMotorControl = TRUE;
+			ROBOT_LOG( TRUE,  "Got Android command: STOP\n")
+			SendCommand( WM_ROBOT_STOP_CMD, 0, 0 ); // Forces stops and tells all modules to reset (cancel current behavior)
+			break;
+		}
+
+
+//>>>>>>>>> LEFT OFF HERE - TODO-MUST-DAVE
+
+		case 14: // Mic Toggle
+		{
+			ROBOT_LOG( TRUE,  "Got Android command: Mic Off \n")
+			// TODO SendCommand( WM_ROBOT_SET_ACTION_CMD, (DWORD)ACTION_MODE_WHAT_TIME_IS_IT, (DWORD)0 );
+			break;
+		}
+		case 15: // Lights
+		{
+			ROBOT_LOG( TRUE,  "Processing command from Android: Toggle Lights\n")
+			if( g_pFullSensorStatus->AuxLightsOn ) // keeps track of current state
+			{
+				SendCommand( WM_ROBOT_AUX_LIGHT_POWER_CMD, 0, (DWORD)FALSE ); // turn off
+			}
+			else
+			{
+				SendCommand( WM_ROBOT_AUX_LIGHT_POWER_CMD, 0, (DWORD)TRUE ); // turn on
+			}
+			break;
+		}
+
+
+		default:
+			ROBOT_LOG( TRUE,  "ERROR! Unhandled Android Button: %d\n", g_pFullSensorStatus->AndroidCommand)
+	}
+#endif // Not Loki	
+
+
 
 	// Handle Accelerometer
 	if( g_pFullSensorStatus->AndroidAccEnabled )
