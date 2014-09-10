@@ -44,6 +44,7 @@ protected:
 	BOOL                         m_bInSound;
 	LCID                         m_lcid;
 	BOOL						 m_bEnableSpeaking;
+	BOOL						 m_SpeechErrorMsgDisplayed;
 	ISpVoice					*m_pVoice;
 #if ( ROBOT_SERVER == 1 )	// This module used for Robot Server only
 	ArmControl					*m_pArmControlRight;

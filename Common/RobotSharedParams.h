@@ -259,6 +259,8 @@ enum SET_ACTION_CMD {
 	ACTION_MODE_FOLLOW_PERSON,					//
 	ACTION_MODE_EXPLORE,						//
 	ACTION_MODE_FIND_DOCK,						//  Find the dock, and recharge
+	ACTION_MODE_RUN_ACROSS_STAGE,				//  Run across the stage and turn
+	ACTION_MODE_RUN_BACK,						//  Turn, then run back
 
 	//Ready;Pickup Close;Pickup Any;Follow;Explore;Dock;
 

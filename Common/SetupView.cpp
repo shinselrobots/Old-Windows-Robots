@@ -3460,11 +3460,17 @@ void Setup::OnBnClickedSetHeadPosition()
 	g_BulkServoCmd[DYNA_CAMERA_PAN_SERVO_ID].PositionTenthDegrees = m_HeadPanServoSet * 10;
 	g_BulkServoCmd[DYNA_CAMERA_PAN_SERVO_ID].Update = TRUE;
 
-	g_BulkServoCmd[DYNA_CAMERA_TILT_SERVO_ID].PositionTenthDegrees = m_HeadTiltServoSet * 10;
-	g_BulkServoCmd[DYNA_CAMERA_TILT_SERVO_ID].Update = TRUE;
+	if( DYNA_CAMERA_TILT_SERVO_ID < 100 ) 
+	{
+		g_BulkServoCmd[DYNA_CAMERA_TILT_SERVO_ID].PositionTenthDegrees = m_HeadTiltServoSet * 10;
+		g_BulkServoCmd[DYNA_CAMERA_TILT_SERVO_ID].Update = TRUE;
+	}
 
-	g_BulkServoCmd[DYNA_CAMERA_SIDETILT_SERVO_ID].PositionTenthDegrees = m_HeadSideTiltServoSet * 10;
-	g_BulkServoCmd[DYNA_CAMERA_SIDETILT_SERVO_ID].Update = TRUE;
+	if( DYNA_CAMERA_SIDETILT_SERVO_ID < 100 ) 
+	{
+		g_BulkServoCmd[DYNA_CAMERA_SIDETILT_SERVO_ID].PositionTenthDegrees = m_HeadSideTiltServoSet * 10;
+		g_BulkServoCmd[DYNA_CAMERA_SIDETILT_SERVO_ID].Update = TRUE;
+	}
 
 	// Now, move all the servos for the head
 	SendCommand( WM_ROBOT_SET_HEAD_POSITION, 0, FALSE );	// FALSE = Don't Set Speed

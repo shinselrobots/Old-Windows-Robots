@@ -488,10 +488,10 @@ if( m_bPlaySimonSays && !m_bSimonSays )
 			ROBOT_LOG( TRUE, "DEBUG: RAND = %d\n", RandomNumber)
 			switch( RandomNumber )
 			{
-				case 0:  Speak( "no pro blemo" );break;
-				case 1:  Speak( "Of course" );break;
-				case 2:  Speak( "My pleasure" );break;
-				default: Speak( "you're welcome" ); // If const is larger number, this gets called more often
+				//case 0:  Speak( "no pro blemo" );break;
+				//case 1:  Speak( "Of course" );break;
+				case 1:  Speak( "My pleasure" );break;
+				default: Speak( "youre welcome" ); // If const is larger number, this gets called more often
 			}
 			break;
 		}

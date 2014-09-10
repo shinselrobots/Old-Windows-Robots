@@ -574,11 +574,14 @@ protected:
 	void	ActionOpenDoor();
 	void	ActionGetBeer();
 	void	ActionFindDock();
+	void	ProcessDockSensorData();
 	int		StartTurnToFaceDock();
 	void	ActionTurnToCompassDir( int nCompassRose );
 	void	ActionPointToCompassDir( int nCompassRose );
 	void	ActionTurnToCompassDegrees( int DesiredCompassHeading );
 	void	ActionWhatTimeIsIt();
+	void	ActionRunAcrossStage( int Distance, int Speed, int TurnDegrees );
+	void	ActionRunBack( int Distance, int Speed, int TurnDegrees );
 	void	ActionBadRobot();
 	void	ActionFreakOut();
 	void	ActionWakeUp();
@@ -652,6 +655,7 @@ protected:
 	BOOL					 m_bSpeakingToChild;
 	BOOL					 m_SubTaskComplete;
 	BOOL					 m_HeadNodEnabled;
+	int						 m_ReaquireSensorCount;
 
 
 	// Scripts

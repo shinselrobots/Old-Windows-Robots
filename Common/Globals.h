@@ -279,6 +279,11 @@ enum CAMERA_STATE {
 #define KOBUKI_BASE_FAR_RIGHT				0x10	// Backward from docs. From the perspective of the Robot, not the base
 #define KOBUKI_BASE_FAR_LEFT				0x20	// Backward from docs. From the perspective of the Robot, not the base
 
+// Base Directon last seen
+#define KOBUKI_BASE_LAST_SEEN_NONE			0x00	
+#define KOBUKI_BASE_LAST_SEEN_LEFT			0x01	
+#define KOBUKI_BASE_LAST_SEEN_RIGHT			0x02	
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -462,6 +467,7 @@ public:
 	int		DockSensorRight;			
 	int		DockSensorCenter;			// IR sensors for the Kobuki Dock
 	int		DockSensorLeft;
+	int		LastDockDirection;
 
 	// From Android Phone
 	BOOL	AndroidConnected;

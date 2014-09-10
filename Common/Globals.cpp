@@ -2777,6 +2777,7 @@ void FullSensorStatus::InitializeDefaults()
 	DockSensorRight =			0;				
 	DockSensorCenter =			0;			// IR sensors for the Kobuki Dock
 	DockSensorLeft =			0;	
+	LastDockDirection =			0;
 
 	// From Android Phone
 	AndroidConnected =			false;

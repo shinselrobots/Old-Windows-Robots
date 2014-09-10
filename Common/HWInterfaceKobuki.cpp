@@ -200,7 +200,7 @@ DWORD WINAPI KobukiAppSharedMemoryIPCThreadProc( LPVOID NotUsed )
 			g_pKobukiStatus->MotorStallErrorLeft =  (KobukiBaseStatus.OverCurrentErrors & 0x02) != 0;
 
 
-			SendCommand( WM_ROBOT_SENSOR_STATUS_READY, 0, 0 );
+			SendCommand( WM_ROBOT_KOBUKI_STATUS_READY, 0, 0 );
 			Sleep(100); // don't let this thread dominate
 		}
 		//ROBOT_LOG( TRUE,"DEBUG: Got Kobuki Data\n")

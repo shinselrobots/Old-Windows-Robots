@@ -445,7 +445,7 @@ void CDynaControl::CameraStop( )
 	Sleep(10);
 
 	// Now, set target position to current position
-	if( g_BulkServoCmd[DYNA_CAMERA_PAN_SERVO_ID].Enable )
+	if( (DYNA_CAMERA_PAN_SERVO_ID < 100) && g_BulkServoCmd[DYNA_CAMERA_PAN_SERVO_ID].Enable )
 	{
 		GetServoStatus( DYNA_CAMERA_PAN_SERVO_ID );
 		g_BulkServoCmd[DYNA_CAMERA_PAN_SERVO_ID].PositionTenthDegrees = g_BulkServoStatus[DYNA_CAMERA_PAN_SERVO_ID].PositionTenthDegrees;
@@ -453,7 +453,7 @@ void CDynaControl::CameraStop( )
 		SetServoPosition( DYNA_CAMERA_PAN_SERVO_ID, PositionTicks );	// ID, position (0-03FF)
 	}
 
-	if( g_BulkServoCmd[DYNA_CAMERA_TILT_SERVO_ID].Enable )
+	if( (DYNA_CAMERA_TILT_SERVO_ID < 100) && g_BulkServoCmd[DYNA_CAMERA_TILT_SERVO_ID].Enable )
 	{
 		GetServoStatus( DYNA_CAMERA_TILT_SERVO_ID );
 		g_BulkServoCmd[DYNA_CAMERA_TILT_SERVO_ID].PositionTenthDegrees = g_BulkServoStatus[DYNA_CAMERA_TILT_SERVO_ID].PositionTenthDegrees;

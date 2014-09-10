@@ -118,6 +118,25 @@ static char THIS_FILE[] = __FILE__;
 		g_pFullSensorStatus->DockSensorLeft =	g_pKobukiStatus->DockLeftSignal;
 
 
+		if( (0 != g_pFullSensorStatus->DockSensorLeft) && (0 == g_pFullSensorStatus->DockSensorRight)  )
+		{
+			//ROBOT_LOG( TRUE,"Last Dock Seen Left" )
+			g_pFullSensorStatus->LastDockDirection = KOBUKI_BASE_LAST_SEEN_LEFT;
+		}
+		else if( (0 != g_pFullSensorStatus->DockSensorRight) && (0 == g_pFullSensorStatus->DockSensorLeft) )
+		{
+			//ROBOT_LOG( TRUE,"Last Dock Seen Right" )
+			g_pFullSensorStatus->LastDockDirection = KOBUKI_BASE_LAST_SEEN_RIGHT;
+		}
+		else if( 0 != g_pFullSensorStatus->DockSensorCenter )
+		{
+			//ROBOT_LOG( TRUE,"Last Dock Seen Center" )
+			g_pFullSensorStatus->LastDockDirection = KOBUKI_BASE_LAST_SEEN_NONE;
+		}
+			
+
+
+
 		// Other Sensors and state
 
 		// No tilt accelerometer on Loki

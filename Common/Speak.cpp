@@ -38,6 +38,7 @@ CRobotSpeak::CRobotSpeak()
 //	m_bSendRecoToAI = FALSE;
 //	m_bEnableMotorsForSpeechCommands = FALSE;
 	m_bEnableSpeaking = FALSE;
+	m_SpeechErrorMsgDisplayed = FALSE; // just display the dialog box once
 //	m_bPlaySimonSays = FALSE;
 //	m_bSimonSays = FALSE;
 //	m_PhraseNumber = 0;
@@ -188,10 +189,11 @@ void CRobotSpeak::Speak( WCHAR *TextToSpeak )
 
 	g_CurrentlySpeaking = TRUE;
 	HRESULT hr = m_pVoice->Speak( TextToSpeak, 0, NULL );
-	if (FAILED(hr))
+	if( FAILED(hr)  && !m_SpeechErrorMsgDisplayed )
 	{
+		// THIS CAN HAPPEN IF NO SPEAKERS ENABLED (for example, Intel NUC requires speaker plugged into audio jack!)
 		AfxMessageBox( _T("Speaker is not connected!  Speech disabled!") );	
-		//ROBOT_ASSERT(0); // THIS CAN HAPPEN IF NO SPEAKERS ENABLED (for example, Intel NUC requires speaker plugged into audio jack!)
+		m_SpeechErrorMsgDisplayed = TRUE;
 	}
 	g_CurrentlySpeaking = FALSE;
 	__itt_task_end( pDomainSpeakThread ); // Robot Speaking

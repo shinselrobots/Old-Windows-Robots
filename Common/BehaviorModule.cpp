@@ -103,6 +103,7 @@ CBehaviorModule::CBehaviorModule( CDriveControlModule *pDriveControlModule )
 	m_pArmControlLeft = new ArmControl( LEFT_ARM );
 	m_pHeadControl = new HeadControl();
 	m_pKinectServoControl = new KinectServoControl;
+	m_ReaquireSensorCount = 0;
 
 	m_MaxMoveTimeRight = 0;
 	m_MaxMoveTimeLeft = 0;
@@ -906,6 +907,17 @@ void CBehaviorModule::ProcessMessage(
 						ActionFindDock();
 						break;
 					}					
+					case ACTION_MODE_RUN_ACROSS_STAGE:
+					{	
+						ActionRunAcrossStage( 72, SPEED_FWD_MED, 0 );		// int DistanceInches, int Speed, int TurnDegrees
+						// 3=36, 4=48, 5=60, 6=72, 7=84, 8=96, 9=108, 10-120
+						break;
+					}					
+					case ACTION_MODE_RUN_BACK:
+					{	
+						ActionRunBack( 72, SPEED_FWD_MED, 160 );		// int DistanceInches, int Speed, int TurnDegrees
+						break;
+					}
 					case ACTION_MODE_TURN_TO_COMPASS_DIR:
 					{	
 						ActionTurnToCompassDir(m_ActionParam); // Pass in Direction COMPASS_ROSE (eg. NORTH_WEST)
@@ -2670,6 +2682,186 @@ void CBehaviorModule::ActionTurnToCompassDegrees( int DesiredCompassHeading )
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CBehaviorModule::ActionRunAcrossStage( int Distance, int Speed, int TurnDegrees )
+{
+	// Run straigth for a while, then stop and turn
+	// Inputs: Distance to run, and how fast
+	// Amount to turn.  Negative = left turn
+
+	switch( m_CurrentTask )
+	{
+		case 0:
+		{
+			break;	// Nothing to do
+		}
+		case 1:	// Send command to run straight
+		{			
+			if( !m_pDriveCtrl->SetMoveDistance( BEHAVIOR_GOAL_MODULE, Speed, 0, (Distance*10), STOP_AFTER ) )
+			{
+				// Error, was not able to set the turn
+				SpeakText( "Drive command failed");
+				ROBOT_LOG( TRUE, "Drive command failed" )
+				m_CurrentActionMode = m_CurrentTask = m_TaskState = 0; // Clear Action Mode
+			}
+			else
+			{
+				ROBOT_LOG( TRUE, "Driving %d inches", Distance/10 )
+				m_pHeadControl->SetHeadPositionCenter( HEAD_OWNER_BEHAVIOR_P2 ); // Look forward while driving
+				SendCommand( WM_ROBOT_AUX_LIGHT_POWER_CMD, 0, (DWORD)TRUE ); // turn on lights
+				g_SpeechRecoBlocked = FALSE; // Enable the microphone
+				m_CurrentTask++; 
+			}
+			break;
+		}
+		case 2:	
+		{
+			if( m_pDriveCtrl->MoveDistanceCompleted() )
+			{
+				// Set a timer to allow robot to come to a complete stop
+				gBehaviorTimer = 20; // TenthSeconds
+				m_CurrentTask++; 
+			}	
+			break;
+		}
+		case 3:	
+		{
+			// Now do the turn
+			if( 0 == TurnDegrees )
+			{
+				m_CurrentTask++;
+			}
+			else
+			{
+				int TurnSpeedAndDirection = TURN_RIGHT_MED_SLOW;
+				if( TurnDegrees < 0 )
+				{
+					TurnSpeedAndDirection = TURN_LEFT_MED_SLOW;
+				}
+				if( !m_pDriveCtrl->SetTurnRotation( BEHAVIOR_GOAL_MODULE, SPEED_STOP, TurnSpeedAndDirection, abs(TurnDegrees), STOP_AFTER ) ) 
+				{
+					// Error, was not able to set the turn
+					SpeakText( "Turn command failed");
+					ROBOT_LOG( TRUE, "Turn command failed" )
+					m_CurrentActionMode = m_CurrentTask = m_TaskState = 0; // Clear Action Mode
+				}
+				else
+				{
+					ROBOT_LOG( TRUE, "Turning %d degrees", TurnDegrees )
+					m_pHeadControl->SetHeadPositionCenter( HEAD_OWNER_BEHAVIOR_P2 ); // Look forward while turning
+					m_CurrentTask++; 
+				}
+			}
+			break;
+		}
+		case 4:
+		{
+			if( m_pDriveCtrl->TurnRotationCompleted() )
+			{
+				// Turn done
+				SpeakText( "Would you like a beverage sir?");
+				m_CurrentActionMode = m_CurrentTask = m_TaskState = 0; // Clear Action Mode
+			}
+			break;
+		}
+
+		default:
+		{
+			ROBOT_ASSERT(0);
+		}
+	}
+
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CBehaviorModule::ActionRunBack( int Distance, int Speed, int TurnDegrees )
+{
+	// Turn, and then run back where you came from
+	// Inputs: Distance to run, and how fast
+	// Amount to turn.  Negative = left turn
+
+	switch( m_CurrentTask )
+	{
+		case 0:
+		{
+			break;	// Nothing to do
+		}
+
+		case 1:	
+		{
+			// Send command to turn
+
+			int TurnSpeedAndDirection = TURN_RIGHT_MED_SLOW;
+			if( TurnDegrees < 0 )
+			{
+				TurnSpeedAndDirection = TURN_LEFT_MED_SLOW;
+			}
+			if( !m_pDriveCtrl->SetTurnRotation( BEHAVIOR_GOAL_MODULE, SPEED_STOP, TurnSpeedAndDirection, abs(TurnDegrees), STOP_AFTER ) ) 
+			{
+				// Error, was not able to set the turn
+				SpeakText( "Turn command failed");
+				ROBOT_LOG( TRUE, "Turn command failed" )
+				m_CurrentActionMode = m_CurrentTask = m_TaskState = 0; // Clear Action Mode
+			}
+			else
+			{
+				ROBOT_LOG( TRUE, "Turning %d degrees", TurnDegrees )
+				m_pHeadControl->SetHeadPositionCenter( HEAD_OWNER_BEHAVIOR_P2 ); // Look forward while turning
+				m_CurrentTask++; 
+			}
+			break;
+		}
+
+		case 2:	
+		{
+			if( m_pDriveCtrl->TurnRotationCompleted() )
+			{
+				// Set a timer to allow robot to come to a complete stop
+				gBehaviorTimer = 20; // TenthSeconds
+				m_CurrentTask++; 
+			}	
+			break;
+		}
+
+		case 3:	// Send command to run straight
+		{			
+			if( !m_pDriveCtrl->SetMoveDistance( BEHAVIOR_GOAL_MODULE, Speed, 0, (Distance*10), STOP_AFTER ) )
+			{
+				// Error, was not able to set the turn
+				SpeakText( "Drive command failed");
+				ROBOT_LOG( TRUE, "Drive command failed" )
+				m_CurrentActionMode = m_CurrentTask = m_TaskState = 0; // Clear Action Mode
+			}
+			else
+			{
+				ROBOT_LOG( TRUE, "Driving %d inches", Distance/10 )
+				m_pHeadControl->SetHeadPositionCenter( HEAD_OWNER_BEHAVIOR_P2 ); // Look forward while driving
+				m_CurrentTask++; 
+			}
+			break;
+		}
+
+		case 4:
+		{
+			if( m_pDriveCtrl->MoveDistanceCompleted() )
+			{
+				// behavior done
+				SendCommand( WM_ROBOT_AUX_LIGHT_POWER_CMD, 0, (DWORD)FALSE ); // turn off lights
+				g_SpeechRecoBlocked = TRUE; // Disable the microphone
+				m_CurrentActionMode = m_CurrentTask = m_TaskState = 0; // Clear Action Mode
+			}
+			break;
+		}
+
+
+		default:
+		{
+			ROBOT_ASSERT(0);
+		}
+	}
+
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CBehaviorModule::ActionWhatTimeIsIt( )
 {
 	// look at arm (as if he had a watch) and report the time
@@ -4077,9 +4269,9 @@ void CBehaviorModule::ActionPointToCompassDir( int nCompassRose )
 // Utilitis for finding Recharge Dock
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define SEEK_DOCK_CENTER_MAX_DISTANCE_TENTH_INCHES	180	// distance to move perpendicular to the base, seeking the center zone
+#define SEEK_DOCK_CENTER_MAX_DISTANCE_TENTH_INCHES	360	// distance to move perpendicular to the base, seeking the center zone
 #define DOCK_BACKUP_DISTANCE_TENTH_INCHES			180	// distance to back up from the base to try again
-#define DRIVE_TO_DOCK_SENSOR_RETRIES				  6 // number of times we can lose the forward sensor before giving up
+#define DRIVE_TO_DOCK_SENSOR_RETRIES				 25 // number of times we can lose the forward sensor before giving up
 #define DEBUG_DOCK	1 // Enable Dock debugging messages
 
 enum DOCK_TASK_STATE { 
@@ -4087,6 +4279,7 @@ enum DOCK_TASK_STATE {
 	DOCK_TASK_INIT,
 	DOCK_TASK_START_LOOKING_FOR_DOCK,
 	DOCK_TASK_SPINNING_IN_PLACE,
+	DOCK_TASK_PROCESSING_SENSOR_DATA,
 	DOCK_TASK_DRIVING_TO_DOCK,
 	DOCK_TASK_DRIVING_TO_CENTER_ZONE,
 	DOCK_TASK_LOOKING_FOR_DOCK_WITH_CENTER_SENSOR,
@@ -4203,6 +4396,62 @@ int CBehaviorModule::StartTurnToFaceDock( )
 	return DOCK_TASK_DONE;
 }	
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CBehaviorModule::ProcessDockSensorData( )
+{
+	// found something, what to do?
+	if( (KOBUKI_BASE_NEAR_CENTER & g_pFullSensorStatus->DockSensorLeft) || (KOBUKI_BASE_NEAR_CENTER & g_pFullSensorStatus->DockSensorCenter) || (KOBUKI_BASE_NEAR_CENTER & g_pFullSensorStatus->DockSensorRight) ||
+		(KOBUKI_BASE_FAR_CENTER  & g_pFullSensorStatus->DockSensorLeft) || (KOBUKI_BASE_FAR_CENTER  & g_pFullSensorStatus->DockSensorCenter) || (KOBUKI_BASE_FAR_CENTER  & g_pFullSensorStatus->DockSensorRight) )
+	{
+		// In the center region. Turn to face dock
+		ROBOT_LOG( DEBUG_DOCK,"Dock Detected, and I am in the Center Zone!" )
+		m_CurrentTask = StartTurnToFaceDock();
+	}
+	else if( (KOBUKI_BASE_NEAR_LEFT & g_pFullSensorStatus->DockSensorLeft) || (KOBUKI_BASE_FAR_LEFT & g_pFullSensorStatus->DockSensorLeft)  )
+	{
+		// In left zone, with left sensor facing the base.
+
+		///////////////////////////////////////////////////////////////////
+		// Stop rotating and drive forward to find the center zone
+		ROBOT_LOG( DEBUG_DOCK,"Dock Detected, and I am in the Left Zone!" )
+		//m_pDriveCtrl->Stop( BEHAVIOR_GOAL_MODULE ); // Cancel the turn
+		m_pDriveCtrl->SetMoveDistance( BEHAVIOR_GOAL_MODULE, SPEED_FWD_SLOW, -4, SEEK_DOCK_CENTER_MAX_DISTANCE_TENTH_INCHES, STOP_AFTER ); // Curve slightly to keep sensor pointing at base
+		m_ReaquireSensorCount = 0;
+		m_CurrentTask = DOCK_TASK_DRIVING_TO_CENTER_ZONE;
+	}
+	else if( (KOBUKI_BASE_NEAR_RIGHT & g_pFullSensorStatus->DockSensorRight) || (KOBUKI_BASE_FAR_RIGHT & g_pFullSensorStatus->DockSensorRight) )
+	{
+		// In right zone, with right sensor facing the base.
+
+		///////////////////////////////////////////////////////////////////
+		// Stop rotating and drive forward to find the center zone
+		ROBOT_LOG( DEBUG_DOCK,"Dock Detected, and I am in the Right Zone!" )
+		//m_pDriveCtrl->Stop( BEHAVIOR_GOAL_MODULE ); // Cancel the turn
+		m_pDriveCtrl->SetMoveDistance( BEHAVIOR_GOAL_MODULE, SPEED_FWD_SLOW, 4, SEEK_DOCK_CENTER_MAX_DISTANCE_TENTH_INCHES, STOP_AFTER );
+		m_ReaquireSensorCount = 0;
+		m_CurrentTask = DOCK_TASK_DRIVING_TO_CENTER_ZONE;
+	}
+	else if( (0 != g_pFullSensorStatus->DockSensorLeft) || (0 != g_pFullSensorStatus->DockSensorCenter) || ( 0 != g_pFullSensorStatus->DockSensorRight) )
+	{
+		// Stop if dock spotted!
+		ROBOT_LOG( DEBUG_DOCK,"DOCK SPOTTED, but not handled!: Sensors:  L=%02X, C=%02X, R=%02X", g_pFullSensorStatus->DockSensorLeft, g_pFullSensorStatus->DockSensorCenter, g_pFullSensorStatus->DockSensorRight )
+/*
+		if( !m_pDriveCtrl->SetTurnRotation( BEHAVIOR_GOAL_MODULE, SPEED_STOP, CounterTurnDirecitonAndSpeed, 350, STOP_AFTER ) )
+		{
+			// Error, was not able to set the turn
+			SpeakText( "Turn command failed, Find dock cancelled");
+			m_CurrentTask = DOCK_TASK_DONE;
+			break;
+		}
+*/
+		if( (0 != g_pFullSensorStatus->DockSensorCenter) )
+		{
+			ROBOT_LOG( DEBUG_DOCK,"DOCK SPOTTED, but CENTER SENSOR not handled!: Sensors:  L=%02X, C=%02X, R=%02X", g_pFullSensorStatus->DockSensorLeft, g_pFullSensorStatus->DockSensorCenter, g_pFullSensorStatus->DockSensorRight )
+		}
+	}
+
+}
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CBehaviorModule::ActionFindDock( )
@@ -4212,22 +4461,24 @@ void CBehaviorModule::ActionFindDock( )
 	// is dock detected on any sensor?
 	// if in Center Region, just head to the dock
 	// if L/R Region, turn perpendicular, and move to Center Region
-#define BASE_APPROACH_NORMAL_SPEED		SPEED_FWD_SLOW
+#define BASE_APPROACH_NORMAL_SPEED		SPEED_FWD_MED_SLOW
 #define BASE_APPROACH_SLOW_SPEED		SPEED_FWD_VERY_SLOW
+#define SENSOR_REAQUIRE_RETRIES			8 // number of times to allow missing a sensor reading
 
 	static int Retries = 0;
 	static int TurnDirecitonAndSpeed = TURN_LEFT_MED_SLOW;
+	static int CounterTurnDirecitonAndSpeed = TURN_RIGHT_SLOW;
 	static int DockDirection = DOCK_CENTER;
 	static int DriveToDockRetry = 0;
 	static int BaseApproachSpeed = BASE_APPROACH_NORMAL_SPEED;
 	static int BaseApproachAcceleration = ACCELERATION_MEDIUM;
 	static int ChargeSourceDelayCount = 0;
+	
 
 
 #if DEBUG_DOCK == 1
 	DisplayDockSensorStatus();
 #endif	
-	
 
 	// Trap bumper or charging, as long as we are not in a "almost done" state.
 	if( (DOCK_TASK_BACKUP != m_CurrentTask) && (DOCK_TASK_DONE != m_CurrentTask ) )
@@ -4260,6 +4511,7 @@ void CBehaviorModule::ActionFindDock( )
 			BaseApproachSpeed = BASE_APPROACH_NORMAL_SPEED;
 			BaseApproachAcceleration = ACCELERATION_MEDIUM;
 			ChargeSourceDelayCount = 0;
+			m_ReaquireSensorCount = 0;
 			m_CurrentTask++;
 			break;
 		}
@@ -4284,13 +4536,44 @@ void CBehaviorModule::ActionFindDock( )
 				(KOBUKI_BASE_FAR_CENTER & g_pFullSensorStatus->DockSensorLeft) || (KOBUKI_BASE_FAR_CENTER & g_pFullSensorStatus->DockSensorCenter) || (KOBUKI_BASE_FAR_CENTER & g_pFullSensorStatus->DockSensorRight) )
 			{
 				// In the center region. Turn towards dock
+				ROBOT_LOG( DEBUG_DOCK,"LOOKING_FOR_DOCK: In Center Region, turning to face dock " )
 				m_CurrentTask = StartTurnToFaceDock();
 				break;
+			}
+			else if( (0!= g_pFullSensorStatus->DockSensorLeft) || (0!= g_pFullSensorStatus->DockSensorCenter) || (0!= g_pFullSensorStatus->DockSensorRight) )
+			{
+				// dock spotted, see what to do about it
+				ROBOT_LOG( DEBUG_DOCK,"LOOKING_FOR_DOCK: Dock Spotted" )
+				ProcessDockSensorData();
 			}
 			else
 			{
 				///////////////////////////////////////////////////////////////////
 				// Send command to turn in a complete circle, looking for the dock
+				if( KOBUKI_BASE_LAST_SEEN_RIGHT == g_pFullSensorStatus->LastDockDirection)
+				{
+					ROBOT_LOG( DEBUG_DOCK,"LOOKING_FOR_DOCK: Last Seen Right, so turning Right" ) // Direction not critical, just a hint
+					if( Retries > 1 )
+					{
+						TurnDirecitonAndSpeed = TURN_RIGHT_SLOW; // Turn slower if last time failed
+					}
+					else
+					{
+						TurnDirecitonAndSpeed = TURN_RIGHT_MED_SLOW;
+					}
+				}
+				else
+				{
+					ROBOT_LOG( DEBUG_DOCK,"LOOKING_FOR_DOCK: Last Seen NOT Right, so turning Left" )
+					if( Retries > 1 )
+					{
+						TurnDirecitonAndSpeed = TURN_LEFT_SLOW; // Turn slower if last time failed
+					}
+					else
+					{
+						TurnDirecitonAndSpeed = TURN_LEFT_MED_SLOW;
+					}
+				}
 				if( !m_pDriveCtrl->SetTurnRotation( BEHAVIOR_GOAL_MODULE, SPEED_STOP, TurnDirecitonAndSpeed, 350, STOP_AFTER ) )
 				{
 					// Error, was not able to set the turn
@@ -4303,53 +4586,19 @@ void CBehaviorModule::ActionFindDock( )
 			break;
 		}
 	
+
 		case DOCK_TASK_SPINNING_IN_PLACE:	// Spinning looking for the beacon
 		{
 			ROBOT_LOG( DEBUG_DOCK,"DOCK_TASK_SPINNING_IN_PLACE" )
-			// See if we spotted the beacon
-
-			// DEBUG ONLY!!!
 			if( (0 != g_pFullSensorStatus->DockSensorLeft) || (0 != g_pFullSensorStatus->DockSensorCenter) || ( 0 != g_pFullSensorStatus->DockSensorRight) )
 			{
-				ROBOT_LOG( DEBUG_DOCK,"Dock Detected" )
-			}
-
-			if( (KOBUKI_BASE_NEAR_CENTER & g_pFullSensorStatus->DockSensorLeft) || (KOBUKI_BASE_NEAR_CENTER & g_pFullSensorStatus->DockSensorCenter) || (KOBUKI_BASE_NEAR_CENTER & g_pFullSensorStatus->DockSensorRight) ||
-				(KOBUKI_BASE_FAR_CENTER  & g_pFullSensorStatus->DockSensorLeft) || (KOBUKI_BASE_FAR_CENTER  & g_pFullSensorStatus->DockSensorCenter) || (KOBUKI_BASE_FAR_CENTER  & g_pFullSensorStatus->DockSensorRight) )
-			{
-				// In the center region. Turn to face dock
-				ROBOT_LOG( DEBUG_DOCK,"Dock Detected, and I am in the Center Zone!" )
-				m_CurrentTask = StartTurnToFaceDock();
-				break;
-			}
-			else if( (KOBUKI_BASE_NEAR_LEFT & g_pFullSensorStatus->DockSensorLeft) || (KOBUKI_BASE_FAR_LEFT & g_pFullSensorStatus->DockSensorLeft)  )
-			{
-				// In left zone, with left sensor facing the base.
-
-				///////////////////////////////////////////////////////////////////
-				// Stop rotating and drive forward to find the center zone
-				ROBOT_LOG( DEBUG_DOCK,"Dock Detected, and I am in the Left Zone!" )
-				//m_pDriveCtrl->Stop( BEHAVIOR_GOAL_MODULE ); // Cancel the turn
-				m_pDriveCtrl->SetMoveDistance( BEHAVIOR_GOAL_MODULE, SPEED_FWD_SLOW, -2, SEEK_DOCK_CENTER_MAX_DISTANCE_TENTH_INCHES, STOP_AFTER ); // Curve slightly to keep sensor pointing at base
-				m_CurrentTask = DOCK_TASK_DRIVING_TO_CENTER_ZONE;
-			}
-			else if( (KOBUKI_BASE_NEAR_RIGHT & g_pFullSensorStatus->DockSensorRight) || (KOBUKI_BASE_FAR_RIGHT & g_pFullSensorStatus->DockSensorRight) )
-			{
-				// In right zone, with right sensor facing the base.
-
-				///////////////////////////////////////////////////////////////////
-				// Stop rotating and drive forward to find the center zone
-				ROBOT_LOG( DEBUG_DOCK,"Dock Detected, and I am in the Right Zone!" )
-				//m_pDriveCtrl->Stop( BEHAVIOR_GOAL_MODULE ); // Cancel the turn
-				m_pDriveCtrl->SetMoveDistance( BEHAVIOR_GOAL_MODULE, SPEED_FWD_SLOW, 2, SEEK_DOCK_CENTER_MAX_DISTANCE_TENTH_INCHES, STOP_AFTER );
-				m_CurrentTask = DOCK_TASK_DRIVING_TO_CENTER_ZONE;
+				ProcessDockSensorData();
 			}
 			else if( m_pDriveCtrl->TurnRotationCompleted() )
 			{
 				// Drive control reports that the rotation is complete, but we did not spot the base!
 				ROBOT_LOG( DEBUG_DOCK,"Turn completed, but I did not see the dock!" )
-				SpeakText( "Help, I can't find my recharge dock");
-				m_CurrentTask = DOCK_TASK_DONE; 
+				m_CurrentTask = DOCK_TASK_START_LOOKING_FOR_DOCK; 
 			}
 			break;
 		}
@@ -4374,15 +4623,26 @@ void CBehaviorModule::ActionFindDock( )
 				m_pDriveCtrl->Stop(BEHAVIOR_GOAL_MODULE);
 				m_CurrentTask = DOCK_TASK_START_LOOKING_FOR_DOCK;
 			}
-			/* 
+			 
 			else if( (0 == g_pFullSensorStatus->DockSensorLeft) && (0 == g_pFullSensorStatus->DockSensorCenter) && (0 == g_pFullSensorStatus->DockSensorRight) )
 			{
 				// Lost track of the dock!
-				ROBOT_LOG( DEBUG_DOCK,"DOCK_TASK_DRIVING_TO_CENTER_ZONE - Lost track of the Dock!  Starting Over!" )
-				m_pDriveCtrl->Stop(BEHAVIOR_GOAL_MODULE);
-				m_CurrentTask = DOCK_TASK_START_LOOKING_FOR_DOCK;
+				if( m_ReaquireSensorCount++ > SENSOR_REAQUIRE_RETRIES )
+				{
+					ROBOT_LOG( DEBUG_DOCK,"DOCK_TASK_DRIVING_TO_CENTER_ZONE - Lost track of the Dock!  Starting Over!" )
+					m_pDriveCtrl->Stop(BEHAVIOR_GOAL_MODULE);
+					m_CurrentTask = DOCK_TASK_START_LOOKING_FOR_DOCK;
+				}
+				else
+				{
+					ROBOT_LOG( DEBUG_DOCK,"DOCK_TASK_DRIVING_TO_CENTER_ZONE - Lost track of the Dock!  Retry %d", m_ReaquireSensorCount )
+				}
 			} 
-			*/
+			else
+			{
+				m_ReaquireSensorCount = 0; // reset the sensor counter
+			}
+			
 
 			break;
 		}
@@ -4433,6 +4693,7 @@ void CBehaviorModule::ActionFindDock( )
 			if( (KOBUKI_BASE_NEAR_LEFT & g_pFullSensorStatus->DockSensorCenter) || (KOBUKI_BASE_NEAR_CENTER & g_pFullSensorStatus->DockSensorCenter) || (KOBUKI_BASE_NEAR_RIGHT & g_pFullSensorStatus->DockSensorCenter))
 			{
 				// Close to base, slow down
+				ROBOT_LOG( DEBUG_DOCK,"DOCK_TASK_DRIVING_TO_DOCK: Close to base, slowing down..." )
 				if( BASE_APPROACH_SLOW_SPEED != BaseApproachSpeed )
 				{
 					BaseApproachSpeed = BASE_APPROACH_SLOW_SPEED;
@@ -4516,7 +4777,10 @@ void CBehaviorModule::ActionFindDock( )
 				ROBOT_LOG( TRUE,"==============================================" )
 				ROBOT_LOG( TRUE,"DOCK_TASK_DELAY_CHECK_CHARGE_SOURCE - SUCCESS!" )
 				ROBOT_LOG( TRUE,"==============================================" )
-				SpeakText( "Docking successful");
+				SpeakText( "Docking successful, good night");
+				SendCommand( WM_ROBOT_AUX_LIGHT_POWER_CMD, 0, (DWORD)FALSE ); // turn off lights
+				g_SpeechRecoBlocked = TRUE; // Disable the microphone
+				m_pDriveCtrl->Stop( BEHAVIOR_GOAL_MODULE );
 				m_CurrentTask = DOCK_TASK_DONE;
 			}
 

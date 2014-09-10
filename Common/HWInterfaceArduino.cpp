@@ -314,7 +314,7 @@ void HandleAndroidInput( )
 			CString TextToSpeak;
 			switch( NextChatPhrase++ )
 			{
-				case 0:   SpeakText( "My name is Tee Key" ) ;break;
+				case 0:   SpeakText( "My name is Alice" ) ;break;
 				case 1:   SpeakText( "What is your name?" ) ;break;
 				case 2:   SpeakText( "Do you like my lights?" ) ;break;
 				case 3:   SpeakText( "want to hear some jokes?" ) ;break;
@@ -326,79 +326,63 @@ void HandleAndroidInput( )
 		}
 		case 3: 
 		{
-			ROBOT_LOG( TRUE,  "Got Android command: May I assist\n")
-			// Respond with random phrases
-			int RandomNumber = ((4 * rand()) / RAND_MAX);
-			ROBOT_LOG( TRUE,"DEBUG: RAND = %d\n", RandomNumber)
-			switch( RandomNumber )
-			{
-				case 0:  SpeakText( "What do you want?" );break;
-				case 1:  SpeakText( "How may I be of service?" );break;
-				default: SpeakText( "May I assist you?" ); // If const is larger number, this gets called more often
-			}
+			ROBOT_LOG( TRUE,  "Got Android command: RUN_ACROSS_STAGE\n")
+			SendCommand( WM_ROBOT_SET_ACTION_CMD, (DWORD)ACTION_MODE_RUN_ACROSS_STAGE, (DWORD)0 ); 
 			break;
 		}
 		case 4: 
 		{
-			ROBOT_LOG( TRUE,  "Got Android command: No Disassemble!\n")
-			SpeakText( "No dis assemble!  no dis assemble!" );
+			ROBOT_LOG( TRUE,  "Got Android command: Run Back\n")
+			SendCommand( WM_ROBOT_SET_ACTION_CMD, (DWORD)ACTION_MODE_RUN_BACK, (DWORD)0 ); 
 			break;
 		}
-		case 5: 
-		{
-			ROBOT_LOG( TRUE,  "Got Android command: Say Yes\n")
-			SpeakText( "yes" );
-			break;
-		}
-		case 6: 
-		{
-			ROBOT_LOG( TRUE,  "Got Android command: Say No\n")
-			SpeakText( "no" );
-			break;
-		}
-		case 7: 
-		{
-			ROBOT_LOG( TRUE,  "Got Android command: Say You are welcome\n")
-			SpeakText( "Youre welcome" );
-			break;
-		}
-		case 8: 
-		{
-			ROBOT_LOG( TRUE,  "Got Android command: Say thank you\n")
-			SpeakText( "thank you" );
-			break;
-		}
-		case 9: // Follow Me
+		case 5: // Follow Me
 		{
 			ROBOT_LOG( TRUE,  "Got Android command: Follow Me\n")
 			SendCommand( WM_ROBOT_SET_ACTION_CMD, (DWORD)ACTION_MODE_FOLLOW_PERSON, (DWORD)TRUE );	// TRUE = start mode
 			SpeakText( "I will follow you" );
 			break;
 		}
-		case 10: // Tell Joke
+		case 6: // Tell Joke
 		{
 			ROBOT_LOG( TRUE,  "Got Android command: Tell Joke\n")
 			SendCommand( WM_ROBOT_SET_ACTION_CMD, (DWORD)ACTION_MODE_TELL_JOKES, (DWORD)0 ); // single joke only
 			break;
 		}
-		case 11: // Danger
+		case 7: // Danger
 		{
-			ROBOT_LOG( TRUE,  "Got Android command: 18 Danger\n")
+			ROBOT_LOG( TRUE,  "Got Android command: Danger\n")
 			SendCommand( WM_ROBOT_SET_ACTION_CMD, (DWORD)ACTION_MODE_FREAK_OUT, (DWORD)0 );
+			break;
+		}
+		case 8:  //ACTION_MODE_FIND_DOCK
+		{
+			ROBOT_LOG( TRUE,  "Got Android command: Find Dock\n")
+			SendCommand( WM_ROBOT_SET_ACTION_CMD, (DWORD)ACTION_MODE_FIND_DOCK, (DWORD)0 );
+			break;
+		}
+		case 9: 
+		{
+			ROBOT_LOG( TRUE,  "Got Android command: Say Yes\n")
+			SpeakText( "yes" );
+			break;
+		}
+		case 10: 
+		{
+			ROBOT_LOG( TRUE,  "Got Android command: Say No\n")
+			SpeakText( "no" );
+			break;
+		}
+		case 11: 
+		{
+			ROBOT_LOG( TRUE,  "Got Android command: Say thank you\n")
+			SpeakText( "thank you" );
 			break;
 		}
 		case 12: 
 		{
-			ROBOT_LOG( TRUE,  "Got Android command: Anyting Else?\n")
-			// Respond with random phrases
-			int RandomNumber = ((4 * rand()) / RAND_MAX);
-			ROBOT_LOG( TRUE,"DEBUG: RAND = %d\n", RandomNumber)
-			switch( RandomNumber )
-			{
-				case 0:  SpeakText( "May I do anyting else for you?" );break;
-				case 1:  SpeakText( "How else may I serve you?" );break;
-				default: SpeakText( "Will there be anyting else?" ); // If const is larger number, this gets called more often
-			}
+			ROBOT_LOG( TRUE,  "Got Android command: Say You are welcome\n")
+			SpeakText( "Youre welcome" );
 			break;
 		}
 		case 13: // EMERGENCY STOP!
@@ -408,14 +392,19 @@ void HandleAndroidInput( )
 			SendCommand( WM_ROBOT_STOP_CMD, 0, 0 ); // Forces stops and tells all modules to reset (cancel current behavior)
 			break;
 		}
-
-
-//>>>>>>>>> LEFT OFF HERE - TODO-MUST-DAVE
-
 		case 14: // Mic Toggle
 		{
 			ROBOT_LOG( TRUE,  "Got Android command: Mic Off \n")
-			// TODO SendCommand( WM_ROBOT_SET_ACTION_CMD, (DWORD)ACTION_MODE_WHAT_TIME_IS_IT, (DWORD)0 );
+			if( !g_SpeechRecoBlocked )
+			{
+				g_SpeechRecoBlocked = TRUE;
+				SpeakText( "mike off" );
+			}
+			else
+			{
+				g_SpeechRecoBlocked = FALSE;
+				SpeakText( "mike on" );
+			}
 			break;
 		}
 		case 15: // Lights
