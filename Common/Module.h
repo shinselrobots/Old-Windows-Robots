@@ -26,6 +26,8 @@
 #include "micropather.h"		// required here since Map Doc inherits from MicroPanther class "Graph"
 using namespace micropather;
 
+#include "DepthCommon.h"
+
 void SimulateHardware( DWORD Cmd, DWORD Param1, DWORD Param2 ); // Implemented in Simulator.cpp
 
 #define ULTRASONIC_TENTH_INCH_PER_STEP			06.74	// .674 inches per step (measured)
@@ -926,7 +928,6 @@ protected:
 /////////////////////////////////////////////////////////////////////////////
 // class CKinectModule
 
-#define MAX_DEPTH_DATA_SIZE	((640*480)+4)	// 4 bytes per 32 bit value
 
 const int ControlFlag_None = 0;
 const int ControlFlag_DisplayBoundingBox = 1;

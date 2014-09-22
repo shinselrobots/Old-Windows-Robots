@@ -183,6 +183,7 @@ xcopy C:\Dev\_Robot\RemoteDbg\Loki.pdb  \\Loki\Dev\_Robot\RemoteDbg /Y</Command>
     <ClInclude Include="..\Common\ChildFrm.h" />
     <ClInclude Include="..\Common\ClientOrServer.h" />
     <ClInclude Include="..\Common\Config.h" />
+    <ClInclude Include="..\Common\DepthCommon.h" />
     <ClInclude Include="..\Common\DrawDevice.h" />
     <ClInclude Include="..\Common\DynamixelControl.h" />
     <ClInclude Include="..\Common\Globals.h" />
