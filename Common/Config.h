@@ -15,7 +15,7 @@
 #define SIMULATED_SIO_SLEEP_TIME	5	// ms - time thread will sleep pretending to tx/rx data
 
 // Simulation mode - Simulate SIO ports, etc.
-#define ROBOT_SIMULATION_MODE		0
+#define ROBOT_SIMULATION_MODE		1
 
 // Force Kinect scan to be far from robot, and loop for debugging object detection
 #define DEBUG_KINECT_FLOOR_OBJECT_DETECTION	0

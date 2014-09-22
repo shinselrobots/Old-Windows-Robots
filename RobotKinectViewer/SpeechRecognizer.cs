@@ -8,7 +8,6 @@
 // of the KinectAudioSource for speech recognition in a game setting.
 
 // IMPORTANT: This code requires the Speech Platform SDK (v11) to be installed on the developer workstation
-//#define ROBOT_TYPE_LOKI
 
 namespace RobotKinect.Speech
 {
@@ -30,7 +29,7 @@ namespace RobotKinect.Speech
 
     public class SpeechRecognizer : IDisposable
     {
-#if (ROBOT_TYPE_LOKI )
+#if (SPEECH_ROBOT_TYPE_LOKI )
         string RobotName = @"loki";
 #else
         string RobotName = @"alice";
@@ -120,26 +119,26 @@ namespace RobotKinect.Speech
 
             };
 
-/*
-        private readonly Dictionary<string, int> ChatParam = new Dictionary<string, int>
-            {
-                { "WHO_IS",             (int)CHAT_PARAM.Chat_WhoIs },
-                { "WHAT_IS",            (int)CHAT_PARAM.Chat_WhatIs },
-                { "WHAT_IS_FAVORITE",   (int)CHAT_PARAM.Chat_WhatIsFavorite },
-                { "DO_YOU_LIKE",        (int)CHAT_PARAM.Chat_DoYouLike },
-                { "YOU",                (int)CHAT_PARAM.Chat_You },
-                { "ME",                 (int)CHAT_PARAM.Chat_Me },
+         /*
+                 private readonly Dictionary<string, int> ChatParam = new Dictionary<string, int>
+                     {
+                         { "WHO_IS",             (int)CHAT_PARAM.Chat_WhoIs },
+                         { "WHAT_IS",            (int)CHAT_PARAM.Chat_WhatIs },
+                         { "WHAT_IS_FAVORITE",   (int)CHAT_PARAM.Chat_WhatIsFavorite },
+                         { "DO_YOU_LIKE",        (int)CHAT_PARAM.Chat_DoYouLike },
+                         { "YOU",                (int)CHAT_PARAM.Chat_You },
+                         { "ME",                 (int)CHAT_PARAM.Chat_Me },
 
-            };
+                     };
 
 
-        private readonly Dictionary<string, int> YesNoPhrases = new Dictionary<string, int>
-            {
-                { "Yes",                (int)1 },
-                { "No",                 (int)0 },
-            };
-*/
-#if (ROBOT_TYPE_LOKI )
+                 private readonly Dictionary<string, int> YesNoPhrases = new Dictionary<string, int>
+                     {
+                         { "Yes",                (int)1 },
+                         { "No",                 (int)0 },
+                     };
+         */
+#if (SPEECH_ROBOT_TYPE_LOKI )
          private readonly Dictionary<string, string> ChatResponse = new Dictionary<string, string>
             {
                 { "1 thank you",                      "you're welcome" },
@@ -165,8 +164,8 @@ namespace RobotKinect.Speech
             };
 
 #else
-        
-        private readonly Dictionary<string, string> ChatResponse = new Dictionary<string, string>
+
+         private readonly Dictionary<string, string> ChatResponse = new Dictionary<string, string>
             {
                 { "1 who is your dog",                          "my dog is candy" },
                 { "2 who is your dog",                          "i have 2 dogs, candy and kallie" },

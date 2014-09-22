@@ -209,6 +209,22 @@ DWORD WINAPI KinectDepthThreadProc( LPVOID lpParameter )
 
 	CString MsgString;
 
+#ifdef SPEECH_ROBOT_TYPE_LOKI
+	if( ROBOT_TYPE != LOKI ) 
+	{
+		AfxMessageBox( _T("ALICE ERROR! Need to set RobotKinectViewer to NOT-Loki Speech (SpeechEnums.cs), and rebuild RobotKinectViewer") );
+	}
+#else
+	if( ROBOT_TYPE == LOKI ) 
+	{
+		AfxMessageBox( _T("LOKI ERROR! Need to set RobotKinectViewer to Loki Speech (SpeechEnums.cs), and rebuild RobotKinectViewer") );
+	}
+
+#endif
+
+
+
+
 	// Open Memory Mapped File
 	if( SUBSYSTEM_DISABLED == g_KinectSubSystemStatus )
 	{

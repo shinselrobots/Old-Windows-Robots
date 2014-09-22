@@ -186,9 +186,6 @@
     <ClInclude Include="..\Common\WiiMoteCommon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RobotType.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\Common\DrawDevice.h">
       <Filter>Header Files</Filter>
     </ClInclude>

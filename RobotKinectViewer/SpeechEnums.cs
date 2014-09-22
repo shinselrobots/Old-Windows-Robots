@@ -1,3 +1,8 @@
+// Shared file between RobotKinectViewer and Main (C++) Robot code (see KinectModule.cpp) 
+
+// Set this for the corect robot:
+#define SPEECH_ROBOT_TYPE_LOKI
+//#define SPEECH_ROBOT_TYPE_ALICE
 
 #if !__cplusplus  // make this file work for C++ as well as C#
 
@@ -5,6 +10,7 @@ namespace RobotKinect.Speech
 {
     public
 #endif
+
 
  enum RECO_TYPE // What kind of speech mode are we seeing?
     {

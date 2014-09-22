@@ -34,6 +34,9 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
+
+// LaunchKinectApp - MOVED TO THREAD.CPP
+
 // Auto launch KobukiControl Application
 #if (MOTOR_CONTROL_TYPE == KOBUKI_MOTOR_CONTROL)
 	#define ENABLE_KOBUKI_APP			1	// set value to 1 to allow app communication

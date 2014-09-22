@@ -816,6 +816,7 @@ bool LaunchKinectApp()
     { 
         /* CreateProcess failed */ 
 		ROBOT_DISPLAY( TRUE, "ERROR: KINECT PROCESS LAUNCH FAILED!  Return Code = %04X", GetLastError() )
+		AfxMessageBox( _T("ERROR: KINECT PROCESS LAUNCH FAILED! (Thread.cpp)") );
 		return false;
     } 
 
