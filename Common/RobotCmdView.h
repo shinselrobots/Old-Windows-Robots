@@ -1,7 +1,7 @@
 #if !defined(AFX_ROBOTCMDVIEW_H__C3CDE9BE_FF13_414D_93E6_6028A38B6AAB__INCLUDED_)
 #define AFX_ROBOTCMDVIEW_H__C3CDE9BE_FF13_414D_93E6_6028A38B6AAB__INCLUDED_
 
-#include "RobotType.h"
+#include "RobotConfig.h"
 
 #if _MSC_VER > 1000
 #pragma once

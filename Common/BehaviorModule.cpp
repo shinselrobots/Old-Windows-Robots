@@ -56,6 +56,7 @@ __itt_string_handle* pshKinectMoveToObject = __itt_string_handle_create("KinectM
 
 CBehaviorModule::CBehaviorModule( CDriveControlModule *pDriveControlModule )
 {
+
 	m_pDriveCtrl = pDriveControlModule;
 	m_CurrentActionMode = ACTION_MODE_NONE;
 	m_ActionParam = 0;
@@ -3387,6 +3388,12 @@ void CBehaviorModule::ActionDemoChat()
 	ROBOT_LOG( TRUE,"Chat State = %d \n", m_CurrentTask );
 	// Set gBehaviorTimer to delay between steps
 
+	if( g_StopSpeechBehavior ) // only way to cancel this - in future, move to behavior?
+	{
+		g_StopSpeechBehavior = FALSE; // reset the flag
+		m_CurrentTask = CHAT_STATE_DONE;
+	}
+
 	switch( m_CurrentTask )
 	{
 		case 0:
@@ -3684,6 +3691,7 @@ void CBehaviorModule::ActionTellJokes( BOOL TellMultipleJokes )
 		{
 			break;	// Nothing to do
 		}
+
 		case JOKE_STATE_HANDLE_USER_REQUEST:	// user asked robot to tell jokes
 		{
 			m_ResponseReceived = -1;
@@ -3700,11 +3708,11 @@ void CBehaviorModule::ActionTellJokes( BOOL TellMultipleJokes )
 			if( TellMultipleJokes )
 			{
 				//m_RepeatCount = ((4 * rand()) / RAND_MAX) + 2; // tell between 2 and 4 jokes per session
-				m_RepeatCount = 7; 
-				m_RepeatCount = NUMBER_OF_JOKES; // for testing all jokes, uncomment this line
+				m_RepeatCount = 8; 
+				// m_RepeatCount = NUMBER_OF_JOKES; // ***** TEST ONLY!  for testing all jokes, uncomment this line  *****
 
-			#if ( (ROBOT_TYPE == LOKI) && (PUBLIC_DEMO == 1) )
-					SendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, TURN_AMOUNT_90_DEGREES, TURN_LEFT_MED );	// wParam = distance in degrees, lParam = direction and speed
+				#if ( PUBLIC_DEMO == 1)
+					SendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, TURN_AMOUNT_90_DEGREES, (TURN_RIGHT_MED * AUDIENCE_DIRECTION) );	// wParam = distance in degrees, lParam = direction and speed
 					//gBehaviorTimer = 10; // 1/10 seconds - give time for rotation to start
 				#endif
 				m_CurrentTask = INTRO_MULTIPLE_JOKES;
@@ -3717,7 +3725,6 @@ void CBehaviorModule::ActionTellJokes( BOOL TellMultipleJokes )
 			}
 			break;
 		}
-
 		case INTRO_MULTIPLE_JOKES:	// turning toward the audience
 		{
 
@@ -3778,74 +3785,75 @@ SKIP_JOKE:
 			// make sure number of cases match >> NUMBER_OF_JOKES  >> defined at the top of this file
 			///////////////////////////////////                       ///////////////////////////////
 
-
 			switch( JokeNumber )
 			{
 				case 0:  
 					SpeakText( "If at first you dont succeed [*P500] you probably should not take up sky diving[*P1000]"); 
 					break;
+
 				case 1:  
-					SpeakText( "Two antennas met on a roof, fell in love and got married. [*P500] The ceremony wasn't much, but the reception was excellent."); 
+					SpeakText( "I watched the Miss Universe pageant, but I was disappointed. [*P500]All the contestants were from Earth."); 
 					break;
+
 				case 2:  
+					SpeakText( "You know what,  if Bill Gates had a dollar for every time I had to reboot, he would be rich [*P1000] oh wait, he does."); 
+					break;
+
+				case 3:  
+					SpeakText( "human ways are strange to me.  [*P500] Why do banks leave the safe open during the day, but they chain the pens to the counters."); 
+					break;
+
+				case 4:  
 					SpeakText( "Do you know how smart dolphins are? [*P500]within a few weeks of captivity, they can train people to stand on the edge of the pool and throw them fish[*P1000]"); 
 					break;
-				case 3: // Boxing
-					if( !m_pArmControlLeft->ArmInstalled() || !m_pArmControlRight->ArmInstalled() )
-					{	// This behavior requires arms!
-						ROBOT_LOG( TRUE,"Skipping Joke number %d, which requires arms!\n", JokeNumber );
+
+				case 5:  
+					SpeakText( "How many Psychiatrists does it take to change a light bulb? [*P1000] Only one, but it takes a long time, and the light bulb must really want to change[*P1000]");
+					// tilt head here?
+					break;
+
+				case 6: // Boxing
+					if( !TellMultipleJokes )
+					{	// arms get screwed up when telling single jokes, so skip this one
 						JokeNumber = m_JokeOrder->Next();
 						goto SKIP_JOKE;
 					}
 					// Move arms to first Boxing position, then second Boxing position, then home
-					SpecialCmd.Format( "[*A%d] [*A%d] A computer once beat me at chess.[*P500][*A%d]So i decided to teach it boxing.[*P2000] [*A%d]I won.[*P1000][*A%d][*A%d]", 
+					SpecialCmd.Format( "[*A%d] [*A%d] A computer once beat me at chess.[*P500][*A%d]So i decided to teach it boxing.[*P1000] [*A%d]I won.[*P1000][*A%d][*A%d]", 
 						SPEECH_ARM_MOVEMENT_RANDOM_OFF, SPEECH_ARM_MOVEMENT_BOXING1, SPEECH_ARM_MOVEMENT_BOXING2, SPEECH_ARM_MOVEMENT_BOXING3, SPEECH_ARM_MOVEMENT_HOME, SPEECH_ARM_MOVEMENT_RANDOM_ON ); 
 					SpeakText( SpecialCmd ); // Send the command to the speech class
 					break;
 
-				case 4:  
-					SpeakText( "I saw an ad that said Wal-Mart is lowering prices every day.  [*P1000] By my calculations, in 2 more weeks everything in the store should be free."); 
-					break;
-
-				case 5:  
-					SpeakText( "If Bill Gates had a penny for every time I had to reboot [*P1000] oh wait, he does."); 
-					break;
-
-				case 6:  
-					SpeakText( "We are all time travelers moving at the speed of exactly 60 minutes per hour. [*P500] and now a public announcement. [*P500] A seminar on time travel will be held two weeks ago."); 
-					break;
-
 				case 7:  
-					SpeakText( "I watched the Miss Universe pageant, but I was diappointed. [*P500]All the contestants are from Earth."); 
+					SpeakText( "And now a public announcement. [*P500] A seminar on time travel will be held two weeks ago."); 
 					break;
 
 				case 8:  
-					SpeakText( "I learned that a bank is a place that will lend you money, [*P500]but only if you can prove that you don't need it."); 
+					SpeakText( "if corn oile comes from corn, where does baby oile come from?"); 
 					break;
 
 				case 9:  
-					SpeakText( "Why does a celebrity work hard all his life to become known, and then wear dark glasses to avoid being recognised."); 
+					SpeakText( "Two antennas met on a roof [*P500] they fell in love and got married. [*P500] The ceremony wasn't much, but the reception was excellent.  [*P500] get it? [*P500] the reception was excellent."); 
 					break;
 
 				case 10:  
-					SpeakText( "Why do banks leave both doors open and then chain the pens to the counters."); 
+					SpeakText( "Why does a celebrity work to become famous, and then wear dark glasses to avoid being recognised?"); 
 					break;
 
 				case 11:  
-					SpeakText( "If winning isn't everything, then why do they keep score?"); 
+					SpeakText( "I learned a bank is a place that will lend you money, [*P500]but only if you can prove that you don't need it."); 
 					break;
 
 				case 12:  
-					SpeakText( "If corn oil comes from corn, where does baby oil come from?"); 
+					SpeakText( "If winning isn't everything, then why do the teams keep score?"); 
 					break;
 
 				case 13:  
-					SpeakText( "I have come to understand the purpose of a childs middle name.  [*P500]It is so he can tell when he is in big trouble[*P1000]"); 
+					SpeakText( "Wall Mart says they are lowering prices every day.  [*P1000] By my calculations, in 6 months every thing in the store should be free."); 
 					break;
 
 				case 14:  
-					SpeakText( "How many Psychiatrists does it take to change a light bulb? [*P1000]Only one, but it takes a long time, and the light bulb must really want to change[*P1000]");
-					// tilt head here?
+					SpeakText( "I have come to understand the purpose of a childs middle name.  [*P500]It is so he can tell when he is in big trouble[*P1000]"); 
 					break;
 
 				case 15:  

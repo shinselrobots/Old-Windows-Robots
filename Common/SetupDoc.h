@@ -6,7 +6,7 @@
 #endif // _MSC_VER > 1000
 // SetupDoc.h : header file
 //
-#include "RobotType.h"
+#include "RobotConfig.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // SetupDoc document

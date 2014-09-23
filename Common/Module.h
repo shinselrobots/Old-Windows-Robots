@@ -2,7 +2,7 @@
 #define __MODULE_H__
 
 #include "stdafx.h"
-#include "RobotType.h"
+#include "RobotConfig.h"
 //#include "../Common/HardwareCmds.h"
 //#include "HWInterfaceParams.h"
 

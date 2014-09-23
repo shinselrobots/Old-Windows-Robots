@@ -3,7 +3,7 @@
 #ifndef __ROBOT_WIIMOTE_SHARED_PARAMS_H__
 #define __ROBOT_WIIMOTE_SHARED_PARAMS_H__
 
-#include "RobotType.h"
+#include "RobotConfig.h"
 
 #define WIIMOTE_SHARED_FILE_NAME	"Global\\MyFileMappingObject"
 

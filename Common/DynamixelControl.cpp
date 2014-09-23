@@ -72,7 +72,7 @@ static char THIS_FILE[] = __FILE__;
 	#define LEFT_ARM_ELBOW_BEND_TENTH_DEGREES_ZERO		 (-68*10)	// TenthDegrees! MX64 Elbow offset to allow Home2 bend
 //	#define LEFT_ARM_ELBOW_BEND_TENTH_DEGREES_ZERO		 (-52*10)	// TenthDegrees! MX64 Elbow offset to allow Home2 bend
 #endif
-#define LEFT_ARM_ELBOW_ROTATE_TENTH_DEGREES_ZERO	 (-5*10)	// TenthDegrees!
+#define LEFT_ARM_ELBOW_ROTATE_TENTH_DEGREES_ZERO	 (-2*10)	// TenthDegrees! Negative to the Left
 #define LEFT_ARM_WRIST_ROTATE_TENTH_DEGREES_ZERO	 (0)//(  0 )		// TenthDegrees!
 #define LEFT_ARM_CLAW_TENTH_DEGREES_ZERO			 (-84*10)	// TenthDegrees!
 
@@ -3213,6 +3213,22 @@ void CDynaControl::HandleCommand( int  Request, int  Param1, int  Param2, int  O
 					*/
 					// Indicate to the system that the servo position has been handled (reset for next time)
 
+					// Trap config error
+					#if (ROBOT_TYPE == LOKI)
+
+						if( !ROBOT_HAS_RIGHT_ARM )
+						{
+							ROBOT_ASSERT(0);
+						}
+						if( !ROBOT_HAS_LEFT_ARM  )
+						{
+							ROBOT_ASSERT(0);
+						}
+					#endif
+
+
+
+
 					if( ROBOT_HAS_RIGHT_ARM && (RIGHT_ARM == Param1) )
 					{
 						g_BulkServoCmd[DYNA_RIGHT_ARM_ELBOW_ROTATE_SERVO_ID].Update = FALSE;
@@ -3220,7 +3236,7 @@ void CDynaControl::HandleCommand( int  Request, int  Param1, int  Param2, int  O
 						g_BulkServoCmd[DYNA_RIGHT_ARM_WRIST_SERVO_ID].Update = FALSE;
 						g_BulkServoCmd[DYNA_RIGHT_ARM_CLAW_SERVO_ID].Update = FALSE;
 					}
-					if( ROBOT_HAS_LEFT_ARM && (LEFT_ARM == Param1) )
+					else if( ROBOT_HAS_LEFT_ARM && (LEFT_ARM == Param1) )
 					{
 						g_BulkServoCmd[DYNA_LEFT_ARM_ELBOW_ROTATE_SERVO_ID].Update = FALSE;
 						g_BulkServoCmd[DYNA_LEFT_ARM_ELBOW_BEND_SERVO_ID].Update = FALSE;

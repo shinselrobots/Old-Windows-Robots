@@ -3,7 +3,7 @@
 // See PicSrvSc.pdf for details and www.jrkerr.com
 
 #pragma once
-#include "RobotType.h"
+#include "RobotConfig.h"
 #include "ArmControl.h"
 
 
@@ -238,7 +238,6 @@ int		TenthDegreeToTicks( int  MotorNumber, int TenthDegrees );
 void	ServoSpeedToKerrSpeed( int  ArmSpeed, int  &Velocity, int  &Acceleration );
 
 double	CentigradeToFahrenheit( double Centigrade );
-void	CheckServoLimit( int  MotorNumber, int  &PositionTicks );
 void	DisplayServoStatus( int  MotorNumber, int  nResponseBytes );
 void	SetArmPosition(int  MotorNumber, int Position);
 void	SetArmPositionAndSpeed(int  MotorNumber, int PositionTenthDegrees, int  Speed);

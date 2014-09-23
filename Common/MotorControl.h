@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "RobotType.h"
+#include "RobotConfig.h"
 #include "KobukiCommon.h"
 
 /************************************************************************

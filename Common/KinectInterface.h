@@ -6,7 +6,7 @@
 
 
 
-#include "RobotType.h"
+#include "RobotConfig.h"
 
 #define MAX_DEPTH_DATA_SIZE	(640*480)
 

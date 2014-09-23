@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "RobotType.h"
+#include "RobotConfig.h"
 #include "Module.h"
 
 #define MAP_PAGE_WIDTH			4000		// Real World Tenth Inches;  8 printed inches

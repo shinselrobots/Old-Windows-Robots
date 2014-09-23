@@ -8,7 +8,7 @@
 #ifndef __GRIDMAP_H__
 #define __GRIDMAP_H__
 
-#include "RobotType.h"
+#include "RobotConfig.h"
 #include "micropather.h"	// required here since Map Doc inherits from MicroPanther class "Graph"
 using namespace micropather;
 

@@ -1,6 +1,6 @@
 // HeadControl.cpp: Head Control class
 // Controls head positioning servos
-#include "RobotType.h"
+#include "RobotConfig.h"
 
 
 #ifndef __HEAD_CONTROL_H_INCLUDED

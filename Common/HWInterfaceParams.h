@@ -5,7 +5,7 @@
 #ifndef __ROBOT_HW_INTERFACE_PARAMS_H__
 #define __ROBOT_HW_INTERFACE_PARAMS_H__
 
-#include "RobotType.h"   // Change this for different robots used
+#include "RobotConfig.h"   // Change this for different robots used
 #include "HWInterfaceOther.h"	// Motor, servo, etc. controllers
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////

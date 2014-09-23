@@ -108,8 +108,8 @@ void CSensorModule::UpdateFromTwoOdometers( double OdometerUpdateTenthInchesL, d
 	// Update the "Tach" display.
 	g_pFullSensorStatus->Tachometer = (int)(g_pFullSensorStatus->OdometerUpdateTenthInches * 21); // Update * (10 +1 for roundoff) * 2 wheels 
 
-				ROBOT_LOG( TRUE,  "DEBUG ODOM L=%3.2f, R=%3.2f, Average=%3.2f, Update=%3.2f\n", 
-					OdometerUpdateTenthInchesL, OdometerUpdateTenthInchesR, g_pFullSensorStatus->Tachometer, g_pFullSensorStatus->OdometerUpdateTenthInches )
+	//			ROBOT_LOG( TRUE,  "DEBUG ODOM L=%3.2f, R=%3.2f, Average=%3.2f, Update=%3.2f\n", 
+	//				OdometerUpdateTenthInchesL, OdometerUpdateTenthInchesR, g_pFullSensorStatus->Tachometer, g_pFullSensorStatus->OdometerUpdateTenthInches )
 		
 	// Update MoveDistance counter, in case a programmed move is in progress
 	m_pDriveCtrl->UpdateMoveDistance( g_pFullSensorStatus->OdometerUpdateTenthInches );

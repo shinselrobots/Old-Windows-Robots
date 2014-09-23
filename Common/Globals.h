@@ -7,7 +7,7 @@
 //#define _ATL_SECURE_NO_WARNINGS
 
 //#include "..\Common\HardwareCmds.h"
-#include "RobotType.h"
+#include "RobotConfig.h"
 #include "RobotSharedParams.h"
 #include "HardwareCmds.h"
 #include "HWInterfaceParams.h"
@@ -23,6 +23,7 @@
 #include <queue>
 
 #define GPA_TRACE_ENABLED 0
+#define AUDIENCE_DIRECTION		(-1)	// +1 = Right, -1 = Left 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Enable or disable Intel GPA for performance analysis (requres GPA to be installed) www.intel.com/software/gpa
@@ -1028,7 +1029,7 @@ extern BOOL					g_CriticalSectionsInitialized;	// Flag when CS are valid
 
 
 //maker
-extern BOOL					g_StopBehavior;					// When enabled, blocks all speech recognition by the C++ code, including "Stop". 
+extern BOOL					g_StopSpeechBehavior;			// Cancels any complex speech behavior in progress (like Intro). 
 
 extern HANDLE				g_hSpeechRecoEvent;				// Synchronization between C# app and C++ for Speech recognition
 extern HANDLE				g_hKinectDepthReadyEvent;		// Synchronization between C# app and C++ for when depth data is ready

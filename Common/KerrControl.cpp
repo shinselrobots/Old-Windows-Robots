@@ -25,9 +25,9 @@ static char THIS_FILE[] = __FILE__;
 //#define DEBUG_KERR_TIMING
 //#define DEBUG_KERR_READWRITE_TIME
 
-// Servo Offset Compensation
+// Servo Offset Compensation - use if Clean Up the Floor does not work!
 #define RIGHT_ARM_SHOULDER_TENTH_DEGREES_ZERO	     (-10)	// TenthDegrees!
-#define LEFT_ARM_SHOULDER_TENTH_DEGREES_ZERO		 (-40)		// 4.5 TenthDegrees!
+#define LEFT_ARM_SHOULDER_TENTH_DEGREES_ZERO		 (-40)	// TenthDegrees!  more negative moves arm further back
 
 
 /***********************************************************
@@ -691,24 +691,6 @@ void CKerrControl::CalibrateHomePosition( int  MotorNumber )
 }
 
 
-
-//void CKerrControl::CheckServoLimit( int  MotorNumber, int  &PositionTicks )
-//{
-	//IGNORE_UNUSED_PARAM (pDC);
-	// Make sure position command is within tick limits
-/*
-	if( PositionTicks > KERR_RIGHT_ARM_ELBOW_ROTATE_MAX )
-	{
-		ROBOT_DISPLAY( TRUE, "ERROR! KERR_RIGHT_ARM_ELBOW_ROTATE_SERVO_ID exceeds MAX limit" )
-		PositionTicks = KERR_RIGHT_ARM_ELBOW_ROTATE_MAX;
-	}
-	else if( PositionTicks < KERR_RIGHT_ARM_ELBOW_ROTATE_MIN)
-	{
-		ROBOT_DISPLAY( TRUE, "ERROR! KERR_RIGHT_ARM_ELBOW_ROTATE_SERVO_ID below MIN limit" )
-		PositionTicks = KERR_RIGHT_ARM_ELBOW_ROTATE_MIN;
-	}
-	*/
-//}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Commands

@@ -167,9 +167,9 @@
     <ClInclude Include="..\Common\RobotClientSock.h" />
     <ClInclude Include="..\Common\RobotCmdDoc.h" />
     <ClInclude Include="..\Common\RobotCmdView.h" />
+    <ClInclude Include="..\Common\RobotConfig.h" />
     <ClInclude Include="..\Common\RobotServerSock.h" />
     <ClInclude Include="..\Common\RobotSharedParams.h" />
-    <ClInclude Include="..\Common\RobotType.h" />
     <ClInclude Include="..\Common\RotateMapDlg.h" />
     <ClInclude Include="..\Common\SetupDoc.h" />
     <ClInclude Include="..\Common\SetupView.h" />

@@ -2,7 +2,7 @@
 //////////////////////////////////////////////////////////////////////
 #pragma once	// Only include this header once
 
-#include "RobotType.h"
+#include "RobotConfig.h"
 
 #define SERVO_CHANGE_TENTH_DEGREES	150		// Tenth degrees per update
 

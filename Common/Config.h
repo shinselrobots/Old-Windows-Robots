@@ -2,7 +2,7 @@
 // 
 #pragma once	// Only include this header once
 #include "stdafx.h"
-#include "RobotType.h"
+#include "RobotConfig.h"
 
 //****************************************************************************
 //                      SYSTEM DEBUG CONFIG SWITCHES
@@ -15,7 +15,7 @@
 #define SIMULATED_SIO_SLEEP_TIME	5	// ms - time thread will sleep pretending to tx/rx data
 
 // Simulation mode - Simulate SIO ports, etc.
-#define ROBOT_SIMULATION_MODE		1
+#define ROBOT_SIMULATION_MODE		0
 
 // Force Kinect scan to be far from robot, and loop for debugging object detection
 #define DEBUG_KINECT_FLOOR_OBJECT_DETECTION	0
@@ -33,7 +33,7 @@
 #define DEBUG_IR					0
 #define DEBUG_ULTRASONIC			0
 #define DEBUG_PIR					0
-#define DEBUG_MOTOR_COMMANDS		1
+#define DEBUG_MOTOR_COMMANDS		0
 
 #define REPORT_CLOSE_OBJECTS		0
 

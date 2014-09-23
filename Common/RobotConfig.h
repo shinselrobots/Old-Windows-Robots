@@ -1,35 +1,13 @@
-// RobotType.h - FOR TURTLE!
-// Top level selection of what kind of robot this is!
+// RobotConfig.h
+// Top level configuration for each robot type
 // This file included by Microcontroller code, and is shared by both compilers
 // Make sure syntax works with all compilers needed
 
 #ifndef __ROBOT_SELECTION_H__
 #define __ROBOT_SELECTION_H__
 
+#include "stdafx.h"
 #include "ClientOrServer.h"
-
-// Hardware Configuration for various types of robots
-// Robot type
-#define LOKI							0
-#define TURTLE							1
-#define CARBOT							2
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// CONFIGURE HARDWARE HERE! - USES ENVIRONMENT VARIABLE SET IN PROJECT
-
-#ifdef __LOKI_CONFIG__
-	#define ROBOT_TYPE					LOKI
-#endif
-
-#ifdef __TURTLE_CONFIG__
-	#define ROBOT_TYPE					TURTLE
-
-	/////////////////////////////////////////////////////
-	// Turtle Sub-types - SET THIS TO MATCH TURTLE TYPE!
-	//#define TURTLE_TYPE					TURTLE_IROBOT_BASE
-	//#define TURTLE_TYPE					TURTLE_TELEPRESENSE
-	#define TURTLE_TYPE					TURTLE_KOBUKI_WITH_ARDUINO
-#endif
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -96,6 +74,11 @@
 
 
 #elif ROBOT_TYPE == TURTLE
+		/////////////////////////////////////////////////////
+		// Turtle Sub-types - SET THIS TO MATCH TURTLE TYPE!
+		//#define TURTLE_TYPE					TURTLE_IROBOT_BASE
+		//#define TURTLE_TYPE					TURTLE_TELEPRESENSE
+		#define TURTLE_TYPE					TURTLE_KOBUKI_WITH_ARDUINO
 
 	#if TURTLE_TYPE == TURTLE_KOBUKI_WITH_ARDUINO
 		#define HW_INTERFACE_TYPE			HW_INTERFACE_KOBUKI		// <============= Change this depending upon Base used!

@@ -202,62 +202,101 @@ void CRobotSpeak::Speak( WCHAR *TextToSpeak )
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
+
 void CRobotSpeak::SpeakIntro()
 {
 	#if( SPEECH_ENGINE_ENABLED == 0 )
 		return;
 	#endif
 
-	#if ( ROBOT_TYPE == LOKI )
+	#if ( ROBOT_TYPE != LOKI )
+		ROBOT_LOG( TRUE, "Disabled unless robot is LOKI!" )
+		return;
+	#endif
+
+	const int TurnAmount = 30;
+	m_pArmControlLeft->SetClawTorque(GENTLE_TORQUE);	// reset to gentle torque
+	//m_pArmControlLeft->SetArmPosition( RIGHT_ARM_SHOULDER_HOME1, RIGHT_ARM_ELBOW_ROTATE_HOME1, RIGHT_ARM_ELBOW_BEND_HOME1, RIGHT_ARM_WRIST_ROTATE_HOME1, RIGHT_ARM_CLAW_HOME1 ); // in DEGREES
+
+	DoRandomArmMovements(); // move arms while speaking
+	Speak( L"My name is Low key, and I am 4 years old" );
+//	Speak( L"I am 4 years old, and I was built by Dave, who builds robots as his hobby");
+	if( g_StopSpeechBehavior ) // only way to cancel this - in future, move to behavior?
+	{
+		goto END_OF_INTRO;
+	}
+
+	SendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, TurnAmount, TURN_LEFT_SLOW );	// wParam = distance in degrees, lParam = direction and speed
+	DoRandomArmMovements(); // move arms while speaking
+	Speak( L"My brain is a laptop computer, which has an Intel core processor with 1.1 billion transistors" );
+	if( g_StopSpeechBehavior ) // only way to cancel this - in future, move to behavior?
+	{
+		goto END_OF_INTRO;
+	}
+
+	DoRandomArmMovements(); // move arms while speaking
+	Speak( L"My actions are controlled by over 25,000 lines of custom C plus plus code" );
+	if( g_StopSpeechBehavior ) // only way to cancel this - in future, move to behavior?
+	{
+		goto END_OF_INTRO;
+	}
+
+	SendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, TurnAmount+10, TURN_RIGHT_SLOW );	// wParam = distance in degrees, lParam = direction and speed
+	DoRandomArmMovements(); // move arms while speaking
+	Speak( L"I have 12 servos, 4 motors, 13 infrared sensors, a compass, two cameras, a laser scanner, and a Depth sensor" );
+	if( g_StopSpeechBehavior ) // only way to cancel this - in future, move to behavior?
+	{
+		goto END_OF_INTRO;
+	}
+
+	SendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, TurnAmount+10, TURN_RIGHT_SLOW );	// wParam = distance in degrees, lParam = direction and speed
+	DoRandomArmMovements(); // move arms while speaking
+	Speak( L"I am able to understand human commands, navigate my home with a built-in map, and avoid obstacles" );
+	if( g_StopSpeechBehavior ) // only way to cancel this - in future, move to behavior?
+	{
+		goto END_OF_INTRO;
+	}
+
+	SendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, TurnAmount, TURN_LEFT_SLOW );	// wParam = distance in degrees, lParam = direction and speed
+	DoRandomArmMovements(); // move arms while speaking
+	Speak( L"I love humans, other robots, and dogs, but unfortunately dogs dont seem to like me" );
+	if( g_StopSpeechBehavior ) // only way to cancel this - in future, move to behavior?
+	{
+		goto END_OF_INTRO;
+	}
+
+	DoRandomArmMovements(); // move arms while speaking
+	RobotSleep(2000, pDomainSpeakThread);
+	Speak( L"the only thing I dont like is darth vaider.  He scares me." );
 
 
-		const int TurnAmount = 30;
-		m_pArmControlLeft->SetClawTorque(GENTLE_TORQUE);	// reset to gentle torque
-		//m_pArmControlLeft->SetArmPosition( RIGHT_ARM_SHOULDER_HOME1, RIGHT_ARM_ELBOW_ROTATE_HOME1, RIGHT_ARM_ELBOW_BEND_HOME1, RIGHT_ARM_WRIST_ROTATE_HOME1, RIGHT_ARM_CLAW_HOME1 ); // in DEGREES
+	SendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, TURN_AMOUNT_90_DEGREES, TURN_RIGHT_MED );	// wParam = distance in degrees, lParam = direction and speed
+	SendCommand( WM_ROBOT_USER_CAMERA_PAN_CMD, (DWORD)CAMERA_PAN_ABS_CENTER, 5 ); // face forward
+	RobotSleep(3000, pDomainSpeakThread);
+	SendCommand( WM_ROBOT_USER_CAMERA_PAN_CMD, (DWORD)CAMERA_PAN_ABS_CENTER, 5 ); // face forward
 
-		DoRandomArmMovements(); // move arms while speaking
-		Speak( L"My name is Low key, and I am 4 years old" );
-	//	Speak( L"I am 4 years old, and I was built by Dave, who builds robots as his hobby");
+END_OF_INTRO:
 
-		SendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, TurnAmount, TURN_LEFT_SLOW );	// wParam = distance in degrees, lParam = direction and speed
-		DoRandomArmMovements(); // move arms while speaking
-		Speak( L"My brain is a laptop computer, which has an Intel core processor with 1.1 billion transistors" );
+	if( g_StopSpeechBehavior ) // only way to cancel this - in future, move to behavior?
+	{
+		ROBOT_LOG( TRUE, "Got g_StopSpeechBehavior flag!  Stopping monolog!" )
+		g_StopSpeechBehavior = FALSE; // reset the flag
+	}
+	else
+	{
+		Speak( L"How was that" );
+	}
 
-		DoRandomArmMovements(); // move arms while speaking
-		Speak( L"My actions are controlled by over 25,000 lines of custom C plus plus code" );
-
-		SendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, TurnAmount+10, TURN_RIGHT_SLOW );	// wParam = distance in degrees, lParam = direction and speed
-		DoRandomArmMovements(); // move arms while speaking
-		Speak( L"I have 12 servos, 4 motors, 13 infrared sensors, a compass, two cameras, a laser scanner, and a Kenect sensor" );
-
-		SendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, TurnAmount+10, TURN_RIGHT_SLOW );	// wParam = distance in degrees, lParam = direction and speed
-		DoRandomArmMovements(); // move arms while speaking
-		Speak( L"I am able to understand human commands, navigate my home with a built-in map, and avoid obstacles" );
-
-		SendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, TurnAmount, TURN_LEFT_SLOW );	// wParam = distance in degrees, lParam = direction and speed
-		DoRandomArmMovements(); // move arms while speaking
-		Speak( L"I love humans, other robots, and dogs, but unfortunately dogs dont seem to like me" );
-
-		DoRandomArmMovements(); // move arms while speaking
-		RobotSleep(2000, pDomainSpeakThread);
-		Speak( L"the only thing I dont like is darth vaider.  He scares me." );
-
-		DoRandomArmMovements(); // move arms while speaking
+	DoRandomArmMovements(); // move arms while speaking
 	
-		m_pArmControlLeft->MoveArmHome( SERVO_SPEED_MED );
-		m_pArmControlLeft->EnableIdleArmMovement(TRUE);
-		m_pArmControlRight->MoveArmHome( SERVO_SPEED_MED );
-		m_pArmControlRight->EnableIdleArmMovement(TRUE);
-		gHeadIdle = TRUE;
+	m_pArmControlLeft->MoveArmHome( SERVO_SPEED_MED );
+	m_pArmControlLeft->EnableIdleArmMovement(TRUE);
+	m_pArmControlRight->MoveArmHome( SERVO_SPEED_MED );
+	m_pArmControlRight->EnableIdleArmMovement(TRUE);
+	gHeadIdle = TRUE;
 
-		SendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, TURN_AMOUNT_90_DEGREES, TURN_RIGHT_MED );	// wParam = distance in degrees, lParam = direction and speed
-		SendCommand( WM_ROBOT_USER_CAMERA_PAN_CMD, (DWORD)CAMERA_PAN_ABS_CENTER, 5 ); // face forward
-		RobotSleep(3000, pDomainSpeakThread);
-		SendCommand( WM_ROBOT_USER_CAMERA_PAN_CMD, (DWORD)CAMERA_PAN_ABS_CENTER, 5 ); // face forward
-		//Speak( L"what should we do next?" );
-
-#endif
 }
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 void CRobotSpeak::SpeakFromGlobalBuffer()

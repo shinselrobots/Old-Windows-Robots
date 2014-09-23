@@ -8,7 +8,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-//#include "RobotType.h"
+//#include "RobotConfig.h"
 //#include "..\Common\HardwareCmds.h"
 
 

@@ -163,8 +163,7 @@ BOOL				g_DynaPowerEnabled = FALSE;
 BOOL				g_KinectPowerEnabled = TRUE;
 BOOL				g_GlobalPause = FALSE;				// freeze all servos and motors until unpaused
 
-//maker
-BOOL	g_StopBehavior = FALSE;
+BOOL				g_StopSpeechBehavior = FALSE;
 
 HANDLE				g_hSpeechRecoEvent = NULL;			// Synchronization between C# app and C++ for Speech recognition
 HANDLE				g_hKinectDepthReadyEvent = NULL;	// Synchronization between C# app and C++ for when depth data is ready
@@ -217,16 +216,16 @@ DWORD				g_dwKobukiAppSharedMemoryIPCThreadId = 0;	// Control Thread for communi
 		SUBSYSTEM_FAILED		// Red
 
 */
-SUBSYSTEM_STATUS	g_ArduinoSubSystemStatus = SUBSYSTEM_WAITING;		//g_ConnectedToPIC = FALSE;		// If false, indicates Arduino not found yet
+SUBSYSTEM_STATUS	g_ArduinoSubSystemStatus = SUBSYSTEM_WAITING;	//g_ConnectedToPIC = FALSE;		// If false, indicates Arduino not found yet
 SUBSYSTEM_STATUS	g_DynaSubSystemStatus = SUBSYSTEM_WAITING;		//g_ConnectedToDyna = FALSE;		// If false, indicates Dyna controller not found yet
-SUBSYSTEM_STATUS	g_RX64SubSystemStatus = SUBSYSTEM_WAITING;		//g_ConnectedToRX64 = FALSE;		// If false, indicates Dyna RX64 controller not found yet
+SUBSYSTEM_STATUS	g_RX64SubSystemStatus = SUBSYSTEM_DISABLED;		//g_ConnectedToRX64 = FALSE;		// If false, indicates Dyna RX64 controller not found yet
 SUBSYSTEM_STATUS	g_KerrSubSystemStatus = SUBSYSTEM_WAITING;		//g_ConnectedToKerr = FALSE;		// If false, indicates Kerro controller not found yet
 SUBSYSTEM_STATUS	g_MotorSubSystemStatus = SUBSYSTEM_WAITING;		//g_ConnectedToMotor = FALSE;		// If false, indicates Motor controller not found yet
 SUBSYSTEM_STATUS	g_GPSSubSystemStatus = SUBSYSTEM_WAITING;		//g_ConnectedToGPSDevice = FALSE;	// If false, indicates GPS device not connected yet
 
-SUBSYSTEM_STATUS	g_KinectSubSystemStatus = SUBSYSTEM_WAITING;   //g_KinectReady = FALSE;			// If false, indicates Kinect not ready
-SUBSYSTEM_STATUS	g_CameraSubSystemStatus = SUBSYSTEM_WAITING;   //g_CameraReady = FALSE;	
-SUBSYSTEM_STATUS	g_LaserSubSystemStatus = SUBSYSTEM_WAITING;		//g_LaserReady = FALSE;	
+SUBSYSTEM_STATUS	g_KinectSubSystemStatus = SUBSYSTEM_WAITING;	//g_KinectReady = FALSE;			// If false, indicates Kinect not ready
+SUBSYSTEM_STATUS	g_CameraSubSystemStatus = SUBSYSTEM_WAITING;	//g_CameraReady = FALSE;	
+SUBSYSTEM_STATUS	g_LaserSubSystemStatus = SUBSYSTEM_DISABLED;	//g_LaserReady = FALSE;	
 SUBSYSTEM_STATUS	g_LeftArmSubSystemStatus = SUBSYSTEM_WAITING;   //g_ArmReady_L = FALSE;	
 SUBSYSTEM_STATUS	g_RightArmSubSystemStatus = SUBSYSTEM_WAITING;	//g_ArmReady_R = FALSE;	
 

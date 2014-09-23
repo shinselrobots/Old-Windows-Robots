@@ -3,7 +3,7 @@
 
 // Robot Server Remote Socket routines
 
-#include "RobotType.h"
+#include "RobotConfig.h"
 
 
 // Function Prototypes

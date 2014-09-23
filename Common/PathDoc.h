@@ -7,7 +7,7 @@
 #if _MSC_VER > 1000
 #pragma once
 #endif // _MSC_VER > 1000
-#include "RobotType.h"
+#include "RobotConfig.h"
 #include "PathStruct.h"
 
 #define MAX_MAP_SIZE 0xFFFFF	// Tenth Inches.  One mile in tenth inches = 0x9AB00

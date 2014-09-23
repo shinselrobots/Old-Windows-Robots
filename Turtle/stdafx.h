@@ -59,4 +59,11 @@
 #pragma comment (lib, "d3d9.lib")
 #pragma comment ( lib, "winmm.lib" )
 
+// Hardware Configuration for various types of robots
+// Robot type
+#define LOKI							1
+#define TURTLE							2
+#define CARBOT							3
+
+#define ROBOT_TYPE					TURTLE
 

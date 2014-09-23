@@ -267,6 +267,7 @@ void HandleAndroidInput( )
 			AndroidHasMotorControl = TRUE;
 			ROBOT_LOG( TRUE,  "Got Android command: STOP\n")
 			SendCommand( WM_ROBOT_STOP_CMD, 0, 0 ); // Forces stops and tells all modules to reset (cancel current behavior)
+			g_StopSpeechBehavior = TRUE; // KLUDGE to interrupt monologs
 			break;
 		}
 		case 14: // What Time

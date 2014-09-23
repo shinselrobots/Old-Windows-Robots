@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "RobotType.h"
+#include "RobotConfig.h"
 
 /////////////////////////////////////////////////////////////////////////////
 class CLaserScannerCommand

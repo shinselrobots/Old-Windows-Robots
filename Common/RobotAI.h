@@ -1,6 +1,6 @@
 #pragma once	// Only include this header once
 
-#include "RobotType.h"
+#include "RobotConfig.h"
 #include "Config.h"
 #if AI_ENGINE_ENABLED == 1
 

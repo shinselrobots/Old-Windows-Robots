@@ -1214,7 +1214,7 @@ BOOL ArmControl::IsObjectInClaw( )
 	if( LEFT_ARM == m_ArmNumber )
 	{
 		if( (GetPressureLoadPercent() > 30) ||  // Pressure sensors sense somehing in the hand (> 30% force)
-			(GetClawPosition() > LEFT_ARM_CLAW_CLOSED_LOOSE) ) // hand did not close all the way, something stopped it
+			(GetClawPosition() > LEFT_ARM_CLAW_CLOSED_NO_BALL) ) // LEFT_ARM_CLAW_CLOSED_LOOSE // hand did not close all the way, something stopped it
 		{
 			return TRUE;
 		}

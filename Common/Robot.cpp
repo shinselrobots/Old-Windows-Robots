@@ -2,7 +2,7 @@
 //
 #include "stdafx.h"
 #include "ClientOrServer.h"
-#include "RobotType.h"
+#include "RobotConfig.h"
 
 
 #if ( ROBOT_SERVER == 1 )

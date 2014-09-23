@@ -3,7 +3,7 @@
 // LaserDisplayWnd.h
 // Display range data from Hokuyo URG-04LX-UG01 Laser Scanner
 
-#include "RobotType.h"
+#include "RobotConfig.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CLaserDisplayWnd window

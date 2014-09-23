@@ -2,7 +2,7 @@
 #ifndef __THREAD_H__
 #define __THREAD_H__
 
-#include "RobotType.h"
+#include "RobotConfig.h"
 //#include "device.h"
 #include "module.h"
 // //#include "RobotServerSock.h"

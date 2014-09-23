@@ -2,7 +2,7 @@
 #define __RADAR_DISPLAY_WND_H__
 // RadarDisplayWnd.h : header file
 //
-#include "RobotType.h"
+#include "RobotConfig.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CRadarDisplayWnd window

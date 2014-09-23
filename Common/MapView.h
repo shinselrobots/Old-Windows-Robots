@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "RobotType.h"
+#include "RobotConfig.h"
 
 class CMapView : public CScrollView
 {

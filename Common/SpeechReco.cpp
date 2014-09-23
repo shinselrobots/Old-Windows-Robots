@@ -1494,7 +1494,9 @@ if( m_bPlaySimonSays && !m_bSimonSays )
 		{
 			// Turn in the direction of the speaker's voice!
 			//g_LastHumanAudioBeamDirection //Audio Angle in TenthDegrees
-			ROBOT_DISPLAY( TRUE, "SpeechReco Command Recognized: Turn Towards Me NOT IMPLEMENTED?") // TODO-MUST Test This
+			ROBOT_DISPLAY( TRUE, "SpeechReco Command Recognized: Turn Towards Me NOT IMPLEMENTED! Use SpeechCmd_FaceMe instead")
+			break;
+
 			if( MovementEnabled() )
 			{
 				// Respond to the command with action, then talk
@@ -1889,7 +1891,7 @@ if( m_bPlaySimonSays && !m_bSimonSays )
 		{
 			ROBOT_DISPLAY( TRUE, "SpeechReco Command Recognized: Introduction")
 			//SendCommand( WM_ROBOT_TEXT_MESSAGE_TO_SERVER, WM_ROBOT_SPEAK_TEXT, SPEAK_INTRO );
-			SpeechSendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, TURN_AMOUNT_90_DEGREES, TURN_RIGHT_MED );	// wParam = distance in degrees, lParam = direction and speed
+			SpeechSendCommand( WM_ROBOT_TURN_SET_DISTANCE_CMD, TURN_AMOUNT_90_DEGREES,  (TURN_RIGHT_MED * AUDIENCE_DIRECTION) );	// wParam = distance in degrees, lParam = direction and speed
 			SpeechSendCommand( WM_ROBOT_USER_CAMERA_PAN_CMD, (DWORD)CAMERA_PAN_ABS_CENTER, 5 ); // face forward
 			RobotSleep(1000, pDomainSpeakThread);
 			SpeechSendCommand( WM_ROBOT_USER_CAMERA_PAN_CMD, (DWORD)CAMERA_PAN_ABS_CENTER, 5 ); // face forward

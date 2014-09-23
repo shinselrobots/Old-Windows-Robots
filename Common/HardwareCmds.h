@@ -4,8 +4,6 @@
 #ifndef __ROBOT_HW_COMMANDS_H__
 #define __ROBOT_HW_COMMANDS_H__
 
-//#include "../Loki/RobotType.h"   // Change this for different robots used
-
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // Hardware Command IDs to the Arduino			CMD_ID	PARAMETER1		PARAMETER2

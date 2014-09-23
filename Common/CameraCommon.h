@@ -6,7 +6,6 @@
 //#include "stdafx.h"
 //#include "TCHAR.H"
 
-//#include "RobotType.h"
 
 #define CAMERA_DATA_SHARED_FILE_NAME	"RobotCameraDataMappingObject"
 #define CAMERA_REQUEST_SHARED_FILE_NAME	"RobotCameraRequestMappingObject"

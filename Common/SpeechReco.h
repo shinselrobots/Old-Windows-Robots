@@ -6,7 +6,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "RobotType.h"
+#include "RobotConfig.h"
 // Turn off all the annoying security warnings! TODO - fix all these some day...
 //#define _CRT_SECURE_NO_WARNINGS  
 //#define _AFX_SECURE_NO_WARNINGS

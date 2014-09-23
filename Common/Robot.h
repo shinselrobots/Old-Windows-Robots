@@ -14,7 +14,7 @@
 #endif
 
 #include "resource.h"       // main symbols
-#include "RobotType.h"
+#include "RobotConfig.h"
 
 // Define Screen size!
 // Robot Computer (Alienware) display is 1366 x 768 (leave room for the Windows Taskbar, or set it to autohide?)

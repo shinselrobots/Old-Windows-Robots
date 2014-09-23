@@ -1,7 +1,7 @@
 #ifndef __ROBOT_SHARED_PARAMS_H__
 #define __ROBOT_SHARED_PARAMS_H__
 
-#include "RobotType.h"
+#include "RobotConfig.h"
 
 // Common defines used by Robot Client and Server
 // But not required by specific hardware, such as Arduino
@@ -344,8 +344,6 @@ enum ARM_MOVEMENT_CMD {
 	ARM_MOVEMENT_NONE,						// No Action mode pending
 	ARM_MOVEMENT_HOME1,						// lparam - Which Arm or BOTH_ARMS (Applies for all ARM commands)
 	ARM_MOVEMENT_HOME2,						// 
-	ARM_MOVEMENT_TAKE_OBJECT,				// 
-	ARM_MOVEMENT_GIVE_OBJECT,				// 
 	ARM_MOVEMENT_EXTEND_ARM_AUTO_CLAW,		// Code figures out if claw open or closed
 	ARM_MOVEMENT_OPEN_CLAW,					// 
 	ARM_MOVEMENT_CLOSE_CLAW_FULL,			// 
@@ -382,6 +380,9 @@ enum ARM_MOVEMENT_CMD {
 	ARM_MOVEMENT_EXTEND_ARM_CLOSE_CLAW,		//
 	ARM_MOVEMENT_ENABLE_IDLE_MOVEMENT,		// lparam = True/False
 	ARM_MOVEMENT_90_DEGREE,					// Mechanical Calibration Mode
+
+	ARM_MOVEMENT_TAKE_OBJECT,				// 
+	ARM_MOVEMENT_GIVE_OBJECT,				// 
 
 };
 
@@ -544,6 +545,7 @@ enum SERVO_GROUP {
 #define LEFT_ARM_CLAW_OPEN_FULL							120		// Degrees
 #define LEFT_ARM_CLAW_OPEN_HALF							 60		// Degrees
 #define LEFT_ARM_CLAW_CLOSED_COKE						 40		// Degrees
+#define LEFT_ARM_CLAW_CLOSED_NO_BALL					 20		// Degrees - detect if the claw is holding a ball or sock
 #define LEFT_ARM_CLAW_CLOSED_LOOSE						  4		// Degrees
 #define LEFT_ARM_CLAW_CLOSED_SNUG						-10		// Degrees  Fingertips touch at zero torque (not good for paper, but fine for other objects)
 #define LEFT_ARM_CLAW_CLOSED_TIGHT						-14		// Degrees  MUST NOT EXCEED LEFT_ARM_CLAW_CLOSED_MIN

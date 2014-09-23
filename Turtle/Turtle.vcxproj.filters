@@ -212,9 +212,6 @@
     <ClInclude Include="..\Common\HWInterfaceSeeker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Common\RobotType.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\Common\KobukiCommon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -228,6 +225,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\HWInterfaceKobuki.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\RobotConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

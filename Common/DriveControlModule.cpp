@@ -7,7 +7,7 @@
 #include "Globals.h"
 #include "module.h"
 #include "thread.h"
-#include "RobotType.h"
+#include "RobotConfig.h"
 #include "HardwareConfig.h"
 
 #ifdef _DEBUG

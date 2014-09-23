@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 
-#include "RobotType.h"
+#include "RobotConfig.h"
 #include "HardwareCmds.h"
 #include "HWInterfaceParams.h"
 

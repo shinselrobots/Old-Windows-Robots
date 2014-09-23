@@ -5,7 +5,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "RobotType.h"
+#include "RobotConfig.h"
 // RobotCmdDoc.h : header file
 //
 

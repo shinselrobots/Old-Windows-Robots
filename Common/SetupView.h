@@ -7,7 +7,7 @@
 // SetupView.h : header file
 //
 
-#include "RobotType.h"
+#include "RobotConfig.h"
 #include <winsvc.h>		// For Start/Stop service
 
 //////////////////////////////////////

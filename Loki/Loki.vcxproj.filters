@@ -216,13 +216,13 @@
     <ClInclude Include="..\Common\HWInterfaceParams.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Common\RobotType.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\Common\CameraCommon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\DepthCommon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\RobotConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
