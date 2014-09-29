@@ -155,14 +155,16 @@ BOOL CRobotApp::InitInstance()
 	// ALLOCATE AND INITIALIZE ALL GLOBALS HERE!
 	/////////////////////////////////////////////////////////////////////////
 	g_CriticalSectionsInitialized = TRUE;
-	InitializeCriticalSection( &g_csSpeakQueue );				// for sync access to Speech queue
-	InitializeCriticalSection( &g_csDisplayLock );				// for sync access to Status buffers
-	InitializeCriticalSection( &g_csServoLock );				// for sync access to Servo Control buffer
-	InitializeCriticalSection( &g_csKinectPointCloudLock );		// for sync access to Kinect Point Cloud buffer
-	InitializeCriticalSection( &g_csKinectSummaryDataLock );	// for sync access to Kinect summary data buffer
-	InitializeCriticalSection( &g_csLaserSummaryDataLock );		// for sync access to Laser summary data buffer
-	InitializeCriticalSection( &g_csLaserDataLock );			// for sync access to Laser data buffer array
-	InitializeCriticalSection( &g_csKinectHumanTrackingLock );	// for sync access to array of detected Humans
+	InitializeCriticalSection( &g_csSpeakQueue );					// for sync access to Speech queue
+	InitializeCriticalSection( &g_csDisplayLock );					// for sync access to Status buffers
+	InitializeCriticalSection( &g_csServoLock );					// for sync access to Servo Control buffer
+	InitializeCriticalSection( &g_csDepthCameraPointCloudLock );	// for sync access to Depth Camera Point Cloud buffer
+	InitializeCriticalSection( &g_csDepthCameraSummaryDataLock );	// for sync access to Depth Camera summary data buffer
+	InitializeCriticalSection( &g_csKinectPointCloudLock );			// for sync access to Kinect Point Cloud buffer
+	InitializeCriticalSection( &g_csKinectSummaryDataLock );		// for sync access to Kinect summary data buffer
+	InitializeCriticalSection( &g_csLaserSummaryDataLock );			// for sync access to Laser summary data buffer
+	InitializeCriticalSection( &g_csLaserDataLock );				// for sync access to Laser data buffer array
+	InitializeCriticalSection( &g_csKinectHumanTrackingLock );		// for sync access to array of detected Humans
 	g_CriticalSectionsInitialized = TRUE;
 	g_MoveArmsWhileSpeaking = FALSE;
 	g_CurrentlySpeaking = FALSE;
@@ -199,6 +201,12 @@ BOOL CRobotApp::InitInstance()
 	g_pKinectObjects3D = new OBJECT_3D_ARRAY_T;
 	memset( g_pKinectObjects3D, 0x00, sizeof( OBJECT_3D_ARRAY_T ) );
 
+	g_pDepthCameraObjects2D = new OBJECT_2D_ARRAY_T;
+	memset( g_pDepthCameraObjects2D, 0x00, sizeof( OBJECT_2D_ARRAY_T ) );
+
+	g_pDepthCameraObjects3D = new OBJECT_3D_ARRAY_T;
+	memset( g_pDepthCameraObjects3D, 0x00, sizeof( OBJECT_3D_ARRAY_T ) );
+
 	g_pLaserScannerData = new LASER_SCANNER_DATA_T;
 	memset( g_pLaserScannerData, 0x00, sizeof( LASER_SCANNER_DATA_T ) );
 
@@ -218,6 +226,10 @@ BOOL CRobotApp::InitInstance()
 	g_pKinectSummary = new SCANNER_SUMMARY_T;
 	memset( g_pKinectSummary, 0x00, sizeof( SCANNER_SUMMARY_T ) );
 	InitScannerSummaryData( g_pKinectSummary );
+
+	g_pDepthCameraSummary = new SCANNER_SUMMARY_T;
+	memset( g_pDepthCameraSummary, 0x00, sizeof( SCANNER_SUMMARY_T ) );
+	InitScannerSummaryData( g_pDepthCameraSummary );
 
 	///////////////////////////////////////////////////////////
 	//Intialize Gobal Structures (that are not automatically initialized in globals.cpp)
@@ -281,6 +293,7 @@ BOOL CRobotApp::InitInstance()
 	////////////////////////////////////////////////////////////////////////////
 	#if (ROBOT_TYPE == LOKI) 
 		//LaunchKinectApp(); // Will only launch if enabled in globals.cpp.  - MOVED TO auto start with thread
+		LaunchDepthCameraApp(); // Will only launch if enabled in globals.cpp
 		LaunchCameraApp(); // Will only launch if enabled in globals.cpp
 	#endif
 
@@ -325,19 +338,19 @@ BOOL CRobotApp::InitInstance()
 	// Create Kobuki App shared memory thread
 	/* MOVED to LaunchKobukiApp
 	#if( MOTOR_CONTROL_TYPE == KOBUKI_MOTOR_CONTROL )
-		g_hKobukiAppSharedMemoryIPCThread = ::CreateThread( NULL, 0, KobukiAppSharedMemoryIPCThreadProc, (LPVOID)0, 0, &g_dwKobukiAppSharedMemoryIPCThreadId );
+		// MOVED: g_hKobukiAppSharedMemoryIPCThread = ::CreateThread( NULL, 0, KobukiAppSharedMemoryIPCThreadProc, (LPVOID)0, 0, &g_dwKobukiAppSharedMemoryIPCThreadId );
 		ROBOT_LOG( TRUE,  "Created Kobuki App IPC Thread. ID = (0x%x) (KobukiAppSharedMemoryIPCThreadProc)", g_dwKobukiAppSharedMemoryIPCThreadId )
 	#endif
 	*/
 
 	// Create the video capture thread - MOVED TO CAMERA MODULE CLASS
 //	g_bRunVidCapThread = TRUE; // When FALSE, tells Vidcap thread to exit
-//	g_hCameraVidCapThread = ::CreateThread( NULL, 0, VidCapThreadProc, (LPVOID)0, 0, &dwTempThreadId );
+// MOVED: 	g_hCameraVidCapThread = ::CreateThread( NULL, 0, VidCapThreadProc, (LPVOID)0, 0, &dwTempThreadId );
 //	ROBOT_LOG( TRUE,  "Created VidCap Thread. ID = (0x%x)", dwTempThreadId )
 
 	// Create the Kinect video capture thread - MOVED TO KINECT CLASS
 //	g_bRunKinectThread = TRUE; // When FALSE, tells Vidcap thread to exit
-//	g_hKinectThread = ::CreateThread( NULL, 0, KinectDepthThreadProc, (LPVOID)0, 0, &dwTempThreadId );
+// MOVED: g_hKinectThread = ::CreateThread( NULL, 0, KinectDepthThreadProc, (LPVOID)0, 0, &dwTempThreadId );
 //	ROBOT_LOG( TRUE,  "Created Kinect Thread. ID = (0x%x)", dwTempThreadId )
 
 
@@ -577,6 +590,7 @@ int CRobotApp::ExitInstance()
 	g_bRunThread = FALSE;	// Used for all threads that are not monitoring a message queue
 	if( NULL != g_hSpeechRecoEvent ) SetEvent( g_hSpeechRecoEvent );	// signal the thread so it will check the global shut down flag
 	if( NULL != g_hKinectDepthReadyEvent ) SetEvent( g_hKinectDepthReadyEvent );
+	if( NULL != g_hDepthFrameReadyEvent ) SetEvent( g_hDepthFrameReadyEvent );
 
 	//  Note!  we don't use WM_QUIT, as it gets filtered out if we turn off "windowing" messages
 	::PostThreadMessage( g_dwLaserScannerCommWriteThreadId,	WM_ROBOT_THREAD_EXIT_CMD, 0, 0 );
@@ -855,15 +869,18 @@ int CRobotApp::ExitInstance()
 	SAFE_DELETE( g_pNavSensorSummary );
 	SAFE_DELETE( g_pLaserSummary );
 	SAFE_DELETE( g_pKinectSummary );	
+	SAFE_DELETE( g_pDepthCameraSummary );	
 
 	SAFE_DELETE( g_pKinectObjects2D );
 	SAFE_DELETE( g_pKinectObjects3D );
+	SAFE_DELETE( g_pDepthCameraObjects2D );
+	SAFE_DELETE( g_pDepthCameraObjects3D );
+	
 	SAFE_DELETE( g_pLaserScannerData );
 	SAFE_DELETE( g_pIRobotStatus );
 	SAFE_DELETE( g_pKobukiStatus );
 	
 	
-
 	TRACE( "                       SHUT DOWN:  Deleting Critical Section Locks \n" );
 	g_CriticalSectionsInitialized = FALSE;					// Prevent CS use after this point	
 	DeleteCriticalSection( &g_csSpeakQueue );				// for sync access to Speech queue

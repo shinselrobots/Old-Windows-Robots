@@ -244,6 +244,7 @@ xcopy C:\Dev\_Robot\RemoteDbg\Loki.pdb  \\Loki\Dev\_Robot\RemoteDbg /Y</Command>
     <ClCompile Include="..\Common\BehaviorModule.cpp" />
     <ClCompile Include="..\Common\ChildFrm.cpp" />
     <ClCompile Include="..\Common\ClientSock.cpp" />
+    <ClCompile Include="..\Common\DepthCameraModule.cpp" />
     <ClCompile Include="..\Common\DrawDevice.cpp" />
     <ClCompile Include="..\Common\DriveAvoidanceModule.cpp" />
     <ClCompile Include="..\Common\DriveBehaviorModule.cpp" />

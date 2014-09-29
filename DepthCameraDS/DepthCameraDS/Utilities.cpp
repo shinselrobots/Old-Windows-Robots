@@ -13,8 +13,7 @@
 
 using namespace std;
 #include <DepthCommon.h>
-//#include "DepthCommon.h"
-#include "DS4DepthViewer.h"
+#include "DepthCameraDS.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 // Initialize shared memory and events for Inter Process Communication with the Robot control application
@@ -33,14 +32,14 @@ int InitIPC( HANDLE &hCommandEvent, LPCTSTR &pCommandBuf, HANDLE &hDepthDataAvai
 	// TODO!  DO I NEED TO RELEASE MEMORY OR HANDLES on EXIT?
 
 	/////////////////////////////////////////////////////////////////////////////////////////
-	// For sending Depth data to the robot control application
+	// For sending Depth Frame data to the robot control application
 	hMapFile = CreateFileMapping(
 		INVALID_HANDLE_VALUE,    // use paging file
 		NULL,                    // default security 
 		PAGE_READWRITE,          // read/write access
 		0,                       // max. object size high
-		sizeof(MAX_DEPTH_DATA_SIZE),	// buffer size  
-		_T(DEPTH_DATA_SHARED_FILE_NAME) );// name of mapping object
+		sizeof(DEPTH_CAMERA_FRAME_T),	 // buffer size  
+		_T(DEPTH_CAMERA_DATA_SHARED_FILE_NAME) );// name of mapping object
 
 	if ( (INVALID_HANDLE_VALUE == hMapFile) || (NULL == hMapFile)  )
 	{ 
@@ -52,7 +51,7 @@ int InitIPC( HANDLE &hCommandEvent, LPCTSTR &pCommandBuf, HANDLE &hDepthDataAvai
 		FILE_MAP_ALL_ACCESS, // read/write permission
 		0,                   
 		0,                   
-		MAX_DEPTH_DATA_SIZE );     // WAS sizeof(KOBUKI_BASE_STATUS_T)      
+		sizeof(DEPTH_CAMERA_FRAME_T) );     // WAS sizeof(KOBUKI_BASE_STATUS_T)      
 
 	if (pDepthDataBuf == NULL) 
 	{ 
@@ -75,10 +74,10 @@ int InitIPC( HANDLE &hCommandEvent, LPCTSTR &pCommandBuf, HANDLE &hDepthDataAvai
 	// For getting Commands from the robot control application
 
 	// Create Event to allow Robot to signal when a new Command is pending
-	hCommandEvent = CreateEvent ( NULL, bManualReset, bInitialState, _T(DEPTH_COMMAND_EVENT_NAME) );
+	hCommandEvent = CreateEvent ( NULL, bManualReset, bInitialState, _T(DEPTH_CAMERA_COMMAND_EVENT_NAME) );
 	if ( !hCommandEvent ) 
 	{ 
-		cerr << "Event creation failed!: " << DEPTH_COMMAND_EVENT_NAME << endl;
+		cerr << "Event creation failed!: " << DEPTH_CAMERA_COMMAND_EVENT_NAME << endl;
 		return FAILED;
 	}
 
@@ -100,7 +99,7 @@ int InitIPC( HANDLE &hCommandEvent, LPCTSTR &pCommandBuf, HANDLE &hDepthDataAvai
 	hMapFile = OpenFileMapping(
 		FILE_MAP_ALL_ACCESS,		// read/write access
 		FALSE,						// do not inherit the name
-		_T(DEPTH_COMMAND_SHARED_FILE_NAME) );	// name of mapping object 
+		_T(DEPTH_CAMERA_COMMAND_SHARED_FILE_NAME) );	// name of mapping object 
 
 	if ( (INVALID_HANDLE_VALUE == hMapFile) || (NULL == hMapFile)  )
 	{ 
@@ -112,7 +111,7 @@ int InitIPC( HANDLE &hCommandEvent, LPCTSTR &pCommandBuf, HANDLE &hDepthDataAvai
 		FILE_MAP_ALL_ACCESS, // read/write permission
 		0,                   
 		0,                   
-		sizeof(DEPTH_COMMAND_T) );           
+		sizeof(DEPTH_CAMERA_COMMAND_T) );           
 
 	if (pCommandBuf == NULL) 
 	{ 

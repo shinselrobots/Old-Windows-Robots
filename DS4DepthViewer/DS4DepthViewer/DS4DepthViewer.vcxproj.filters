@@ -27,6 +27,9 @@
     <ClInclude Include="..\..\Common\DepthCommon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DS4DepthViewer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

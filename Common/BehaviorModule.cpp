@@ -4840,7 +4840,7 @@ void CBehaviorModule::ActionPickupObjects()
 	// look for next one
 	switch( m_CurrentTask )
 	{
-		case OBJECT_TASK_NONE:
+		case TASK_NONE:
 		{
 			break;	// Nothing to do
 		}
@@ -5347,7 +5347,7 @@ void CBehaviorModule::ActionPickupCloseObject()
 
 	switch( m_CurrentTask )
 	{
-		case OBJECT_TASK_NONE:
+		case TASK_NONE:
 		{
 			break;	// Nothing to do
 		}

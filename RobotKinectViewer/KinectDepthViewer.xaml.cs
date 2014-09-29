@@ -64,6 +64,7 @@ namespace KinectWpfViewers
         const int mmfOffsetBitmapStart =        48;
 
         const int MAX_SHARED_DATA_SIZE = (640 * 480 * 2) + mmfOffsetBitmapStart + 4; // 2 bytes per Int16
+        //const int MAX_SHARED_DATA_SIZE = (640 * 480 * 2) + mmfOffsetBitmapStart; // <<+ 4>>?; // 2 bytes per Int16
         private bool SharedDataFileInitialized = true;
         private int FrameLoopCount = 1;
         private int CopiedFrameNumber = 0; // number of frames copied to shared memory

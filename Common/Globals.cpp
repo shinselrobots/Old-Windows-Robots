@@ -37,6 +37,13 @@ static char THIS_FILE[] = __FILE__;
 
 // LaunchKinectApp - MOVED TO THREAD.CPP
 
+// Auto launch Depth Camera Application
+#define ENABLE_DEPTH_CAMERA_APP			1	// set value to 1 to allow app communication
+#define AUTO_LAUNCH_DEPTH_CAMERA_APP	1	// set value to 1 to auto launch
+#if (ENABLE_DEPTH_CAMERA_APP == 1)
+	FIND_WINDOW_HANDLE_STRUCT_T DepthCameraFWHS; // global to this file
+#endif
+
 // Auto launch KobukiControl Application
 #if (MOTOR_CONTROL_TYPE == KOBUKI_MOTOR_CONTROL)
 	#define ENABLE_KOBUKI_APP			1	// set value to 1 to allow app communication
@@ -47,11 +54,12 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 // Auto launch Camera OpenCV Application
-#define ENABLE_CAMERA_APP			1	// set value to 1 to allow app communication
-#define AUTO_LAUNCH_CAMERA_APP		1	// set value to 1 to auto launch
+#define ENABLE_CAMERA_APP			0	// set value to 1 to allow app communication
+#define AUTO_LAUNCH_CAMERA_APP		0	// set value to 1 to auto launch
 #if (ENABLE_CAMERA_APP == 1)
 	FIND_WINDOW_HANDLE_STRUCT_T CameraFWHS; // global to this file
 #endif
+
 
 
 //#include <windows.h>
@@ -156,6 +164,7 @@ BOOL				g_CriticalSectionsInitialized = FALSE; // Flag when CS are valid
 BOOL				g_bRunThread = TRUE;				// When FALSE, tells all threads to exit
 BOOL				g_bRunVidCapThread = FALSE;			// When FALSE, tells Vidcap thread to exit
 BOOL				g_bRunKinectThread = FALSE;			// When FALSE, tells Vidcap thread to exit
+BOOL				g_bRunDepthCameraThread;			// When FALSE, tells Depth Camera thread to exit
 
 // Global Pause and Power Control - Allows pausing or powering on/off subsystems instantly
 BOOL				g_SleepMode = FALSE;				// Power on by default, unless in lowpower "sleep mode"
@@ -167,6 +176,7 @@ BOOL				g_StopSpeechBehavior = FALSE;
 
 HANDLE				g_hSpeechRecoEvent = NULL;			// Synchronization between C# app and C++ for Speech recognition
 HANDLE				g_hKinectDepthReadyEvent = NULL;	// Synchronization between C# app and C++ for when depth data is ready
+HANDLE				g_hDepthFrameReadyEvent = NULL;		// Synchronization between depth camera app and robot control for when depth data is ready
 BOOL				g_SpeechRecoBlocked = FALSE;		// When enabled, blocks all speech recognition by the C++ code, including "Stop". 
 														// Used when arm motors are moving due to noise picked by Kinect
 
@@ -179,6 +189,7 @@ HANDLE				g_hSoundThread = INVALID_HANDLE_VALUE;
 HANDLE				g_hSpeakThread = INVALID_HANDLE_VALUE;
 HANDLE				g_hCameraVidCapThread = INVALID_HANDLE_VALUE;
 HANDLE				g_hKinectThread = INVALID_HANDLE_VALUE;
+HANDLE				g_hDepthCameraThread = INVALID_HANDLE_VALUE;
 HANDLE				g_hTimerThread = INVALID_HANDLE_VALUE;
 HANDLE				g_hSmartServoThread = INVALID_HANDLE_VALUE;
 HANDLE				g_hServoThread = INVALID_HANDLE_VALUE;
@@ -285,14 +296,23 @@ int 				g_LaserScansRemaining = 0;					// Number of scans remaining when laser s
 LASER_SCANNER_STATE_T g_LaserScannerState;
 LASER_SCANNER_DATA_T* g_pLaserScannerData = NULL;
 
+// For Depth Camera
+CRITICAL_SECTION	g_csDepthCameraSummaryDataLock;				// Initialized in Robot.cpp 
+CRITICAL_SECTION	g_csDepthCameraPointCloudLock;				// Initialized in Robot.cpp 
+
+DEPTH_3D_CLOUD_T*	g_DepthCameraPointCloud = NULL;				// Array of 3D points detected by Depth Camera in TenthInches
+OBJECT_2D_ARRAY_T*	g_pDepthCameraObjects2D = NULL;				// Array of 2D object slices from one scan line
+OBJECT_3D_ARRAY_T*	g_pDepthCameraObjects3D = NULL;				// Array of 3D complete objects detected in the complete capture
+
 // For Kinect
 CRITICAL_SECTION	g_csKinectSummaryDataLock;					// Initialized in Robot.cpp 
 CRITICAL_SECTION	g_csKinectPointCloudLock;					// Initialized in Robot.cpp 
-CRITICAL_SECTION	g_csKinectHumanTrackingLock;				// Initialized in Robot.cpp 
+CRITICAL_SECTION	g_csKinectHumanTrackingLock;				// Initialized in Robot.cpp
 
-KINECT_3D_CLOUD_T*	g_KinectPointCloud = NULL;					// Array of 3D points detected by Kinect in TenthInches
+DEPTH_3D_CLOUD_T*	g_KinectPointCloud = NULL;					// Array of 3D points detected by Kinect in TenthInches
 OBJECT_2D_ARRAY_T*	g_pKinectObjects2D = NULL;					// Array of 2D object slices from one scan line
 OBJECT_3D_ARRAY_T*	g_pKinectObjects3D = NULL;					// Array of 3D complete objects detected in the complete capture
+
 KINECT_HUMAN_TRACKING_T g_HumanLocationTracking[KINECT_MAX_HUMANS_TO_TRACK]; // Location of humans being tracked
 int					g_CurrentHumanTracked = 0;					// Current player number of the human currently being tracked (zero if none)
 int					g_LastHumanCompassDirection = -1;			// Direction last human was at
@@ -340,6 +360,7 @@ int					gKinectMoveTimeout = 0;
 int					gKinectDelayTimer = 0;
 int					gKinectOwnerTimer = 0;
 int					gKinectCurrentOwner = KINECT_TILT_OWNER_NONE;
+int					gDepthCameraDelayTimer = 0;
 
 int					gHeadIdleTimer = 0;
 int					gHeadMoveTimeout = 0;
@@ -370,6 +391,10 @@ LPCTSTR				g_pKobukiCommandSharedMemory = NULL;
 HANDLE				g_hKobukiDataEvent;
 LPCTSTR				g_pKobukiDataSharedMemory;
 
+HANDLE				g_hDepthCameraCommandEvent = NULL;
+LPCTSTR				g_pDepthCameraCommandSharedMemory = NULL;
+HANDLE				g_hDepthCameraDataEvent;
+LPCTSTR				g_pDepthCameraDataSharedMemory;
 
 
 SERVER_SOCKET_STRUCT g_ServerSockStruct;
@@ -446,6 +471,7 @@ GPS_MESSAGE_T*		g_pGPSData;				// Initialized in ?
 NavSensorSummary*	g_pNavSensorSummary;	// created in Robot.cpp and initialized in DoSensorFusion().  Values in TENTH INCHES!
 SCANNER_SUMMARY_T*	g_pLaserSummary;		// created in Robot.cpp and initialized in DoSensorFusion()
 SCANNER_SUMMARY_T*	g_pKinectSummary;		// created in Robot.cpp and initialized in DoSensorFusion()
+SCANNER_SUMMARY_T*	g_pDepthCameraSummary;	// created in Robot.cpp and initialized in DoSensorFusion()
 
 
 // Global Utility Functions
@@ -811,6 +837,11 @@ DWORD WINAPI TimerThreadProc( LPVOID NotUsed )
 				{
 					//ROBOT_LOG( TRUE,"GLOBAL gKinectDelayTimer = %ld\n", gKinectDelayTimer)
 					gKinectDelayTimer--;
+				}				
+				if( gDepthCameraDelayTimer != 0 ) 
+				{
+					//ROBOT_LOG( TRUE,"GLOBAL gDepthCameraDelayTimer = %ld\n", gDepthCameraDelayTimer)
+					gDepthCameraDelayTimer--;
 				}				
 
 			}
@@ -2556,6 +2587,151 @@ void LaunchKobukiApp()
 
 
 }
+
+//-----------------------------------------------------------------------------
+// Name: LaunchDepthCameraApp
+// Desc: If enabled, auto-launch the applicaiton that handles Depth Camera input
+// Done as a separate application, so core app can be run debug, while Depth Camera runs in release code (for performance)
+//-----------------------------------------------------------------------------
+
+
+// Shut down the Depth Camera process
+void TerminateDepthCameraApp()
+{
+	#if (AUTO_LAUNCH_DEPTH_CAMERA_APP == 1)
+		TerminateProcess( DepthCameraFWHS.ProcessInfo.hProcess, 0 );
+		CloseHandle( DepthCameraFWHS.ProcessInfo.hProcess ); 
+		CloseHandle( DepthCameraFWHS.ProcessInfo.hThread ); 
+	#endif
+}
+
+void LaunchDepthCameraApp()
+{
+#if ( (ENABLE_DEPTH_CAMERA_APP == 1) && ( ROBOT_SERVER == 1 )  )
+
+	int SecondsToWait = 240;
+    //size_t iMyCounter = 0, iReturnVal = 0, iPos = 0; 
+    DWORD dwExitCode = 0; 
+    //std::wstring sTempStr = L""; 
+	// If need to pass parameters, see example at: http://www.goffconcepts.com/techarticles/development/cpp/createprocess.html
+	// http://msdn.microsoft.com/en-us/library/ms682425(VS.85).aspx
+
+
+	// Initialize Shared Memory and Event for communicating commands to the App
+	HANDLE hMapFile;
+	g_pDepthCameraCommandSharedMemory = NULL;
+
+	hMapFile = CreateFileMapping(
+		INVALID_HANDLE_VALUE,    // use paging file
+		NULL,                    // default security 
+		PAGE_READWRITE,          // read/write access
+		0,                       // max. object size high
+		(sizeof(DEPTH_CAMERA_COMMAND_T)),	// buffer size  
+		_T(DEPTH_CAMERA_COMMAND_SHARED_FILE_NAME) );// name of mapping object
+
+	if (hMapFile == NULL) 
+	{ 
+		ROBOT_LOG( TRUE, "ERROR!  Shared Memory init failed for communicating with DepthCamera App!  Error: %d\n", GetLastError() )
+		return;
+	}
+
+	g_pDepthCameraCommandSharedMemory = (LPTSTR) MapViewOfFile(hMapFile,   // handle to map object
+		FILE_MAP_ALL_ACCESS, // read/write permission
+		0,                   
+		0,                   
+		(sizeof(DEPTH_CAMERA_COMMAND_T)) );           
+
+	if (g_pDepthCameraCommandSharedMemory == NULL) 
+	{ 
+		ROBOT_LOG( TRUE, "Could not map view of file (%d).\n", GetLastError() )
+		CloseHandle(hMapFile);
+		return;
+	}
+
+	// Now, create the event for signaling when a command is sent to the DepthCamera app
+	static BOOL bManualReset = FALSE;
+	static BOOL bInitialState = FALSE; // Not Signaled 
+	g_hDepthCameraCommandEvent = CreateEvent ( NULL, bManualReset, bInitialState, _T(DEPTH_CAMERA_COMMAND_EVENT_NAME) );
+	if ( !g_hDepthCameraCommandEvent ) 
+	{ 
+		ROBOT_LOG( TRUE, "ERROR!  Depth Camera Request Event creation failed!\n" )
+	}
+	SetEvent( g_hDepthCameraCommandEvent );  // Indicate to child process that file mapping is setup
+
+	#if (AUTO_LAUNCH_DEPTH_CAMERA_APP == 1)
+		///////////////////////////////////////////////////////////////////////////////////////////
+		// Launch app if autolaunch enabled.  Disable this, and manually launch the kobuki app when debugging it
+		// CreateProcess API initialization 
+		STARTUPINFO StartupInfo; 
+		PROCESS_INFORMATION ProcessInfo; 
+		memset(&StartupInfo, 0, sizeof(StartupInfo)); 
+		memset(&ProcessInfo, 0, sizeof(ProcessInfo)); 
+		StartupInfo.cb = sizeof(StartupInfo); 
+		memset(&DepthCameraFWHS, 0, sizeof(DepthCameraFWHS)); 
+
+		ROBOT_LOG( TRUE, "\n ==================== Starting DepthCamera App ====================\n" )
+
+		if( !CreateProcess(
+			"C:\\Dev\\Robots\\DepthCameraDS\\Debug\\DepthCameraDS.exe",	//  __in_opt     LPCTSTR lpApplicationName,
+			//"C:\\Dev\\Robots\\DepthCameraDS\\Release\\DepthCameraDS.exe",	//  __in_opt     LPCTSTR lpApplicationName,
+			"",											//  __inout_opt  LPTSTR lpCommandLine,
+			0,											//  __in_opt     LPSECURITY_ATTRIBUTES lpProcessAttributes,
+			0,											//  __in_opt     LPSECURITY_ATTRIBUTES lpThreadAttributes,
+			false,										//  __in         BOOL bInheritHandles,
+			CREATE_DEFAULT_ERROR_MODE,					//  __in         DWORD dwCreationFlags,
+			0,											//  __in_opt     LPVOID lpEnvironment,
+			"C:\\Dev\\Robots\\DepthCameraDS\\Debug",	//  __in_opt     LPCTSTR lpCurrentDirectory,
+			//"C:\\Dev\\Robots\\DepthCameraDS\\Release",	//  __in_opt     LPCTSTR lpCurrentDirectory,
+			&StartupInfo,								// __in         LPSTARTUPINFO lpStartupInfo,
+			&(DepthCameraFWHS.ProcessInfo) )					//  __out        LPPROCESS_INFORMATION lpProcessInformation
+		)
+		{ 
+			/* CreateProcess failed */ 
+			ROBOT_DISPLAY( TRUE, "ERROR: DEPTH_CAMERA CONTROL PROCESS LAUNCH FAILED!  Return Code = %04X", GetLastError() )
+		} 
+	#endif // (AUTO_LAUNCH_DEPTH_CAMERA_APP == 1)
+
+
+
+	// Note: Unlike Kobuki Control or Camera Control modules, this module does not need a tread created,
+// because the Depth Camera Module creates it's own thread for video processing
+	// Allow the DepthCameraControl process to get started a bit.  this is not critical...
+	Sleep(20); 
+
+	//g_hDepthCameraAppSharedMemoryIPCThread = ::CreateThread( NULL, 0, DepthCameraAppSharedMemoryIPCThreadProc, (LPVOID)0, 0, &g_dwDepthCameraAppSharedMemoryIPCThreadId );
+	//ROBOT_LOG( TRUE,  "Created DepthCamera App IPC Thread. ID = (0x%x) (DepthCameraAppSharedMemoryIPCThreadProc)", g_dwDepthCameraAppSharedMemoryIPCThreadId )
+
+
+/*
+	// Wait until child process has created a window
+	ROBOT_LOG( TRUE,  "WAITING FOR PROCESS WINDOW...\n" )
+	DWORD Result = WaitForInputIdle(
+		ProcessInfo.hProcess,	// __in  HANDLE hProcess,
+		(DWORD)30000 );					// __in  DWORD dwMilliseconds
+
+	if( 0 == Result )
+	{
+		ROBOT_LOG( TRUE,  "DONE\n" )
+	}
+	else
+	{
+		ROBOT_LOG( TRUE,  "TIMED OUT!\n" )
+	}
+
+	// Try PostThreadMessage or PostMessage
+	DepthCameraFWHS.hWndFound  = NULL;
+
+	// Enumerate all top level windows on the desktop, and find the itunes one
+	EnumWindows ( EnumWindowCallBack, (LPARAM)&DepthCameraFWHS ) ;
+	*/
+
+//	SendMessage ( DepthCameraFWHS.hWndFound, Msg, wParam, lParam );
+
+#endif  // #if ( (ENABLE_DEPTH_CAMERA_APP == 1) && ( ROBOT_SERVER == 1 ) )
+
+
+}
+
 
 /////////////////////////////////////////////////////////////////////////////
 void ReportCommError(LPTSTR lpszMessage, DWORD dwCommError)

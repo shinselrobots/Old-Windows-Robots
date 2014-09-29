@@ -171,6 +171,7 @@ Setup::~Setup()
 	Sleep(10);
 	g_bRunVidCapThread = FALSE;
 	g_bRunKinectThread = FALSE;
+	g_bRunDepthCameraThread = FALSE;
 
 }
 
@@ -1266,7 +1267,9 @@ void Setup::OpenArduinoPort()
 			{
 				// Loki and Turtle with Arduino REQUIRES Arduino!
 				ROBOT_DISPLAY( TRUE, "Error!! Unable to open Arduino COM Port %s", m_strPicSerialPort )
-				ROBOT_ASSERT(0);
+				AfxMessageBox("Unable to open Arduino COM Port, REQUIRED for Loki!");
+
+				//ROBOT_ASSERT(0);
 			}
 			else
 			{
@@ -2161,10 +2164,10 @@ void Setup::EnableCamera( UINT nCamera, BOOL bEnable )
 	{
 		if( bEnable)
 		{
-			g_Camera[KINECT_DEPTH].FrameSize.cx = KINECT_CAPTURE_SIZE_MAX_X;	// TODO: THIS IS NOT USED, BUT IF WAS IS A BUG! Kinect video size is NOT fixed
-			g_Camera[KINECT_DEPTH].FrameSize.cy = KINECT_CAPTURE_SIZE_MAX_Y;
-			g_Camera[KINECT_VIDEO].FrameSize.cx = KINECT_CAPTURE_SIZE_MAX_X;
-			g_Camera[KINECT_VIDEO].FrameSize.cy = KINECT_CAPTURE_SIZE_MAX_Y;
+			g_Camera[KINECT_DEPTH].FrameSize.cx = DEPTH_CAPTURE_SIZE_MAX_X;	// TODO: THIS IS NOT USED, BUT IF WAS IS A BUG! Kinect video size is NOT fixed
+			g_Camera[KINECT_DEPTH].FrameSize.cy = DEPTH_CAPTURE_SIZE_MAX_Y;
+			g_Camera[KINECT_VIDEO].FrameSize.cx = DEPTH_CAPTURE_SIZE_MAX_X;
+			g_Camera[KINECT_VIDEO].FrameSize.cy = DEPTH_CAPTURE_SIZE_MAX_Y;
 			g_Camera[KINECT_DEPTH].DisplaySize = GetFrameSize(GetDocument()->m_KinectDisplaySizeSelected);
 			g_Camera[KINECT_VIDEO].DisplaySize = GetFrameSize(GetDocument()->m_KinectDisplaySizeSelected);
 			g_Camera[KINECT_DEPTH].Flip = GetDocument()->m_bEnableKinectVideoFlip;

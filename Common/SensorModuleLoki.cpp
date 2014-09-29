@@ -246,6 +246,13 @@ static char THIS_FILE[] = __FILE__;
 			}
 		}
 
+
+
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// Get Depth Camera sensor data, if exists.  May be overridden by other sensors later
+		// TODO: g_pDepthCameraSummary
+
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Get Kinect sensor data, if the Kinect exists.  May be overridden by other sensors later
 		// Note that Kinect data is in tenth inches, but other sensor are in inches (due to low resoluton)

@@ -123,6 +123,9 @@ enum WM_ROBOT_MESSAGES {
 		WM_ROBOT_KINECT_TRACK_OBJECT_CMD,			// 
 		WM_ROBOT_KINECT_CANCEL_CMD,					// wParam:  N/A - Cancel any pending search / track work
 
+		WM_ROBOT_DEPTH_CAMERA_SEARCH_FLOOR_CMD,		// wParam:  TRUE = Find Close Objects Only
+		WM_ROBOT_DEPTH_CAMERA_TRACK_OBJECT_CMD,		// 
+		WM_ROBOT_DEPTH_CAMERA_CANCEL_CMD,			// wParam:  N/A - Cancel any pending search / track work
 
 		WM_ROBOT_FIND_OBJECT_AT_XYZ_CMD,			// wParam = X,Z, lParam = Y -- point to XYZ position in space (Y is dist from robot)
 		WM_ROBOT_SLAM_CHECK_CMD,					// wParam n/a, lParam n/a
@@ -176,6 +179,7 @@ enum WM_ROBOT_MESSAGES {
 
 		WM_ROBOT_LASER_SCAN_DATA_READY,				// from LaserScannerParser
 		WM_ROBOT_KINECT_SEARCH_COMPLETE,			// wParam = ObjectFound (T/F)
+		WM_ROBOT_DEPTH_CAMERA_SEARCH_COMPLETE,			// wParam = ObjectFound (T/F)
 
 		// Bulk Commands from Remote GUI
 		WM_ROBOT_TEXT_MESSAGE_TO_SERVER,			
@@ -226,7 +230,8 @@ enum SERVER_RESPONSE_MESSAGES {
 		ROBOT_RESPONSE_DRIVE_MODULE_OWNER,	
 		ROBOT_RESPONSE_MOTOR_SPEED,					// From the ER1 Pilot controller
 		ROBOT_RESPONSE_LASER_SCANNER_DATA,		
-		ROBOT_RESPONSE_KINECT_DATA		
+		ROBOT_RESPONSE_KINECT_DATA,
+		ROBOT_RESPONSE_DEPTH_CAMERA_DATA,
 }; // SERVER_RESPONSE_MESSAGES
 
 
@@ -298,44 +303,45 @@ enum SET_ACTION_CMD {
 };
 
 // Tasks needed to accomplish actions
-#define TASK_NONE							0x00	// No Tasks Pending
-#define TASK_GO_TO_LOCATION					0x01	//
-#define TASK_OPEN_DOOR						0x02	//
-#define TASK_CLOSE_DOOR						0x03	//
-#define TASK_OPEN_FRIDGE_DOOR				0x04	//
-#define TASK_CLOSE_FRIDGE_DOOR				0x05	//
-#define TASK_GET_BEER						0x06	//
-#define TASK_RETURN_TO_START				0x07	//
-#define TASK_FIND_HUMAN						0x08	//
-#define TASK_PERFORM_KARATE					0x09	//
+#define TASK_NONE									0x00	// No Tasks Pending
+#define TASK_GO_TO_LOCATION							0x01	//
+#define TASK_OPEN_DOOR								0x02	//
+#define TASK_CLOSE_DOOR								0x03	//
+#define TASK_OPEN_FRIDGE_DOOR						0x04	//
+#define TASK_CLOSE_FRIDGE_DOOR						0x05	//
+#define TASK_GET_BEER								0x06	//
+#define TASK_RETURN_TO_START						0x07	//
+#define TASK_FIND_HUMAN								0x08	//
+#define TASK_PERFORM_KARATE							0x09	//
 
 // Tasks for picking up objects
-#define OBJECT_TASK_NONE					0x00	// No Tasks Pending
 #define OBJECT_TASK_SCAN_FLOOR_FOR_CLOSEST_OBJECT	0x01	//
-#define OBJECT_TASK_PICK_UP_OBJECT			0x02
-#define OBJECT_TASK_LOOK_WHILE_MOVING		0x03	//
-#define OBJECT_TASK_CLOSE_SCAN_FOR_OBJECT	0x04	//
-#define OBJECT_TASK_MOVE_TO_OBJECT			0x05	//
-#define OBJECT_TASK_DONE					0x06	//
+#define OBJECT_TASK_PICK_UP_OBJECT					0x02
+#define OBJECT_TASK_LOOK_WHILE_MOVING				0x03	//
+#define OBJECT_TASK_CLOSE_SCAN_FOR_OBJECT			0x04	//
+#define OBJECT_TASK_MOVE_TO_OBJECT					0x05	//
+#define OBJECT_TASK_DONE							0x06	//
 
 // Kinect Module Task states
-#define OBJECT_TASK_NONE					0x00	// No Tasks Pending
 #define KINECT_TASK_SCAN_FLOOR_FOR_CLOSEST_OBJECT	0x01	//
-#define KINECT_TASK_TRACK_CLOSEST_OBJECT	0x02	//
-#define KINECT_TASK_HUMAN_DETECTION			0x03	// Kinect can be in either Object or Human search/track mode
+#define KINECT_TASK_TRACK_CLOSEST_OBJECT			0x02	//
+#define KINECT_TASK_HUMAN_DETECTION					0x03	// Kinect can be in either Object or Human search/track mode
+
+// Depth Camera Module Task states
+#define DEPTH_CAMERA_TASK_SCAN_FLOOR_FOR_CLOSEST_OBJECT	0x01	//
+#define DEPTH_CAMERA_TASK_TRACK_CLOSEST_OBJECT		0x02	//
 
 // Script Task states
-#define OBJECT_TASK_NONE					0x00	// No Tasks Pending
-#define SCRIPT_TASK_OPEN_FILE				0x01	// Open the script file
-#define SCRIPT_TASK_RUN_SCRIPT				0x02	// Run the script
-#define SCRIPT_TASK_CLEAN_UP				0x03	// Close file, cleanup, and exit task
+#define SCRIPT_TASK_OPEN_FILE						0x01	// Open the script file
+#define SCRIPT_TASK_RUN_SCRIPT						0x02	// Run the script
+#define SCRIPT_TASK_CLEAN_UP						0x03	// Close file, cleanup, and exit task
 
 
 // Turn Handle States
-#define TURN_HANDLE_STATE_NONE				0x00
-#define ARM_TURN_HANDLE_STATE_IN_PROGRESS	0x01
-#define TURN_HANDLE_STATE_SUCCESS			0x02
-#define TURN_HANDLE_STATE_FAIL				0x03
+#define TURN_HANDLE_STATE_NONE						0x00
+#define ARM_TURN_HANDLE_STATE_IN_PROGRESS			0x01
+#define TURN_HANDLE_STATE_SUCCESS					0x02
+#define TURN_HANDLE_STATE_FAIL						0x03
 
 
 
@@ -773,7 +779,6 @@ enum SERVO_GROUP {
 #define LASER_RANGEFINDER_MAX_SCAN_LINES		    4		// Max number of scan lines to store for analysis
 #define LASER_RANGEFINDER_MAX_OBJECT_LINES		  100		// Max number of object scan lines to store for analysis (up to one sample per 1/2 inch for 4 feet)
 
-
 #define KINECT_MM_MAX							 4096 		// Kinect max range = 4096 mm, or 13.4 feet (at least the PC version,  XBox version might be more?) 
 #define KINECT_RANGE_TENTH_INCHES_MAX			 1560		// = 13.0 feet, just under sensor limit of 161 inches (13.4 feet)
 #define KINECT_RANGE_TENTH_INCHES_ERROR			 1570		// Bad Reading, ignore
@@ -782,6 +787,15 @@ enum SERVO_GROUP {
 #define KINECT_MAX_SAMPLES						 2047		// Max number of samples per scan from URG-04LX Laser Scanner
 #define KINECT_MAX_SCAN_LINES					   16		// Max number of scan lines to store for analysis
 #define KINECT_MAX_OBJECT_LINES					  100		// Max number of object scan lines to store for analysis (up to one sample per 1/2 inch for 4 feet)
+
+#define DEPTH_CAMERA_MM_MAX						 4096 		// Kinect max range = 4096 mm, or 13.4 feet (at least the PC version,  XBox version might be more?) 
+#define DEPTH_CAMERA_RANGE_TENTH_INCHES_MAX		 1560		// = 13.0 feet, just under sensor limit of 161 inches (13.4 feet)
+#define DEPTH_CAMERA_RANGE_TENTH_INCHES_ERROR	 1570		// Bad Reading, ignore
+#define DEPTH_CAMERA_DEGREES_PER_STEP_X		0.3515625		// TODO Horizontal degrees per pixel step calculation: ????
+#define DEPTH_CAMERA_DEGREES_PER_STEP_Y		0.3515625		// TODO Horizontal degrees per pixel step calculation: ????
+#define DEPTH_CAMERA_MAX_SAMPLES				 2047		// Max number of samples per scan from URG-04LX Laser Scanner
+#define DEPTH_CAMERA_MAX_SCAN_LINES				   16		// Max number of scan lines to store for analysis
+#define DEPTH_CAMERA_MAX_OBJECT_LINES			  100		// Max number of object scan lines to store for analysis (up to one sample per 1/2 inch for 4 feet)
 
 
 //#define IR_RAW_MAX							 255

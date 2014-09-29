@@ -13,6 +13,8 @@ mkdir ..\Backups\%date:~-4,4%-%date:~-10,2%-%date:~7,2%-Backup\RobotCamera
 mkdir ..\Backups\%date:~-4,4%-%date:~-10,2%-%date:~7,2%-Backup\RobotCamera\RobotCamera
 mkdir ..\Backups\%date:~-4,4%-%date:~-10,2%-%date:~7,2%-Backup\KobukiControl
 mkdir ..\Backups\%date:~-4,4%-%date:~-10,2%-%date:~7,2%-Backup\KobukiControl\KobukiControl
+mkdir ..\Backups\%date:~-4,4%-%date:~-10,2%-%date:~7,2%-Backup\DepthCameraDS
+mkdir ..\Backups\%date:~-4,4%-%date:~-10,2%-%date:~7,2%-Backup\DepthCameraDS\DepthCameraDS
 
 
 @Echo Copying Common Folders...
@@ -40,6 +42,9 @@ xcopy .\RobotCamera\FaceData         ..\Backups\%date:~-4,4%-%date:~-10,2%-%date
 
 xcopy .\KobukiControl		     ..\Backups\%date:~-4,4%-%date:~-10,2%-%date:~7,2%-Backup\KobukiControl	    	    /H/R/I/G/K/Y  
 xcopy .\KobukiControl\KobukiControl  ..\Backups\%date:~-4,4%-%date:~-10,2%-%date:~7,2%-Backup\KobukiControl\KobukiControl   /H/R/I/G/K/Y  
+
+xcopy .\DepthCameraDS		     ..\Backups\%date:~-4,4%-%date:~-10,2%-%date:~7,2%-Backup\DepthCameraDS	            /H/R/I/G/K/Y  
+xcopy .\DepthCameraDS\DepthCameraDS  ..\Backups\%date:~-4,4%-%date:~-10,2%-%date:~7,2%-Backup\DepthCameraDS\DepthCameraDS   /H/R/I/G/K/Y  
 
 @Echo ---------------------------------------------------------------
 @ECHO Done!

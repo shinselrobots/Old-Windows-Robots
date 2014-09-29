@@ -947,6 +947,8 @@ OLD -----------------
 //	#define CAMERA_TILT_TENTHDEGREES_REST_LIMIT				(  30 * 10)		// Max tilt when in Rest position
 //	#define CAMERA_NECK_TENTHDEGREES_PAN_ENABLE_POSITION	( -60 * 10)		// Don't allow PAN if head further back then this!
 
+	#define DEPTH_CAMERA_TILT_LOOKING_AT_FLOOR				(-200) // KinectTiltTenthDegrees
+
 
 // Misc stuff
 

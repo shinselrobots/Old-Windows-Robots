@@ -246,17 +246,17 @@ enum CAMERA_STATE {
 #if (CAMERA_WINDOW_DISPLAY_SIZE_LARGE == TRUE)
 	#define CAMERA_WINDOW_DISPLAY_SIZE_X			640
 	#define CAMERA_WINDOW_DISPLAY_SIZE_Y			480
-	#define KINECT_WINDOW_DISPLAY_SIZE_X			640
-	#define KINECT_WINDOW_DISPLAY_SIZE_Y			480
+	#define DEPTH_WINDOW_DISPLAY_SIZE_X			640
+	#define DEPTH_WINDOW_DISPLAY_SIZE_Y			480
 #else
 	#define CAMERA_WINDOW_DISPLAY_SIZE_X			320
 	#define CAMERA_WINDOW_DISPLAY_SIZE_Y			240
-	#define KINECT_WINDOW_DISPLAY_SIZE_X			320
-	#define KINECT_WINDOW_DISPLAY_SIZE_Y			240
+	#define DEPTH_WINDOW_DISPLAY_SIZE_X			320
+	#define DEPTH_WINDOW_DISPLAY_SIZE_Y			240
 #endif
 
-#define KINECT_CAPTURE_SIZE_MAX_X					640
-#define KINECT_CAPTURE_SIZE_MAX_Y					480
+#define DEPTH_CAPTURE_SIZE_MAX_X					640
+#define DEPTH_CAPTURE_SIZE_MAX_Y					480
 
 
 
@@ -692,9 +692,9 @@ typedef struct
 #define LASER_SCAN_MAX_3D_OBJECTS			  32  
 
 
-// Kinect Object detection limits 
-#define KINECT_SCAN_MAX_2D_OBJECTS			 255	// max 2D object slices that can be found by the laser scanner LookForObjects function
-#define KINECT_SCAN_MAX_3D_OBJECTS			  32  
+// Kinect and other Depth Camera Object detection limits 
+#define DEPTH_SCAN_MAX_2D_OBJECTS			 255	// max 2D object slices that can be found by the laser scanner LookForObjects function
+#define DEPTH_SCAN_MAX_3D_OBJECTS			  32  
 
 
 // Laser Object 2D data
@@ -770,11 +770,11 @@ typedef struct
 	int			CompassHeading;							// Heading of robot at the time of the laser scanscanner
 	int			FrameSizeX;
 	int			FrameSizeY;
-	POINT2D_T	MapPoints2D[KINECT_CAPTURE_SIZE_MAX_X];		// 2D map of objects in X,Y from front center of Robot
-	POINT2D_T	WallPoints[KINECT_CAPTURE_SIZE_MAX_X];		// Wall distance X,Y from front center of Robot (ignores low objects)
-	POINT3D_T	Point3dArray[KINECT_CAPTURE_SIZE_MAX_Y][KINECT_CAPTURE_SIZE_MAX_X];	// 3D values in TenthInches
+	POINT2D_T	MapPoints2D[DEPTH_CAPTURE_SIZE_MAX_X];		// 2D map of objects in X,Y from front center of Robot
+	POINT2D_T	WallPoints[DEPTH_CAPTURE_SIZE_MAX_X];		// Wall distance X,Y from front center of Robot (ignores low objects)
+	POINT3D_T	Point3dArray[DEPTH_CAPTURE_SIZE_MAX_Y][DEPTH_CAPTURE_SIZE_MAX_X];	// 3D values in TenthInches
 
-} KINECT_3D_CLOUD_T;
+} DEPTH_3D_CLOUD_T;
 
 
 // TODO - REMOVE THIS - DEBUG ONLY!!!
@@ -980,6 +980,13 @@ void TerminateCameraApp();
 void LaunchKobukiApp();
 void TerminateKobukiApp();
 
+//-----------------------------------------------------------------------------
+// Name: LaunchDepthCameraApp
+// Desc: If enabled, auto-launch the applicaiton that handles Depth Camera input
+// Done as a separate application, so core app can be run debug, while Depth Camera runs in release code (for performance)
+//-----------------------------------------------------------------------------
+void TerminateDepthCameraApp();
+void LaunchDepthCameraApp();
 
 //-----------------------------------------------------------------------------
 void ReportCommError( LPTSTR lpszMessage, DWORD dwCommError );
@@ -1007,6 +1014,7 @@ extern FullSensorStatus*	g_pFullSensorStatus;			// Current status of all sensors
 extern NavSensorSummary*	g_pNavSensorSummary;
 extern SCANNER_SUMMARY_T*	g_pLaserSummary;
 extern SCANNER_SUMMARY_T*	g_pKinectSummary;
+extern SCANNER_SUMMARY_T*	g_pDepthCameraSummary;
 
 extern HWND					g_RobotMainFrameHWND;			// Handle to main frame, for Joystick
 extern HWND					g_RobotCmdViewHWND;				// Handle for posting messages to Command window
@@ -1017,6 +1025,7 @@ extern HWND					g_RobotSetupViewHWND;			// Handle for posting messages to Setup 
 extern BOOL					g_bRunThread;					// When FALSE, tells all threads to exit
 extern BOOL					g_bRunVidCapThread;				// When FALSE, tells Vidcap thread to exit
 extern BOOL					g_bRunKinectThread;				// When FALSE, tells Kinect thread to exit
+extern BOOL					g_bRunDepthCameraThread;		// When FALSE, tells Depth Camera thread to exit
 
 // Global Pause and Power Control - Allows pausing or powering on/off subsystems instantly
 extern BOOL					g_SleepMode;					// Power on by default, unless in lowpower "sleep mode"
@@ -1033,6 +1042,7 @@ extern BOOL					g_StopSpeechBehavior;			// Cancels any complex speech behavior i
 
 extern HANDLE				g_hSpeechRecoEvent;				// Synchronization between C# app and C++ for Speech recognition
 extern HANDLE				g_hKinectDepthReadyEvent;		// Synchronization between C# app and C++ for when depth data is ready
+extern HANDLE				g_hDepthFrameReadyEvent;		// Synchronization between depth camera app and robot control for when depth data is ready
 extern BOOL					g_SpeechRecoBlocked;			// When enabled, blocks all speech recognition by the C++ code, including "Stop". 
 															// Used when arm motors are moving due to noise picked by Kinect
 
@@ -1044,6 +1054,7 @@ extern HANDLE				g_hSoundThread;
 extern HANDLE				g_hSpeakThread;
 extern HANDLE				g_hCameraVidCapThread;
 extern HANDLE				g_hKinectThread;
+extern HANDLE				g_hDepthCameraThread;
 extern HANDLE				g_hTimerThread;
 extern HANDLE				g_hSmartServoThread;
 
@@ -1060,18 +1071,20 @@ extern HANDLE				g_hGPSThread;
 extern HANDLE				g_hiRobotReadThread;	// Read thread for iRobot Base.  The write thread is g_dwMotorCommThreadId
 extern HANDLE				g_hKinectNuiThread;
 //extern HANDLE				g_hEvNuiProcessStop;
-extern HANDLE				g_hKinectAppSharedMemoryIPCThread;
+extern HANDLE				g_hKinectAppSharedMemoryIPCThread; // TODO- REMOVE THIS GLOBAL!
 extern HANDLE				g_hCameraAppSharedMemoryIPCThread;
 extern HANDLE				g_hKobukiAppSharedMemoryIPCThread;
+extern HANDLE				g_hDepthCameraAppSharedMemoryIPCThread;
 
 extern DWORD				g_dwControlThreadId;	// Control Thread for communicating to hardware
 extern DWORD				g_dwSoundThreadId;		// Thread for playing sounds
 extern DWORD				g_dwSpeakThreadId;			// Thread for processing AI input
 extern DWORD				g_dwCameraVidCapThreadId;	// Thread for camera object recognition
 extern DWORD				g_dwServerSendThreadId;	// For sending messages to the client Socket thread
-extern DWORD				g_dwKinectAppSharedMemoryIPCThreadId;	// Thread for shared memory access between managed C# and C++ processes
-extern DWORD				g_dwCameraAppSharedMemoryIPCThreadId;	// Thread for shared memory access between managed C# and C++ processes
-extern DWORD				g_dwKobukiAppSharedMemoryIPCThreadId;	// Thread for shared memory access between managed C# and C++ processes
+extern DWORD				g_dwKinectAppSharedMemoryIPCThreadId;	// Thread for shared memory
+extern DWORD				g_dwCameraAppSharedMemoryIPCThreadId;	// Thread for shared memory 
+extern DWORD				g_dwKobukiAppSharedMemoryIPCThreadId;	// Thread for shared memory access
+extern DWORD				g_dwDepthCameraAppSharedMemoryIPCThreadId;	// Thread for shared memory access
 
 
 // System Status
@@ -1147,6 +1160,13 @@ extern int 					g_LaserScansRemaining;				// Number of scans remaining when lase
 extern LASER_SCANNER_STATE_T g_LaserScannerState;
 extern LASER_SCANNER_DATA_T* g_pLaserScannerData;
 
+// For Depth Camera
+extern CRITICAL_SECTION		g_csDepthCameraSummaryDataLock;			// Initialized in Robot.cpp 
+extern CRITICAL_SECTION		g_csDepthCameraPointCloudLock;			// Initialized in Robot.cpp 
+
+extern OBJECT_2D_ARRAY_T*	g_pDepthCameraObjects2D;			// Array of 2D object slices from one scan line
+extern OBJECT_3D_ARRAY_T*	g_pDepthCameraObjects3D;			// Array of 3D complete objects detected in the complete capture
+extern DEPTH_3D_CLOUD_T*	g_DepthCameraPointCloud;			// Array of 3D points detected by Depth Camera in TenthInches
 
 // For Kinect
 extern CRITICAL_SECTION		g_csKinectSummaryDataLock;			// Initialized in Robot.cpp 
@@ -1155,7 +1175,8 @@ extern CRITICAL_SECTION		g_csKinectHumanTrackingLock;		// Initialized in Robot.c
 
 extern OBJECT_2D_ARRAY_T*	g_pKinectObjects2D;					// Array of 2D object slices from one scan line
 extern OBJECT_3D_ARRAY_T*	g_pKinectObjects3D;					// Array of 3D complete objects detected in the complete capture
-extern KINECT_3D_CLOUD_T*	g_KinectPointCloud;					// Array of 3D points detected by Kinect in TenthInches
+extern DEPTH_3D_CLOUD_T*	g_KinectPointCloud;					// Array of 3D points detected by Kinect in TenthInches
+
 extern KINECT_HUMAN_TRACKING_T g_HumanLocationTracking[KINECT_MAX_HUMANS_TO_TRACK]; // Locations of humans being tracked
 extern int					g_CurrentHumanTracked;				// Current player number of the human currently being tracked (zero if none)
 extern int					g_LastHumanCompassDirection;		// Direction last human was at
@@ -1203,6 +1224,7 @@ extern int					gKinectMoveTimeout;
 extern int					gKinectDelayTimer;
 extern int					gKinectOwnerTimer;
 extern int					gKinectCurrentOwner;
+extern int					gDepthCameraDelayTimer;
 
 extern int					gHeadIdleTimer;
 extern int					gHeadMoveTimeout;
@@ -1234,6 +1256,10 @@ extern LPCTSTR				g_pKobukiCommandSharedMemory;
 extern HANDLE				g_hKobukiDataEvent;
 extern LPCTSTR				g_pKobukiDataSharedMemory;
 
+extern HANDLE				g_hDepthCameraCommandEvent;
+extern LPCTSTR				g_pDepthCameraCommandSharedMemory;
+extern HANDLE				g_hDepthCameraDataEvent;
+extern LPCTSTR				g_pDepthCameraDataSharedMemory;
 
 extern SERVER_SOCKET_STRUCT g_ServerSockStruct;
 extern CString				g_ScriptToRun;			// For sending the name of a script from GUI to Behavior Module

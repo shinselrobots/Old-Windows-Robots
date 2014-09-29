@@ -1,8 +1,10 @@
 // KobukiCommon.h
 // Common defines used by Robot and KobukiControl process
 // KobukiControl runs in it's own process, because driver only support non-debug
-#ifndef __ROBOT_KOBUKI_SHARED_PARAMS_H__
-#define __ROBOT_KOBUKI_SHARED_PARAMS_H__
+#pragma once
+
+//#ifndef __ROBOT_KOBUKI_SHARED_PARAMS_H__
+//#define __ROBOT_KOBUKI_SHARED_PARAMS_H__
 
 #define KOBUKI_STATUS_SHARED_FILE_NAME	"RobotKobukiStatusMappingObject"
 #define KOBUKI_COMMAND_SHARED_FILE_NAME	"RobotKobukiCommandMappingObject"
@@ -185,4 +187,4 @@ ox10 for FAR_LEFT state
 //////////////////////////////////////////////////
 
 
-#endif // __ROBOT_KOBUKI_SHARED_PARAMS_H__
+//#endif // __ROBOT_KOBUKI_SHARED_PARAMS_H__

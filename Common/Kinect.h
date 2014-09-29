@@ -28,18 +28,6 @@
 #include "DrawDevice.h"
 
 
-// Calculaiton of Kinect Field Of View (FOV) in degrees
-// Robot at 36.0" from wall:  
-// Depth Camera FOV width = 38.0", height = 28.8"
-// Video Camera FOV width = 43.0", height = 32.0"
-// ArcTan = Opp/Adj. Opp = 1/2 width or height (to form right triangle)
-// In Excell:  =(DEGREES(ATAN( (C8/B8) ))) * 2
-// Now, adjust values as needed to compensate for mechanical position
-#define KINECT_DEPTH_FOV_X	 93.10 	// 93.10 calculated.
-#define KINECT_DEPTH_FOV_Y	 77.32 	// 77.32 calculated.
-#define KINECT_VIDEO_FOV_X	100.13 	// 100.13 calculated.
-#define KINECT_VIDEO_FOV_Y	 83.27	// 83.27 calculated.
-
 #if ( KINECT_SDK_TYPE == KINECT_MICROSOFT_BETA )
 
 	/////////////////////////////////////////////////////////////////////////////

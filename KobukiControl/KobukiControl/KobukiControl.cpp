@@ -685,13 +685,8 @@ int _tmain(int argc, _TCHAR* argv[])
 
 			}
 
-
-			// TODO - Get Status
-			//ecl::Pose2D<double> pose;
-			//pose = KobukiManager.getPose();
-			//std::cout << "current pose: [" << pose.x() << ", " << pose.y() << ", " << pose.heading() << "]" << std::endl;
-
-			//TODO - Put status into shared memory
+			// Note: Sensor data is collected and sent to the Robot control process via shared memory
+			// in the processStreamData() function.
 
 			Sleep(50);  // tune this to adjust update rate and avoid over saturating the CPU
 
@@ -704,13 +699,14 @@ int _tmain(int argc, _TCHAR* argv[])
 	}
 
 
-  std::cout << "Exiting..." << std::endl;
-  // TODO  - DISABLED FOR NOW.  Turns off the display, and it does not turn back on!
-  //  KobukiManager.SetPower( 0 ); // Turn off all external power (Kinect, Servos, etc.)
-  SAFE_DELETE(LastCommand);
+	// Handle shut down clean up
+	std::cout << "Exiting..." << std::endl;
+	// TODO  - DISABLED FOR NOW.  Turns off the display, and it does not turn back on!
+	//  KobukiManager.SetPower( 0 ); // Turn off all external power (Kinect, Servos, etc.)
+	SAFE_DELETE(LastCommand);
 
-  Sleep(1000); // for debugging
-  return 0;
+	Sleep(1000); // for debugging
+	return 0;
 
 }
 

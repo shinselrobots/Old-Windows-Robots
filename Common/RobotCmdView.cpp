@@ -190,8 +190,9 @@ CRobotCmdView::~CRobotCmdView()
 
 	// Shut down the Kinect C# process, and OpenCV Camera capture process
 	//TerminateKinectApp(); - shuts down with threads
-	TerminateCameraApp();
-	TerminateKobukiApp();	// if started
+	TerminateDepthCameraApp();	// if started
+	TerminateCameraApp();		// if started
+	TerminateKobukiApp();		// if started
 
 	// delete allocated stuff
 	//delete m_pArmControlDlg;

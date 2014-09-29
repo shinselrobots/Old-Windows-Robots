@@ -42,6 +42,9 @@ void SimulateHardware( DWORD Cmd, DWORD Param1, DWORD Param2 ); // Implemented i
 #define KINECT_FIND_OBJECTS_REQUEST_CONTINUOUS	 1024	
 #define KINECT_FIND_OBJECTS_REQUEST_RETRIES		    3	// Number of frames to view trying to find an object
 
+#define DEPTH_CAMERA_FIND_OBJECTS_REQUEST_CONTINUOUS	 1024	
+#define DEPTH_CAMERA_FIND_OBJECTS_REQUEST_RETRIES		    3	// Number of frames to view trying to find an object
+
 // Generic strings to mark ITT brackets on state machine case statements
 extern __itt_string_handle* pshCase1;
 extern __itt_string_handle* pshCase2;
@@ -87,6 +90,38 @@ enum KINECT_FLOOR_SCAN_STATES {
 
 
 
+///////////////////////////////////////////////////////////////////////////////
+// DEPTH CAMERA STUFF
+enum DEPTH_CAMERA_POSITIONS { 
+		DEPTH_CAMERA_SERVO_POSITION_CLOSE_SCAN = 0, 
+		DEPTH_CAMERA_SERVO_POSITION_MID_SCAN,
+		DEPTH_CAMERA_SERVO_POSITION_FAR_SCAN,
+		DEPTH_CAMERA_SERVO_POSITION_CENTER,
+		DEPTH_CAMERA_SERVO_POSITION_LOOK_UP
+};
+enum DEPTH_CAMERA_SERVO_MOVE_STATUS { 
+		DEPTH_CAMERA_SERVO_MOVING = 0, 
+		DEPTH_CAMERA_SERVO_SUCCESS,
+		DEPTH_CAMERA_SERVO_TIMED_OUT
+};
+const int DEPTH_CAMERA_FLOOR_SCAN_POSITION[] = {
+   (  -60 * 10),	//  -58 degrees -  DEPTH_CAMERA_SERVO_POSITION_CLOSE_SCAN (closest possible to Robot body)
+   (  -40 * 10),	//  -40 degrees -  DEPTH_CAMERA_SERVO_POSITION_MID_SCAN - Floor Far Scan
+   (  -22 * 10),	//  -22 degrees -  DEPTH_CAMERA_SERVO_POSITION_FAR_SCAN - Floor Far Scan
+   (  0),			//    0 degrees	- DEPTH_CAMERA_SERVO_POSITION_CENTER - looking straight forward
+   (   30 * 10)	//  +30 degrees -  DEPTH_CAMERA_SERVO_POSITION_LOOK_UP - Looking up at people (not used?)
+};
+
+
+enum DEPTH_CAMERA_FLOOR_SCAN_STATES {
+		DEPTH_CAMERA_FLOOR_SCAN_MOVE_ARMS_STATE	= 1,
+		DEPTH_CAMERA_FLOOR_SCAN_START_SEARCH_STATE,
+		DEPTH_CAMERA_FLOOR_SCAN_WAIT_SEARCH_STATE,
+		DEPTH_CAMERA_FLOOR_SCAN_OBJECT_FOUND_STATE,
+		DEPTH_CAMERA_FLOOR_SCAN_PICKING_UP_OBJECT_STATE,
+};
+
+// COMMON TO BOTH KINECT AND DEPTH CAMERA
 typedef struct
 {
 	int		CenterX;	// current average center
@@ -111,10 +146,10 @@ typedef struct
 typedef struct
 {
 	int						nObjectsDetected;
-	TEMP_OBJECT_3D_T		Object[KINECT_SCAN_MAX_3D_OBJECTS];
+	TEMP_OBJECT_3D_T		Object[DEPTH_SCAN_MAX_3D_OBJECTS];
 } TEMP_OBJECT_3D_ARRAY_T;
 
-//#define KINECT_FLOOR_SCAN_POSITION_1		(  -65 * 10)	//  -65 degrees
+//#define DEPTH_CAMERA_FLOOR_SCAN_POSITION_1		(  -65 * 10)	//  -65 degrees
 
 
 
@@ -929,10 +964,10 @@ protected:
 // class CKinectModule
 
 
-const int ControlFlag_None = 0;
-const int ControlFlag_DisplayBoundingBox = 1;
-const int ControlFlag_HidePlayers = 2;
-const int ControlFlag_All = 3;				// enables all flags
+const int KinectControlFlag_None = 0;
+const int KinectControlFlag_DisplayBoundingBox = 1;
+const int KinectControlFlag_HidePlayers = 2;
+const int KinectControlFlag_All = 3;				// enables all flags
 
 typedef struct
 {
@@ -948,7 +983,7 @@ typedef struct
 	int MouseDown;
 	int MouseX;
 	int MouseY;
-	short DepthData[MAX_DEPTH_DATA_SIZE];
+	short DepthData[MAX_KINECT_DEPTH_DATA_SIZE];
 
 } KINECT_DATA_T; // Must match struct in Managed code!
 
@@ -1060,10 +1095,124 @@ protected:
 #endif
 	TEMP_OBJECT_3D_ARRAY_T  *m_pKinectTempObjects3D;
 
-
-///////////////////////////////////////////////////////////////////////
 };
 
+
+/////////////////////////////////////////////////////////////////////////////
+// class CDepthCameraModule
+
+
+class CDepthCameraModule : public CRobotModule
+{
+
+public:
+
+	CDepthCameraModule( CDriveControlModule *pDriveControlModule );
+	~CDepthCameraModule();
+
+public:
+	void	ProcessMessage( UINT uMsg, WPARAM wParam, LPARAM lParam );
+	void	FindObjectsOnFloorRequest( int NumberOfTries );		// Queue up requests to find objects on the floor
+	void	FindObjectsOnFloor();							// finds 3D objects.  Assumes depth camera is pointing down at the floor
+	void	FindObjectsInSingleScanLine( int  ScanLine, int NumberOfSamples, OBJECT_2D_ARRAY_T* pDepthObjects2D );
+	void	FindWallsAnd2dMaps();
+	void	UpdateDepthCameraObjectSummary();
+	BOOL	OpenMemoryMappedFile();
+
+	// Helper functions.  Left camera is used for most operations
+//	int		GetFrameWidth(IplImage*	pVideoFrame) { return pVideoFrame->width; }
+//	int		GetFrameHeight() { return m_pVideoFrameLeft->height; }
+//	CvSize	GetFrameSize()	 { return cvGetSize(m_pVideoFrameLeft); }
+
+//	CvPoint	GetFrameCenter(IplImage* pVideoFrame)	// Need to specify Left or Right Frame
+//		{ return cvPoint( (pVideoFrame->width /2), (pVideoFrame->height /2) ); }
+
+//	double	GetFrameAspectRatio(IplImage* pVideoFrame)
+//		{ return ( (double)pVideoFrame->height/(double)pVideoFrame->width ); }
+
+
+	// Depth Frame
+	void	ShowDepthFrame( );
+	void	GetDepthImage();
+	RGBQUAD ZValueToColor( int Zvalue ); // for debugging Z Depth on floor
+
+
+///	void	ProcessVideoFrames( );
+	void	GetControlCommand();
+	void	MoveDepthWindow();
+	void	MoveVideoWindow();
+///	void	PositionCamera( int nOwner, CvPoint CameraPanTiltPoint );
+///	int		WindowPosX( IplImage* pInputFrame );
+///	void	CopyImage( IplImage* pInputFrame, IplImage* pOutputFrame );
+
+
+public:
+
+	// Mouse Target State
+	CvPoint					m_OpenCVDepthMousePoint;
+	BOOL					m_OpenCVDepthMousePointSelected;	// OpenCV window in the C++ app
+	BOOL					m_DepthCameraWindowMousePointSelected;	// Window in the depth camera app
+	// Image info
+	//CvSize					m_CaptureSize; USE: m_FrameInfo->Height
+	CvSize					m_DisplaySize;
+
+	// Working Images
+	int 					m_FrameNumber;
+//	IplImage*				m_pDepthFrame;	// Working copy of current Depth frame
+//	IplImage*				m_pVideoFrame;	// Working copy of current Video frame
+//	IplImage*				m_pDepthDisplayFrame;
+//	IplImage*				m_pVideoDisplayFrame;
+#if (SHOW_XYZ_WINDOW)
+
+	IplImage*				m_pDebugZFrame;	// Z values frame for debugging
+#endif
+
+	// Memory Mapped File
+	HANDLE					m_hMapFile;
+	int					   *m_pDepthFrameSharedMemory;	// Shared Buffer space LPCTSTR
+	BOOL					m_bDepthCameraSharedMemoryOpened;
+	DEPTH_CAMERA_FRAME_HEADER_T	m_DepthFrameInfo;
+	unsigned short		   *m_pDepthFrameData; // pointer to the depth frame
+
+	DEPTH_CAMERA_COMMAND_T m_DepthCameraCommand;	// Commands to the camera app
+
+protected:
+
+	HeadControl				*m_pHeadControl; // For telling head where to look
+	int 					 m_CurrentTask;
+	int 					 m_TaskState;
+	int						 m_TrackObjectX;
+	int						 m_TrackObjectY;
+	int						 m_FindObjectsOnFloorTrys;
+	int						 m_nDepthCamera3DObjectsFound;
+	UINT					 m_DepthCameraScanPosition;
+	BOOL					 m_FindCloseObjectsOnly;
+
+
+	BOOL					m_ServoMoving;			// Indicate that a head move is in progress
+	DWORD					m_BlurSettleTime;		// non-zero indicates the camera is moving
+
+	// Camera VidCap object detection and tracking flags
+	BOOL					m_VidCapProcessingEnabled;
+	BOOL					m_ObjectTrackingEnabled;
+	BOOL					m_ObjectTrackingActive;
+	BOOL					m_ObjectToTrackFound;
+	CvSize					m_ObjectTrackSize;
+	CvPoint					m_ObjectTrackingCenter;
+	//DWORD					m_LastCameraMoveTime;	
+	SCANNER_SUMMARY_T		m_DepthCameraSummary;		// Summary of objects to avoid detected by Depth Camera
+
+	// Pointers to Detector Objects
+//	CDetphCameraTrackObjectDetector*	m_pTrackObjectDetector;
+
+	CDriveControlModule *m_pDriveCtrl;
+//	HeadControl			*m_pHeadControl;	// For controlling Head servos
+//#if ( ROBOT_SERVER == 1 )	// This module used for Robot Server only
+//	KinectServoControl		*m_pKinectServoControl;
+//#endif
+	TEMP_OBJECT_3D_ARRAY_T  *m_pDepthCameraTempObjects3D;
+
+};
 
 /////////////////////////////////////////////////////////////////////////////
 /****

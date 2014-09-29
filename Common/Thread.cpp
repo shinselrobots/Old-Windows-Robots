@@ -56,6 +56,7 @@ static char THIS_FILE[] = __FILE__;
 __itt_string_handle* pshControlThreadLoop = __itt_string_handle_create("ControlThreadLoop");
 __itt_string_handle* pshSensorModule = __itt_string_handle_create("SensorModule");
 __itt_string_handle* pshCameraModule = __itt_string_handle_create("CameraModule");
+__itt_string_handle* pshDepthCameraModule = __itt_string_handle_create("DepthCameraModule");
 __itt_string_handle* pshKinectModule = __itt_string_handle_create("KinectModule");
 __itt_string_handle* pshSystemModule = __itt_string_handle_create("SystemModule");
 __itt_string_handle* pshCollisionModule = __itt_string_handle_create("CollisionModule");
@@ -87,6 +88,7 @@ DWORD WINAPI ControlThreadProc( LPVOID NotUsed )
 	CSensorModule		*pSensorModule = new CSensorModule(pDriveControlModule);
 ////	CCameraModule		*pCameraModule = new CCameraModule(pDriveControlModule);  
 ////						 g_pCameraModule = (void*)pCameraModule; // Make pointer to class available to video callback
+	CDepthCameraModule	*pDepthCameraModule = new CDepthCameraModule(pDriveControlModule); 
 	CKinectModule		*pKinectModule = new CKinectModule(pDriveControlModule); // Kinect Module creates its own video thread 
 						 g_pKinectModule = (void*)pKinectModule; // Make pointer to class available to video callback
 	CSystemModule		*pSystemModule = new CSystemModule(pDriveControlModule);
@@ -180,6 +182,11 @@ DWORD WINAPI ControlThreadProc( LPVOID NotUsed )
 				__itt_task_end(pDomainControlThread);
 			}
 			{
+				__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, pshDepthCameraModule);
+				pDepthCameraModule->ProcessMessage( UserMessage, msg.wParam, msg.lParam );
+				__itt_task_end(pDomainControlThread);
+			}
+			{
 				__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, pshSystemModule);
 				pSystemModule->ProcessMessage( UserMessage, msg.wParam, msg.lParam );
 				__itt_task_end(pDomainControlThread);
@@ -255,6 +262,7 @@ DWORD WINAPI ControlThreadProc( LPVOID NotUsed )
 	SAFE_DELETE( pCollisionModule );
 	SAFE_DELETE( pSystemModule );
 ////	SAFE_DELETE( pCameraModule );
+	SAFE_DELETE( pDepthCameraModule );
 	SAFE_DELETE( pKinectModule );
 	SAFE_DELETE( pSensorModule );
 	SAFE_DELETE( pDriveControlModule );

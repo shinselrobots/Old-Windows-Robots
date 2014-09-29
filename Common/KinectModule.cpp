@@ -25,6 +25,8 @@
 #include "kinect.h"
 #include <SpeechEnums.cs>
 
+#define USE_OPEN_CV								0
+
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -84,6 +86,18 @@ __itt_string_handle* psh_ProcessVerticalScan = __itt_string_handle_create("Proce
 //---------------------------------------------------------------------------
 
 #define KINECT_VIDEO_ENABLED  1
+
+// Calculaiton of Kinect Field Of View (FOV) in degrees
+// Robot at 36.0" from wall:  
+// Depth Camera FOV width = 38.0", height = 28.8"
+// Video Camera FOV width = 43.0", height = 32.0"
+// ArcTan = Opp/Adj. Opp = 1/2 width or height (to form right triangle)
+// In Excell:  =(DEGREES(ATAN( (C8/B8) ))) * 2
+// Now, adjust values as needed to compensate for mechanical position
+#define KINECT_DEPTH_FOV_X	 93.10 	// 93.10 calculated.
+#define KINECT_DEPTH_FOV_Y	 77.32 	// 77.32 calculated.
+#define KINECT_VIDEO_FOV_X	100.13 	// 100.13 calculated.
+#define KINECT_VIDEO_FOV_Y	 83.27	// 83.27 calculated.
 
 // FINAL 3D OBJECT PARAMETERS
 #define MIN_3D_OBJECT_LENGTH			15	// TenthInches - minimim size of object to detect
@@ -274,7 +288,7 @@ DWORD WINAPI KinectDepthThreadProc( LPVOID lpParameter )
 		if( g_BulkServoStatus[DYNA_KINECT_SCANNER_SERVO_ID].PositionTenthDegrees <= KINECT_TILT_CENTER )
 		{
 			// Not in position to spot a human, so disable human tracking
-			pKinectModule->m_FrameInfo->ControlFlags |= ControlFlag_HidePlayers; // flag for controlling the C# app
+			pKinectModule->m_FrameInfo->ControlFlags |= KinectControlFlag_HidePlayers; // flag for controlling the C# app
 
 			// only enable if in position to see ahead
 			__itt_task_begin(pDomainKinectThread, __itt_null, __itt_null, psh_csFindWallsAnd2dMaps);
@@ -344,17 +358,11 @@ DWORD WINAPI KinectDepthThreadProc( LPVOID lpParameter )
 	m_FindCloseObjectsOnly = FALSE;
 
 	m_FrameNumber = 0;
-//	m_pDepthFrame = 0;
-//	m_pVideoFrame = 0;
-//	m_pDepthDisplayFrame = 0;
-//	m_pVideoDisplayFrame = 0;
 #if (SHOW_XYZ_WINDOW)
 	m_pDebugZFrame = 0;
 #endif
-	//m_CaptureSize.width = m_FrameInfo->Width;	// Defaults
-	//m_CaptureSize.height = m_FrameInfo->Height;
-	m_DisplaySize.width = KINECT_WINDOW_DISPLAY_SIZE_X;
-	m_DisplaySize.height = KINECT_WINDOW_DISPLAY_SIZE_Y;
+	m_DisplaySize.width = DEPTH_WINDOW_DISPLAY_SIZE_X;
+	m_DisplaySize.height = DEPTH_WINDOW_DISPLAY_SIZE_Y;
 	m_pKinectServoControl = new KinectServoControl;
 	m_pHeadControl = new HeadControl();
 
@@ -367,15 +375,6 @@ DWORD WINAPI KinectDepthThreadProc( LPVOID lpParameter )
 	m_ServoMoving = FALSE;
 	m_BlurSettleTime = 0;
 
-/*
-	// Detectors
-//	m_pTrackObjectDetector	= NULL;
-	// Detector Enabling flags
-	m_VidCapProcessingEnabled = FALSE;
-	m_ObjectTrackingEnabled = FALSE;
-	m_ObjectTrackingActive = FALSE;
-	m_ObjectToTrackFound = FALSE;
-*/
 	// Processing variables
 	m_ObjectTrackSize.width = 0;
 	m_ObjectTrackSize.height = 0;
@@ -388,27 +387,38 @@ DWORD WINAPI KinectDepthThreadProc( LPVOID lpParameter )
 	m_OpenCVDepthMousePointSelected = FALSE;
 //	m_LastCameraMoveTime = GetTickCount();
 
+/*
+	// Detectors
+//	m_pTrackObjectDetector	= NULL;
+	// Detector Enabling flags
+	m_VidCapProcessingEnabled = FALSE;
+	m_ObjectTrackingEnabled = FALSE;
+	m_ObjectTrackingActive = FALSE;
+	m_ObjectToTrackFound = FALSE;
+*/
+
+
 	// Create the Point Cloud
 
 	//__itt_task_begin(pDomainControlThread, __itt_null, __itt_null, psh_csKinectPointCloudLock);
 	//ROBOT_LOG( TRUE,"Kinect Init: EnterCriticalSection g_csKinectPointCloudLock\n")
 	//EnterCriticalSection(&g_csKinectPointCloudLock);
 
-	g_KinectPointCloud = new KINECT_3D_CLOUD_T;
+	g_KinectPointCloud = new DEPTH_3D_CLOUD_T;
 	g_KinectPointCloud->dwTimeOfSample = 0;
 	g_KinectPointCloud->RobotLocation.x = 0.0;	// Location of robot at the time of depth snapshot
 	g_KinectPointCloud->RobotLocation.y = 0.0;
 	g_KinectPointCloud->CompassHeading = 0;		// Heading of robot at the time of depth snapshot
-	for( int i=0; i < KINECT_CAPTURE_SIZE_MAX_Y; i++ )
+	for( int i=0; i < DEPTH_CAPTURE_SIZE_MAX_Y; i++ )
 	{
-		for( int j=0; j < KINECT_CAPTURE_SIZE_MAX_X; j++ )
+		for( int j=0; j < DEPTH_CAPTURE_SIZE_MAX_X; j++ )
 		{
 			g_KinectPointCloud->Point3dArray[i][j].X = 0;
 			g_KinectPointCloud->Point3dArray[i][j].Y = 0;
 			g_KinectPointCloud->Point3dArray[i][j].Z = 0;
 		}
 	}
-	for( int i=0; i < KINECT_CAPTURE_SIZE_MAX_X; i++ )
+	for( int i=0; i < DEPTH_CAPTURE_SIZE_MAX_X; i++ )
 	{
 		g_KinectPointCloud->WallPoints[i].X = LASER_RANGEFINDER_TENTH_INCHES_ERROR;
 		g_KinectPointCloud->WallPoints[i].Y = LASER_RANGEFINDER_TENTH_INCHES_ERROR;
@@ -467,11 +477,12 @@ CKinectModule::~CKinectModule()
 	{
 		UnmapViewOfFile(m_pDepthInfoSharedMemory);
 	}
+	/*
 	if( INVALID_HANDLE_VALUE != m_hMapFile)
 	{
 		CloseHandle(m_hMapFile);
 	}
-	
+	*/
 	m_pDepthInfoSharedMemory = NULL;
 	m_hMapFile = INVALID_HANDLE_VALUE;
 	ROBOT_LOG( TRUE,"SHUT DOWN: ~CKinectModule done.\n")
@@ -637,7 +648,7 @@ void CKinectModule::GetDepthImage()
 		return;
 	}
 	m_FrameInfo = (KINECT_DATA_T*)m_pDepthInfoSharedMemory;
-	m_FrameInfo->ControlFlags = ControlFlag_None; // init flags for controlling the C# app.  These will be overridden as needed.
+	m_FrameInfo->ControlFlags = KinectControlFlag_None; // init flags for controlling the C# app.  These will be overridden as needed.
 
 	#if DEBUG_SHARED_MEMORY == 1
 		ROBOT_LOG( TRUE,  "m_FrameInfo  No=%4d, H=%d, W=%d, MaxDepth=%d\n", 
@@ -731,13 +742,13 @@ void CKinectModule::GetDepthImage()
 
 	short* pDepthBuffer = m_FrameInfo->DepthData;
 
-/* TEST DEBUG CODE
-			m_FrameInfo->ControlFlags |= ControlFlag_DisplayBoundingBox; // Draw a bounding box
+// TEST DEBUG CODE
+			m_FrameInfo->ControlFlags |= KinectControlFlag_DisplayBoundingBox; // Draw a bounding box
 			m_FrameInfo->BoundingBoxTop = 100;
 			m_FrameInfo->BoundingBoxBottom = 150;
 			m_FrameInfo->BoundingBoxLeft = 100;
 			m_FrameInfo->BoundingBoxRight = 150;
-*/
+
 
 	// From Microsoft.Kinect:
 	const int PlayerIndexBitmask = 7;
@@ -1195,7 +1206,7 @@ void CKinectModule::ProcessMessage(
 
 			switch( m_CurrentTask )
 			{
-				case OBJECT_TASK_NONE:
+				case TASK_NONE:
 				{
 					break;	// Nothing to do
 				}
@@ -2017,7 +2028,7 @@ void CKinectModule::FindObjectsInSingleScanLine( int  ScanLine, int NumberOfSamp
 						(double)(pKinectObjects2D->Object[pKinectObjects2D->nObjectsDetected].EndX)/10.0 )
 				#endif
 
-				if( pKinectObjects2D->nObjectsDetected++ > KINECT_SCAN_MAX_2D_OBJECTS )
+				if( pKinectObjects2D->nObjectsDetected++ > DEPTH_SCAN_MAX_3D_OBJECTS )
 				{
 					ROBOT_LOG( TRUE, "ERROR!  Kinect Scanner LookForObjects nDetectedObjects > KINECT_SCAN_MAX_OBJECTS!  ABORTING further object search!\n")
 					ROBOT_ASSERT(0);
@@ -2174,9 +2185,9 @@ void CKinectModule::FindObjectsOnFloor()
 				if( Nearest3DObjectDistance > OBJECT_CENTER_TOLLERANCE )
 				{
 					// Must be a new 3D object.  Initialize the 3D object.
-					if( m_pKinectTempObjects3D->nObjectsDetected > KINECT_SCAN_MAX_3D_OBJECTS )
+					if( m_pKinectTempObjects3D->nObjectsDetected > DEPTH_SCAN_MAX_3D_OBJECTS )
 					{
-						//ROBOT_LOG( DEBUG_FIND_OBJECTS_ON_FLOOR_MESSAGES,"WARNING: KinectMultiLineScanFindObjects3D: m_pKinectTempObjects3D->nObjectsDetected > KINECT_SCAN_MAX_3D_OBJECTS. Ignoring far objects\n")
+						//ROBOT_LOG( DEBUG_FIND_OBJECTS_ON_FLOOR_MESSAGES,"WARNING: KinectMultiLineScanFindObjects3D: m_pKinectTempObjects3D->nObjectsDetected > DEPTH_SCAN_MAX_3D_OBJECTS. Ignoring far objects\n")
 					}
 					else
 					{
@@ -2452,9 +2463,9 @@ void CKinectModule::FindObjectsOnFloor()
 			g_pKinectObjects3D->nObjectsDetected++;
 
 
-			if( g_pKinectObjects3D->nObjectsDetected > KINECT_SCAN_MAX_3D_OBJECTS )
+			if( g_pKinectObjects3D->nObjectsDetected > DEPTH_SCAN_MAX_3D_OBJECTS )
 			{
-				ROBOT_LOG( DEBUG_FIND_OBJECTS_ON_FLOOR_MESSAGES,"\nWARNING: 3D Objects found > KINECT_SCAN_MAX_3D_OBJECTS. Ignoring far objects")
+				ROBOT_LOG( DEBUG_FIND_OBJECTS_ON_FLOOR_MESSAGES,"\nWARNING: 3D Objects found > DEPTH_SCAN_MAX_3D_OBJECTS. Ignoring far objects")
 				break;
 			}
 		}
@@ -2464,7 +2475,7 @@ void CKinectModule::FindObjectsOnFloor()
 		if( g_pKinectObjects3D->nClosestObjectDistance < KINECT_RANGE_TENTH_INCHES_MAX )
 		{
 			// An object was found. Tell the C# code to display a bounding box
-			m_FrameInfo->ControlFlags |= ControlFlag_DisplayBoundingBox; // Draw a bounding box
+			m_FrameInfo->ControlFlags |= KinectControlFlag_DisplayBoundingBox; // Draw a bounding box
 			m_FrameInfo->BoundingBoxBottom = g_pKinectObjects3D->Object[g_pKinectObjects3D->nClosestObjectIndex].StartScanLine;
 			m_FrameInfo->BoundingBoxTop = g_pKinectObjects3D->Object[g_pKinectObjects3D->nClosestObjectIndex].EndScanLine;	// lines are inverted
 			m_FrameInfo->BoundingBoxLeft = g_pKinectObjects3D->Object[g_pKinectObjects3D->nClosestObjectIndex].LeftPixel;
