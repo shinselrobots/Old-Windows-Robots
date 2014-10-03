@@ -52,6 +52,10 @@
 	I2C Expansion board: IRE2_0:
 	*/
 
+	#define DEPTH_CAMERA_INSTALLED_IN_HEAD	1 // determines how to move depth camera; via head, or dedicated servos
+	#define FIND_OBJECTS_WITH_KINECT		1 // determines how to find objects, using Kinect or other depth camera
+
+
 	#define OBJECT_EQUAL_DISTANCE		  0
 	#define SIDE_SENSOR_ANGLE			 80	// degrees from forward TODO-LOKI-MUST is this right???
 	#define ANGLE_SENSOR_ANGLE			 15 // Angled "IR Bumper" sensors - almost directly forward
@@ -168,6 +172,9 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 #elif SENSOR_CONFIG_TYPE == SENSOR_CONFIG_KOBUKI_WITH_ARDUINO
 	// Turtle Sensor Configuration:
+
+	#define DEPTH_CAMERA_INSTALLED_IN_HEAD	1 // determines how to move depth camera; via head, or dedicated servos
+	#define FIND_OBJECTS_WITH_KINECT		1 // determines how to find objects, using Kinect or other depth camera
 
 	#define OBJECT_EQUAL_DISTANCE		  0
 	#define SIDE_SENSOR_ANGLE			 80	// degrees from forward TODO-TURTLE-MUST is this right???
@@ -290,6 +297,9 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 #elif SENSOR_CONFIG_TYPE == SENSOR_CONFIG_TELEOP_KOBUKI
 	// Teleoperated Robot on Kobuki Base Sensor Configuration:
+
+	#define DEPTH_CAMERA_INSTALLED_IN_HEAD	1 // determines how to move depth camera; via head, or dedicated servos
+	#define FIND_OBJECTS_WITH_KINECT		1 // determines how to find objects, using Kinect or other depth camera
 
 	#define OBJECT_EQUAL_DISTANCE		  0
 	#define SIDE_SENSOR_ANGLE			 80	// degrees from forward TODO-TURTLE-MUST is this right???
@@ -418,6 +428,9 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 #elif SENSOR_CONFIG_TYPE == SENSOR_CONFIG_CARBOT
 	// Seeker CarBot Sensor Configuration:
+
+	#define DEPTH_CAMERA_INSTALLED_IN_HEAD	1 // determines how to move depth camera; via head, or dedicated servos
+	#define FIND_OBJECTS_WITH_KINECT		1 // determines how to find objects, using Kinect or other depth camera
 
 	// Angle from forward of objects
 	#define OBJECT_EQUAL_DISTANCE	  0

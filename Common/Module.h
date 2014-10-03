@@ -57,41 +57,9 @@ extern __itt_string_handle* pshCase8;
 extern __itt_string_handle* pshCase9;
 
 
-///////////////////////////////////////////////////////////////////////////////
-// KINECT STUFF
-enum KINECT_POSITIONS { 
-		KINECT_SERVO_POSITION_CLOSE_SCAN = 0, 
-		KINECT_SERVO_POSITION_MID_SCAN,
-		KINECT_SERVO_POSITION_FAR_SCAN,
-		KINECT_SERVO_POSITION_CENTER,
-		KINECT_SERVO_POSITION_LOOK_UP
-};
-enum KINECT_SERVO_MOVE_STATUS { 
-		KINECT_SERVO_MOVING = 0, 
-		KINECT_SERVO_SUCCESS,
-		KINECT_SERVO_TIMED_OUT
-};
-const int KINECT_FLOOR_SCAN_POSITION[] = {
-   (  -60 * 10),	//  -58 degrees -  KINECT_SERVO_POSITION_CLOSE_SCAN (closest possible to Robot body)
-   (  -40 * 10),	//  -40 degrees -  KINECT_SERVO_POSITION_MID_SCAN - Floor Far Scan
-   (  -22 * 10),	//  -22 degrees -  KINECT_SERVO_POSITION_FAR_SCAN - Floor Far Scan
-   (  0),			//    0 degrees	- KINECT_SERVO_POSITION_CENTER - looking straight forward
-   (   30 * 10)	//  +30 degrees -  KINECT_SERVO_POSITION_LOOK_UP - Looking up at people (not used?)
-};
-
-
-enum KINECT_FLOOR_SCAN_STATES {
-		KINECT_FLOOR_SCAN_MOVE_ARMS_STATE	= 1,
-		KINECT_FLOOR_SCAN_START_SEARCH_STATE,
-		KINECT_FLOOR_SCAN_WAIT_SEARCH_STATE,
-		KINECT_FLOOR_SCAN_OBJECT_FOUND_STATE,
-		KINECT_FLOOR_SCAN_PICKING_UP_OBJECT_STATE,
-};
-
-
 
 ///////////////////////////////////////////////////////////////////////////////
-// DEPTH CAMERA STUFF
+// DEPTH CAMERA STUFF.  Used for Kinect and for other depth cameras.
 enum DEPTH_CAMERA_POSITIONS { 
 		DEPTH_CAMERA_SERVO_POSITION_CLOSE_SCAN = 0, 
 		DEPTH_CAMERA_SERVO_POSITION_MID_SCAN,
@@ -99,19 +67,12 @@ enum DEPTH_CAMERA_POSITIONS {
 		DEPTH_CAMERA_SERVO_POSITION_CENTER,
 		DEPTH_CAMERA_SERVO_POSITION_LOOK_UP
 };
+
 enum DEPTH_CAMERA_SERVO_MOVE_STATUS { 
 		DEPTH_CAMERA_SERVO_MOVING = 0, 
 		DEPTH_CAMERA_SERVO_SUCCESS,
 		DEPTH_CAMERA_SERVO_TIMED_OUT
 };
-const int DEPTH_CAMERA_FLOOR_SCAN_POSITION[] = {
-   (  -60 * 10),	//  -58 degrees -  DEPTH_CAMERA_SERVO_POSITION_CLOSE_SCAN (closest possible to Robot body)
-   (  -40 * 10),	//  -40 degrees -  DEPTH_CAMERA_SERVO_POSITION_MID_SCAN - Floor Far Scan
-   (  -22 * 10),	//  -22 degrees -  DEPTH_CAMERA_SERVO_POSITION_FAR_SCAN - Floor Far Scan
-   (  0),			//    0 degrees	- DEPTH_CAMERA_SERVO_POSITION_CENTER - looking straight forward
-   (   30 * 10)	//  +30 degrees -  DEPTH_CAMERA_SERVO_POSITION_LOOK_UP - Looking up at people (not used?)
-};
-
 
 enum DEPTH_CAMERA_FLOOR_SCAN_STATES {
 		DEPTH_CAMERA_FLOOR_SCAN_MOVE_ARMS_STATE	= 1,
@@ -120,6 +81,23 @@ enum DEPTH_CAMERA_FLOOR_SCAN_STATES {
 		DEPTH_CAMERA_FLOOR_SCAN_OBJECT_FOUND_STATE,
 		DEPTH_CAMERA_FLOOR_SCAN_PICKING_UP_OBJECT_STATE,
 };
+
+const int DEPTH_CAMERA_IN_HEAD_FLOOR_SCAN_POSITION[] = {  // Tilt HEAD to point at each of these positions
+   (  -60 * 10),	//  -58 degrees -  DEPTH_CAMERA_SERVO_POSITION_CLOSE_SCAN (closest possible to Robot body)
+   (  -40 * 10),	//  -40 degrees -  DEPTH_CAMERA_SERVO_POSITION_MID_SCAN - Floor Far Scan
+   (  -22 * 10),	//  -22 degrees -  DEPTH_CAMERA_SERVO_POSITION_FAR_SCAN - Floor Far Scan
+   (  0),			//    0 degrees	- DEPTH_CAMERA_SERVO_POSITION_CENTER - looking straight forward
+   (   30 * 10)	//  +30 degrees -  DEPTH_CAMERA_SERVO_POSITION_LOOK_UP - Looking up at people (not used?)
+};
+
+const int KINECT_FLOOR_SCAN_POSITION[] = {
+   (  -60 * 10),	//  -58 degrees -  KINECT_SERVO_POSITION_CLOSE_SCAN (closest possible to Robot body)
+   (  -40 * 10),	//  -40 degrees -  KINECT_SERVO_POSITION_MID_SCAN - Floor Far Scan
+   (  -22 * 10),	//  -22 degrees -  KINECT_SERVO_POSITION_FAR_SCAN - Floor Far Scan
+   (  0),			//    0 degrees	- KINECT_SERVO_POSITION_CENTER - looking straight forward
+   (   30 * 10)	//  +30 degrees -  KINECT_SERVO_POSITION_LOOK_UP - Looking up at people (not used?)
+};
+
 
 // COMMON TO BOTH KINECT AND DEPTH CAMERA
 typedef struct
@@ -1059,10 +1037,10 @@ public:
 	KINECT_DATA_T			m_KinectData;
 	BOOL					m_bKinectSharedMemoryOpened;
 	KINECT_DATA_T		   *m_FrameInfo;
+	HeadControl				*m_pHeadControl; // For telling head to look at humans found
 
 protected:
 
-	HeadControl				*m_pHeadControl; // For telling head to look at humans found
 	int 					 m_CurrentTask;
 	int 					 m_TaskState;
 	int						 m_TrackObjectX;
@@ -1168,17 +1146,17 @@ public:
 #endif
 
 	// Memory Mapped File
-	HANDLE					m_hMapFile;
-	int					   *m_pDepthFrameSharedMemory;	// Shared Buffer space LPCTSTR
-	BOOL					m_bDepthCameraSharedMemoryOpened;
-	DEPTH_CAMERA_FRAME_HEADER_T	m_DepthFrameInfo;
-	unsigned short		   *m_pDepthFrameData; // pointer to the depth frame
+	HANDLE					 m_hMapFile;
+	int						*m_pDepthFrameSharedMemory;	// Shared Buffer space LPCTSTR
+	BOOL					 m_bDepthCameraSharedMemoryOpened;
+	unsigned short			*m_pDepthFrameData; // pointer to the depth frame
+	HeadControl				*m_pHeadControl; // For telling head where to look
 
-	DEPTH_CAMERA_COMMAND_T m_DepthCameraCommand;	// Commands to the camera app
+	DEPTH_CAMERA_FRAME_HEADER_T	m_DepthFrameInfo;
+	DEPTH_CAMERA_COMMAND_T   m_DepthCameraCommand;	// Commands to the camera app
 
 protected:
 
-	HeadControl				*m_pHeadControl; // For telling head where to look
 	int 					 m_CurrentTask;
 	int 					 m_TaskState;
 	int						 m_TrackObjectX;

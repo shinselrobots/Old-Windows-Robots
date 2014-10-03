@@ -1234,12 +1234,12 @@ void CKinectModule::ProcessMessage(
 
 							/*
 							int ServoStatus = m_pKinectServoControl->CheckServoPosition(FALSE);
-							if ( KINECT_SERVO_SUCCESS == ServoStatus )
+							if ( DEPTH_CAMERA_SERVO_SUCCESS == ServoStatus )
 							{
 								// Kinect in position, go to next state
 								m_TaskState++;	
 							}
-							else if( KINECT_SERVO_TIMED_OUT == ServoStatus )
+							else if( DEPTH_CAMERA_SERVO_TIMED_OUT == ServoStatus )
 							{
 								ROBOT_LOG( TRUE,"ERROR: KINECT SERVO TIME OUT! \n\n")
 								gKinectDelayTimer = 10; // tenth-seconds - avoid tight loop on error
@@ -1332,7 +1332,7 @@ void CKinectModule::ProcessMessage(
 							#if DEBUG_KINECT_FLOOR_OBJECT_DETECTION	== 1
 								m_KinectScanPosition = 2;  //******** FAR SCAN DEBUG ONLY !!!
 							#else		
-								m_KinectScanPosition = KINECT_SERVO_POSITION_CLOSE_SCAN;
+								m_KinectScanPosition = DEPTH_CAMERA_SERVO_POSITION_CLOSE_SCAN;
 							#endif
 							ROBOT_LOG( TRUE,"KINECT Scan Position %d\n", m_KinectScanPosition)
 							m_pKinectServoControl->SetTiltPosition( KINECT_TILT_OWNER_TRACK_OBJECT, KINECT_FLOOR_SCAN_POSITION[m_KinectScanPosition] );
@@ -1346,13 +1346,13 @@ void CKinectModule::ProcessMessage(
 							//else if( WM_ROBOT_SERVO_STATUS_READY == uMsg ) ROBOT_LOG( TRUE," - SERVO\n")
 
 							int ServoStatus = m_pKinectServoControl->CheckServoPosition(FALSE);
-							if ( KINECT_SERVO_SUCCESS == ServoStatus )
+							if ( DEPTH_CAMERA_SERVO_SUCCESS == ServoStatus )
 							{
 								// Kinect in position, go to next state (Kinect should have done a scan by then)
 								gKinectDelayTimer = 5; // tenth-seconds - Wait for image to settle before checking 3D
 								m_TaskState++;	
 							}
-							else if( KINECT_SERVO_TIMED_OUT == ServoStatus )
+							else if( DEPTH_CAMERA_SERVO_TIMED_OUT == ServoStatus )
 							{
 								ROBOT_LOG( TRUE,"ERROR: KINECT SERVO TIME OUT!  ABORTING!\n\n")
 								SendCommand( WM_ROBOT_KINECT_SEARCH_COMPLETE, 0, 0 ); // no objects found
@@ -1360,7 +1360,7 @@ void CKinectModule::ProcessMessage(
 								m_CurrentTask = KINECT_TASK_HUMAN_DETECTION;
 								m_TaskState = 1;
 							}
-							// else KINECT_SERVO_MOVING == ServoStatus								
+							// else DEPTH_CAMERA_SERVO_MOVING == ServoStatus								
 							break; // keep waiting
 						}
 						case 3:	// Request 3D analysis at current position
@@ -1380,7 +1380,7 @@ void CKinectModule::ProcessMessage(
 							else
 							{
 								// if objects found, we're done, else move kinect and try again
-								if( (0 == m_nKinect3DObjectsFound) && (m_KinectScanPosition < KINECT_SERVO_POSITION_FAR_SCAN) && (!m_FindCloseObjectsOnly) )
+								if( (0 == m_nKinect3DObjectsFound) && (m_KinectScanPosition < DEPTH_CAMERA_SERVO_POSITION_FAR_SCAN) && (!m_FindCloseObjectsOnly) )
 								{
 									// Move Kinect to next position and try again
 									m_KinectScanPosition++;
@@ -1419,7 +1419,7 @@ void CKinectModule::ProcessMessage(
 				{	
 					// Used to track the closest object on the floor
 					int ServoStatus = m_pKinectServoControl->CheckServoPosition(FALSE);
-					if( KINECT_SERVO_TIMED_OUT == ServoStatus )
+					if( DEPTH_CAMERA_SERVO_TIMED_OUT == ServoStatus )
 					{
 						ROBOT_LOG( TRUE,"ERROR: KINECT SERVO TIME OUT!  ABORTING!\n\n")
 						SendCommand( WM_ROBOT_KINECT_SEARCH_COMPLETE, 0, 0 ); // no objects found
@@ -1427,12 +1427,12 @@ void CKinectModule::ProcessMessage(
 						m_CurrentTask = KINECT_TASK_HUMAN_DETECTION;
 						m_TaskState = 1;
 					}
-					else if( KINECT_SERVO_MOVING == ServoStatus )
+					else if( DEPTH_CAMERA_SERVO_MOVING == ServoStatus )
 					{
 						// keep waiting
 						break;
 					}
-					// else KINECT_SERVO_SUCCESS == ServoStatus - Done!
+					// else DEPTH_CAMERA_SERVO_SUCCESS == ServoStatus - Done!
 
 					switch( m_TaskState )
 					{
@@ -1457,13 +1457,13 @@ void CKinectModule::ProcessMessage(
 							else
 							{
 								// Determine if the Kinect tilt needs to be adjusted
-								if ( KINECT_SERVO_POSITION_CLOSE_SCAN != m_KinectScanPosition )
+								if ( DEPTH_CAMERA_SERVO_POSITION_CLOSE_SCAN != m_KinectScanPosition )
 								{
 									// Not in Close Scan Mode
 									if( 0 == m_nKinect3DObjectsFound )
 									{
 										ROBOT_LOG( TRUE, "TRACK_CLOSEST_OBJECT - Lost Object!  Moving to CLOSE_SCAN\n" )
-										m_KinectScanPosition = KINECT_SERVO_POSITION_CLOSE_SCAN;
+										m_KinectScanPosition = DEPTH_CAMERA_SERVO_POSITION_CLOSE_SCAN;
 										m_pKinectServoControl->SetTiltPosition( KINECT_TILT_OWNER_TRACK_OBJECT, KINECT_FLOOR_SCAN_POSITION[m_KinectScanPosition] );
 									}
 									else
@@ -1478,7 +1478,7 @@ void CKinectModule::ProcessMessage(
 											// Object within zone where close scan can find it, so tilt Kinect down
 											// Move to the close position, so we are ready for the next request
 											ROBOT_LOG( TRUE, "TRACK_CLOSEST_OBJECT - Object in range, Moving to CLOSE_SCAN\n" )
-											m_KinectScanPosition = KINECT_SERVO_POSITION_CLOSE_SCAN;
+											m_KinectScanPosition = DEPTH_CAMERA_SERVO_POSITION_CLOSE_SCAN;
 											m_pKinectServoControl->SetTiltPosition( KINECT_TILT_OWNER_TRACK_OBJECT, KINECT_FLOOR_SCAN_POSITION[m_KinectScanPosition] );
 										}
 									}
@@ -2120,7 +2120,7 @@ void CKinectModule::FindObjectsOnFloor()
 	// Only look for objects if the Kinect is in position and
 	// track how many times to retry finding objects on the floor
 	int ServoPosition = m_pKinectServoControl->GetTiltPosition();
-	if( (m_FindObjectsOnFloorTrys <= 0) || (ServoPosition > KINECT_FLOOR_SCAN_POSITION[KINECT_SERVO_POSITION_FAR_SCAN]) )
+	if( (m_FindObjectsOnFloorTrys <= 0) || (ServoPosition > KINECT_FLOOR_SCAN_POSITION[DEPTH_CAMERA_SERVO_POSITION_FAR_SCAN]) )
 	{
 		// Don't look for any objects
 		m_nKinect3DObjectsFound = 0;
@@ -2595,15 +2595,15 @@ void KinectServoControl::SetTiltPosition( int  nOwner, int TiltTenthDegrees, int
 // Desc: Are we there yet?  Check to see if servo has reached commanded position
 // Verbose flag will print out the servo that is blocking move complete status
 // Returns:
-//		KINECT_SERVO_MOVING = 0, 
-//		KINECT_SERVO_SUCCESS,
-//		KINECT_SERVO_TIMED_OUT
+//		DEPTH_CAMERA_SERVO_MOVING = 0, 
+//		DEPTH_CAMERA_SERVO_SUCCESS,
+//		DEPTH_CAMERA_SERVO_TIMED_OUT
 //-----------------------------------------------------------------------------
 int KinectServoControl::CheckServoPosition( BOOL verbose )
 {
 	if( 1 == ROBOT_SIMULATION_MODE )
 	{
-		return KINECT_SERVO_SUCCESS;	// Handle simulation mode (no servos!)
+		return DEPTH_CAMERA_SERVO_SUCCESS;	// Handle simulation mode (no servos!)
 	}
 
 	int DeltaTilt = g_BulkServoCmd[DYNA_KINECT_SCANNER_SERVO_ID].PositionTenthDegrees -
@@ -2622,7 +2622,7 @@ int KinectServoControl::CheckServoPosition( BOOL verbose )
 		{
 			//if( verbose ) 
 				ROBOT_LOG( TRUE,"Kinect CheckServoPosition: Servo Move Timed Out!  Delta = %d TenthDegrees\n", DeltaTilt)
-			return KINECT_SERVO_TIMED_OUT;
+			return DEPTH_CAMERA_SERVO_TIMED_OUT;
 		}
 	}
 	else
@@ -2633,10 +2633,10 @@ int KinectServoControl::CheckServoPosition( BOOL verbose )
 		{
 			ROBOT_LOG( TRUE,"Kinect CheckServoPosition: Servo in Target Position\n")
 		}
-		return KINECT_SERVO_SUCCESS;
+		return DEPTH_CAMERA_SERVO_SUCCESS;
 	}
 
-	return KINECT_SERVO_MOVING;	// Did not reach target position yet
+	return DEPTH_CAMERA_SERVO_MOVING;	// Did not reach target position yet
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////

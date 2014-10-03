@@ -5,8 +5,6 @@
 #include "ClientOrServer.h"
 #if ( ROBOT_SERVER == 1 )	// This module used for Robot Server only
 
-#define DEPTH_CAMERA_INSTALLED_IN_HEAD	1 // determines how to move depth camera; via head, or dedicated servos
-
 
 // THIS MUST BE IN FRONT OF module.h include
 #define SHOW_XYZ_WINDOW							 0 // Show an OpenCV view of the point cloud
@@ -258,28 +256,24 @@ DWORD WINAPI DepthCameraDepthThreadProc( LPVOID lpParameter )
 		__itt_task_end(pDomainDepthCameraThread);
 
 		// Update 2D map with wall and object locations
-		// TODO??? if( ROBOT_HAS_DEPTH_CAMERA_SERVO )
-/*** TODO-MUST
-		if( g_BulkServoStatus[DYNA_DEPTH_CAMERA_SCANNER_SERVO_ID].PositionTenthDegrees <= DEPTH_CAMERA_TILT_CENTER )
+		if( 1 == DEPTH_CAMERA_INSTALLED_IN_HEAD )
 		{
-			// Not in position to spot a human, so disable human tracking
-			pDepthCameraModule->m_FrameInfo->ControlFlags |= ControlFlag_HidePlayers; // flag for controlling the C# app
+			if( pDepthCameraModule->m_pHeadControl->GetTiltPosition() < 0 )				
+			{
+				// only enable if in position to see ahead
+				__itt_task_begin(pDomainDepthCameraThread, __itt_null, __itt_null, psh_csFindWallsAnd2dMaps);
+					pDepthCameraModule->FindWallsAnd2dMaps();
+				__itt_task_end(pDomainDepthCameraThread); // psh_csFindWallsAnd2dMaps
 
-			// only enable if in position to see ahead
-			__itt_task_begin(pDomainDepthCameraThread, __itt_null, __itt_null, psh_csFindWallsAnd2dMaps);
-				pDepthCameraModule->FindWallsAnd2dMaps();
-			__itt_task_end(pDomainDepthCameraThread); // psh_csFindWallsAnd2dMaps
-
-			// Update global summary of objects seen for object avoidance
-			__itt_task_begin(pDomainDepthCameraThread, __itt_null, __itt_null, psh_csUpdateDepthCameraObjectSummary);
-				pDepthCameraModule->UpdateDepthCameraObjectSummary();
-			__itt_task_end(pDomainDepthCameraThread); // psh_csUpdateDepthCameraObjectSummary
+				// Update global summary of objects seen for object avoidance
+				__itt_task_begin(pDomainDepthCameraThread, __itt_null, __itt_null, psh_csUpdateDepthCameraObjectSummary);
+					pDepthCameraModule->UpdateDepthCameraObjectSummary();
+				__itt_task_end(pDomainDepthCameraThread); // psh_csUpdateDepthCameraObjectSummary
+			}
+			else
+			{
+			}
 		}
-		else
-		{
-		}
-		***/
-
 		// Find objects on floor, if enabled by other modules
 		if( ROBOT_TYPE == LOKI )
 		{
@@ -292,10 +286,12 @@ DWORD WINAPI DepthCameraDepthThreadProc( LPVOID lpParameter )
 
 		if( ROBOT_TYPE == LOKI )
 		{
+			/*
 			if( 0 != g_CurrentHumanTracked )
 			{
 				SendCommand( WM_ROBOT_CAMERA_LOOK_AT_PLAYER_CMD, (DWORD)(0), (DWORD)SERVO_SPEED_MED );
 			}
+			*/
 		}
 		//__itt_task_end(pDomainDepthCameraThread);  // pshDepthCameraThreadLoop
 
@@ -339,7 +335,9 @@ DWORD WINAPI DepthCameraDepthThreadProc( LPVOID lpParameter )
 #endif
 	m_DisplaySize.width = DEPTH_WINDOW_DISPLAY_SIZE_X;
 	m_DisplaySize.height = DEPTH_WINDOW_DISPLAY_SIZE_Y;
-	/// TODO m_pDepthCameraServoControl = new DepthCameraServoControl;
+#if( 1 != DEPTH_CAMERA_INSTALLED_IN_HEAD )
+	m_pDepthCameraServoControl = new DepthCameraServoControl;
+#endif
 	m_pHeadControl = new HeadControl();
 
 	// Memory Mapped File
@@ -447,7 +445,9 @@ CDepthCameraModule::~CDepthCameraModule()
 	#endif
 	SAFE_DELETE( m_pDepthCameraTempObjects3D );
 	SAFE_DELETE( g_DepthCameraPointCloud );
-	/// TODO SAFE_DELETE( m_pDepthCameraServoControl );
+	#if( 1 != DEPTH_CAMERA_INSTALLED_IN_HEAD )
+		SAFE_DELETE( m_pDepthCameraServoControl );
+	#endif
 	SAFE_DELETE( m_pHeadControl );
 
 	SAFE_DELETE( m_pDepthFrameData );
@@ -1193,44 +1193,78 @@ void CDepthCameraModule::ProcessMessage(
 						}
 						case 1:	// begin with scan close to robot
 						{	
-							/*** TODO ***
-							//ROBOT_LOG( TRUE,"DEPTH_CAMERA_TASK_SCAN_FLOOR_FOR_CLOSEST_OBJECT: Moving DepthCamera to position %d\n", m_DepthCameraScanPosition)
-							#if DEBUG_DEPTH_CAMERA_FLOOR_OBJECT_DETECTION	== 1
-								m_DepthCameraScanPosition = 2;  //******** FAR SCAN DEBUG ONLY !!!
-							#else		
-								m_DepthCameraScanPosition = DEPTH_CAMERA_SERVO_POSITION_CLOSE_SCAN;
+							#if( 1 == DEPTH_CAMERA_INSTALLED_IN_HEAD )
+								ROBOT_LOG( TRUE,"DEPTH_CAMERA_TASK_SCAN_FLOOR_FOR_CLOSEST_OBJECT: Moving Head to position %d\n", m_DepthCameraScanPosition)
+								#if DEBUG_DEPTH_CAMERA_FLOOR_OBJECT_DETECTION	== 1
+									m_DepthCameraScanPosition = 2;  //******** FAR SCAN DEBUG ONLY !!!
+								#else		
+									m_DepthCameraScanPosition = DEPTH_CAMERA_SERVO_POSITION_CLOSE_SCAN;
+								#endif
+								ROBOT_LOG( TRUE,"DEPTH_CAMERA Scan Position %d\n", m_DepthCameraScanPosition)
+								m_pHeadControl->SetHeadPosition( HEAD_OWNER_BEHAVIOR_P1, CAMERA_PAN_CENTER, (CAMERA_TILT_CENTER + CAMERA_TILT_CENTER+DEPTH_CAMERA_IN_HEAD_FLOOR_SCAN_POSITION[m_DepthCameraScanPosition]), CAMERA_SIDETILT_CENTER ); // Pan, Tilt, SideTilt TENTHDEGREES
+							#else
+								#error DEPTH SENSOR NOT IN HEAD NOT IMPLEMENTED
+								//ROBOT_LOG( TRUE,"DEPTH_CAMERA_TASK_SCAN_FLOOR_FOR_CLOSEST_OBJECT: Moving DepthCamera to position %d\n", m_DepthCameraScanPosition)
+								#if DEBUG_DEPTH_CAMERA_FLOOR_OBJECT_DETECTION	== 1
+									m_DepthCameraScanPosition = 2;  //******** FAR SCAN DEBUG ONLY !!!
+								#else		
+									m_DepthCameraScanPosition = DEPTH_CAMERA_SERVO_POSITION_CLOSE_SCAN;
+								#endif
+								ROBOT_LOG( TRUE,"DEPTH_CAMERA Scan Position %d\n", m_DepthCameraScanPosition)
+								m_pDepthCameraServoControl->SetTiltPosition( DEPTH_CAMERA_TILT_OWNER_TRACK_OBJECT, DEPTH_CAMERA_FLOOR_SCAN_POSITION[m_DepthCameraScanPosition] );
 							#endif
-							ROBOT_LOG( TRUE,"DEPTH_CAMERA Scan Position %d\n", m_DepthCameraScanPosition)
-							m_pDepthCameraServoControl->SetTiltPosition( DEPTH_CAMERA_TILT_OWNER_TRACK_OBJECT, DEPTH_CAMERA_FLOOR_SCAN_POSITION[m_DepthCameraScanPosition] );
-							***/
+							}
 							m_TaskState++;
 							break;
 						}
 						case 2:	// Wait for Servo to reach commanded position
 						{	
-							/*** TODO ***
-							//ROBOT_LOG( TRUE, "DEBUG DEPTH_CAMERA_TASK_SCAN_FLOOR_FOR_CLOSEST_OBJECT : CheckServoPosition ")
-							//if( WM_ROBOT_SENSOR_STATUS_READY == uMsg ) ROBOT_LOG( TRUE," - Arduino\n")
-							//else if( WM_ROBOT_SERVO_STATUS_READY == uMsg ) ROBOT_LOG( TRUE," - SERVO\n")
+							#if( 1 == DEPTH_CAMERA_INSTALLED_IN_HEAD )
+								ROBOT_LOG( TRUE, "DEBUG DEPTH_CAMERA_TASK_SCAN_FLOOR_FOR_CLOSEST_OBJECT : CheckServoPosition ")
+								//if( WM_ROBOT_SENSOR_STATUS_READY == uMsg ) ROBOT_LOG( TRUE," - Arduino\n")
+								//else if( WM_ROBOT_SERVO_STATUS_READY == uMsg ) ROBOT_LOG( TRUE," - SERVO\n")
 
-							int ServoStatus = m_pDepthCameraServoControl->CheckServoPosition(FALSE);
-							if ( DEPTH_CAMERA_SERVO_SUCCESS == ServoStatus )
-							{
-								// DepthCamera in position, go to next state (DepthCamera should have done a scan by then)
-								gDepthCameraDelayTimer = 5; // tenth-seconds - Wait for image to settle before checking 3D
-								m_TaskState++;	
-							}
-							else if( DEPTH_CAMERA_SERVO_TIMED_OUT == ServoStatus )
-							{
-								ROBOT_LOG( TRUE,"ERROR: DEPTH_CAMERA SERVO TIME OUT!  ABORTING!\n\n")
-								SendCommand( WM_ROBOT_DEPTH_CAMERA_SEARCH_COMPLETE, 0, 0 ); // no objects found
-								// Stop Tracking, and go back to looking for Humans
-								m_CurrentTask = DEPTH_CAMERA_TASK_HUMAN_DETECTION;
-								m_TaskState = 1;
-							}
-							// else DEPTH_CAMERA_SERVO_MOVING == ServoStatus
-							***/
-							ROBOT_ASSERT(0); // TODO
+								int ServoStatus = m_pHeadControl->CheckHeadPosition(FALSE);
+								if ( DEPTH_CAMERA_SERVO_SUCCESS == ServoStatus )
+								{
+									// Head in position, go to next state (DepthCamera should have grabed a frame and scanned it by then)
+									gDepthCameraDelayTimer = 5; // tenth-seconds - Wait for image to settle before checking 3D
+									m_TaskState++;	
+								}
+								else if( DEPTH_CAMERA_SERVO_TIMED_OUT == ServoStatus )
+								{
+									ROBOT_LOG( TRUE,"ERROR: HEAD SERVO TIME OUT WHILE LOOKING FOR OBJECT!  ABORTING!\n\n")
+									SendCommand( WM_ROBOT_DEPTH_CAMERA_SEARCH_COMPLETE, 0, 0 ); // no objects found
+									// Stop Tracking, and go back to looking for Humans
+									m_CurrentTask = TASK_NONE;
+									m_TaskState = 1;
+								}
+								// else DEPTH_CAMERA_SERVO_MOVING == ServoStatus
+
+							#else
+								#error DEPTH SENSOR NOT IN HEAD NOT IMPLEMENTED
+								//ROBOT_LOG( TRUE, "DEBUG DEPTH_CAMERA_TASK_SCAN_FLOOR_FOR_CLOSEST_OBJECT : CheckServoPosition ")
+								//if( WM_ROBOT_SENSOR_STATUS_READY == uMsg ) ROBOT_LOG( TRUE," - Arduino\n")
+								//else if( WM_ROBOT_SERVO_STATUS_READY == uMsg ) ROBOT_LOG( TRUE," - SERVO\n")
+
+								int ServoStatus = m_pDepthCameraServoControl->CheckServoPosition(FALSE);
+								if ( DEPTH_CAMERA_SERVO_SUCCESS == ServoStatus )
+								{
+									// DepthCamera in position, go to next state (DepthCamera should have done a scan by then)
+									gDepthCameraDelayTimer = 5; // tenth-seconds - Wait for image to settle before checking 3D
+									m_TaskState++;	
+								}
+								else if( DEPTH_CAMERA_SERVO_TIMED_OUT == ServoStatus )
+								{
+									ROBOT_LOG( TRUE,"ERROR: DEPTH_CAMERA SERVO TIME OUT!  ABORTING!\n\n")
+									SendCommand( WM_ROBOT_DEPTH_CAMERA_SEARCH_COMPLETE, 0, 0 ); // no objects found
+									// Stop Tracking, and go back to looking for Humans
+									m_CurrentTask = DEPTH_CAMERA_TASK_HUMAN_DETECTION;
+									m_TaskState = 1;
+								}
+								// else DEPTH_CAMERA_SERVO_MOVING == ServoStatus
+
+							#endif
 							break; // keep waiting
 						}
 						case 3:	// Request 3D analysis at current position
@@ -1249,14 +1283,19 @@ void CDepthCameraModule::ProcessMessage(
 							}
 							else
 							{
-								/*** TODO ***
+								
 								// if objects found, we're done, else move depth camera anagle and try again
 								if( (0 == m_nDepthCamera3DObjectsFound) && (m_DepthCameraScanPosition < DEPTH_CAMERA_SERVO_POSITION_FAR_SCAN) && (!m_FindCloseObjectsOnly) )
 								{
 									// Move DepthCamera to next position and try again
 									m_DepthCameraScanPosition++;
 									ROBOT_LOG( TRUE,"DEPTH_CAMERA Scan Position %d\n", m_DepthCameraScanPosition)
-									m_pDepthCameraServoControl->SetTiltPosition( DEPTH_CAMERA_TILT_OWNER_TRACK_OBJECT, DEPTH_CAMERA_FLOOR_SCAN_POSITION[m_DepthCameraScanPosition] );
+									#if( 1 == DEPTH_CAMERA_INSTALLED_IN_HEAD )
+										m_pHeadControl->SetHeadPosition( HEAD_OWNER_BEHAVIOR_P1, CAMERA_PAN_CENTER, (CAMERA_TILT_CENTER+DEPTH_CAMERA_IN_HEAD_FLOOR_SCAN_POSITION[m_DepthCameraScanPosition]), CAMERA_SIDETILT_CENTER ); // Pan, Tilt, SideTilt TENTHDEGREES
+									#else
+										#error DEPTH SENSOR NOT IN HEAD NOT IMPLEMENTED
+										m_pDepthCameraServoControl->SetTiltPosition( DEPTH_CAMERA_TILT_OWNER_TRACK_OBJECT, DEPTH_CAMERA_FLOOR_SCAN_POSITION[m_DepthCameraScanPosition] );
+									#endif
 									m_TaskState = 2; // Move DepthCamera to next position and try again
 								}
 								else
@@ -1277,7 +1316,7 @@ void CDepthCameraModule::ProcessMessage(
 									m_CurrentTask = TASK_NONE;
 									m_TaskState = 1;
 								}
-								***/
+								
 								ROBOT_ASSERT(0); // TODO
 
 							}
@@ -1292,8 +1331,8 @@ void CDepthCameraModule::ProcessMessage(
 				case DEPTH_CAMERA_TASK_TRACK_CLOSEST_OBJECT:
 				{	
 					// Used to track the closest object on the floor
-					/*** TODO-MUST
-					int ServoStatus = m_pDepthCameraServoControl->CheckServoPosition(FALSE);
+					int ServoStatus = m_pHeadControl->CheckHeadPosition(FALSE);
+					//int ServoStatus = m_pDepthCameraServoControl->CheckServoPosition(FALSE);
 					if( DEPTH_CAMERA_SERVO_TIMED_OUT == ServoStatus )
 					{
 						ROBOT_LOG( TRUE,"ERROR: DEPTH_CAMERA SERVO TIME OUT!  ABORTING!\n\n")
@@ -1308,7 +1347,6 @@ void CDepthCameraModule::ProcessMessage(
 						break;
 					}
 					// else DEPTH_CAMERA_SERVO_SUCCESS == ServoStatus - Done!
-					***/
 
 					switch( m_TaskState )
 					{
@@ -1391,7 +1429,8 @@ void CDepthCameraModule::ProcessMessage(
 		} // case WM_ROBOT_SENSOR_STATUS_READY:
 
 
-/////////////// ALL THIS IS FOR FUTURE USE ON DEPTH_CAMERA//////////////////
+#ifdef FUTURE_DEPTH_CAMERA
+////////////// ALL THIS IS FOR FUTURE USE ON DEPTH_CAMERA//////////////////
 		case WM_ROBOT_CAMERA_POWER_CMD:
 		{
 	//		g_bCmdRecognized = TRUE;
@@ -1453,7 +1492,9 @@ void CDepthCameraModule::ProcessMessage(
 //			g_CameraTiltPos = CameraTiltPos;	// Keep track of position!
 			return;
 		}
-	}
+#endif //FUTURE_DEPTH_CAMERA
+
+	
 }
 
 

@@ -45,9 +45,18 @@ __itt_string_handle* pshKinectArrivedAtObject = __itt_string_handle_create("Kine
 __itt_string_handle* pshKinectMoveToObject = __itt_string_handle_create("KinectMoveToObject"); // marker
 
 
-
-
-
+// Determine if we are using Kinect or other Depth Camera to find objects
+#if( 1 == FIND_OBJECTS_WITH_KINECT )
+	#define DEPTH_SEARCH_FLOOR_CMD		WM_ROBOT_KINECT_SEARCH_FLOOR_CMD			// wParam:  TRUE = Find Close Objects Only
+	#define DEPTH_TRACK_OBJECT_CMD		WM_ROBOT_KINECT_TRACK_OBJECT_CMD			// 
+	#define DEPTH_CANCEL_CMD			WM_ROBOT_KINECT_CANCEL_CMD					// wParam:  N/A - Cancel any pending search / track work
+	#define DEPTH_SEARCH_COMPLETE		WM_ROBOT_KINECT_SEARCH_COMPLETE				// wParam = ObjectFound (T/F)
+#else
+	#define DEPTH_SEARCH_FLOOR_CMD		WM_ROBOT_DEPTH_CAMERA_SEARCH_FLOOR_CMD			// wParam:  TRUE = Find Close Objects Only
+	#define DEPTH_TRACK_OBJECT_CMD		WM_ROBOT_DEPTH_CAMERA_TRACK_OBJECT_CMD			// 
+	#define DEPTH_CANCEL_CMD			WM_ROBOT_DEPTH_CAMERA_CANCEL_CMD					// wParam:  N/A - Cancel any pending search / track work
+	#define DEPTH_SEARCH_COMPLETE		WM_ROBOT_DEPTH_CAMERA_SEARCH_COMPLETE				// wParam = ObjectFound (T/F)
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 //	MODULE: BehaviorModule
@@ -389,8 +398,9 @@ void CBehaviorModule::ProcessMessage(
 				if( ACTION_MODE_NONE != m_CurrentActionMode )
 				{
 					ROBOT_LOG( TRUE,"WM_ROBOT_SET_ACTION_CMD: CURRENT ACTION CANCELLED!\n")
-					// Tell Kinect module to cancel behavior too
+					// Tell Depth module to cancel behavior too
 					SendCommand( WM_ROBOT_KINECT_CANCEL_CMD, (DWORD)0, (DWORD)0 );
+					SendCommand( WM_ROBOT_DEPTH_CAMERA_CANCEL_CMD, (DWORD)0, (DWORD)0 );
 				}
 				EndActionMode();
 			}
@@ -759,7 +769,7 @@ void CBehaviorModule::ProcessMessage(
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// ============================================================================================================
-		case WM_ROBOT_KINECT_SEARCH_COMPLETE:
+		case DEPTH_SEARCH_COMPLETE:
 		case WM_ROBOT_SERVO_STATUS_READY:
 		case WM_ROBOT_SENSOR_STATUS_READY:
 		// ============================================================================================================
@@ -769,13 +779,13 @@ void CBehaviorModule::ProcessMessage(
 			// such as the Arduino being offline - the Heartbeat continues!
 			g_bCmdRecognized = TRUE;
 
-			if( WM_ROBOT_KINECT_SEARCH_COMPLETE == uMsg )
+			if( DEPTH_SEARCH_COMPLETE == uMsg )
 			{
 				m_KinectSearchComplete = TRUE;
 				nKinectObjectsDetected = wParam;
 				m_ObjectX = (int)(signed short)(LOWORD(lParam));
 				m_ObjectY = (int)(signed short)(HIWORD(lParam));
-				ROBOT_LOG( TRUE,"DEBUG - WM_ROBOT_KINECT_SEARCH_COMPLETE: m_ObjectX = %d, m_ObjectY = %d\n", m_ObjectX, m_ObjectY)
+				ROBOT_LOG( TRUE,"DEBUG - DEPTH_SEARCH_COMPLETE: m_ObjectX = %d, m_ObjectY = %d\n", m_ObjectX, m_ObjectY)
 			}
 
 			if( WM_ROBOT_SERVO_STATUS_READY == uMsg )
@@ -4878,7 +4888,7 @@ void CBehaviorModule::ActionPickupObjects()
 				{
 					break;	// Nothing to do
 				}
-				case KINECT_FLOOR_SCAN_MOVE_ARMS_STATE:
+				case DEPTH_CAMERA_FLOOR_SCAN_MOVE_ARMS_STATE:
 				{	
 					// Make sure arms are not in the way of the Kinect View
 					ROBOT_LOG( TRUE,"ACTION_MODE_PICKUP_OBJECTS Moving Arms Home\n")
@@ -4892,12 +4902,12 @@ void CBehaviorModule::ActionPickupObjects()
 					m_ObjectDirectionDegreesPeak = 0;
 					m_TaskState++;
 				}
-				case KINECT_FLOOR_SCAN_START_SEARCH_STATE:	// Request a scan by the Kinect Module
+				case DEPTH_CAMERA_FLOOR_SCAN_START_SEARCH_STATE:	// Request a scan by the Kinect Module
 				{
-					ROBOT_LOG( TRUE,"Behavior: KINECT_FLOOR_SCAN_START_SEARCH_STATE Sending WM_ROBOT_KINECT_SEARCH_FLOOR_CMD\n")
+					ROBOT_LOG( TRUE,"Behavior: DEPTH_CAMERA_FLOOR_SCAN_START_SEARCH_STATE Sending DEPTH_SEARCH_FLOOR_CMD\n")
 					m_KinectSearchComplete = FALSE;	// Set flag so we know when the search is done.
 					nKinectObjectsDetected = 0;
-					SendCommand( WM_ROBOT_KINECT_SEARCH_FLOOR_CMD, (DWORD)FALSE, (DWORD)0 ); // FALSE = Find Close or Far Objects
+					SendCommand( DEPTH_SEARCH_FLOOR_CMD, (DWORD)FALSE, (DWORD)0 ); // FALSE = Find Close or Far Objects
 					// Point the head looking at the floor too (just for affect)
 					gHeadIdle = FALSE;
 					m_pHeadControl->SetHeadSpeed( HEAD_OWNER_BEHAVIOR_P1, SERVO_SPEED_MED_SLOW, SERVO_SPEED_MED_SLOW, SERVO_SPEED_MED_SLOW );
@@ -4906,11 +4916,11 @@ void CBehaviorModule::ActionPickupObjects()
 					m_TaskState++;
 					break;
 				}
-				case KINECT_FLOOR_SCAN_WAIT_SEARCH_STATE:	// See if we are done waiting
+				case DEPTH_CAMERA_FLOOR_SCAN_WAIT_SEARCH_STATE:	// See if we are done waiting
 				{	
 					if( !m_KinectSearchComplete )
 					{
-						//ROBOT_LOG( TRUE,"KINECT_FLOOR_SCAN_WAIT_SEARCH_STATE: Waiting for m_KinectSearchComplete 2\n")
+						//ROBOT_LOG( TRUE,"DEPTH_CAMERA_FLOOR_SCAN_WAIT_SEARCH_STATE: Waiting for m_KinectSearchComplete 2\n")
 						break;	// continue waiting
 					}
 					else
@@ -4921,7 +4931,7 @@ void CBehaviorModule::ActionPickupObjects()
 						if( nKinectObjectsDetected > 0 )
 						{	
 							// Object found.																								
-							m_TaskState = KINECT_FLOOR_SCAN_OBJECT_FOUND_STATE;
+							m_TaskState = DEPTH_CAMERA_FLOOR_SCAN_OBJECT_FOUND_STATE;
 						}
 						else
 						{	// No object found.
@@ -4931,7 +4941,7 @@ void CBehaviorModule::ActionPickupObjects()
 					}
 					break;
 				}
-				case KINECT_FLOOR_SCAN_OBJECT_FOUND_STATE:	// Object found!
+				case DEPTH_CAMERA_FLOOR_SCAN_OBJECT_FOUND_STATE:	// Object found!
 				{
 					// Objects found.  Calculate path to the nearest one
 					if( g_pKinectObjects3D->nObjectsDetected > 1 )
@@ -4978,7 +4988,7 @@ void CBehaviorModule::ActionPickupObjects()
 						m_KinectSearchComplete = FALSE;	// Set flag so we know when the search is done.
 						nKinectObjectsDetected = 0;
 						m_KinectRetries = 3;
-						SendCommand( WM_ROBOT_KINECT_TRACK_OBJECT_CMD, (DWORD)1, (DWORD)0 );	// Enable Tracking
+						SendCommand( DEPTH_TRACK_OBJECT_CMD, (DWORD)1, (DWORD)0 );	// Enable Tracking
 						m_CurrentTask = OBJECT_TASK_MOVE_TO_OBJECT;
 						m_TaskState = 1;
 					}
@@ -4996,7 +5006,7 @@ void CBehaviorModule::ActionPickupObjects()
 			/***
 				// DEBUG DEBUG DEBUG!!!  NORMAL OPERATION DISABLED - FOR TESTING, JUST TRACK THE OBJECT
 				ROBOT_DISPLAY( TRUE, "OBJECT_TASK_MOVE_TO_OBJECT: Pick up disabled in code!" )
-				SendCommand( WM_ROBOT_KINECT_TRACK_OBJECT_CMD, (DWORD)1, (DWORD)0 );	// Enable Tracking -  Just loop for now
+				SendCommand( DEPTH_TRACK_OBJECT_CMD, (DWORD)1, (DWORD)0 );	// Enable Tracking -  Just loop for now
 				m_CurrentTask = 0;
 				m_TaskState = 0;
 				break;
@@ -5004,7 +5014,7 @@ void CBehaviorModule::ActionPickupObjects()
 
 			if( !m_KinectSearchComplete )
 			{
-				//ROBOT_LOG( TRUE,"KINECT_FLOOR_SCAN_WAIT_SEARCH_STATE: Waiting for m_KinectSearchComplete 3\n")
+				//ROBOT_LOG( TRUE,"DEPTH_CAMERA_FLOOR_SCAN_WAIT_SEARCH_STATE: Waiting for m_KinectSearchComplete 3\n")
 				break;	// continue waiting
 			}
 			/*else if( 1 == m_TaskState )
@@ -5036,7 +5046,7 @@ void CBehaviorModule::ActionPickupObjects()
 						m_pDriveCtrl->SetSpeedAndTurn( BEHAVIOR_GOAL_MODULE, SPEED_FWD_VERY_SLOW, TURN_CENTER );
 						m_KinectSearchComplete = FALSE;	// Set flag so we know when the search is done.
 						nKinectObjectsDetected = 0;
-						SendCommand( WM_ROBOT_KINECT_TRACK_OBJECT_CMD, (DWORD)1, (DWORD)0 );	// Enable Tracking
+						SendCommand( DEPTH_TRACK_OBJECT_CMD, (DWORD)1, (DWORD)0 );	// Enable Tracking
 						m_TaskState = 1;
 						break;
 					}
@@ -5082,12 +5092,12 @@ void CBehaviorModule::ActionPickupObjects()
 						/////////////////////////////////////////////////////////////////////////////////
 						// OK, now switch to Pickup behavior!
 						// Start with a final close scan.  Set flag to indicate close search only
-						ROBOT_LOG( TRUE,"Behavior: OBJECT_TASK_MOVE_TO_OBJECT Sending WM_ROBOT_KINECT_SEARCH_FLOOR_CMD\n")
+						ROBOT_LOG( TRUE,"Behavior: OBJECT_TASK_MOVE_TO_OBJECT Sending DEPTH_SEARCH_FLOOR_CMD\n")
 						m_KinectSearchComplete = FALSE;	// Set flag so we know when the search is done.
 						nKinectObjectsDetected = 0;
-						SendCommand( WM_ROBOT_KINECT_SEARCH_FLOOR_CMD, (DWORD)TRUE, (DWORD)0 ); // TRUE = Find Close Objects Only
+						SendCommand( DEPTH_SEARCH_FLOOR_CMD, (DWORD)TRUE, (DWORD)0 ); // TRUE = Find Close Objects Only
 						m_CurrentTask = OBJECT_TASK_SCAN_FLOOR_FOR_CLOSEST_OBJECT;
-						m_TaskState = KINECT_FLOOR_SCAN_WAIT_SEARCH_STATE;
+						m_TaskState = DEPTH_CAMERA_FLOOR_SCAN_WAIT_SEARCH_STATE;
 						/////////////////////////////////////////////////////////////////////////////////
 						break;
 					}
@@ -5158,7 +5168,7 @@ void CBehaviorModule::ActionPickupObjects()
 
 					m_KinectSearchComplete = FALSE;	// Reset flag for the next scan
 					nKinectObjectsDetected = 0;
-					SendCommand( WM_ROBOT_KINECT_TRACK_OBJECT_CMD, (DWORD)1, (DWORD)0 ); 	// Enable Tracking
+					SendCommand( DEPTH_TRACK_OBJECT_CMD, (DWORD)1, (DWORD)0 ); 	// Enable Tracking
 					__itt_marker(pDomainControlThread, __itt_null, pshKinectMoveToObject, __itt_marker_scope_task);
 
 				}
@@ -5308,7 +5318,7 @@ void CBehaviorModule::ActionPickupObjects()
 					// if objects found, go to next state, else keep on trying
 					//if( nObjectsFound > 0 )
 					{
-						m_TaskState = KINECT_FLOOR_SCAN_OBJECT_FOUND_STATE; // Object found
+						m_TaskState = DEPTH_CAMERA_FLOOR_SCAN_OBJECT_FOUND_STATE; // Object found
 					}
 					break;
 				}
@@ -5382,7 +5392,7 @@ void CBehaviorModule::ActionPickupCloseObject()
 				{
 					break;	// Nothing to do
 				}
-				case KINECT_FLOOR_SCAN_MOVE_ARMS_STATE:
+				case DEPTH_CAMERA_FLOOR_SCAN_MOVE_ARMS_STATE:
 				{	
 					// Make sure arms are not in the way of the Kinect View
 					ROBOT_LOG( TRUE,"ACTION_MODE_PICKUP_OBJECTS Moving Arms Home\n")
@@ -5394,27 +5404,29 @@ void CBehaviorModule::ActionPickupCloseObject()
 						LEFT_ARM_ELBOW_BEND_HOME1, LEFT_ARM_WRIST_ROTATE_HOME1, LEFT_ARM_CLAW_HOME1 );  // Explicitly close the claw
 					m_pArmControlRight->ExecutePositionAndSpeed();
 
-					// Point the head looking at the floor too (just for affect)
-					gHeadIdle = FALSE;
-					m_pHeadControl->SetHeadSpeed( HEAD_OWNER_BEHAVIOR_P1, SERVO_SPEED_MED, SERVO_SPEED_MED, SERVO_SPEED_MED );
-					m_pHeadControl->SetHeadPosition( HEAD_OWNER_BEHAVIOR_P1, CAMERA_PAN_CENTER, CAMERA_TILT_CENTER-450, CAMERA_SIDETILT_CENTER );
-					m_pHeadControl->ExecutePositionAndSpeed( HEAD_OWNER_BEHAVIOR_P1 );
+					#if( 1 != DEPTH_CAMERA_INSTALLED_IN_HEAD )
+						// Point the head looking at the floor too (just for affect)
+						gHeadIdle = FALSE;
+						m_pHeadControl->SetHeadSpeed( HEAD_OWNER_BEHAVIOR_P1, SERVO_SPEED_MED, SERVO_SPEED_MED, SERVO_SPEED_MED );
+						m_pHeadControl->SetHeadPosition( HEAD_OWNER_BEHAVIOR_P1, CAMERA_PAN_CENTER, CAMERA_TILT_CENTER-450, CAMERA_SIDETILT_CENTER );
+						m_pHeadControl->ExecutePositionAndSpeed( HEAD_OWNER_BEHAVIOR_P1 );
+					#endif
 					m_TaskState++;
 				}
-				case KINECT_FLOOR_SCAN_START_SEARCH_STATE:	// Request a scan by the Kinect Module
+				case DEPTH_CAMERA_FLOOR_SCAN_START_SEARCH_STATE:	// Request a scan by the Kinect Module
 				{
-					ROBOT_LOG( TRUE,"Behavior: KINECT_FLOOR_SCAN_START_SEARCH_STATE Sending WM_ROBOT_KINECT_SEARCH_FLOOR_CMD\n")
+					ROBOT_LOG( TRUE,"Behavior: DEPTH_CAMERA_FLOOR_SCAN_START_SEARCH_STATE Sending DEPTH_SEARCH_FLOOR_CMD\n")
 					m_KinectSearchComplete = FALSE;	// Set flag so we know when the search is done.
 					nKinectObjectsDetected = 0;
-					SendCommand( WM_ROBOT_KINECT_SEARCH_FLOOR_CMD, (DWORD)TRUE, (DWORD)0 ); // TRUE = Find Close Objects ONLY
+					SendCommand( DEPTH_SEARCH_FLOOR_CMD, (DWORD)TRUE, (DWORD)0 ); // TRUE = Find Close Objects ONLY
 					m_TaskState++;
 					break;
 				}
-				case KINECT_FLOOR_SCAN_WAIT_SEARCH_STATE:	// See if we are done waiting
+				case DEPTH_CAMERA_FLOOR_SCAN_WAIT_SEARCH_STATE:	// See if we are done waiting
 				{	
 					if( !m_KinectSearchComplete )
 					{
-						//ROBOT_LOG( TRUE,"KINECT_FLOOR_SCAN_WAIT_SEARCH_STATE: Waiting for m_KinectSearchComplete 2\n")
+						//ROBOT_LOG( TRUE,"DEPTH_CAMERA_FLOOR_SCAN_WAIT_SEARCH_STATE: Waiting for m_KinectSearchComplete 2\n")
 						break;	// continue waiting
 					}
 					else
@@ -5429,11 +5441,11 @@ void CBehaviorModule::ActionPickupCloseObject()
 							ROBOT_DISPLAY( TRUE, "*** LOOPING FOR DEBUG PURPOSES! ****")
 							ROBOT_DISPLAY( TRUE, "********************************************\n" )
 							// DEBUG DEBUG Loop on find object for debugging object detection
-							ROBOT_LOG( TRUE,"DEBUG Behavior: KINECT_FLOOR_SCAN_OBJECT_FOUND_STATE Looping - Sending WM_ROBOT_KINECT_SEARCH_FLOOR_CMD\n")
+							ROBOT_LOG( TRUE,"DEBUG Behavior: DEPTH_CAMERA_FLOOR_SCAN_OBJECT_FOUND_STATE Looping - Sending DEPTH_SEARCH_FLOOR_CMD\n")
 							m_KinectSearchComplete = FALSE;	// Set flag so we know when the search is done.
 							nKinectObjectsDetected = 0;
-							SendCommand( WM_ROBOT_KINECT_SEARCH_FLOOR_CMD, (DWORD)TRUE, (DWORD)0 ); // TRUE = Find Close Objects ONLY
-							m_TaskState = KINECT_FLOOR_SCAN_WAIT_SEARCH_STATE;
+							SendCommand( DEPTH_SEARCH_FLOOR_CMD, (DWORD)TRUE, (DWORD)0 ); // TRUE = Find Close Objects ONLY
+							m_TaskState = DEPTH_CAMERA_FLOOR_SCAN_WAIT_SEARCH_STATE;
 							break;
 						#endif
 						// **************************************
@@ -5443,7 +5455,7 @@ void CBehaviorModule::ActionPickupCloseObject()
 						if( nKinectObjectsDetected > 0 )
 						{	
 							// Object found.																								
-							m_TaskState = KINECT_FLOOR_SCAN_OBJECT_FOUND_STATE;
+							m_TaskState = DEPTH_CAMERA_FLOOR_SCAN_OBJECT_FOUND_STATE;
 						}
 						else
 						{	// No object found.
@@ -5453,7 +5465,7 @@ void CBehaviorModule::ActionPickupCloseObject()
 					}
 					break;
 				}
-				case KINECT_FLOOR_SCAN_OBJECT_FOUND_STATE:	// Object found!
+				case DEPTH_CAMERA_FLOOR_SCAN_OBJECT_FOUND_STATE:	// Object found!
 				{
 					// Objects found.  Calculate path to the nearest one
 				//	m_ObjectX = g_pKinectObjects3D->Object[0].CenterX;
@@ -5475,18 +5487,18 @@ void CBehaviorModule::ActionPickupCloseObject()
 							ROBOT_DISPLAY( TRUE, "\n*** OBJECT FOUND AND IN RANGE, BUT PICKUP DISABLED FOR DEBUG PURPOSES! ****")
 							ROBOT_DISPLAY( TRUE, "********************************************\n" )
 							// DEBUG: Loop on find object for debugging object detection
-							ROBOT_LOG( TRUE,"DEBUG Behavior: KINECT_FLOOR_SCAN_OBJECT_FOUND_STATE Looping - Sending WM_ROBOT_KINECT_SEARCH_FLOOR_CMD\n")
+							ROBOT_LOG( TRUE,"DEBUG Behavior: DEPTH_CAMERA_FLOOR_SCAN_OBJECT_FOUND_STATE Looping - Sending DEPTH_SEARCH_FLOOR_CMD\n")
 							m_KinectSearchComplete = FALSE;	// Set flag so we know when the search is done.
 							nKinectObjectsDetected = 0;
-							SendCommand( WM_ROBOT_KINECT_SEARCH_FLOOR_CMD, (DWORD)TRUE, (DWORD)0 ); // TRUE = Find Close Objects ONLY
-							m_TaskState = KINECT_FLOOR_SCAN_WAIT_SEARCH_STATE;
+							SendCommand( DEPTH_SEARCH_FLOOR_CMD, (DWORD)TRUE, (DWORD)0 ); // TRUE = Find Close Objects ONLY
+							m_TaskState = DEPTH_CAMERA_FLOOR_SCAN_WAIT_SEARCH_STATE;
 							break;
 							// **************************************
 						#endif
 
 						// Object within range, pick it up.
 						__itt_marker(pDomainControlThread, __itt_null, pshKinectArrivedAtObject, __itt_marker_scope_task);
-						ROBOT_DISPLAY( TRUE, "KINECT_FLOOR_SCAN_OBJECT_FOUND_STATE - Object found\n" )
+						ROBOT_DISPLAY( TRUE, "DEPTH_CAMERA_FLOOR_SCAN_OBJECT_FOUND_STATE - Object found\n" )
 						// Point head at object for realism.  Note Z assumed to be 1 inch above the floor (doesn't really matter)
 						m_pHeadControl->SetHeadSpeed( HEAD_OWNER_BEHAVIOR_P1, SERVO_SPEED_MED_SLOW, SERVO_SPEED_MED_SLOW, SERVO_SPEED_MED_SLOW );
 						m_pHeadControl->LookAtXYZ( HEAD_OWNER_BEHAVIOR_P1, m_ObjectX,(m_ObjectY+100), 10 ); // Pad Y so camera does not bottom out
@@ -5498,7 +5510,7 @@ void CBehaviorModule::ActionPickupCloseObject()
 						// Out of range, abort
 						SpeakText( "The object is too far away to pick up" );
 		
-						ROBOT_DISPLAY( TRUE, "KINECT_FLOOR_SCAN_OBJECT_FOUND_STATE - Object Too far away to pickup without moving\n" )
+						ROBOT_DISPLAY( TRUE, "DEPTH_CAMERA_FLOOR_SCAN_OBJECT_FOUND_STATE - Object Too far away to pickup without moving\n" )
 						gArmTimerLeft = 30; // 10 second delay - Give time for Loki to speak this phrase!
 						m_CurrentTask = OBJECT_TASK_DONE;
 						m_TaskState = 0;	// Silence further talking

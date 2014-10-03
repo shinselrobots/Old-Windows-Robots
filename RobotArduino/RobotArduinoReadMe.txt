@@ -19,3 +19,12 @@ TO SETUP A NEW DEVICE:
 2.  Run Amarino and add BT devices!
 (if you skip these steps, the App will never connect)
 
+
+
+
+If you get this error (or similar):
+	In file included from RobotArduino.ino:3:
+	RobotConstants.h:37: error: 'byte' does not name a type
+	RobotUtilities:216: error: 'struct ARDUINO_CMD_T' has no member named 'Param4'
+
+You need to set the Sketchbook location above, exit and restart Arduino IDE! 

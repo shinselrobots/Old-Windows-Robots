@@ -122,10 +122,12 @@ enum WM_ROBOT_MESSAGES {
 		WM_ROBOT_KINECT_SEARCH_FLOOR_CMD,			// wParam:  TRUE = Find Close Objects Only
 		WM_ROBOT_KINECT_TRACK_OBJECT_CMD,			// 
 		WM_ROBOT_KINECT_CANCEL_CMD,					// wParam:  N/A - Cancel any pending search / track work
+		WM_ROBOT_KINECT_SEARCH_COMPLETE,			// wParam = ObjectFound (T/F)
 
 		WM_ROBOT_DEPTH_CAMERA_SEARCH_FLOOR_CMD,		// wParam:  TRUE = Find Close Objects Only
 		WM_ROBOT_DEPTH_CAMERA_TRACK_OBJECT_CMD,		// 
 		WM_ROBOT_DEPTH_CAMERA_CANCEL_CMD,			// wParam:  N/A - Cancel any pending search / track work
+		WM_ROBOT_DEPTH_CAMERA_SEARCH_COMPLETE,			// wParam = ObjectFound (T/F)
 
 		WM_ROBOT_FIND_OBJECT_AT_XYZ_CMD,			// wParam = X,Z, lParam = Y -- point to XYZ position in space (Y is dist from robot)
 		WM_ROBOT_SLAM_CHECK_CMD,					// wParam n/a, lParam n/a
@@ -178,8 +180,6 @@ enum WM_ROBOT_MESSAGES {
 		WM_ROBOT_CAMERA_MATCH_COMPLETE,				// Response to WM_ROBOT_CAMERA_MATCH_OBJECT request.  wParam: ObjectID, lParam: Location in Frame.  
 
 		WM_ROBOT_LASER_SCAN_DATA_READY,				// from LaserScannerParser
-		WM_ROBOT_KINECT_SEARCH_COMPLETE,			// wParam = ObjectFound (T/F)
-		WM_ROBOT_DEPTH_CAMERA_SEARCH_COMPLETE,			// wParam = ObjectFound (T/F)
 
 		// Bulk Commands from Remote GUI
 		WM_ROBOT_TEXT_MESSAGE_TO_SERVER,			
