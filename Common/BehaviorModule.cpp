@@ -22,7 +22,7 @@ static char THIS_FILE[] = __FILE__;
 
 
 #define DEBUG_ARM_MOVEMENT			0 // 
-#define DEBUG_SCRIPT_SHOW_COMMANDS	1
+#define DEBUG_SCRIPT_SHOW_COMMANDS	1 // 
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -58,6 +58,7 @@ __itt_string_handle* pshKinectMoveToObject = __itt_string_handle_create("KinectM
 	#define DEPTH_CANCEL_CMD			WM_ROBOT_DEPTH_CAMERA_CANCEL_CMD					// wParam:  N/A - Cancel any pending search / track work
 	#define DEPTH_SEARCH_COMPLETE		WM_ROBOT_DEPTH_CAMERA_SEARCH_COMPLETE				// wParam = ObjectFound (T/F)
 #endif
+
 
 ///////////////////////////////////////////////////////////////////////////////
 //	MODULE: BehaviorModule
