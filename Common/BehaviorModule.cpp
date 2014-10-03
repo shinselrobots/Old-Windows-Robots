@@ -20,7 +20,8 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 
-#define DEBUG_ARM_MOVEMENT			0
+
+#define DEBUG_ARM_MOVEMENT			0 // 
 #define DEBUG_SCRIPT_SHOW_COMMANDS	1
 
 
