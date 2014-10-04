@@ -56,7 +56,21 @@ extern __itt_string_handle* pshCase7;
 extern __itt_string_handle* pshCase8;
 extern __itt_string_handle* pshCase9;
 
+///////////////////////////////////////////////////////////////////////////////
+// KINECT STUFF.  Used for Kinect and for other depth cameras.
+enum KINECT_POSITIONS { 
+		KINECT_SERVO_POSITION_CLOSE_SCAN = 0, 
+		KINECT_SERVO_POSITION_MID_SCAN,
+		KINECT_SERVO_POSITION_FAR_SCAN,
+		KINECT_SERVO_POSITION_CENTER,
+		KINECT_SERVO_POSITION_LOOK_UP
+};
 
+enum KINECT_SERVO_MOVE_STATUS { 
+		KINECT_SERVO_MOVING = 0, 
+		KINECT_SERVO_SUCCESS,
+		KINECT_SERVO_TIMED_OUT
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 // DEPTH CAMERA STUFF.  Used for Kinect and for other depth cameras.
