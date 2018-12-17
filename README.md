@@ -1,3 +1,4 @@
-# OLD Robot code (windows based), used in Loki other windows robots.
+# OLD Robot code (Windows based)
+## Used in Loki other Microsoft Windows-based robots.
 - Just for archive purposes, not actively maintained
-- recommand you use ROS with other robot packages on this site
+- It is recommended that you use ROS with other robot packages on this site
